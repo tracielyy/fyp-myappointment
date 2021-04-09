@@ -4,8 +4,8 @@ Notes:
 
 
 
-# Module: CSIT 321 - Project
-# Group Number: FYP-21-S2-24
+- Module: CSIT 321 - Project
+- Group Number: FYP-21-S2-24
 
 Group Member:
 
