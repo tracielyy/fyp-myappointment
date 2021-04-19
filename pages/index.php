@@ -14,7 +14,13 @@
             // Code here
         ?>
         
-        <!-- HTML Design -->
+        <!-- HTML Page Design -->
+        <div>
+            <!-- Navigation -->
+            <?php include '../components/navbar.php' ?>
+            
+            
+        </div>
         
     </body>
 </html>

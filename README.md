@@ -9,9 +9,9 @@ Notes:
 
 Group Member:
 
-- Ling Yan Ying                                 (Team Leader | Programmer | Software Tester)
-- Kadek Anantawijaya Swadharma        			(Lead Programmer | Software Designer | Documentation)
-- Ho Murn Por Jeremy                            (Software Analyst | Documentation)
-- Lee Kheen Hong                                (Software Designer | Software Analyst | Documentation)
-- Kshitij Bir Arora                             (Software Analyst | Documentation | Software Tester)
-- Lim Jin Hin                                   (Programmer | Software Tester)
+- Ling Yan Ying  (Team Leader | Back-End Developer | Software Tester)
+- Kadek Anantawijaya Swadharma (Lead Programmer | Software Designer)
+- Ho Murn Por Jeremy (Software Analyst | Marketing Site Moderator)
+- Lee Kheen Hong  (Main Software Designer | Software Analyst)
+- Kshitij Bir Arora (Software Analyst | Front-End Developer)
+- Lim Jin Hin (Developer | Software Tester)
