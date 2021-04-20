@@ -7,14 +7,18 @@ cache:
   - vendor/
 
 before_script:
-    # Install dependencies
-    - bash ci/docker_install.sh > /dev/null
+  - apt-get update -y
+  - apt-get upgrade -y
+  - apt-get install sudo -y
+  - sudo pecl install grpc
+  # Install dependencies
+  - bash ci/docker_install.sh > /dev/null
     
-    # Install composer
-    - curl -sS https://getcomposer.org/installer | php
+  # Install composer
+  - curl -sS https://getcomposer.org/installer | php
 
-    # Install all project dependencies
-    - php composer.phar install
+  # Install all project dependencies
+  - php composer.phar install
     
 
 
