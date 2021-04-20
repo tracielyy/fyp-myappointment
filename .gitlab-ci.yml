@@ -10,6 +10,9 @@ before_script:
 
     # Install all project dependencies
     - php composer.phar install
+    
+    # Update
+    - php composer.phar update --lock
 
 
 test:app:
