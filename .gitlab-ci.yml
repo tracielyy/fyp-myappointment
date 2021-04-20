@@ -7,7 +7,11 @@ cache:
   - vendor/
 
 before_script:
-  
+  - apt-get update -y
+  - apt-get upgrade -y
+  - apt-get install sudo -y
+
+
   # Install dependencies
   - bash ci/docker_install.sh > /dev/null
     
