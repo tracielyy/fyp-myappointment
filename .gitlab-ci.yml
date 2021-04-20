@@ -19,12 +19,11 @@ before_script:
   - curl -sS https://getcomposer.org/installer | php
 
   - php --ini 
-  - sudo pecl install grpc-1.27.0
+  - sudo docker-php-ext-enable grpc
   
   # Install all project dependencies
   - echo "extension=grpc.dll" > /usr/local/etc/php && echo "extension=grpc.dll" > /usr/local/etc/php/conf.d/docker-php-ext-sodium.ini && php composer.phar update
     
-
 
 
 test:app:
