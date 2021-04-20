@@ -7,4 +7,4 @@ before_script:
 
 test:app:
     script:
-        - vendor/bin/phpunit/phpunit --configuration phpunit_myapp.xml
+        - vendor/phpunit/phpunit/phpunit --configuration phpunit_myapp.xml
