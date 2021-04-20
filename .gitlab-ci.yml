@@ -10,7 +10,7 @@ before_script:
   - apt-get update -y
   - apt-get upgrade -y
   - apt-get install sudo -y
-
+  - apt-get install zlib1g-dev
 
   # Install dependencies
   - bash ci/docker_install.sh > /dev/null
@@ -19,7 +19,7 @@ before_script:
   - curl -sS https://getcomposer.org/installer | php
 
   - php --ini 
-  - sudo pecl install grpc-beta
+  - sudo pecl install grpc
   - sudo docker-php-ext-enable grpc
   
   # Install all project dependencies
