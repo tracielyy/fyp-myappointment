@@ -8,11 +8,13 @@ before_script:
     # Install composer
     - curl -sS https://getcomposer.org/installer | php
 
+    # Update
+    - php composer.phar update --lock
+
     # Install all project dependencies
     - php composer.phar install
     
-    # Update
-    - php composer.phar update --lock
+
 
 
 test:app:
