@@ -9,7 +9,7 @@ before_script:
     - curl -sS https://getcomposer.org/installer | php
 
     # Update
-    - php composer.phar update --lock
+    - php composer.phar update
 
     # Install all project dependencies
     - php composer.phar install
