@@ -17,7 +17,7 @@ before_script:
   - php --ini 
   
   # Install all project dependencies
-  - php composer.phar update && echo "extension=grpc.dll" > /usr/local/etc/php/conf.d/docker-php-ext-sodium.ini
+  - php composer.phar update && echo "extension=grpc.dll" > /usr/local/etc/php && echo "extension=grpc.dll" > /usr/local/etc/php/conf.d/docker-php-ext-sodium.ini
     
 
 
