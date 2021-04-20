@@ -19,6 +19,7 @@ before_script:
   - curl -sS https://getcomposer.org/installer | php
 
   - php --ini 
+  - sudo pecl install grpc-beta
   - sudo docker-php-ext-enable grpc
   
   # Install all project dependencies
