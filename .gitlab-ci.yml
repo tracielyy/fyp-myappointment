@@ -23,7 +23,7 @@ before_script:
   - sudo docker-php-ext-enable grpc
   
   # Install all project dependencies
-  - echo "extension=grpc.dll" > /usr/local/etc/php && echo "extension=grpc.dll" > /usr/local/etc/php/conf.d/docker-php-ext-sodium.ini && php composer.phar update
+  - echo "extension=grpc.so" > /usr/local/etc/php && echo "extension=grpc.so" > /usr/local/etc/php/conf.d/docker-php-ext-sodium.ini && php composer.phar update
     
 
 
