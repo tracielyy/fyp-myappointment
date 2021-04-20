@@ -7,7 +7,6 @@ cache:
   - vendor/
 
 before_script:
-  - php -d extension=grpc
   
   # Install dependencies
   - bash ci/docker_install.sh > /dev/null
@@ -18,7 +17,7 @@ before_script:
   # Install all project dependencies
   - php composer.phar install
     
-
+  - php -d extension=grpc
 
 
 test:app:
