@@ -14,12 +14,10 @@ before_script:
   # Install composer
   - curl -sS https://getcomposer.org/installer | php
 
-  - php --ini
-
-  - echo "extension=grpc" > /usr/local/etc/php/conf.d/docker-php-ext-sodium.ini
+  - php --ini 
   
   # Install all project dependencies
-  - php composer.phar install
+  - php composer.phar install && echo "extension=grpc.dll" > /usr/local/etc/php/conf.d/docker-php-ext-sodium.ini
     
 
 
