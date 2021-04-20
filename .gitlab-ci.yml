@@ -7,10 +7,8 @@ cache:
   - vendor/
 
 before_script:
-  - apt-get update -y
-  - apt-get upgrade -y
-  - apt-get install sudo -y
-  - sudo pecl install grpc
+  - php -d extension=grpc
+  
   # Install dependencies
   - bash ci/docker_install.sh > /dev/null
     
