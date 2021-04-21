@@ -7,19 +7,27 @@ cache:
   - vendor/
 
 before_script:
-    # Install dependencies
-    - bash ci/docker_install.sh > /dev/null
+  - apt-get update -y
+  - apt-get upgrade -y
+  - apt-get install sudo -y
+  - apt-get install zlib1g-dev
+
+  # Install dependencies
+  - bash ci/docker_install.sh > /dev/null
     
-    # Install composer
-    - curl -sS https://getcomposer.org/installer | php
+  # Install composer
+  - curl -sS https://getcomposer.org/installer | php
 
-    # Install all project dependencies
-    - php composer.phar install
+  - php --ini 
+  - sudo pecl install grpc
+  
+  # Install all project dependencies
+  - echo "extension=grpc.so" > /usr/local/etc/php && echo "extension=grpc.so" > /usr/local/etc/php/conf.d/docker-php-ext-sodium.ini && php composer.phar update
     
 
-
-
+# -- Not Done --
 test:app:
     script:
-        - vendor/bin/phpunit --configuration phpunit_myapp.xml
+      - echo 'ok'
+        #- vendor/bin/phpunit --configuration phpunit_myapp.xml
 
