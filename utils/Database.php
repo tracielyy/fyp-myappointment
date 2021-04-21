@@ -28,6 +28,17 @@ class Database {
         }
     }
 
+    // Get Firestore Document Wihout Knowing Document ID
+    function retrieveUserDocument($collection, $email, $password) {
+        $collectionRef = $this->db->collection($collection);
+        $query = $collectionRef->where('email', '=', $email);
+        $query = $query->where('password', '=', $password);
+        $snapshot = $query->documents();
+        foreach ($snapshot as $document) {
+            return $document->data();
+        }
+    }
+
 }
 
 ?>
