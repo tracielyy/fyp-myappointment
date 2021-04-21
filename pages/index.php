@@ -19,7 +19,6 @@
             <!-- Navigation -->
             <?php include '../components/navbar.php' ?>
             
-            
         </div>
         
     </body>
