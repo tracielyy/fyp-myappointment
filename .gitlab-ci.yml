@@ -28,5 +28,6 @@ before_script:
 # -- Not Done --
 test:app:
     script:
+      - echo 'ok'
         #- vendor/bin/phpunit --configuration phpunit_myapp.xml
 
