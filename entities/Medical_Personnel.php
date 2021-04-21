@@ -6,8 +6,9 @@ class Medical_Personnel extends Account_User{
     
     
     // Constructor
-    function __construct() {
-        parent::__construct();
+    function __construct($firstname = NULL, $lastname = NULL, $gender = NULL, $dob = NULL,
+            $contactnumber = NULL, $address = NULL, $email = NULL, $password = NULL) {
+        parent::__construct($firstname,$lastname, $gender, $dob, $contactnumber,$address, $email, $password );
     
     }
     
