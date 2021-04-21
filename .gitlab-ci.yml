@@ -25,8 +25,8 @@ before_script:
   - echo "extension=grpc.so" > /usr/local/etc/php && echo "extension=grpc.so" > /usr/local/etc/php/conf.d/docker-php-ext-sodium.ini && php composer.phar update
     
 
-
-test:app:
-    script:
-        - vendor/bin/phpunit --configuration phpunit_myapp.xml
+# -- Not Done --
+#test:app:
+    #script:
+        #- vendor/bin/phpunit --configuration phpunit_myapp.xml
 
