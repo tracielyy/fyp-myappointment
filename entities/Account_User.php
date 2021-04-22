@@ -15,7 +15,7 @@ class Account_User {
     private $dob;       // Date of birth -- DDMMYYYY
     private $usertype;
 
-    private const ACCOUNT_USER = "Account_User";
+    protected const ACCOUNT_USER = "Account_User"; //  'protected' Access For Subclasses.
 
     // Constructor
     public function __construct($firstname = NULL, $lastname = NULL, $gender = NULL, $dob = NULL,
@@ -114,9 +114,9 @@ class Account_User {
     //      Methods Accessing Firestore Database 
     //============================================
 
-    public static function authenticate_user($email, $password) {
+    public static function authenticate_user(array $credentialArr) {
         $db = new Database();
-        $user_data = $db->retrieveUserDocument(self::ACCOUNT_USER, $email, $password);
+        $user_data = $db->query_exact_match(self::ACCOUNT_USER, $credentialArr);
         if ($user_data != NULL) {
             return new Account_User($user_data['firstname'], $user_data['lastname'], $user_data['gender'],
                     $user_data['dob'], $user_data['contactnumber'], $user_data['address'], $user_data['usertype'],
@@ -124,6 +124,18 @@ class Account_User {
         }
         return NULL;  // Failed to authenticate (Will need to display error message)
     }
+    
+    public static function check_user_exist($email, $contactnumber) {
+        $db = new Database();
+        $emails_found = $db->query_exact_match(self::ACCOUNT_USER, array('email'=> $email));
+        $contactnumbers_found = $db->query_exact_match(self::ACCOUNT_USER, array('contactnumber'=>$contactnumber));
+        if(($emails_found !== NULL) || ($contactnumbers_found!== NULL)) {
+            return True;  // There is existing user
+        }
+        return False; 
+    }
+    
+
 
 }
 

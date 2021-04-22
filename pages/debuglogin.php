@@ -33,6 +33,9 @@ session_start();
                 'password' => '',
             );
 
+            // -- Regex
+            $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
+
             // Upon clicking "Login" Button
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -42,37 +45,51 @@ session_start();
                         $loginArr[$key] = htmlspecialchars($value);
                     }
                 }
-                
-               // Possible Validation of Email Before Firestore Query
+
+                // Possible Validation of Email Before Firestore Query
                 /* ------------ Start Validation ------------ */
 
+
+                // -- Email Validation
+                if (empty($registerArr['email'])) {
+                    // Store Some Error Message
+                } else if (!preg_match($email_pattern, $loginArr['email'])) {
+                    // Store Some Error Message
+                } else {
+                    $validArr['email'] = True; // Pass Validation
+                }
 
                 /* ------------ End Validation ------------ */
 
                 // Start Authenticating User
-                $auth_user = Account_User::authenticate_user($loginArr['email'], $loginArr['password']);
+                $auth_user = Account_User::authenticate_user($loginArr);
                 if ($auth_user != NULL) {
                     echo $auth_user;  // Debug Printing
                     $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
-                    header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
-                } else {
-                    echo "Invalid Credentials!";
-                    
+                    //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
+                    echo nl2br(PHP_EOL . "Success" . PHP_EOL);
+                    echo $auth_user;
+
                     // Clear Fields
                     $loginArr = array(
                         'email' => '',
                         'password' => '',
                     );
+                } else {
+                    echo "Invalid Credentials!";
                 }
             }
             ?>
-            
+
             <!-- Login Form -->
             <form method="post"  action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                 <input type="email" name="email" required placeholder="Email"  value="<?php echo $loginArr['email']; ?>"/>
                 <input type="password" name="password" placeholder="Password" value="<?php echo $loginArr['password']; ?>"/>
-                <button type="submit">Login</button>
+                <button type="submit" name="login" value="login">Login</button>
             </form>
+            <!-- Logout -->
+            <!--<button type ="submit" name="logout" value="logout">Logout</button>-->
+            <a href="debuglogout.php">Logout</a>
 
         </div>
 
