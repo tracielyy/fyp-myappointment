@@ -230,10 +230,10 @@ session_start();
                 <input type="text" name="email" placeholder="Email" value="<?php echo $registerArr['email']; ?>"/><br/>
 
                 <!-- Password -->
-                <input type="text" name="password" placeholder="Password" value="<?php echo $registerArr['password']; ?>"/><br/>
+                <input type="password" name="password" placeholder="Password" value="<?php echo $registerArr['password']; ?>"/><br/>
 
                 <!-- Confirmation Password -->
-                <input type="text" name="confirmpassword" placeholder="Confirm Password" value="<?php echo $registerArr['confirmpassword']; ?>"/><br/>
+                <input type="password" name="confirmpassword" placeholder="Confirm Password" value="<?php echo $registerArr['confirmpassword']; ?>"/><br/>
 
                 <!-- Registration Submission -->
                 <button type="submit">Register</button><br/>
