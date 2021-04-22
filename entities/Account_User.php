@@ -114,7 +114,19 @@ class Account_User {
     //      Methods Accessing Firestore Database 
     //============================================
 
-    public static function authenticate_user(array $credentialArr) {
+    public static function login (array $credentialArr) : mixed {
+        // Successfully Authenticated
+        $auth_user = self::authenticate_user($credentialArr);
+        if ($auth_user !== NULL) {
+            $db = new Database();
+            $db->modify_single_field(self::ACCOUNT_USER, $credentialArr['email'], 'isloggedin', true);
+            return $auth_user;
+        } else {
+            return NULL;
+        }
+    }
+    
+    private static function authenticate_user(array $credentialArr) : mixed {
         $db = new Database();
         $user_data = $db->query_exact_match(self::ACCOUNT_USER, $credentialArr);
         if ($user_data != NULL) {
@@ -125,7 +137,7 @@ class Account_User {
         return NULL;  // Failed to authenticate (Will need to display error message)
     }
     
-    public static function check_user_exist($email, $contactnumber) {
+    public static function check_user_exist(string $email, string $contactnumber) : bool {
         $db = new Database();
         $emails_found = $db->query_exact_match(self::ACCOUNT_USER, array('email'=> $email));
         $contactnumbers_found = $db->query_exact_match(self::ACCOUNT_USER, array('contactnumber'=>$contactnumber));
@@ -133,6 +145,11 @@ class Account_User {
             return True;  // There is existing user
         }
         return False; 
+    }
+    
+    public static function logout($email) {
+        $db = new Database();
+        $db->modify_single_field(self::ACCOUNT_USER, $email, 'isloggedin', false);
     }
     
 
