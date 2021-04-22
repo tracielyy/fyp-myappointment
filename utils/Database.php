@@ -16,8 +16,8 @@ class Database {
         ]);
     }
 
-    // Get unique Firestore document in specific collection
-    function getDocument($collection, $id) {
+    // Get Unique Firestore Document In Specific Collection
+    function get_document($collection, $id) {
         $collectionRef = $this->db->collection($collection);
         $docRef = $collectionRef->document($id);
         $snapshot = $docRef->snapshot();
@@ -29,16 +29,36 @@ class Database {
     }
 
     // Get Firestore Document Wihout Knowing Document ID
-    function retrieveUserDocument($collection, $email, $password) {
-        $collectionRef = $this->db->collection($collection);
-        $query = $collectionRef->where('email', '=', $email);
-        $query = $query->where('password', '=', $password);
+    function query_exact_match($collection, $conditionArr) {
+        $query = $this->db->collection($collection);
+        foreach ($conditionArr as $condition => $condition_value) {
+            $query = $query->where($condition, "=", $condition_value);
+        }
         $snapshot = $query->documents();
         foreach ($snapshot as $document) {
             return $document->data();
         }
     }
 
+    // Insert Data: return success status
+    function insert_data(string $collection, array $userDataInfo): bool {
+        $dataDocRef = $this->db->collection($collection)->add($userDataInfo);
+        if ($dataDocRef !== NULL) {
+            return True;
+        }
+        return False;
+    }
+
+    //    // Get Firestore Document Wihout Knowing Document ID
+//    function retrieve_user_credential($collection, $email, $password) {
+//        $collectionRef = $this->db->collection($collection);
+//        $query = $collectionRef->where('email', '=', $email);
+//        $query = $query->where('password', '=', $password);
+//        $snapshot = $query->documents();
+//        foreach ($snapshot as $document) {
+//            return $document->data();
+//        }
+//    }
 }
 
 ?>
