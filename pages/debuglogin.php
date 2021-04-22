@@ -62,7 +62,7 @@ session_start();
                 /* ------------ End Validation ------------ */
 
                 // Start Authenticating User
-                $auth_user = Account_User::authenticate_user($loginArr);
+                $auth_user = Account_User::login($loginArr);
                 if ($auth_user != NULL) {
                     echo $auth_user;  // Debug Printing
                     $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
@@ -90,7 +90,7 @@ session_start();
             <!-- Logout -->
             <!--<button type ="submit" name="logout" value="logout">Logout</button>-->
             <a href="debuglogout.php">Logout</a>
-
+    
         </div>
 
     </body>
