@@ -18,9 +18,9 @@ class Database {
 
     // Get Unique Firestore Document In Specific Collection
     function get_document($collection, $id) {
-        $collectionRef = $this->db->collection($collection);
-        $docRef = $collectionRef->document($id);
-        $snapshot = $docRef->snapshot();
+        $collection_ref = $this->db->collection($collection);
+        $doc_ref = $collection_ref->document($id);
+        $snapshot = $doc_ref->snapshot();
         if ($snapshot->exists()) {
             return $snapshot->data();
         } else {
@@ -32,21 +32,39 @@ class Database {
     function query_exact_match($collection, $conditionArr) {
         $query = $this->db->collection($collection);
         foreach ($conditionArr as $condition => $condition_value) {
-            $query = $query->where($condition, "=", $condition_value);
+            $query = $query->where($condition, "=", $condition_value)->limit(1);
         }
         $snapshot = $query->documents();
         foreach ($snapshot as $document) {
-            return $document->data();
+            if ($document->exists()) {
+                return $document->data();
+            }
         }
     }
 
     // Insert Data: return success status
     function insert_data(string $collection, array $userDataInfo): bool {
-        $dataDocRef = $this->db->collection($collection)->add($userDataInfo);
-        if ($dataDocRef !== NULL) {
+        $data_doc_ref = $this->db->collection($collection)->add($userDataInfo);
+        if ($data_doc_ref !== NULL) {
             return True;
         }
         return False;
+    }
+
+    // Modify Data Via Email
+    function modify_single_field(string $collection, string $email, string $field, $field_value) {
+        $collection_ref = $this->db->collection($collection);
+        $get_query = $collection_ref->where("email", "=", $email)->limit(1);
+        $snapshot = $get_query->documents();
+        foreach ($snapshot as $document) {
+            if ($document->exists()) {
+                $doc_id = $document->id();
+                $doc_ref = $collection_ref->document($doc_id);
+                $doc_ref->update([
+                    ['path' => $field, 'value' => $field_value]
+                ]);
+            }
+        }
     }
 
     //    // Get Firestore Document Wihout Knowing Document ID
