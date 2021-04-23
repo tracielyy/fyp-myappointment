@@ -1,7 +1,5 @@
 <?php
 
-use Google\Cloud\Firestore\FirestoreClient;
-
 require '../vendor/autoload.php';
 
 class Database {
