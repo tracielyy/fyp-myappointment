@@ -123,6 +123,8 @@ class Account_User {
                 "isloggedin" => true
             )
         );
+        // Check If There Are Any Other Login Session (Terminate Other Session?)
+        
         // Successfully Authenticated
         if ($auth_user !== NULL) {
             $db = new Database();
@@ -132,7 +134,7 @@ class Account_User {
             return NULL;
         }
     }
-    // Check If Therer Are Any Other Login Session
+    // Check If There Are Any Other Login Session
     public static function check_session() {
         
     }
