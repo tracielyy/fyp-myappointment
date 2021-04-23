@@ -27,7 +27,7 @@ class Patient extends Account_User {
         $db = new Database();
         $userDataArr['session'] = array(
             "sessionid" => "",
-            "isloggedin" => true
+            "isloggedin" => false
         );
         $userDataArr['usertype'] = self::PATIENT;
         $db->insert_data(parent::ACCOUNT_USER, $userDataArr);
