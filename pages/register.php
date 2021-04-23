@@ -311,8 +311,6 @@ session_start();
     </div>
   </div>
 
-
-
   <?php require '../components/javascript.php'?>
 </body>
 

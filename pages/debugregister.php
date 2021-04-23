@@ -27,7 +27,7 @@ session_start();
 
             <!-- Debug Test For Users -->
             <!-- Hint: Explode & Implode For Date Of Birth (DD-MM-YYYY) If there is other preferred string format (e.g. '/') -->
-            <?php
+        <?php
             // Used to store correct data
             $registerArr = array(
                 'firstname' => '',
@@ -190,7 +190,7 @@ session_start();
                     echo "<div style='color:red;'>Register Fail!</div>";
                 }
             }
-            ?>
+        ?>
 
             <!-- Form -->
             <form  method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
