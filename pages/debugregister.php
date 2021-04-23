@@ -43,6 +43,8 @@ session_start();
 
 
             // Some Variables
+            $err_firstname = $err_lastname = $err_gender = $err_contactnumber
+                    = $err_address = $err_dob = $err_password = $err_confirmpassword = $err_email = "";
             // -- Regex
             $contact_number_pattern = "/^[689]{1}[0-9]{7}$/"; // Singapore phone number length
             $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
@@ -72,27 +74,27 @@ session_start();
 
                 // -- First Name
                 if (empty($registerArr['firstname'])) {
-                    
+                    $err_firstname = "Field Cannot Be Empty";
                 } else if (!preg_match($name_pattern, $registerArr['firstname'])) {
-                    
+                    $err_firstname = "Invalid";
                 } else {
                     $validArr['firstname'] = True; // Pass Validation
                 }
 
                 // -- Last Name
                 if (empty($registerArr['lastname'])) {
-                    
+                    $err_lastname = "Field Cannot Be Empty";
                 } else if (!preg_match($name_pattern, $registerArr['lastname'])) {
-                    
+                    $err_lastname = "Invalid";
                 } else {
                     $validArr['lastname'] = True; // Pass Validation
                 }
 
                 // -- Contact Number Validation
                 if (empty($registerArr['contactnumber'])) {
-                    // Store Some Error Message
+                    $err_contactnumber = "Field Cannot Be Empty";
                 } else if (!preg_match($contact_number_pattern, $registerArr['contactnumber'])) {
-                    // Store Some Error Message
+                    $err_contactnumber = "Invalid";
                 } else {
                     $validArr['contactnumber'] = True; // Pass Validation
                 }
@@ -100,15 +102,17 @@ session_start();
                 // -- Gender Validation (Just Make Sure Either Male Or Female Is 'Checked')
                 if (empty($registerArr['gender'])) {
                     // Store Some Error Message
+                    $err_gender = "Not Selected";
                 } else if (!($registerArr['gender'] == 'F' || $registerArr['gender'] == 'M')) {
                     // Store Some Error Message
+                    $err_gender = "Invalid";
                 } else {
                     $validArr['gender'] = True; // Pass Validation
                 }
 
                 // -- Date Of Birth (DOB) Validation
                 if (empty($registerArr['dob'])) {
-                    
+                    $err_dob = "Field Cannot Be Empty";
                 } else {
                     $validArr['dob'] = True; // Pass Validation
                 }
@@ -122,7 +126,7 @@ session_start();
 
                 // -- Address Validation (Unsure Of What Further Validation To Be Done)
                 if (empty($registerArr['address'])) {
-                    
+                    $err_address = "Field Cannot Be Empty";
                 } else {
                     $validArr['address'] = True; // Pass Validation
                 }
@@ -131,8 +135,10 @@ session_start();
                 // -- Email Validation
                 if (empty($registerArr['email'])) {
                     // Store Some Error Message
+                    $err_email = "Field Cannot Be Empty";
                 } else if (!preg_match($email_pattern, $registerArr['email'])) {
                     // Store Some Error Message
+                    $err_email = "Invalid";
                 } else {
                     $validArr['email'] = True; // Pass Validation
                 }
@@ -140,9 +146,10 @@ session_start();
                 // -- Password Validation
                 if (empty($registerArr['password'])) {
                     // Store Some Error Message
+                    $err_password = "Field Cannot Be Empty";
                 } else if (!preg_match($password_pattern, $registerArr['password'])) {
                     // Store Some Error Message
-                    echo 'Password invalid';
+                   $err_password = "Invalid";
                 } else {
                     $validArr['password'] = True; // Pass Validation
                 }
@@ -150,8 +157,10 @@ session_start();
                 // -- Confirm Password Validation (Check if it is the same as 'Password')
                 if (empty($registerArr['confirmpassword'])) {
                     // Store Some Error Message
+                    $err_confirmpassword = "Field Cannot Be Empty";
                 } else if ($registerArr['confirmpassword'] !== $registerArr['password']) {
                     // Store Some Error Message
+                    $err_confirmpassword = "Password Does Not Match";
                 } else {
                     $validArr['confirmpassword'] = True; // Pass Validation
                 }
@@ -220,7 +229,7 @@ session_start();
                 </select><br/>
 
 
-                <!-- Date Of Birth -->
+                <!-- Date Of Birth (Do We Use Calendar?) --> 
                 <input type="text" name="dob" placeholder="Date Of Birth" value="<?php echo $registerArr['dob']; ?>"/><br/>
 
                 <!-- Address -->
