@@ -123,6 +123,8 @@ class Account_User {
                 "isloggedin" => true
             )
         );
+        // Check If There Are Any Active Session Running
+        
         // Successfully Authenticated
         if ($auth_user !== NULL) {
             $db = new Database();
