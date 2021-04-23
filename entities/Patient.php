@@ -22,10 +22,20 @@ class Patient extends Account_User {
     //============================================
     //      Methods Accessing Firestore Database 
     //============================================
+    // Insert New Patient To Firestore
     public static function add_patient(array $userDataArr) {
         $db = new Database();
+        $userDataArr['session'] = array(
+            "sessionid" => "",
+            "isloggedin" => true
+        );
         $userDataArr['usertype'] = self::PATIENT;
         $db->insert_data(parent::ACCOUNT_USER, $userDataArr);
+    }
+
+    // Retrieve Patients Medical Record (Per Doctor Visit?)
+    public static function get_patient_medical_record() {
+        
     }
 
 //    // Getters

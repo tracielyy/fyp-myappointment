@@ -114,19 +114,31 @@ class Account_User {
     //      Methods Accessing Firestore Database 
     //============================================
 
-    public static function login (array $credentialArr) : mixed {
-        // Successfully Authenticated
+    // Triggered When The The User Clicks On "Login"
+    public static function login(array $credentialArr, string $sessionid): mixed {
         $auth_user = self::authenticate_user($credentialArr);
+        $mapArr = array(
+            "session" => array(
+                "sessionid" => $sessionid,
+                "isloggedin" => true
+            )
+        );
+        // Successfully Authenticated
         if ($auth_user !== NULL) {
             $db = new Database();
-            $db->modify_single_field(self::ACCOUNT_USER, $credentialArr['email'], 'isloggedin', true);
+            $db->modify_map_field(self::ACCOUNT_USER, $credentialArr['email'], $mapArr);
             return $auth_user;
         } else {
             return NULL;
         }
     }
-    
-    private static function authenticate_user(array $credentialArr) : mixed {
+    // Check If Therer Are Any Other Login Session
+    public static function check_session() {
+        
+    }
+
+    // Authenticate & Return The User Data If Authenticated Successfully
+    private static function authenticate_user(array $credentialArr): mixed {
         $db = new Database();
         $user_data = $db->query_exact_match(self::ACCOUNT_USER, $credentialArr);
         if ($user_data != NULL) {
@@ -136,23 +148,29 @@ class Account_User {
         }
         return NULL;  // Failed to authenticate (Will need to display error message)
     }
-    
-    public static function check_user_exist(string $email, string $contactnumber) : bool {
+
+    // Check If The User Exist In The Database
+    public static function check_user_exist(string $email, string $contactnumber): bool {
         $db = new Database();
-        $emails_found = $db->query_exact_match(self::ACCOUNT_USER, array('email'=> $email));
-        $contactnumbers_found = $db->query_exact_match(self::ACCOUNT_USER, array('contactnumber'=>$contactnumber));
-        if(($emails_found !== NULL) || ($contactnumbers_found!== NULL)) {
+        $emails_found = $db->query_exact_match(self::ACCOUNT_USER, array('email' => $email));
+        $contactnumbers_found = $db->query_exact_match(self::ACCOUNT_USER, array('contactnumber' => $contactnumber));
+        if (($emails_found !== NULL) || ($contactnumbers_found !== NULL)) {
             return True;  // There is existing user
         }
-        return False; 
+        return False;
     }
-    
+
+    // Triggered When User Clicks On "Logout"
     public static function logout($email) {
         $db = new Database();
-        $db->modify_single_field(self::ACCOUNT_USER, $email, 'isloggedin', false);
+        $mapArr = array(
+            "session" => array(
+                "sessionid" => "",
+                "isloggedin" => false
+            )
+        );
+        $db->modify_map_field(self::ACCOUNT_USER, $email, $mapArr);
     }
-    
-
 
 }
 

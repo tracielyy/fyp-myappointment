@@ -35,6 +35,16 @@ session_start();
 
             // -- Regex
             $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
+            
+            
+            // -- When Redirect or Load The Page
+            if ($_SERVER['REQUEST_METHOD'] == "GET")  {
+                if (isset($_SESSION["user"])) {
+                    echo unserialize($_SESSION["user"]);
+                }
+            }
+            
+            
 
             // Upon clicking "Login" Button
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -62,13 +72,11 @@ session_start();
                 /* ------------ End Validation ------------ */
 
                 // Start Authenticating User
-                $auth_user = Account_User::login($loginArr);
+                $auth_user = Account_User::login($loginArr, session_id());
                 if ($auth_user != NULL) {
-                    echo $auth_user;  // Debug Printing
                     $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
                     //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
                     echo nl2br(PHP_EOL . "Success" . PHP_EOL);
-                    echo $auth_user;
 
                     // Clear Fields
                     $loginArr = array(
