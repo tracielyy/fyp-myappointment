@@ -8,12 +8,13 @@ session_start();
         <?php require '../components/bootstrap.php' ?>
         <?php require '../components/navbar.php' ?>
 
-        <?php require '../css/register.php' ?>
+        <link rel="stylesheet" href="../css/register.css"/> 
 
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Document</title>
+
     </head>
 
     <!-- PHP Script -->
@@ -37,6 +38,7 @@ session_start();
 
 
     // Some Variables
+    $err_firstname = $err_lastname = $err_gender = $err_contactnumber = $err_address = $err_dob = $err_password = $err_confirmpassword = $err_email = "";
     // -- Regex
     $contact_number_pattern = "/^[689]{1}[0-9]{7}$/"; // Singapore phone number length
     $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
@@ -60,49 +62,57 @@ session_start();
         }
 
         // 
+        
 
 
         /* ------------ Start Validation ------------ */
 
         // -- First Name
         if (empty($registerArr['firstname'])) {
-            
+            $err_firstname = "Field Cannot Be Empty";
+            echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
         } else if (!preg_match($name_pattern, $registerArr['firstname'])) {
-            
+            $err_firstname = "Invalid";
+            echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
         } else {
             $validArr['firstname'] = True; // Pass Validation
         }
 
         // -- Last Name
         if (empty($registerArr['lastname'])) {
-            
+            $err_lastname = "Field Cannot Be Empty";
+             echo "<style type='text/css'> #lastname{border:1.5px solid red;}</style>";
         } else if (!preg_match($name_pattern, $registerArr['lastname'])) {
-            
+            $err_lastname = "Invalid";
+             echo "<style type='text/css'> #lastname{border:1.5px solid red;}</style>";
         } else {
             $validArr['lastname'] = True; // Pass Validation
         }
 
         // -- Contact Number Validation
         if (empty($registerArr['contactnumber'])) {
-            // Store Some Error Message
+            $err_contactnumber = "Field Cannot Be Empty";
+            echo "<style type='text/css'> #contactnumber{border:1.5px solid red;}</style>";
         } else if (!preg_match($contact_number_pattern, $registerArr['contactnumber'])) {
-            // Store Some Error Message
+            $err_contactnumber = "Invalid";
+            echo "<style type='text/css'> #contactnumber{border:1.5px solid red;}</style>";
         } else {
             $validArr['contactnumber'] = True; // Pass Validation
         }
 
         // -- Gender Validation (Just Make Sure Either Male Or Female Is 'Checked')
         if (empty($registerArr['gender'])) {
-            // Store Some Error Message
+            $err_gender = "Not Selected";
         } else if (!($registerArr['gender'] == 'F' || $registerArr['gender'] == 'M')) {
-            // Store Some Error Message
+            $err_gender = "Invalid";
         } else {
             $validArr['gender'] = True; // Pass Validation
         }
 
         // -- Date Of Birth (DOB) Validation
         if (empty($registerArr['dob'])) {
-            
+            $err_dob = "Field Cannot Be Empty";
+            echo "<style type='text/css'> #dob{border:1.5px solid red;}</style>";
         } else {
             $validArr['dob'] = True; // Pass Validation
         }
@@ -116,7 +126,8 @@ session_start();
 
         // -- Address Validation (Unsure Of What Further Validation To Be Done)
         if (empty($registerArr['address'])) {
-            
+            $err_address = "Field Cannot Be Empty";
+            echo "<style type='text/css'> #address{border:1.5px solid red;}</style>";
         } else {
             $validArr['address'] = True; // Pass Validation
         }
@@ -124,9 +135,11 @@ session_start();
 
         // -- Email Validation
         if (empty($registerArr['email'])) {
-            // Store Some Error Message
+            $err_email = "Field Cannot Be Empty";
+            echo "<style type='text/css'> #email{border:1.5px solid red;}</style>";
         } else if (!preg_match($email_pattern, $registerArr['email'])) {
-            // Store Some Error Message
+            $err_email = "Invalid";
+            echo "<style type='text/css'> #email{border:1.5px solid red;}</style>";
         } else {
             $validArr['email'] = True; // Pass Validation
         }
@@ -134,18 +147,23 @@ session_start();
         // -- Password Validation
         if (empty($registerArr['password'])) {
             // Store Some Error Message
+            $err_password = "Field Cannot Be Empty";
+            echo "<style type='text/css'> #password{border:1.5px solid red;}</style>";
         } else if (!preg_match($password_pattern, $registerArr['password'])) {
             // Store Some Error Message
-            echo 'Password invalid';
+            $err_password = "Invalid";
+            echo "<style type='text/css'> #password{border:1.5px solid red;}</style>";
         } else {
             $validArr['password'] = True; // Pass Validation
         }
 
         // -- Confirm Password Validation (Check if it is the same as 'Password')
         if (empty($registerArr['confirmpassword'])) {
-            // Store Some Error Message
+            $err_confirmpassword = "Field Cannot Be Empty";
+            echo "<style type='text/css'> #confirmpassword{border:1.5px solid red;}</style>";
         } else if ($registerArr['confirmpassword'] !== $registerArr['password']) {
-            // Store Some Error Message
+            $err_confirmpassword = "Password Does Not Match";
+            echo "<style type='text/css'> #confirmpassword{border:1.5px solid red;}</style>";
         } else {
             $validArr['confirmpassword'] = True; // Pass Validation
         }
@@ -203,13 +221,13 @@ session_start();
                                 <div class="row pb-3">
                                     <div class="col">
                                         <!-- First Name -->
-                                        <input class="form-control" type="text" name="firstname" placeholder="First Name"
-                                               value="<?php echo $registerArr['firstname']; ?>" />
+                                        <input id="firstname" class="form-control" type="text" name="firstname" placeholder="First Name"
+                                               value="<?php echo htmlspecialchars($registerArr['firstname']); ?>" />
                                     </div>
                                     <div class="col">
                                         <!-- Last Name -->
-                                        <input class="form-control" type="text" name="lastname" placeholder="Last Name"
-                                               value="<?php echo $registerArr['lastname']; ?>" />
+                                        <input id="lastname" class="form-control" type="text" name="lastname" placeholder="Last Name"
+                                               value="<?php echo htmlspecialchars($registerArr['lastname']); ?>" />
 
                                     </div>
                                 </div>
@@ -222,8 +240,8 @@ session_start();
                                 <div class="row">
                                     <div class="col">
                                         <!-- Date Of Birth -->
-                                        <input class="form-control" type="text" name="dob" placeholder="Date Of Birth"
-                                               value="<?php echo $registerArr['dob']; ?>" /><br />
+                                        <input id="dob" class="form-control" type="text" name="dob" placeholder="Date Of Birth"
+                                               value="<?php echo htmlspecialchars($registerArr['dob']); ?>" /><br />
                                     </div>
                                     <div class="col py-2">
 
@@ -254,13 +272,13 @@ session_start();
                                 <div class="row">
                                     <div class="col">
                                         <!-- Email -->
-                                        <input class="form-control" type="text" name="email" placeholder="Email"
-                                               value="<?php echo $registerArr['email']; ?>" /><br />
+                                        <input id="email" class="form-control" type="text" name="email" placeholder="Email"
+                                               value="<?php echo htmlspecialchars($registerArr['email']); ?>" /><br />
                                     </div>
                                     <div class="col">
                                         <!-- Contact Number -->
-                                        <input class="form-control" type="text" name="contactnumber" placeholder="Contact Number"
-                                               value="<?php echo $registerArr['contactnumber']; ?>" /><br />
+                                        <input id="contactnumber" class="form-control" type="text" name="contactnumber" placeholder="Contact Number"
+                                               value="<?php echo htmlspecialchars($registerArr['contactnumber']); ?>" /><br />
                                     </div>
                                 </div>
 
@@ -272,8 +290,8 @@ session_start();
                                 <div class="row">
                                     <div class="col">
                                         <!-- Address -->
-                                        <input class="form-control" type="text" name="address" placeholder="Address"
-                                               value="<?php echo $registerArr['address']; ?>" /><br />
+                                        <input id="address" class="form-control" type="text" name="address" placeholder="Address"
+                                               value="<?php echo htmlspecialchars($registerArr['address']); ?>" /><br />
                                     </div>
                                     <div class="col"></div>
                                 </div>
@@ -286,13 +304,13 @@ session_start();
                                 <div class="row">
                                     <div class="col">
                                         <!-- Password -->
-                                        <input class="form-control" type="password" name="password" placeholder="Password"
-                                               value="<?php echo $registerArr['password']; ?>" /><br />
+                                        <input id="password" class="form-control" type="password" name="password" placeholder="Password"
+                                               value="<?php echo htmlspecialchars($registerArr['password']); ?>" /><br />
                                     </div>
                                     <div class="col">
                                         <!-- Confirmation Password -->
-                                        <input class="form-control" type="password" name="confirmpassword" placeholder="Confirm Password"
-                                               value="<?php echo $registerArr['confirmpassword']; ?>" /><br /></div>
+                                        <input id="confirmpassword" class="form-control" type="password" name="confirmpassword" placeholder="Confirm Password"
+                                               value="<?php echo htmlspecialchars($registerArr['confirmpassword']); ?>" /><br /></div>
                                 </div>
 
                                 <div class="row">

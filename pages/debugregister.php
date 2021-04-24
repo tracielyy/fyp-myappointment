@@ -43,8 +43,7 @@ session_start();
 
 
             // Some Variables
-            $err_firstname = $err_lastname = $err_gender = $err_contactnumber
-                    = $err_address = $err_dob = $err_password = $err_confirmpassword = $err_email = "";
+            $err_firstname = $err_lastname = $err_gender = $err_contactnumber = $err_address = $err_dob = $err_password = $err_confirmpassword = $err_email = "";
             // -- Regex
             $contact_number_pattern = "/^[689]{1}[0-9]{7}$/"; // Singapore phone number length
             $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
@@ -70,13 +69,16 @@ session_start();
                 // 
 
 
+
                 /* ------------ Start Validation ------------ */
 
                 // -- First Name
                 if (empty($registerArr['firstname'])) {
                     $err_firstname = "Field Cannot Be Empty";
+                    echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
                 } else if (!preg_match($name_pattern, $registerArr['firstname'])) {
                     $err_firstname = "Invalid";
+                    echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
                 } else {
                     $validArr['firstname'] = True; // Pass Validation
                 }
@@ -149,7 +151,7 @@ session_start();
                     $err_password = "Field Cannot Be Empty";
                 } else if (!preg_match($password_pattern, $registerArr['password'])) {
                     // Store Some Error Message
-                   $err_password = "Invalid";
+                    $err_password = "Invalid";
                 } else {
                     $validArr['password'] = True; // Pass Validation
                 }
@@ -205,10 +207,10 @@ session_start();
             <form  method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
 
                 <!-- First Name -->
-                <input type="text" name="firstname" placeholder="First Name" value="<?php echo $registerArr['firstname']; ?>"/><br/>
+                <input type="text" id="firstname" name="firstname" placeholder="First Name" value="<?php echo $registerArr['firstname']; ?>"/><br/>
 
                 <!-- Last Name -->
-                <input type="text" name="lastname" placeholder="Last Name" value="<?php echo $registerArr['lastname']; ?>"/><br/>
+                <input type="text" id="lastname" name="lastname" placeholder="Last Name" value="<?php echo $registerArr['lastname']; ?>"/><br/>
 
                 <!-- Contact Number -->
                 <input type="text" name="contactnumber" placeholder="Contact Number" value="<?php echo $registerArr['contactnumber']; ?>"/><br/>
@@ -216,33 +218,33 @@ session_start();
                 <!-- Gender -->
                 <label for="gender">Select Gender: </label>
                 <input type="radio" id="Female" name="gender" value="F"<?php
-                if ($registerArr['gender'] == "F") {
-                    echo "checked";
-                }
-                ?>/><label for="Female" class="btnLabel">Female</label>
+            if ($registerArr['gender'] == "F") {
+                echo "checked";
+            }
+            ?>/><label for="Female" class="btnLabel">Female</label>
 
                 <input type="radio" name="gender" id="Male" value="M" <?php
-                       if ($registerArr['gender'] == "M") {
-                           echo "checked";
-                       }
-                       ?> /><label for="Male">Male</label>
+                if ($registerArr['gender'] == "M") {
+                    echo "checked";
+                }
+            ?> /><label for="Male">Male</label>
                 </select><br/>
 
 
                 <!-- Date Of Birth (Do We Use Calendar?) --> 
-                <input type="text" name="dob" placeholder="Date Of Birth" value="<?php echo $registerArr['dob']; ?>"/><br/>
+                <input type="text" name="dob" placeholder="Date Of Birth" value="<?php echo htmlspecialchars($registerArr['dob']); ?>"/><br/>
 
                 <!-- Address -->
-                <input type="text" name="address" placeholder="Address" value="<?php echo $registerArr['address']; ?>"/><br/>
+                <input type="text" name="address" placeholder="Address" value="<?php echo htmlspecialchars($registerArr['address']); ?>"/><br/>
 
                 <!-- Email -->
-                <input type="text" name="email" placeholder="Email" value="<?php echo $registerArr['email']; ?>"/><br/>
+                <input type="text" name="email" placeholder="Email" value="<?php echo htmlspecialchars($registerArr['email']); ?>"/><br/>
 
                 <!-- Password -->
-                <input type="password" name="password" placeholder="Password" value="<?php echo $registerArr['password']; ?>"/><br/>
+                <input type="password" name="password" placeholder="Password" value="<?php echo htmlspecialchars($registerArr['password']); ?>"/><br/>
 
                 <!-- Confirmation Password -->
-                <input type="password" name="confirmpassword" placeholder="Confirm Password" value="<?php echo $registerArr['confirmpassword']; ?>"/><br/>
+                <input type="password" name="confirmpassword" placeholder="Confirm Password" value="<?php echo htmlspecialchars($registerArr['confirmpassword']); ?>"/><br/>
 
                 <!-- Registration Submission -->
                 <button type="submit">Register</button><br/>
