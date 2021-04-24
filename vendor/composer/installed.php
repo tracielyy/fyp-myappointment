@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '4abb8eefe5b3858b3537f0d45d1c7e78330e00a2',
+    'reference' => '0c8d5788fe54847db4c59bf51478880d18d44e8e',
     'name' => '__root__',
   ),
   'versions' => 
@@ -18,7 +18,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '4abb8eefe5b3858b3537f0d45d1c7e78330e00a2',
+      'reference' => '0c8d5788fe54847db4c59bf51478880d18d44e8e',
     ),
     'brick/math' => 
     array (
@@ -49,12 +49,12 @@
     ),
     'google/auth' => 
     array (
-      'pretty_version' => 'v1.15.0',
-      'version' => '1.15.0.0',
+      'pretty_version' => 'v1.15.1',
+      'version' => '1.15.1.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'b346c07de6613e26443d7b4830e5e1933b830dc4',
+      'reference' => '4e0c9367719df9703e96f5ad613041b87742471c',
     ),
     'google/cloud-core' => 
     array (
