@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '3d48c9dd195ba73481108ae17a9aaadf2b6a5404',
+    'reference' => 'f423875b263e9c5ff5855e50034676dee0b8f36b',
     'name' => '__root__',
   ),
   'versions' => 
@@ -18,7 +18,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '3d48c9dd195ba73481108ae17a9aaadf2b6a5404',
+      'reference' => 'f423875b263e9c5ff5855e50034676dee0b8f36b',
     ),
     'brick/math' => 
     array (
