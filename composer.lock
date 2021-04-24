@@ -252,7 +252,7 @@
                 "shasum": ""
             },
             "require": {
-                "grpc/grpc": "^1.27",
+                "ext-grpc": "*",
                 "google/cloud-core": "^1.39",
                 "google/gax": "^1.1",
                 "ramsey/uuid": "^3.0|^4.0"
