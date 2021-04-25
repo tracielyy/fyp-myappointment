@@ -22,8 +22,8 @@
             <!-- Navigation -->  
             <?php include '../components/navbar.php' ?>
             
-            
-            
+            <!-- Test Echo -->
+            <?php echo "index.php displayed correctly"; ?>
         </div>
             
         <div>

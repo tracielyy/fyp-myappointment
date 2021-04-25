@@ -1,6 +1,6 @@
 <?php
 
-header("Location:./pages");
+// Root Folder Index 
 
 ?>
 
