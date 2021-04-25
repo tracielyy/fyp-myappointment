@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5dffbfebedd64b15f2d2494c6748ccab",
+    "content-hash": "3ea18edfbf7ad3e81607e817ec642bb1",
     "packages": [
         {
             "name": "brick/math",
@@ -1414,6 +1414,48 @@
                 "source": "https://github.com/rize/UriTemplate/tree/0.3.3"
             },
             "time": "2021-02-22T15:03:38+00:00"
+        },
+        {
+            "name": "svk/yc-grpc-injector",
+            "version": "0.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://gitlab.com/svk/yc-grpc-injector.git",
+                "reference": "727b71c551aaacc23b22e00e9f7caf82b00e626a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/svk%2Fyc-grpc-injector/repository/archive.zip?sha=727b71c551aaacc23b22e00e9f7caf82b00e626a",
+                "reference": "727b71c551aaacc23b22e00e9f7caf82b00e626a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0.0"
+            },
+            "provide": {
+                "ext-grpc": "1.32.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "svk\\GRPCInjector\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "svk",
+                    "email": "svk@svk.su"
+                }
+            ],
+            "description": "Интеграция драйвера grpc для php 7.4.4 в Cloud Functions Яндекс.Облака",
+            "support": {
+                "issues": "https://gitlab.com/api/v4/projects/21838721/issues"
+            },
+            "time": "2020-10-17T10:01:49+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
