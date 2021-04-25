@@ -27,9 +27,9 @@
         </div>
             
         <div>
-        <?php include './components/test.php' ?>
+        <?php //include './components/test.php' ?>
         </div>
 
-        <?php include './components/scripts.php' ?>
+        <?php // include './components/scripts.php' ?>
     </body>
 </html>
