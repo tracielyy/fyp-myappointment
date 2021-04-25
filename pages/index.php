@@ -4,7 +4,8 @@
 
 <html>
     <head>
-        <title>FYP-21-S2-24</title>
+        <!-- This Is The Home Page -->
+        <title>FYP-21-S2-24: Home</title>
         <?php include '../components/bootstrap.php' ?>
        
         <!-- Styling -->
