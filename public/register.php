@@ -5,10 +5,10 @@ session_start();
 <html lang="en">
 
     <head>
-        <?php require '../components/bootstrap.php' ?>
-        <?php require '../components/navbar.php' ?>
+        <?php require './components/bootstrap.php' ?>
+        <?php require './components/navbar.php' ?>
 
-        <link rel="stylesheet" href="../css/register.css"/> 
+        <link rel="stylesheet" href="./css/register.css"/> 
 
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -327,7 +327,7 @@ session_start();
             </div>
         </div>
 
-        <?php require '../components/javascript.php' ?>
+        <?php require './components/javascript.php' ?>
     </body>
 
 </html>

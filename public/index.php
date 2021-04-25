@@ -6,7 +6,7 @@
     <head>
         <!-- This Is The Home Page -->
         <title>FYP-21-S2-24: Home</title>
-        <?php include '../components/bootstrap.php' ?>
+        <?php include './components/bootstrap.php' ?>
        
         <!-- Styling -->
         
@@ -20,16 +20,16 @@
         <!-- HTML Page Design -->
         <div>
             <!-- Navigation -->  
-            <?php include '../components/navbar.php' ?>
+            <?php include './components/navbar.php' ?>
             
             <!-- Test Echo -->
             <?php echo "index.php displayed correctly"; ?>
         </div>
             
         <div>
-        <?php include '../components/test.php' ?>
+        <?php include './components/test.php' ?>
         </div>
 
-        <?php include '../components/scripts.php' ?>
+        <?php include './components/scripts.php' ?>
     </body>
 </html>

@@ -4,7 +4,7 @@
 
 <html>
     <head>
-        <?php include '../components/bootstrap.php' ?>
+        <?php include './components/bootstrap.php' ?>
         <title>FYP-21-S2-24</title>
         <!-- Styling -->
         
@@ -18,7 +18,7 @@
         <!-- HTML Page Design -->
         <div>
             <!-- Navigation -->
-            <?php include '../components/navbar.php' ?>
+            <?php include './components/navbar.php' ?>
             
             
         </div>
