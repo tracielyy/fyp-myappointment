@@ -6,7 +6,7 @@
 <!-- The navigation is added at server level -->
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-      <a class="navbar-brand mx-2" href="#">My Appointment</a>
+      <a class="navbar-brand mx-2" href="index.php">My Appointment</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample04" aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
