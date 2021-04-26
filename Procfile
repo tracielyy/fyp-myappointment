@@ -1,3 +1,2 @@
-config: echo "extension=grpc.so" > /conf/php/8/php-fpm.conf
-config: echo "extension=grpc.so" > /conf/php/php-fpm.conf
+release: chmod u+x release.sh && ./release.sh
 web: vendor/bin/heroku-php-apache2 public/
