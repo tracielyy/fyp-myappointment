@@ -61,7 +61,7 @@ session_start();
 
 
                 // -- Email Validation
-                if (empty($registerArr['email'])) {
+                if (empty($loginArr['email'])) {
                     // Store Some Error Message
                 } else if (!preg_match($email_pattern, $loginArr['email'])) {
                     // Store Some Error Message
