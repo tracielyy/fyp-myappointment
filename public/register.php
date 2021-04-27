@@ -1,12 +1,14 @@
+<!--
+   Developed By FYP-21-S2-24
+-->
 <!DOCTYPE html>
 <?php
 session_start();
 ?>
 <html lang="en">
-
     <head>
         <?php require './components/bootstrap.php' ?>
-        <?php require './components/navbar.php' ?>
+        <?php require './components/javascript.php' ?>
 
         <link rel="stylesheet" href="./css/register.css"/> 
 
@@ -17,7 +19,7 @@ session_start();
 
     </head>
 
-    <!-- PHP Script -->
+    <!-- Logic & Validation -->
     <?php
     require_once '../entities/Account_User.php';
     require_once '../entities/Patient.php';
@@ -62,7 +64,7 @@ session_start();
         }
 
         // 
-        
+
 
 
         /* ------------ Start Validation ------------ */
@@ -81,10 +83,10 @@ session_start();
         // -- Last Name
         if (empty($registerArr['lastname'])) {
             $err_lastname = "Field Cannot Be Empty";
-             echo "<style type='text/css'> #lastname{border:1.5px solid red;}</style>";
+            echo "<style type='text/css'> #lastname{border:1.5px solid red;}</style>";
         } else if (!preg_match($name_pattern, $registerArr['lastname'])) {
             $err_lastname = "Invalid";
-             echo "<style type='text/css'> #lastname{border:1.5px solid red;}</style>";
+            echo "<style type='text/css'> #lastname{border:1.5px solid red;}</style>";
         } else {
             $validArr['lastname'] = True; // Pass Validation
         }
@@ -205,6 +207,10 @@ session_start();
     ?>
 
     <body>
+        <!-- Navigation -->
+        <?php require './components/navbar.php' ?>
+        
+        <!-- Registration -->
         <div class="row m-4"></div>
         <div class="container w-50">
             <div class="col-auto">
@@ -323,11 +329,12 @@ session_start();
                             </form>
                         </div>
                     </div>
+                    <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                 </div>
             </div>
         </div>
 
-        <?php require './components/javascript.php' ?>
+        
     </body>
 
 </html>
