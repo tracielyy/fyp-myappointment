@@ -1,7 +1,7 @@
 <!--
    Developed By FYP-21-S2-24
 -->
-<!-- This File Is Solely Used For Debugging -->
+<!-- This the official logout page (Not Fully Tested) -->
 <?php
 session_start();
 require_once '../entities/Account_User.php';
