@@ -4,11 +4,12 @@
         "google/protobuf": "^v3.3.0",
         "google/cloud-firestore": "^1.19",
         "google/cloud-storage": "^1.23",
-        "svk/yc-grpc-injector": "^0.0.1"
-       
+        "svk/yc-grpc-injector": "^0.0.1",
+        "ext-mbstring": "*",
+        "ext-grpc": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "9.5",
-         "heroku/heroku-buildpack-php": "*"
+        "heroku/heroku-buildpack-php": "*"
     }
 }
