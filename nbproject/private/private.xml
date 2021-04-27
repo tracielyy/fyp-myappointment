@@ -5,15 +5,14 @@
         <group>
             <file>file:/C:/xampp/htdocs/MyAppointment/composer.lock</file>
             <file>file:/C:/xampp/htdocs/MyAppointment/.git/config</file>
-            <file>file:/C:/xampp/htdocs/MyAppointment/pages/debugregister.php</file>
-            <file>file:/C:/xampp/htdocs/MyAppointment/pages/register.php</file>
             <file>file:/C:/xampp/htdocs/MyAppointment/composer.json</file>
-            <file>file:/C:/xampp/htdocs/MyAppointment/entities/Patient.php</file>
+            <file>file:/C:/xampp/htdocs/MyAppointment/public/phpinfo.php</file>
             <file>file:/C:/xampp/htdocs/MyAppointment/php.ini</file>
-            <file>file:/C:/xampp/htdocs/MyAppointment/pages/debuglogin.php</file>
-            <file>file:/C:/xampp/htdocs/MyAppointment/entities/Account_User.php</file>
-            <file>file:/C:/xampp/htdocs/MyAppointment/entities/Medical_Record.php</file>
-            <file>file:/C:/xampp/htdocs/MyAppointment/.gitignore</file>
+            <file>file:/C:/xampp/htdocs/MyAppointment/Procfile</file>
+            <file>file:/C:/xampp/htdocs/MyAppointment/release.sh</file>
+            <file>file:/C:/xampp/htdocs/MyAppointment/public/index.php</file>
+            <file>file:/C:/xampp/htdocs/MyAppointment/public/debugregister.php</file>
+            <file>file:/C:/xampp/htdocs/MyAppointment/index.php</file>
         </group>
     </open-files>
 </project-private>
