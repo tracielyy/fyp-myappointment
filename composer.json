@@ -10,5 +10,6 @@
     "require-dev": {
         "phpunit/phpunit": "9.5",
          "heroku/heroku-buildpack-php": "*"
-    }
+    },
+    "php-includes": ["php.ini"]
 }
