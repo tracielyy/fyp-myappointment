@@ -32,5 +32,6 @@
         </div>
 
         <?php // include './components/scripts.php' ?>
+         <!-- Footer -->
     </body>
 </html>
