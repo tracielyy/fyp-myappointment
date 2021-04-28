@@ -1,6 +1,0 @@
-<?php
-
-// Root Folder Index 
-
-?>
-
