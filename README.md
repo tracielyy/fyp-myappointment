@@ -1,8 +1,5 @@
 # fyp-myappointment
 
-Notes:
-
-
 - Module: CSIT 321 - Project
 - Group Number: FYP-21-S2-24
 
@@ -14,3 +11,7 @@ Group Member:
 - Lee Kheen Hong  (Main Software Designer | Software Analyst)
 - Kshitij Bir Arora (Software Analyst | Front-End Developer)
 - Lim Jin Hin (Developer | Software Tester)
+
+
+# Folders Explanation:
+
