@@ -17,13 +17,15 @@ class Account_User {
     private string $dob;       // Date of birth -- DDMMYYYY
     private string $usertype;
     private string $createdon; // Date which the account is created
+    private array $session;
 
     protected const ACCOUNT_USER = "Account_User"; //  'protected' Access For Subclasses.
 
     // Constructor
-    public function __construct($firstname, $lastname, $gender, $dob,
+    public function __construct($session, $firstname, $lastname, $gender, $dob,
             $contactnumber, $address, $usertype, $createdon, $email, $password = NULL) {
 
+        $this->session = $session;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
         $this->gender = $gender;
@@ -37,6 +39,9 @@ class Account_User {
     }
 
     // Getters
+    public function get_session(): array {
+        return $this->session;
+    }
     public function get_firstname(): string {
         return $this->firstname;
     }
@@ -123,16 +128,18 @@ class Account_User {
     //============================================
     // Triggered When The The User Clicks On "Login"
     public static function login(array $credentialArr, string $sessionid): mixed {
-        $auth_user = self::authenticate_user($credentialArr);
-        $mapArr = array(
-            "session" => array(
-                "sessionid" => $sessionid,
-                "isloggedin" => true
-            )
-        );
+        $auth_user = self::authenticate_user($credentialArr); // User Object Returned、
         // Check If There Are Any Other Login Session (Terminate Other Session?)
+        $session_logon_allowed = self::session_logon_allowed($auth_user->get_session(), $sessionid);
+
         // Successfully Authenticated
-        if ($auth_user !== NULL) {
+        if ($auth_user !== NULL && $session_logon_allowed) {
+            $mapArr = array(
+                "session" => array(
+                    "sessionid" => $sessionid,
+                    "isloggedin" => true
+                )
+            );
             $db = new Database();
             $db->modify_map_field(self::ACCOUNT_USER, $credentialArr['email'], $mapArr);
             return $auth_user;
@@ -142,8 +149,18 @@ class Account_User {
     }
 
     // Check If There Are Any Other Login Session
-    public static function check_session() {
-        
+    public static function session_logon_allowed(array $db_session, string $current_sessionid): bool {
+        // Session Status
+        if ($db_session['isloggedin'] == false) {
+            return true;
+        } else {
+            // Compare Session ID
+            if ($db_session['sessionid'] == $current_sessionid) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
     // Authenticate & Return The User Data If Authenticated Successfully
@@ -151,7 +168,7 @@ class Account_User {
         $db = new Database();
         $user_data = $db->query_exact_match(self::ACCOUNT_USER, $credentialArr);
         if ($user_data != NULL) {
-            return new Account_User($user_data['firstname'], $user_data['lastname'], $user_data['gender'],
+            return new Account_User($user_data['session'], $user_data['firstname'], $user_data['lastname'], $user_data['gender'],
                     $user_data['dob'], $user_data['contactnumber'], $user_data['address'], $user_data['usertype'],
                     $user_data['createdon'], $user_data['email']);
         }
@@ -170,7 +187,7 @@ class Account_User {
     }
 
     // Triggered When User Clicks On "Logout"
-    public static function logout($email) {
+    public static function logout(string $email) {
         $db = new Database();
         $mapArr = array(
             "session" => array(
@@ -179,6 +196,12 @@ class Account_User {
             )
         );
         $db->modify_map_field(self::ACCOUNT_USER, $email, $mapArr);
+    }
+
+    // Password Reset/ Password Change
+    public static function change_password() {
+        // Need To Send Verification Email To User.
+        
     }
 
 }

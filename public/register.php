@@ -183,7 +183,7 @@ require_once '../resources/config.php';
                 // > Salt Generation (?)
                 // > Need To Encrypt The Password Then Store In Database
                 unset($registerArr["confirmpassword"]); // We do not need to store 'confirmpassword'
-                Patient::add_patient($registerArr);
+                Patient::create_patient($registerArr);
 
                 // Reset Information
                 $registerArr = array(

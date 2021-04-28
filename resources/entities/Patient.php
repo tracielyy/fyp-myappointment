@@ -12,9 +12,11 @@ class Patient extends Account_User {
 
     //private $appointment_record = array();  // Appointment_Record Object
     // Constructor
-    function __construct($firstname = NULL, $lastname = NULL, $gender = NULL, $dob = NULL,
-            $contactnumber = NULL, $address = NULL, $email = NULL, $password = NULL) {
-        parent::__construct($firstname, $lastname, $gender, $dob, $contactnumber, $address, $email, $password);
+    public function __construct($firstname, $lastname, $gender, $dob,
+            $contactnumber, $address, $usertype, $createdon, $email, $password = NULL) {
+
+        parent::__construct($firstname, $lastname, $gender, $dob, $contactnumber, $address,
+                $usertype, $createdon, $email, $password);
     }
 
     // Use For Debugging/ Logging Purpose
@@ -26,7 +28,7 @@ class Patient extends Account_User {
     //      Methods Accessing Firestore Database 
     //============================================
     // Insert New Patient To Firestore
-    public static function add_patient(array $userDataArr) {
+    public static function create_patient(array $userDataArr) {
         $db = new Database();
         $userDataArr['session'] = array(
             "sessionid" => "",
@@ -39,6 +41,11 @@ class Patient extends Account_User {
 
     // Retrieve Patients Medical Record (Per Doctor Visit?)
     public static function get_patient_medical_record() {
+        
+    }
+    
+    // Retrieve Patient Appointment Record
+    public static function get_patient_appointment_record() {
         
     }
 

@@ -1,25 +1,21 @@
 <?php
 
-class Medical_Personnel extends Account_User{
-    
+class Medical_Personnel extends Account_User {
+
     // Properties
+    private string $medical_facility; // Name of the medical facility
     
     
     // Constructor
-    function __construct($firstname = NULL, $lastname = NULL, $gender = NULL, $dob = NULL,
-            $contactnumber = NULL, $address = NULL, $email = NULL, $password = NULL) {
-        parent::__construct($firstname,$lastname, $gender, $dob, $contactnumber,$address, $email, $password );
-    
-    }
-    
-    
-    // Getters
-    
-    
-    
-    // Setters
-    
-}
+    public function __construct($firstname, $lastname, $gender, $dob,
+            $contactnumber, $address, $usertype, $createdon, $email, $password = NULL) {
 
+        parent::__construct($firstname, $lastname, $gender, $dob, $contactnumber, $address,
+                $usertype, $createdon, $email, $password);
+    }
+
+    // Getters
+    // Setters
+}
 
 ?>

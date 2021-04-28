@@ -1,28 +1,35 @@
 <?php
+
 /* Load Config File */
 require_once '../config.php';
 require_once ENTITIES_PATH . '/Account_User.php';
 
-class Admin extends Account_User{
-    
+class Admin extends Account_User {
+
     // Properties
-    
-    
     // Constructor
-    function __construct($firstname = NULL, $lastname = NULL, $gender = NULL, $dob = NULL,
-            $contactnumber = NULL, $address = NULL, $email = NULL, $password = NULL) {
-        parent::__construct($firstname,$lastname, $gender, $dob, $contactnumber,$address, $email, $password );
+    public function __construct($firstname, $lastname, $gender, $dob,
+            $contactnumber, $address, $usertype, $createdon, $email, $password = NULL) {
+
+        parent::__construct($firstname, $lastname, $gender, $dob, $contactnumber, $address,
+                $usertype, $createdon, $email, $password);
+    }
+
+    // Getters
+    // Setters
+    //============================================
+    //      Methods Accessing Firestore Database 
+    //============================================
     
+    // Add Medical Personnel
+    public static function create_medical_personnel() {
+        
     }
     
-    
-    // Getters
-    
-    
-    
-    // Setters
+    public static function remove_medical_personnel() {
+        
+    }
     
 }
-
 
 ?>
