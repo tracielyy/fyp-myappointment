@@ -4,11 +4,13 @@
 <!DOCTYPE html>
 <?php
 session_start();
+/* Load Config File */
+require_once '../resources/config.php';
 ?>
 <html lang="en">
     <head>
-        <?php require './components/bootstrap.php' ?>
-        <?php require './components/javascript.php' ?>
+        <?php require COMPONENT_PATH . '/bootstrap.php' ?>
+        <?php require COMPONENT_PATH . '/javascript.php' ?>
 
         <link rel="stylesheet" href="./css/register.css"/> 
 
@@ -21,8 +23,8 @@ session_start();
 
     <!-- Logic & Validation -->
     <?php
-    require_once '../entities/Account_User.php';
-    require_once '../entities/Patient.php';
+    require_once ENTITIES_PATH . '/Account_User.php';
+    require_once ENTITIES_PATH . '/Patient.php';
 
 
     // Used to store correct data
@@ -201,15 +203,14 @@ session_start();
             }
         } else {
             // Any Actions Or Displays For Errors
-            echo "<div style='color:red;'>Register Fail!</div>";
         }
     }
     ?>
 
     <body>
         <!-- Navigation -->
-        <?php require './components/navbar.php' ?>
-        
+        <?php require COMPONENT_PATH . '/navbar.php' ?>
+
         <!-- Registration -->
         <div class="row m-4"></div>
         <div class="container w-50">
@@ -334,7 +335,7 @@ session_start();
             </div>
         </div>
 
-        
+
     </body>
 
 </html>

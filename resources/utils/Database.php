@@ -1,4 +1,6 @@
 <?php
+/* Load Config File */
+require_once '../resources/config.php';
 
 use Google\Cloud\Firestore\FirestoreClient;
 use Google\Cloud\Firestore\DocumentReference;
@@ -13,7 +15,7 @@ class Database {
     function __construct() {
         $this->db = new FirestoreClient([
             'projectId' => 'fyp-21-s2-24',
-            'keyFile' => json_decode(file_get_contents('../utils/json-key-tracy-001.json'), true)
+            'keyFile' => json_decode(file_get_contents( UTILS_PATH . '/json-key-tracy-001.json'), true)
         ]);
     }
 

@@ -1,4 +1,7 @@
 <?php
+/* Load Config File */
+require_once '../config.php';
+require_once ENTITIES_PATH . '/Account_User.php';
 
 class Admin extends Account_User{
     

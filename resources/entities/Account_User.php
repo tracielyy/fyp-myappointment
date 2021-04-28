@@ -1,25 +1,28 @@
 <?php
 
-require_once '../utils/Database.php';
+/* Load Config File */
+require_once '../resources/config.php';
+require_once UTILS_PATH . '/Database.php';
 
 class Account_User {
 
     // Properties
-    private $firstname;
-    private $lastname;
-    private $gender;
-    private $address;
-    private $email;
-    private $password;
-    private $contactnumber; // Unsure whether to use 'int' or 'string' -- Is Foreign Number Allowed?
-    private $dob;       // Date of birth -- DDMMYYYY
-    private $usertype;
+    private string $firstname;
+    private string $lastname;
+    private string $gender;
+    private string $address;
+    private string $email;
+    private ?string $password;  // ?: Nullable Since We Are Not Storing The Password On Website
+    private string $contactnumber; // Unsure whether to use 'int' or 'string' -- Is Foreign Number Allowed?
+    private string $dob;       // Date of birth -- DDMMYYYY
+    private string $usertype;
+    private string $createdon; // Date which the account is created
 
     protected const ACCOUNT_USER = "Account_User"; //  'protected' Access For Subclasses.
 
     // Constructor
-    public function __construct($firstname = NULL, $lastname = NULL, $gender = NULL, $dob = NULL,
-            $contactnumber = NULL, $address = NULL, $usertype = NULL, $email = NULL, $password = NULL) {
+    public function __construct($firstname, $lastname, $gender, $dob,
+            $contactnumber, $address, $usertype, $createdon, $email, $password = NULL) {
 
         $this->firstname = $firstname;
         $this->lastname = $lastname;
@@ -28,49 +31,54 @@ class Account_User {
         $this->contactnumber = $contactnumber;
         $this->address = $address;
         $this->usertype = $usertype;
+        $this->createdon = $createdon;
         $this->email = $email;
         $this->password = $password; // Not Sure How To Store It Yet
     }
 
     // Getters
-    public function get_firstname() {
+    public function get_firstname(): string {
         return $this->firstname;
     }
 
-    public function get_lastname() {
+    public function get_lastname(): string {
         return $this->lastname;
     }
 
-    public function get_fullname() {
+    public function get_fullname(): string {
         return $this->firstname . ' ' . $this->lastname;
     }
 
-    public function get_gender() {
+    public function get_gender(): string {
         return $this->gender;
     }
 
-    public function get_address() {
+    public function get_address(): string {
         return $this->address;
     }
 
-    public function get_contactnumber() {
+    public function get_contactnumber(): string {
         return $this->contactnumber;
     }
 
-    public function get_dob() {
+    public function get_dob(): string {
         return $this->dob;
     }
 
-    public function get_email() {
+    public function get_email(): string {
         return $this->email;
     }
 
-    public function get_password() {
+    public function get_password(): string {
         return $this->password;  // Security Measures Not Implemented
     }
 
-    public function get_usertype() {
+    public function get_usertype(): string {
         return $this->usertype;
+    }
+
+    public function get_createdon(): string {
+        return $this->createdon;
     }
 
     // Setters
@@ -78,23 +86,23 @@ class Account_User {
         $this->firstname = $firstname;
     }
 
-    public function set_lastname($lastname) {
+    public function set_lastname(string $lastname) {
         $this->lastname = $lastname;
     }
 
-    public function set_email($email) {
+    public function set_email(string $email) {
         $this->email = $email;
     }
 
-    public function set_gender($gender) {
+    public function set_gender(string $gender) {
         $this->gender = $gender;
     }
 
-    public function set_dob($dob) {
+    public function set_dob(string $dob) {
         $this->dob = $dob;
     }
 
-    public function set_address($address) {
+    public function set_address(string $address) {
         $this->address = $address;
     }
 
@@ -103,7 +111,7 @@ class Account_User {
     }
 
     // Use For Debugging/ Logging Purpose
-    public function __toString() {
+    public function __toString(): string {
         $str = nl2br('First Name: ' . $this->firstname . PHP_EOL . 'Last Name: ' . $this->lastname . PHP_EOL . 'Email: ' . $this->email .
                 PHP_EOL . 'User Type: ' . $this->usertype . PHP_EOL . 'Gender: ' . $this->gender . PHP_EOL . 'DOB: ' . $this->dob .
                 PHP_EOL . 'Address: ' . $this->address . PHP_EOL . 'Contact Number: ' . $this->contactnumber);
@@ -113,7 +121,6 @@ class Account_User {
     //============================================
     //      Methods Accessing Firestore Database 
     //============================================
-
     // Triggered When The The User Clicks On "Login"
     public static function login(array $credentialArr, string $sessionid): mixed {
         $auth_user = self::authenticate_user($credentialArr);
@@ -124,7 +131,6 @@ class Account_User {
             )
         );
         // Check If There Are Any Other Login Session (Terminate Other Session?)
-        
         // Successfully Authenticated
         if ($auth_user !== NULL) {
             $db = new Database();
@@ -134,6 +140,7 @@ class Account_User {
             return NULL;
         }
     }
+
     // Check If There Are Any Other Login Session
     public static function check_session() {
         
@@ -146,7 +153,7 @@ class Account_User {
         if ($user_data != NULL) {
             return new Account_User($user_data['firstname'], $user_data['lastname'], $user_data['gender'],
                     $user_data['dob'], $user_data['contactnumber'], $user_data['address'], $user_data['usertype'],
-                    $user_data['email']);
+                    $user_data['createdon'], $user_data['email']);
         }
         return NULL;  // Failed to authenticate (Will need to display error message)
     }

@@ -3,8 +3,11 @@
     Author: FYP-21-S2-24
 
 -->
-<!-- The navigation is added at server level -->
 
+<!-- The navigation is added at server level  (PHP File Need To Contain PHP Code) -->
+<!-- Will Need To Add Logic To Make Sure User Is Logged In Before Displaying Logout Button. -->
+<?php
+echo '
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
       <a class="navbar-brand mx-2" href="index.php">My Appointment</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample04" aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +39,7 @@
         </form>
       </div>
     </nav>
-  
+        
+'; ?>
 
 

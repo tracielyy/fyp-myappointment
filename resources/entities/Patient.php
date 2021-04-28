@@ -1,6 +1,9 @@
 <?php
 
-require_once '../entities/Appointment_Record.php';
+/* Load Config File */
+require_once '../resources/config.php';
+require_once 'Appointment_Record.php';
+require_once 'Account_User.php';
 
 class Patient extends Account_User {
 
@@ -30,6 +33,7 @@ class Patient extends Account_User {
             "isloggedin" => false
         );
         $userDataArr['usertype'] = self::PATIENT;
+        $userDataArr['createdon'] = (string) date("d-m-Y");
         $db->insert_data(parent::ACCOUNT_USER, $userDataArr);
     }
 

@@ -4,7 +4,9 @@
 <!-- This File Is Solely Used For Debugging -->
 <?php
 session_start();
-require_once '../entities/Account_User.php';
+/* Load Config File */
+require_once '../resources/config.php';
+require_once ENTITIES_PATH . '/Account_User.php';
 if (isset($_SESSION['user'])) {
     $current_user = unserialize($_SESSION['user']);
     Account_User::logout($current_user->get_email());

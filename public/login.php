@@ -3,6 +3,8 @@
 -->
 <?php
 session_start();
+/* Load Config File */
+require_once '../resources/config.php';
 ?>
 
 <html>
@@ -10,15 +12,15 @@ session_start();
         <!-- Title -->
         <title>FYP-21-S2-24</title>
         <!-- Styling -->
-        <?php include './components/bootstrap.php'; ?>
+        <?php include COMPONENT_PATH . '/bootstrap.php'; ?>
 
 
     </head>
     <body>
         <!-- Logic & Validation -->
         <?php
-        require_once '../entities/Account_User.php';
-        require_once '../entities/Patient.php';
+        require_once ENTITIES_PATH . '/Account_User.php';
+        require_once ENTITIES_PATH . '/Patient.php';
 
         // Used to store correct data
         $loginArr = array(
@@ -89,7 +91,7 @@ session_start();
         <!-- HTML Page Design -->
         <div>
             <!-- Navigation -->
-            <?php include './components/navbar.php' ?>
+            <?php include COMPONENT_PATH . '/navbar.php' ?>
 
             <!-- Login Card -->
 

@@ -4,17 +4,22 @@
 <!-- This File Is Solely Used For Debugging -->
 <?php
 session_start();
+/* Load Config File */
+require_once '../resources/config.php';
 ?>
 <html>
     <head>
+        <!-- Title -->
         <title>FYP-21-S2-24</title>
         <!-- Styling -->
-
+        <?php require COMPONENT_PATH . '/bootstrap.php' ?>
+        <?php require COMPONENT_PATH . '/javascript.php' ?>
+        
     </head>
     <body>
         <!-- PHP Script -->
         <?php
-        require_once '../entities/Account_User.php';
+        require_once ENTITIES_PATH . '/Account_User.php';
         // Code here
         ?>
 
@@ -35,16 +40,16 @@ session_start();
 
             // -- Regex
             $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
-            
-            
+
+
             // -- When Redirect or Load The Page
-            if ($_SERVER['REQUEST_METHOD'] == "GET")  {
+            if ($_SERVER['REQUEST_METHOD'] == "GET") {
                 if (isset($_SESSION["user"])) {
                     echo unserialize($_SESSION["user"]);
                 }
             }
-            
-            
+
+
 
             // Upon clicking "Login" Button
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -98,7 +103,7 @@ session_start();
             <!-- Logout -->
             <!--<button type ="submit" name="logout" value="logout">Logout</button>-->
             <a href="debuglogout.php">Logout</a>
-    
+
         </div>
 
     </body>

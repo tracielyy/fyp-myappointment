@@ -4,6 +4,8 @@
 <!-- This File Is Solely Used For Debugging -->
 <?php
 session_start();
+/* Load Config File */
+require_once '../resources/config.php';
 ?>
 <html>
     <head>
@@ -14,8 +16,8 @@ session_start();
     <body>
         <!-- PHP Script -->
         <?php
-        require_once '../entities/Account_User.php';
-        require_once '../entities/Patient.php';
+        require_once ENTITIES_PATH . '/Account_User.php';
+        require_once ENTITIES_PATH . '/Patient.php';
         // Code here
         ?>
 
@@ -218,16 +220,16 @@ session_start();
                 <!-- Gender -->
                 <label for="gender">Select Gender: </label>
                 <input type="radio" id="Female" name="gender" value="F"<?php
-            if ($registerArr['gender'] == "F") {
-                echo "checked";
-            }
-            ?>/><label for="Female" class="btnLabel">Female</label>
-
-                <input type="radio" name="gender" id="Male" value="M" <?php
-                if ($registerArr['gender'] == "M") {
+                if ($registerArr['gender'] == "F") {
                     echo "checked";
                 }
-            ?> /><label for="Male">Male</label>
+                ?>/><label for="Female" class="btnLabel">Female</label>
+
+                <input type="radio" name="gender" id="Male" value="M" <?php
+                       if ($registerArr['gender'] == "M") {
+                           echo "checked";
+                       }
+                       ?> /><label for="Male">Male</label>
                 </select><br/>
 
 
