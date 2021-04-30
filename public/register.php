@@ -12,7 +12,7 @@ require_once '../resources/config.php';
         <?php require COMPONENT_PATH . '/bootstrap.php' ?>
         <?php require COMPONENT_PATH . '/javascript.php' ?>
 
-        <link rel="stylesheet" href="./css/register.css"/> 
+        <link rel="stylesheet" href="./css/login_register.css"/> 
 
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
