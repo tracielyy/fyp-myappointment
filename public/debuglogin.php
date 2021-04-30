@@ -4,6 +4,9 @@
 <!-- This File Is Solely Used For Debugging -->
 <?php
 session_start();
+
+
+
 /* Load Config File */
 require_once '../resources/config.php';
 ?>
@@ -13,8 +16,7 @@ require_once '../resources/config.php';
         <title>FYP-21-S2-24</title>
         <!-- Styling -->
         <?php require COMPONENT_PATH . '/bootstrap.php' ?>
-        <?php require COMPONENT_PATH . '/javascript.php' ?>
-        
+
     </head>
     <body>
         <!-- PHP Script -->
@@ -37,6 +39,9 @@ require_once '../resources/config.php';
                 'email' => '',
                 'password' => '',
             );
+
+            // -- Msg Variables
+            $msg = "";
 
             // -- Regex
             $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
@@ -76,23 +81,45 @@ require_once '../resources/config.php';
 
                 /* ------------ End Validation ------------ */
 
-                // Start Authenticating User
-                $auth_user = Account_User::login($loginArr, session_id());
-                if ($auth_user != NULL) {
-                    $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
-                    //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
-                    echo nl2br(PHP_EOL . "Success" . PHP_EOL);
+                // Start Authenticating User (boolean)
+                $auth = Account_User::authenticate_user($loginArr);
 
-                    // Clear Fields
-                    $loginArr = array(
-                        'email' => '',
-                        'password' => '',
-                    );
+                // Check If There Is Any "token" generated
+                if (!isset($_SESSION['token'])) {
+                    $token_length = 10;
+                    $_SESSION['token'] = Account_User::get_token($token_length);
+                }
+
+                // Check If There Are Any Other Login Session (Terminate Other Session?)
+                $auth_user = Account_User::load_user_data($loginArr);
+                $session_logon_allowed = Account_User::check_session($auth_user->get_session(), $_SESSION['token']);
+
+                // User Authenticated
+                if ($auth) {
+                    if ($session_logon_allowed) {
+                        Account_User::login($auth_user->get_email(), session_id(), $_SESSION['token']);
+                        $auth_user = Account_User::load_user_data($loginArr); // Reload After Login Session Update
+                        $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
+                        //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
+                        echo nl2br(PHP_EOL . "Success" . PHP_EOL);
+
+                        // Clear Fields
+                        $loginArr = array(
+                            'email' => '',
+                            'password' => '',
+                        );
+                    } else {
+                        $msg = "Account is logged in at another location";
+                    }
                 } else {
-                    echo "Invalid Credentials!";
+                    $msg = "Invalid Credentials!";
                 }
             }
             ?>
+            <!-- Msg -->
+            <div>
+                <?php echo $msg; ?>
+            </div>
 
             <!-- Login Form -->
             <form method="post"  action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">

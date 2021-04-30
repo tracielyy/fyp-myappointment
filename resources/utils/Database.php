@@ -43,6 +43,7 @@ class Database {
                 return $document->data();
             }
         }
+        return NULL;
     }
 
     // Insert Data: return success status
@@ -69,9 +70,10 @@ class Database {
                 $doc_id = $document->id();
                 $doc_ref = $collection_ref->document($doc_id);
                 self::update_map_values($doc_ref, $mapArr);
-                break;
+                return True;
             }
         }
+        return False;
     }
 
     // Update Multiple Map Field Values

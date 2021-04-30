@@ -72,7 +72,13 @@ require_once '../resources/config.php';
 
             // Start Authenticating User
             $auth_user = Account_User::login($loginArr, session_id());
+
+            // Check If There Are Any Other Login Session (Terminate Other Session?)
+            $session_logon_allowed = self::check_token($auth_user->get_session(), session_id());
+
+            // User Authenticated
             if ($auth_user != NULL) {
+                // Check Active Session
                 $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
                 //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
                 echo nl2br(PHP_EOL . "Success" . PHP_EOL);
@@ -83,7 +89,7 @@ require_once '../resources/config.php';
                     'password' => '',
                 );
             } else {
-                $err_msg = "Invalid Credentials!";
+                $msg = "Invalid Credentials!";
             }
         }
         ?>

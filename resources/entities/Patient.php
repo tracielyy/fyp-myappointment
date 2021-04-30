@@ -12,10 +12,10 @@ class Patient extends Account_User {
 
     //private $appointment_record = array();  // Appointment_Record Object
     // Constructor
-    public function __construct($firstname, $lastname, $gender, $dob,
+    public function __construct($session, $firstname, $lastname, $gender, $dob,
             $contactnumber, $address, $usertype, $createdon, $email, $password = NULL) {
 
-        parent::__construct($firstname, $lastname, $gender, $dob, $contactnumber, $address,
+        parent::__construct($session, $firstname, $lastname, $gender, $dob, $contactnumber, $address,
                 $usertype, $createdon, $email, $password);
     }
 
@@ -32,7 +32,8 @@ class Patient extends Account_User {
         $db = new Database();
         $userDataArr['session'] = array(
             "sessionid" => "",
-            "isloggedin" => false
+            "isloggedin" => false,
+            "token" => ""
         );
         $userDataArr['usertype'] = self::PATIENT;
         $userDataArr['createdon'] = (string) date("d-m-Y");

@@ -22,8 +22,8 @@ class Account_User {
     protected const ACCOUNT_USER = "Account_User"; //  'protected' Access For Subclasses.
 
     // Constructor
-    public function __construct($session, $firstname, $lastname, $gender, $dob,
-            $contactnumber, $address, $usertype, $createdon, $email, $password = NULL) {
+    public function __construct(array $session, string $firstname, string $lastname, string $gender, string $dob,
+            string $contactnumber, string $address, string $usertype, string $createdon, string $email, string $password = NULL) {
 
         $this->session = $session;
         $this->firstname = $firstname;
@@ -42,6 +42,7 @@ class Account_User {
     public function get_session(): array {
         return $this->session;
     }
+
     public function get_firstname(): string {
         return $this->firstname;
     }
@@ -87,7 +88,7 @@ class Account_User {
     }
 
     // Setters
-    public function set_firstname($firstname) {
+    public function set_firstname(string $firstname) {
         $this->firstname = $firstname;
     }
 
@@ -127,35 +128,30 @@ class Account_User {
     //      Methods Accessing Firestore Database 
     //============================================
     // Triggered When The The User Clicks On "Login"
-    public static function login(array $credentialArr, string $sessionid): mixed {
-        $auth_user = self::authenticate_user($credentialArr); // User Object Returned、
-        // Check If There Are Any Other Login Session (Terminate Other Session?)
-        $session_logon_allowed = self::session_logon_allowed($auth_user->get_session(), $sessionid);
-
+    public static function login(string $email, string $sessionid, string $token): mixed {
         // Successfully Authenticated
-        if ($auth_user !== NULL && $session_logon_allowed) {
-            $mapArr = array(
-                "session" => array(
-                    "sessionid" => $sessionid,
-                    "isloggedin" => true
-                )
-            );
-            $db = new Database();
-            $db->modify_map_field(self::ACCOUNT_USER, $credentialArr['email'], $mapArr);
-            return $auth_user;
-        } else {
-            return NULL;
-        }
+
+        $mapArr = array(
+            "session" => array(
+                "sessionid" => $sessionid,
+                "isloggedin" => true,
+                "token" => $token
+            )
+        );
+        $db = new Database();
+
+        $login = $db->modify_map_field(self::ACCOUNT_USER, $email, $mapArr);
+        return $login;
     }
 
     // Check If There Are Any Other Login Session
-    public static function session_logon_allowed(array $db_session, string $current_sessionid): bool {
-        // Session Status
+    public static function check_session(array $db_session, string $token): bool {
+        // Session Status 
         if ($db_session['isloggedin'] == false) {
             return true;
         } else {
-            // Compare Session ID
-            if ($db_session['sessionid'] == $current_sessionid) {
+            // Compare Token
+            if ($db_session['token'] == $token && $db_session['sessionid'] == $sessionid) {
                 return true;
             } else {
                 return false;
@@ -163,8 +159,23 @@ class Account_User {
         }
     }
 
-    // Authenticate & Return The User Data If Authenticated Successfully
-    private static function authenticate_user(array $credentialArr): mixed {
+    // Generate Token
+    public static function get_token(int $length): string {
+        $token = "";
+        $token_repo = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Upper Case
+        $token_repo .= "abcdefghijklmnopqrstuvwxyz"; // Lower Case
+        $token_repo .= "0123456789"; // Digits
+        $max = strlen($token_repo);
+
+        for ($i = 0; $i < $length; $i++) {
+            $token .= $token_repo[random_int(0, $max - 1)];
+        }
+
+        return $token;
+    }
+
+    // Load User Data
+    public static function load_user_data(array $credentialArr) {
         $db = new Database();
         $user_data = $db->query_exact_match(self::ACCOUNT_USER, $credentialArr);
         if ($user_data != NULL) {
@@ -172,7 +183,17 @@ class Account_User {
                     $user_data['dob'], $user_data['contactnumber'], $user_data['address'], $user_data['usertype'],
                     $user_data['createdon'], $user_data['email']);
         }
-        return NULL;  // Failed to authenticate (Will need to display error message)
+        return NULL;
+    }
+
+    // Authenticate & Return The User Data If Authenticated Successfully
+    public static function authenticate_user(array $credentialArr): bool {
+        $db = new Database();
+        $user_data = $db->query_exact_match(self::ACCOUNT_USER, $credentialArr);
+        if ($user_data != NULL) {
+            return True;
+        }
+        return False;
     }
 
     // Check If The User Exist In The Database
@@ -187,12 +208,13 @@ class Account_User {
     }
 
     // Triggered When User Clicks On "Logout"
-    public static function logout(string $email) {
+    public static function session_logout(string $email) {
         $db = new Database();
         $mapArr = array(
             "session" => array(
                 "sessionid" => "",
-                "isloggedin" => false
+                "isloggedin" => false,
+                "token" => ""
             )
         );
         $db->modify_map_field(self::ACCOUNT_USER, $email, $mapArr);
@@ -201,7 +223,6 @@ class Account_User {
     // Password Reset/ Password Change
     public static function change_password() {
         // Need To Send Verification Email To User.
-        
     }
 
 }
