@@ -11,13 +11,13 @@ require_once '../resources/config.php';
     <head>
         <?php require COMPONENT_PATH . '/bootstrap.php' ?>
         <?php require COMPONENT_PATH . '/javascript.php' ?>
-
-        <link rel="stylesheet" href="./css/login_register.css"/> 
-
+        
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Document</title>
+        <link rel="stylesheet" href="./css/loginRegister.css"/> 
+        <title>Register</title>
+        
 
     </head>
 
@@ -180,7 +180,13 @@ require_once '../resources/config.php';
             // > Check If User Already Exist (Email & Contact Number)
             $exist = Account_User::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
             if (!$exist) {
-                // > Salt Generation (?)
+                // > Salt is in built in the hash php std library function
+                // > Hashing the password to be stored in the database
+                
+                //  From php doc: The used algorithm, cost and salt are returned as part of the hash. Therefore, 
+                //all information that's needed to verify the hash is included in it. This allows the password_verify() function to verify 
+                //the hash without needing separate storage for the salt or algorithm information.
+                password_hash('sha256',$registerArr['password']);
                 // > Need To Encrypt The Password Then Store In Database
                 unset($registerArr["confirmpassword"]); // We do not need to store 'confirmpassword'
                 Patient::create_patient($registerArr);
@@ -213,7 +219,7 @@ require_once '../resources/config.php';
 
         <!-- Registration -->
         <div class="row m-4"></div>
-        <div class="container w-50">
+        <div class="container col-md-10 col-lg-6">
             <div class="col-auto">
                 <div class="shadow card p-2 rounded1">
                     <div class="card-body m-2">
