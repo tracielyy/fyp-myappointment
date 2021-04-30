@@ -13,6 +13,7 @@ require_once '../resources/config.php';
         <title>FYP-21-S2-24</title>
         <!-- Styling -->
         <?php include COMPONENT_PATH . '/bootstrap.php'; ?>
+        <link rel="stylesheet" href="./css/loginRegister.css"/> 
 
 
     </head>
@@ -100,6 +101,45 @@ require_once '../resources/config.php';
             <?php include COMPONENT_PATH . '/navbar.php' ?>
 
             <!-- Login Card -->
+        <div class="row m-4" ></div>
+        <div class="center container col-md-6 col-lg-4">
+            <div class="my-5 col-sm-12">
+                <div class="shadow card p-2 rounded1">
+                    <div class="card-body m-1">
+                        <h1 class="card-title px-1 py-3">Login</h1>
+                        <div class="px-1">
+                            <!-- Form -->
+                            <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                                <div class="row pb-2">
+                                    <div class="col">
+                                        Email:
+                                    </div>
+                                    <div class="col">
+                                        <!-- EMAIL -->
+                                        <input type="email" class="form-control" name="email" required placeholder="Email"  value="<?php echo $loginArr['email']; ?>"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                <div class="col">Password: </div>
+                                    <div class="col">
+                                        <!-- PASSWORD -->
+                                        <input type="password" class="form-control" name="password" placeholder="Password" value="<?php echo $loginArr['password']; ?>"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col ">
+                                    </div>
+                                    <!-- Login Submission -->
+                                    <div class="col py-3"><button class="btn btn-primary" type="submit" style="float: right";>Login</button><br /></div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                    <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
+                </div>
+            </div>
+        </div>
 
             <!-- After the "Login" button -->
             <!-- ("Register Now") & ("Forgot your password?") [Hyperlink(s)] -->
