@@ -13,7 +13,7 @@ require_once '../resources/config.php';
         <title>FYP-21-S2-24</title>
         <!-- Styling -->
         <?php include COMPONENT_PATH . '/bootstrap.php'; ?>
-        <link rel="stylesheet" href="./css/login_register.css"/> 
+        <link rel="stylesheet" href="./css/loginRegister.css"/> 
 
 
     </head>
@@ -95,10 +95,10 @@ require_once '../resources/config.php';
             <?php include COMPONENT_PATH . '/navbar.php' ?>
 
             <!-- Login Card -->
-            <div class="row m-4"></div>
-        <div class="container w-25">
-            <div class="col-auto">
-                <div class="center shadow card p-2 rounded1">
+        <div class="row m-4" ></div>
+        <div class="center container col-md-6 col-lg-4">
+            <div class="my-5 col-sm-12">
+                <div class="shadow card p-2 rounded1">
                     <div class="card-body m-1">
                         <h1 class="card-title px-1 py-3">Login</h1>
                         <div class="px-1">
