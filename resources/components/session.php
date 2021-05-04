@@ -10,8 +10,8 @@ if (isset($_SESSION['timeout'])) {
         // Any Alert
         echo
         '<script type = "text/javascript" >
-                alert("Your session will expire soon!");
-            </script>';
+            alert("Your session will expire soon!");
+        </script>';
         // If User Do Not Want To Continue The Session
         // header("Location:'logout.php'");
     }
