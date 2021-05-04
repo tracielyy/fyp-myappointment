@@ -53,6 +53,7 @@ require_once '../resources/config.php';
             foreach ($_POST as $key => $value) {
                 if (isset($loginArr[$key])) {
                     $loginArr[$key] = htmlspecialchars($value);
+                    $validArr[$key] = False; // Set All Field Validation Check As False
                 }
             }
 
@@ -68,29 +69,44 @@ require_once '../resources/config.php';
             } else {
                 $validArr['email'] = True; // Pass Validation
             }
+            
+            // -- Password 
+            $validArr["password"] = True;  // Default Password Valid
 
             /* ------------ End Validation ------------ */
 
-            // Start Authenticating User
-            $auth_user = Account_User::login($loginArr, session_id());
+            // Start Authenticating User (boolean)
+            $auth = Account_User::authenticate_user($loginArr);
+
+            // Check If There Is Any "token" generated
+            if (!isset($_SESSION['token'])) {
+                $token_length = 10;
+                $_SESSION['token'] = Account_User::get_token($token_length);
+            }
 
             // Check If There Are Any Other Login Session (Terminate Other Session?)
-            $session_logon_allowed = self::check_token($auth_user->get_session(), session_id());
+            $auth_user = Account_User::load_user_data($loginArr);
+            $session_logon_allowed = Account_User::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
 
             // User Authenticated
-            if ($auth_user != NULL) {
-                // Check Active Session
-                $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
-                //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
-                echo nl2br(PHP_EOL . "Success" . PHP_EOL);
+            if ($auth) {
+                if ($session_logon_allowed) {
+                    Account_User::login($auth_user->get_email(), session_id(), $_SESSION['token']);
+                    $auth_user = Account_User::load_user_data($loginArr); // Reload After Login Session Update
+                    $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
+                    //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
+                    $err_msg = "Success";
 
-                // Clear Fields
-                $loginArr = array(
-                    'email' => '',
-                    'password' => '',
-                );
+                    // Clear Fields
+                    $loginArr = array(
+                        'email' => '',
+                        'password' => '',
+                    );
+                } else {
+                    $err_msg = "Account is logged in at another location";
+                }
             } else {
-                $msg = "Invalid Credentials!";
+                $err_msg = "Invalid Credentials!";
             }
         }
         ?>
@@ -101,45 +117,45 @@ require_once '../resources/config.php';
             <?php include COMPONENT_PATH . '/navbar.php' ?>
 
             <!-- Login Card -->
-        <div class="row m-4" ></div>
-        <div class="center container col-md-6 col-lg-4">
-            <div class="my-5 col-sm-12">
-                <div class="shadow card p-2 rounded1">
-                    <div class="card-body m-1">
-                        <h1 class="card-title px-1 py-3">Login</h1>
-                        <div class="px-1">
-                            <!-- Form -->
-                            <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-                                <div class="row pb-2">
-                                    <div class="col">
-                                        Email:
+            <div class="row m-4" ></div>
+            <div class="center container col-md-6 col-lg-4">
+                <div class="my-5 col-sm-12">
+                    <div class="shadow card p-2 rounded1">
+                        <div class="card-body m-1">
+                            <h1 class="card-title px-1 py-3">Login</h1>
+                            <div class="px-1">
+                                <!-- Form -->
+                                <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                                    <div class="row pb-2">
+                                        <div class="col">
+                                            Email:
+                                        </div>
+                                        <div class="col">
+                                            <!-- EMAIL -->
+                                            <input type="email" class="form-control" name="email" required placeholder="Email"  value="<?php echo $loginArr['email']; ?>"/>
+                                        </div>
                                     </div>
-                                    <div class="col">
-                                        <!-- EMAIL -->
-                                        <input type="email" class="form-control" name="email" required placeholder="Email"  value="<?php echo $loginArr['email']; ?>"/>
+                                    <div class="row">
+                                        <div class="col">Password: </div>
+                                        <div class="col">
+                                            <!-- PASSWORD -->
+                                            <input type="password" class="form-control" name="password" placeholder="Password" value="<?php echo $loginArr['password']; ?>"/>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                <div class="col">Password: </div>
-                                    <div class="col">
-                                        <!-- PASSWORD -->
-                                        <input type="password" class="form-control" name="password" placeholder="Password" value="<?php echo $loginArr['password']; ?>"/>
+                                    <div class="row">
+                                        <div class="col ">
+                                        </div>
+                                        <!-- Login Submission -->
+                                        <div class="col py-3"><button class="btn btn-primary" type="submit" style="float: right";>Login</button><br /></div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col ">
-                                    </div>
-                                    <!-- Login Submission -->
-                                    <div class="col py-3"><button class="btn btn-primary" type="submit" style="float: right";>Login</button><br /></div>
-                                </div>
 
-                            </form>
+                                </form>
+                            </div>
                         </div>
+                        <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                     </div>
-                    <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                 </div>
             </div>
-        </div>
 
             <!-- After the "Login" button -->
             <!-- ("Register Now") & ("Forgot your password?") [Hyperlink(s)] -->

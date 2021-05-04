@@ -4,9 +4,6 @@
 <!-- This File Is Solely Used For Debugging -->
 <?php
 session_start();
-
-
-
 /* Load Config File */
 require_once '../resources/config.php';
 ?>
@@ -63,6 +60,7 @@ require_once '../resources/config.php';
                 foreach ($_POST as $key => $value) {
                     if (isset($loginArr[$key])) {
                         $loginArr[$key] = htmlspecialchars($value);
+                        $validArr[$key] = False; // Set All Field Validation Check As False
                     }
                 }
 
@@ -78,6 +76,9 @@ require_once '../resources/config.php';
                 } else {
                     $validArr['email'] = True; // Pass Validation
                 }
+                
+                // Password
+                $validArr["password"] = True;
 
                 /* ------------ End Validation ------------ */
 
@@ -92,7 +93,7 @@ require_once '../resources/config.php';
 
                 // Check If There Are Any Other Login Session (Terminate Other Session?)
                 $auth_user = Account_User::load_user_data($loginArr);
-                $session_logon_allowed = Account_User::check_session($auth_user->get_session(), $_SESSION['token']);
+                $session_logon_allowed = Account_User::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
 
                 // User Authenticated
                 if ($auth) {

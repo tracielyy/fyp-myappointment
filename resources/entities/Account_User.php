@@ -145,7 +145,7 @@ class Account_User {
     }
 
     // Check If There Are Any Other Login Session
-    public static function check_session(array $db_session, string $token): bool {
+    public static function check_session(array $db_session, string $sessionid, string $token): bool {
         // Session Status 
         if ($db_session['isloggedin'] == false) {
             return true;
@@ -175,7 +175,7 @@ class Account_User {
     }
 
     // Load User Data
-    public static function load_user_data(array $credentialArr) {
+    public static function load_user_data(array $credentialArr): mixed {
         $db = new Database();
         $user_data = $db->query_exact_match(self::ACCOUNT_USER, $credentialArr);
         if ($user_data != NULL) {
@@ -220,9 +220,15 @@ class Account_User {
         $db->modify_map_field(self::ACCOUNT_USER, $email, $mapArr);
     }
 
-    // Password Reset/ Password Change
+    // Password Change
     public static function change_password() {
         // Need To Send Verification Email To User.
+    }
+    
+    // Password Reset
+    public static function reset_password() {
+        // Need To Send OTP Via Email To User.
+        
     }
 
 }
