@@ -141,7 +141,7 @@ class Account_User {
         $db = new Database();
 
         $login = $db->modify_map_field(self::ACCOUNT_USER, $email, $mapArr);
-        return $login;
+        return $login; # Return Account_User Object
     }
 
     // Check If There Are Any Other Login Session
@@ -197,11 +197,12 @@ class Account_User {
     }
 
     // Check If The User Exist In The Database
-    public static function check_user_exist(string $email, string $contactnumber): bool {
+    public static function check_user_exist(string $email /*, string $contactnumber */): bool {
         $db = new Database();
         $emails_found = $db->query_exact_match(self::ACCOUNT_USER, array('email' => $email));
-        $contactnumbers_found = $db->query_exact_match(self::ACCOUNT_USER, array('contactnumber' => $contactnumber));
-        if (($emails_found !== NULL) || ($contactnumbers_found !== NULL)) {
+        //$contactnumbers_found = $db->query_exact_match(self::ACCOUNT_USER, array('contactnumber' => $contactnumber));
+        //if (($emails_found !== NULL) || ($contactnumbers_found !== NULL)) {
+        if (($emails_found !== NULL)) {
             return True;  // There is existing user
         }
         return False;
