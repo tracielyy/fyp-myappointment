@@ -27,6 +27,7 @@ class Patient extends Account_User {
     //============================================
     //      Methods Accessing Firestore Database 
     //============================================
+    
     // Insert New Patient To Firestore
     public static function create_patient(array $userDataArr) {
         $db = new Database();
