@@ -19,6 +19,8 @@ require_once '../resources/config.php';
         <?php
         require_once ENTITIES_PATH . '/Account_User.php';
         require_once UTILS_PATH . '/Email.php';
+
+
         // Used to store correct data
         $resetArr = array(
             'email' => '',
@@ -28,6 +30,8 @@ require_once '../resources/config.php';
         $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
         // Upon clicking "Login" Button
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
+          
+            
 
             /* Load Data to Array */
             foreach ($_POST as $key => $value) {
@@ -39,7 +43,6 @@ require_once '../resources/config.php';
 
             // Possible Validation of Email Before Firestore Query
             /* ------------ Start Validation ------------ */
-
 
             // -- Email Validation
             if (empty($resetArr['email'])) {
@@ -60,9 +63,19 @@ require_once '../resources/config.php';
                 $to = $resetArr['email'];
                 // Need To Generate Hash For URL (NOT IMPLEMENTED YET)
                 $subject = "FYP-21-S2-24: Password Reset";
-                $message = "Click on the link to reset password";
-                $mail = new Email($to, $subject, $message);
-                $mail->send_mail();
+                $message = "Hi {$resetArr["email"]}, Please click on the link to reset your password ";
+                $mail = new Email();
+                
+                // -- User That Requested Password Reset
+                $mail->addAddress($to);
+                
+                // Content
+                $mail->isHTML(true);
+                $mail->Subject = $subject ;
+                $mail->Body = $message;
+                $mail->AltBody =$message ;
+                $mail->send();
+                echo "Successfully sent";
             } else {
                 echo "This email does not exist";
             }
