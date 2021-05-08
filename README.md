@@ -13,5 +13,10 @@ Group Member:
 - Lim Jin Hin (Developer | Software Tester)
 
 
+# Reminder
+- composer update
+
 # Folders Explanation:
+
+
 
