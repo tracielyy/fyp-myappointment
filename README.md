@@ -14,7 +14,7 @@ Group Member:
 
 
 # Reminder
-- composer update 
+- composer update  
 
 # Folders Explanation:
 
