@@ -30,8 +30,8 @@ require_once '../resources/config.php';
         $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
         // Upon clicking "Login" Button
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-          
-            
+
+
 
             /* Load Data to Array */
             foreach ($_POST as $key => $value) {
@@ -60,20 +60,52 @@ require_once '../resources/config.php';
 
             // -- Invoke Email Send To User To Reset Password
             if ($user_exist) {
+                // -- Recipient
                 $to = $resetArr['email'];
-                // Need To Generate Hash For URL (NOT IMPLEMENTED YET)
+
+                // -- Email Subject
                 $subject = "FYP-21-S2-24: Password Reset";
-                $message = "Hi {$resetArr["email"]}, Please click on the link to reset your password ";
+
+                // -- Generate Token (Security) # NOT IMPLEMENTED YET#
+                $token_length = 25; # Size Not Determined Yet
+                $token = Account_User::get_token($token_length);
+                # -- Token Expiry Date Needs To Be Set -- #
+                // -- Password Reset Link With Token (To Be Added To The Email Message)
+                $unique_password_url = "http://localhost/MyAppointment/public/debugpasswordreset.php";
+                $request_another_url = "http://localhost/MyAppointment/public/debugpasswordreset.php";
+
+
+                // -- Clickable Links
+                $user_email = "<a href=mailto:{$resetArr["email"]}>{$resetArr["email"]}</a>";
+                $reset_password = "<a href={$unique_password_url} style='color:red; text-decoration: none;'>here</a>";
+                $reset_password_url = "<a href={$unique_password_url}>{$unique_password_url}</a>";
+                $request_another = "<a href={$request_another_url} style='color:teal;'>request another</a>";
+
+                // -- Miscellaneous
+                $break = "<br/><br/>";
+                $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
+
+                // -- Message
+                $message = "Hi,{$break}";
+                $message .= "We have received a request to reset the password for the MyAppointment account associated with {$user_email}. {$break}";
+                $message .= "You can reset your password by clicking {$reset_password} or copy the link below in your browser:<br/>";
+                $message .= "{$reset_password_url}{$break}";
+                $message .= "If you did make this request, please disregard this email.";
+                $message .= "Please note that your password will not change unless you click the link above and create a new one. This link will expire in one day.";
+                $message .= "If your link has expired, you can always {$request_another}. {$break}";
+                $message .= "If you have requested multiple reset emails, please make sure you click the link inside the most recent email.{$break}";
+                $message .= "{$sign_off}";
+
+
+                // -- Create New Email Object
                 $mail = new Email();
-                
-                // -- User That Requested Password Reset
                 $mail->addAddress($to);
-                
-                // Content
+
+                // -- Content
                 $mail->isHTML(true);
-                $mail->Subject = $subject ;
+                $mail->Subject = $subject;
                 $mail->Body = $message;
-                $mail->AltBody =$message ;
+                $mail->AltBody = $message;
                 $mail->send();
                 echo "Successfully sent";
             } else {

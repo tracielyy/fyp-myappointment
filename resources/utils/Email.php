@@ -2,6 +2,7 @@
 
 /*
  *  Email Class: For System Generated Mail Messages
+ * 
  */
 
 // Import PHPMailer Class
@@ -19,7 +20,7 @@ class Email extends PHPMailer {
         $this->Host = 'smtp.gmail.com';
         $this->SMTPAuth = true;
         $this->Username = 'tracieqwynn@gmail.com';
-        $this->Password = 'tdeguawjiftvobjk'; /* App Password*/
+        $this->Password = 'tdeguawjiftvobjk'; /* @tracieqwynn's App Password */
         $this->SMTPSecure = 'tls';
         $this->Port = 587;
         // Default Receipient Settings

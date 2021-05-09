@@ -159,7 +159,7 @@ class Account_User {
         }
     }
 
-    // Generate Token
+    // Generate Token (Multi-Function Usage) -- Not Sure If This Should Be In `Account_User` Class
     public static function get_token(int $length): string {
         $token = "";
         $token_repo = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Upper Case
