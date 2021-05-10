@@ -47,8 +47,8 @@ class Database {
     }
 
     // Insert Data: return success status
-    public function insert_data(string $collection, array $userDataInfo): bool {
-        $data_doc_ref = $this->db->collection($collection)->add($userDataInfo);
+    public function insert_data(string $collection, array $data_info): bool {
+        $data_doc_ref = $this->db->collection($collection)->add($data_info);
         if ($data_doc_ref !== NULL) {
             return True;
         }
