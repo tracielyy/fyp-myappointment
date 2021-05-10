@@ -7,8 +7,9 @@ cache:
   - vendor/
 
 before_script:
-  #- apt-get update -y
-  #- apt-get upgrade -y
+  - apt-get update -yqq
+  - apt-get upgrade -yqq
+  - apt-get install git -yqq
   - apt-get install sudo -y
   - apt-get install zlib1g-dev
 
