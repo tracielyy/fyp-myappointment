@@ -1,5 +1,5 @@
 # Select image from https://hub.docker.com/_/php
-image: php:7.3
+image: php:7.4
 
 # Select what we should cache
 cache:
@@ -18,7 +18,10 @@ before_script:
   # Install composer
   - curl -sS https://getcomposer.org/installer | php
 
+   # Get Info
   - php --ini 
+  
+  # Install gRPC for Google Cloud Firestore
   - sudo pecl install grpc
   
   # Install all project dependencies
