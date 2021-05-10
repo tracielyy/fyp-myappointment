@@ -1,5 +1,5 @@
 # Select image from https://hub.docker.com/_/php
-image: php:7.3
+image: ruby:2.6
 
 # Select what we should cache
 cache:
@@ -30,7 +30,8 @@ before_script:
 
 # -- Not Done --
 test:app:
-    script:
-      - echo 'ok'
-        #- vendor/bin/phpunit --configuration phpunit_myapp.xml
+  image: php:7.3
+  script:
+    - echo 'ok'
+     #- vendor/bin/phpunit --configuration phpunit_myapp.xml
 
