@@ -26,6 +26,9 @@ require_once '../resources/config.php';
             'email' => '',
         );
 
+        // -- Misc Variables
+        $msg = "";
+
         // -- Regex
         $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
         // Upon clicking "Login" Button
@@ -96,7 +99,6 @@ require_once '../resources/config.php';
                 $message .= "If you have requested multiple reset emails, please make sure you click the link inside the most recent email.{$break}";
                 $message .= "{$sign_off}</span>";
 
-
                 // -- Create New Email Object
                 $mail = new Email();
                 $mail->addAddress($to);
@@ -107,14 +109,15 @@ require_once '../resources/config.php';
                 $mail->Body = $message;
                 $mail->AltBody = $message;
                 $mail->send();
-                echo "Successfully sent";
+                $msg = "Successfully sent";
             } else {
-                echo "This email does not exist";
+                $msg = "This email does not exist";
             }
         }
         ?>
-        <!-- Ask For The Email To Reset -->
-        <!-- Reset Form -->
+        <!-- Display Message Info -->
+        <div><?php echo $msg; ?></div>
+        <!-- Reset Form (Ask For Email To Reset) -->
         <form method="post"  action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
             <p>Enter Email Address To Reset Password</p>
             <input type="email" name="email" required placeholder="Email"  value="<?php echo $resetArr['email']; ?>"/>
