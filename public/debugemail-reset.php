@@ -77,7 +77,7 @@ require_once '../resources/config.php';
 
                 // -- Clickable Links
                 $user_email = "<a href=mailto:{$resetArr["email"]}>{$resetArr["email"]}</a>";
-                $reset_password = "<a href={$unique_password_url} style='color:red; text-decoration: none;'>here</a>";
+                $reset_password = "<a href={$unique_password_url} style='color:red; text-decoration:none;'>here</a>";
                 $reset_password_url = "<a href={$unique_password_url}>{$unique_password_url}</a>";
                 $request_another = "<a href={$request_another_url} style='color:teal;'>request another</a>";
 
@@ -86,15 +86,15 @@ require_once '../resources/config.php';
                 $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
 
                 // -- Message
-                $message = "Hi,{$break}";
+                $message = "<span style='color:black;'>Hi,{$break}";
                 $message .= "We have received a request to reset the password for the MyAppointment account associated with {$user_email}. {$break}";
                 $message .= "You can reset your password by clicking {$reset_password} or copy the link below in your browser:<br/>";
                 $message .= "{$reset_password_url}{$break}";
-                $message .= "If you did make this request, please disregard this email.";
-                $message .= "Please note that your password will not change unless you click the link above and create a new one. This link will expire in one day.";
-                $message .= "If your link has expired, you can always {$request_another}. {$break}";
+                $message .= "If you did make this request, please disregard this email. ";
+                $message .= "Please note that your password will not change unless you click the link above and create a new one. ";
+                $message .= "This link will expire in one day. If your link has expired, you can always {$request_another}. {$break}";
                 $message .= "If you have requested multiple reset emails, please make sure you click the link inside the most recent email.{$break}";
-                $message .= "{$sign_off}";
+                $message .= "{$sign_off}</span>";
 
 
                 // -- Create New Email Object
