@@ -7,7 +7,7 @@ cache:
   - vendor/
 
 before_script:
-  - apt-get update -yqq
+  #- apt-get update -yqq
   - apt-get upgrade -yqq
   - apt-get install git -yqq
   - apt-get install sudo -y
