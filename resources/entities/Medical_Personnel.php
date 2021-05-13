@@ -14,8 +14,11 @@ class Medical_Personnel extends Account_User {
 
     // Properties
     # Name  Of The Medical Facility (e.g. NUH)
-    private string $medical_facility;
+    private array $facility_ids; // Multiple Places (e.g. mf001, mf002)
 
+    # Types
+    private string $roletype; // Doctor, Nurse
+    
     # License Number
     private string $license_number; // License Number
 

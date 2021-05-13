@@ -8,9 +8,12 @@ class Medical_Record {
 
     # Medical Diagnosis (Some Descriptions)
     private string $diagnosis_description;
+    
+    # Prescription
+    private array $prescription;  // Multiple Medications. (Possible `Prescription` Class)
 
     # Attending Medical Personnel
-    private string $medical_personnel;
+    private string $personnel_licenseno;
 
     # Date
     private string $date;

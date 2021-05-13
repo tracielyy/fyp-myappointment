@@ -19,6 +19,9 @@ class Appointment_Record {
     # Appointment Status (Upcoming, Missed, Open, etc...) -- Need To Call A Function To Update Status When Directed To The Page or Reload
     private string $appointmentstatus;
 
+    # Appointment Type
+    private string $appointmenttype; // Specialist, Doctor Consultation
+
     # Appointment Date [e.g. 01-01-2021]
     private string $date;
 
@@ -26,7 +29,7 @@ class Appointment_Record {
     private string $time;
 
     # Appointment Venue
-    private string $location;
+    private string $facilityid; // location
 
     protected const APPOINTMENT_RECORD = "Appointment_Record";
 
