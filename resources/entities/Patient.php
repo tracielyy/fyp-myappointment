@@ -1,5 +1,11 @@
+<!-- 
+    Developed By FYP-21-S2-24
+   
+-->
 <?php
-
+/*
+ * @author yanying (Tracy)
+ */
 /* Load Config File */
 require_once '../resources/config.php';
 require_once 'Appointment_Record.php';
@@ -27,7 +33,6 @@ class Patient extends Account_User {
     //============================================
     //      Methods Accessing Firestore Database 
     //============================================
-    
     // Insert New Patient To Firestore
     public static function create_patient(array $userDataArr) {
         $db = new Database();
@@ -35,6 +40,10 @@ class Patient extends Account_User {
             "sessionid" => "",
             "isloggedin" => false,
             "token" => ""
+        );
+        $userDataArr["reset"] = array(
+            "token" => "",
+            "requestedon" => ""
         );
         $userDataArr['usertype'] = self::PATIENT;
         $userDataArr['createdon'] = (string) date("d-m-Y");
@@ -45,7 +54,7 @@ class Patient extends Account_User {
     public static function get_patient_medical_record() {
         
     }
-    
+
     // Retrieve Patient Appointment Record
     public static function get_patient_appointment_record() {
         
@@ -62,5 +71,4 @@ class Patient extends Account_User {
 //        $this->$appointment_record = new Appointment_Record(); // Params TBC
 //    }
 }
-
 ?>

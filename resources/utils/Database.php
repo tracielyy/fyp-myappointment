@@ -1,4 +1,11 @@
+<!-- 
+    Developed By FYP-21-S2-24
+-->
+
 <?php
+/*
+ * @author yanying (Tracy)
+ */
 /* Load Config File */
 require_once '../resources/config.php';
 
@@ -40,7 +47,7 @@ class Database {
         $snapshot = $query->documents();
         foreach ($snapshot as $document) {
             if ($document->exists()) {
-                return $document->data();
+                return $document->data(); //  -- Returning the Data
             }
         }
         return NULL;

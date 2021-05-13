@@ -43,6 +43,7 @@ require_once '../resources/config.php';
             // -- Regex
             $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
 
+            $validArr = array();
 
             // -- When Redirect or Load The Page
             if ($_SERVER['REQUEST_METHOD'] == "GET") {
@@ -76,44 +77,47 @@ require_once '../resources/config.php';
                 } else {
                     $validArr['email'] = True; // Pass Validation
                 }
-                
+
                 // Password
                 $validArr["password"] = True;
 
                 /* ------------ End Validation ------------ */
+                if (!in_array(FALSE, $validArr)) {
+                    // Start Authenticating User (boolean)
+                    $auth = Account_User::authenticate_user($loginArr);
 
-                // Start Authenticating User (boolean)
-                $auth = Account_User::authenticate_user($loginArr);
+                    // Check If There Is Any "token" generated
+                    if (!isset($_SESSION['token'])) {
+                        $token_length = 10;  // Default Session Token Length
+                        $_SESSION['token'] = Account_User::get_token($token_length);
+                    }
 
-                // Check If There Is Any "token" generated
-                if (!isset($_SESSION['token'])) {
-                    $token_length = 10;  // Default Session Token Length
-                    $_SESSION['token'] = Account_User::get_token($token_length);
-                }
+                    // Check If There Are Any Other Login Session (Terminate Other Session?)
+                    $auth_user = Account_User::load_user_data($loginArr);
+                    $session_logon_allowed = Account_User::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
 
-                // Check If There Are Any Other Login Session (Terminate Other Session?)
-                $auth_user = Account_User::load_user_data($loginArr);
-                $session_logon_allowed = Account_User::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
+                    // User Authenticated
+                    if ($auth) {
+                        if ($session_logon_allowed) {
+                            Account_User::login($auth_user->get_email(), session_id(), $_SESSION['token']);
+                            $auth_user = Account_User::load_user_data($loginArr); // Reload After Login Session Update
+                            $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
+                            //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
+                            echo nl2br(PHP_EOL . "Success" . PHP_EOL);
 
-                // User Authenticated
-                if ($auth) {
-                    if ($session_logon_allowed) {
-                        Account_User::login($auth_user->get_email(), session_id(), $_SESSION['token']);
-                        $auth_user = Account_User::load_user_data($loginArr); // Reload After Login Session Update
-                        $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
-                        //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
-                        echo nl2br(PHP_EOL . "Success" . PHP_EOL);
-
-                        // Clear Fields
-                        $loginArr = array(
-                            'email' => '',
-                            'password' => '',
-                        );
+                            // Clear Fields
+                            $loginArr = array(
+                                'email' => '',
+                                'password' => '',
+                            );
+                        } else {
+                            $msg = "Account is logged in at another location";
+                        }
                     } else {
-                        $msg = "Account is logged in at another location";
+                        $msg = "Invalid Credentials!";
                     }
                 } else {
-                    $msg = "Invalid Credentials!";
+                    // When Validation Fails
                 }
             }
             ?>

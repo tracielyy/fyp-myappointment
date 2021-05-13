@@ -1,8 +1,15 @@
-<?php
+<!-- 
+    Developed By FYP-21-S2-24
+-->
 
+<?php
+/*
+ * @author yanying (Tracy)
+ */
 /* Load Config File */
 require_once '../resources/config.php';
 require_once UTILS_PATH . '/Database.php';
+require_once ENUMS_PATH . '/Appointment_Status.php';
 
 class Account_User {
 
@@ -18,6 +25,8 @@ class Account_User {
     private string $usertype;
     private string $createdon; // Date which the account is created
     private array $session;
+    // Future Possible
+    private boolean $enabled; # disabled || enabled
 
     protected const ACCOUNT_USER = "Account_User"; //  'protected' Access For Subclasses.
 
@@ -197,7 +206,7 @@ class Account_User {
     }
 
     // Check If The User Exist In The Database
-    public static function check_user_exist(string $email /*, string $contactnumber */): bool {
+    public static function check_user_exist(string $email /* , string $contactnumber */): bool {
         $db = new Database();
         $emails_found = $db->query_exact_match(self::ACCOUNT_USER, array('email' => $email));
         //$contactnumbers_found = $db->query_exact_match(self::ACCOUNT_USER, array('contactnumber' => $contactnumber));
@@ -221,17 +230,20 @@ class Account_User {
         $db->modify_map_field(self::ACCOUNT_USER, $email, $mapArr);
     }
 
+    // To Update The Generated Token To Database (Valid For 24 Hours)
+    public static function request_password_reset(string $email) {
+        $db = new Database();
+    }
+
     // Password Change
     public static function change_password() {
         // Need To Send Verification Email To User.
     }
-    
+
     // Password Reset
     public static function reset_password() {
         // Need To Send OTP Via Email To User.
-        
     }
 
 }
-
 ?>

@@ -1,12 +1,25 @@
+<!-- 
+    Developed By FYP-21-S2-24
+-->
 <?php
+/*
+ * @author yanying (Tracy)
+ */
+
+/*
+ *  Medical Personnel (e.g. Doctor, Practioner)
+ */
 
 class Medical_Personnel extends Account_User {
 
     // Properties
-    private string $medical_facility; // Name of the medical facility
+    # Name  Of The Medical Facility (e.g. NUH)
+    private string $medical_facility;
+
+    # License Number
     private string $license_number; // License Number
 
-    // Constructor
+    // -- Constructor
     public function __construct($firstname, $lastname, $gender, $dob,
             $contactnumber, $address, $usertype, $createdon, $email, $password = NULL) {
 
@@ -14,7 +27,7 @@ class Medical_Personnel extends Account_User {
                 $usertype, $createdon, $email, $password);
     }
 
-    // Getters
+    // -- Getters
     public function get_medical_facility() {
         return $this->medical_facility;
     }
@@ -23,7 +36,11 @@ class Medical_Personnel extends Account_User {
         return $this->license_number;
     }
 
-    // Setters
-}
+    // -- Setters
+    // Use For Debugging/ Logging Purpose
+    public function __toString(): string {
+        return parent::__toString();
+    }
 
+}
 ?>
