@@ -28,15 +28,17 @@ class Admin extends Account_User {
     // Add Medical Personnel
     public static function create_medical_personnel($admin, $medical_personnel): bool {
 
+        // Double Check If The One Performing The Action Is `ADMIN`
         if (self::check_admin($admin)) {
-            // Create Medical Pesronnel
+            // Create Medical Personnel
         }
     }
 
     public static function remove_medical_personnel($admin, $medical_personnel): bool {
         
+        // Double Check If The One Performing The Action Is `ADMIN`
         if (self::check_admin($admin)) {
-            // Remove Medical Pesronnel
+            // Remove Medical Personnel
         }
     }
 

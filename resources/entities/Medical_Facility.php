@@ -101,14 +101,17 @@ class Medical_Facility {
     //============================================
     //      Methods Accessing Firestore Database 
     //============================================
+    // -- When User Request To Display All Medical Facilities -- //
     public static function display_all_facilities() {
         
     }
 
+    // -- When User Request To Display Facilities By Certain Location -- //
     public static function display_facilities_by_location() {
         
     }
 
+    // -- When A Certain Facility Is Requested To Be Displayed -- //
     public static function get_facility_by_id() {
         
     }

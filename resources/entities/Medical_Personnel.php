@@ -13,14 +13,14 @@
 class Medical_Personnel extends Account_User {
 
     // Properties
-    # Name  Of The Medical Facility (e.g. NUH)
-    private array $facility_ids; // Multiple Places (e.g. mf001, mf002)
+    # Name  Of The Medical Facility (e.g. NUH) -- Multiple Places (e.g. mf001, mf002)
+    private array $facility_ids;
 
-    # Types
-    private string $roletype; // Doctor, Nurse
+    # Types (e.g. Doctor, Nurse)
+    private string $roletype;
     
     # License Number
-    private string $license_number; // License Number
+    private string $license_number;
 
     // -- Constructor
     public function __construct($firstname, $lastname, $gender, $dob,
@@ -44,6 +44,16 @@ class Medical_Personnel extends Account_User {
     public function __toString(): string {
         return parent::__toString();
     }
+
+
+    //============================================
+    //      Methods Accessing Firestore Database 
+    //============================================
+    // -- Get Medical Personnel (Individual) -- //
+    public static function get_medical_personnel(){
+
+    }
+
 
 }
 ?>

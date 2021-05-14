@@ -31,10 +31,24 @@ class Medical_Record {
     //============================================
     //      Methods Accessing Firestore Database 
     //============================================
-    // Create Appointment
+
+    /* 
+    * Logic As Per Discussed:
+    * Nurse can create medical record (e.g. Triage and some initial diagnosis)
+    * Doctor needs to validate, edit and further validate before it can be saved.
+    */
+
+    // -- Create Medical Record -- //
     public static function create_medical_record(array $medical_record_info) {
         
     }
+
+    // -- Edit Medical Record -- //
+    public static function edit_medical_record() {
+
+    }
+
+
 
 }
 
