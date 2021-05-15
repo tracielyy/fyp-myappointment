@@ -7,9 +7,13 @@
  */
 abstract class Appointment_Status {
 
-    const MISSED = "MISSED";
-    const OPEN = "OPEN";
-    const UPCOMING = "UPCOMING";
+    // -- Status Visible To Patient -- //
+    const MISSED = "Missed";
+    const OPEN = "Open";
+    const UPCOMING = "Upcoming";
+    
+    // -- Status Not Visible To Patient -- //
+    const SEEN = "Seen";
 
 }
 ?>
