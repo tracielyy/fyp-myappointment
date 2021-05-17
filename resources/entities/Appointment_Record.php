@@ -35,6 +35,9 @@ class Appointment_Record {
     private string $facilityid;
     private Medical_Facility $facility;
 
+    # Appointment Created on
+    private string $createdon;
+
     protected const APPOINTMENT_RECORD = "Appointment_Record";
 
     // Constructor
@@ -93,7 +96,7 @@ class Appointment_Record {
     // Use For Debugging/ Logging Purpose
     public function __toString(): string {
         $str = nl2br('Appointment ID: ' . $this->appointmentid . PHP_EOL . 'Appointment Status ' . $this->appointmentstatus . PHP_EOL . 'Date: ' . $this->date .
-                PHP_EOL . 'Time: ' . $this->time . PHP_EOL . 'Location ' . $this->facilityid);
+                PHP_EOL . 'Time: ' . $this->time . PHP_EOL . 'Location ' . $this->facility);
         return $str;
     }
 
@@ -102,29 +105,66 @@ class Appointment_Record {
     //============================================
     // -- Create Appointment -- //
     public static function create_appointment(array $appointment_info) {
+
+
+        $appointment_info['createdon'] = (string) date("d-m-Y");
+
         $db = new DbQuery();
         $db->insert_data(self::APPOINTMENT_RECORD, $appointment_info);
     }
 
-    // -- Get Apppointment Record By Patient -- //
+    // -- Get Upcoming Appointment By Patient (Array Of Appointment_Record) -- //
     public static function get_upcoming_appointments(array $email) {
+        # List Of Upcoming Appointments
+        $upcoming_arr = array();
+
         # Set Default Appointment Status
         $appointmentstatus['appointmentstatus'] = Appointment_Status::UPCOMING;
 
-        # Query For Upcoming Appointment Records (NOT DONE)
+        # Query For Upcoming Appointment Records
         $db = new DbQuery();
-        $record = $db->get_nested_collection(Database::ACCOUNT_USER, Database::APPOINTMENT_RECORD,
+        $record_list = $db->get_nested_collection(Database::ACCOUNT_USER, Database::APPOINTMENT_RECORD,
                 $email, $appointmentstatus);
 
-        # Create Appointment Record Object
-        $facility = Medical_Facility::get_facility_by_id($record['facilityid']);
-        $record_object = new Appointment_Record($record['appointmentid'], $record['appointmenttype'], $record['date'], $record['time'], $facility);
+        # Create Appointment Record Object List
+        foreach ($record_list as $record) {
+            $facility = Medical_Facility::get_facility_by_id($record['facilityid']);
+            $record_object = new Appointment_Record($record['appointmentid'], $record['appointmenttype'], $record['date'], $record['time'], $facility);
+            $upcoming_arr[] = $record_object;
+        }
+        return $upcoming_arr;
+    }
 
-        return $record_object;
+    // -- Get Missed Appointment By Patient (Array Of Appointment Record)  last 14 days -- //
+    public static function get_missed_appointments(array $email) {
+        # List Of Upcoming Appointments
+        $missed_arr = array();
+
+        # Set Various Subconditions
+        $subconditions['appointmentstatus'] = Appointment_Status::MISSED;
+        # Date TBC
+        
+        # Query For Missed Appointment Records (Need To Query For Last 14 Days)
+        $db = new DbQuery();
+        $record_list = $db->get_nested_collection(Database::ACCOUNT_USER, Database::APPOINTMENT_RECORD,
+                $email, $subconditions);
+
+        # Create Appointment Record Object List
+        foreach ($record_list as $record) {
+            $facility = Medical_Facility::get_facility_by_id($record['facilityid']);
+            $record_object = new Appointment_Record($record['appointmentid'], $record['appointmenttype'], $record['date'], $record['time'], $facility);
+            $missed_arr[] = $record_object;
+        }
+        return $missed_arr;
     }
 
     // -- Update Appointment Status (e.g. Upcoming > Missed) -- //
-    public static function change_appointment_status() {
+    private static function change_appointment_status() {
+        
+    }
+
+    // -- Remove Appointment_Record When User `Cancel` Their Appointment
+    public static function cancel_appointment(string $email, string $appointmentid) {
         
     }
 
