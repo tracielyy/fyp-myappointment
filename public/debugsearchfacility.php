@@ -4,6 +4,4 @@
 <!-- This File Is Solely Used For Debugging -->
 <?php
 
-
 ?>
-
