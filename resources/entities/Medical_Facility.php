@@ -10,6 +10,12 @@
 /*
  *  Medical Facility (e.g. Hospital, Clinics)
  */
+/* Load Config File */
+require_once '../resources/config.php';
+require_once ENUMS_PATH . '/Appointment_Status.php';
+require_once ENTITIES_PATH . '/Medical_Facility.php';
+require_once UTILS_PATH . '/DbQuery.php';
+require_once UTILS_PATH . '/Database.php';
 
 class Medical_Facility {
 
@@ -28,18 +34,19 @@ class Medical_Facility {
 
     # Medical Facility Operating Hours
     private array $operatinghours = array('opening' => '', 'closing' => '');
-    
+
     # DATABASE CONSTANT
+
     protected const MEDICAL_FACILITY = "Medical_Facility";
 
     // -- Constructor -- //
-    public function __construct(string $facilityname, string $address,
+    public function __construct(string $facilityid, string $facilityname, string $address,
             string $contactnumber, array $operatinghours) {
+        $this->facilityid = $facilityid;
         $this->facilityname = $facilityname;
         $this->address = $address;
         $this->contactnumber = $contactnumber;
         $this->operatinghours = $operatinghours;
-        
     }
 
     // -- Getters -- //
@@ -97,9 +104,9 @@ class Medical_Facility {
         $this->operatinghour['closing'] = $closinghour;
     }
 
-    // Use For Debugging/ Logging Purpose
+    //  -- Use For Debugging/ Logging Purpose -- //
     public function __toString(): string {
-        $str = nl2br('Facility ID: ' . $this->facility . PHP_EOL . 'Facility Name: ' . $this->facilityname . PHP_EOL . 'Address: ' . $this->address .
+        $str = nl2br(PHP_EOL . 'Facility ID: ' . $this->facilityid . PHP_EOL . 'Facility Name: ' . $this->facilityname . PHP_EOL . 'Address: ' . $this->address .
                 PHP_EOL . 'Contact Number: ' . $this->contactnumber . PHP_EOL . 'Opening Hour: ' . $this->operatinghours['opening'] .
                 PHP_EOL . 'Closing Hour: ' . $this->operatinghours['closing']);
         return $str;
@@ -123,12 +130,14 @@ class Medical_Facility {
     public static function get_facility_by_id(string $facilityid) {
         # Create Facility Array
         $arr['facilityid'] = $facilityid;
-        
+
         # Query For Facility
         $db = new DbQuery();
-        $facility = $db->query_exact_match(self::MEDICAL_FACILITY, $arr);
+        $facility = $db->query_exact_match(Database::MEDICAL_FACILITY, $arr);
         if ($facility != NULL) {
-            return $facility;
+            $facility_object = new Medical_Facility($facility['facilityid'], $facility['facilityname'], $facility['address'],
+                    $facility['contactnumber'], $facility['operatinghours']);
+            return $facility_object;
         }
     }
 
