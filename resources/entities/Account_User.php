@@ -9,6 +9,7 @@
 require_once '../resources/config.php';
 require_once UTILS_PATH . '/DbQuery.php';
 require_once UTILS_PATH . '/Database.php';
+require_once UTILS_PATH . '/Time.php';
 require_once ENUMS_PATH . '/Appointment_Status.php';
 
 class Account_User {
@@ -27,8 +28,6 @@ class Account_User {
     private array $session;
     // Future Possible
     private bool $enabled; # disabled || enabled
-
-    protected const ACCOUNT_USER = "Account_User"; //  'protected' Access For Subclasses.
 
     // Constructor
     public function __construct(array $session, string $firstname, string $lastname, string $gender, string $dob,
@@ -147,7 +146,7 @@ class Account_User {
         );
         $db = new DbQuery();
 
-        $login = $db->modify_map_field(self::ACCOUNT_USER, $email, $mapArr);
+        $login = $db->modify_map_field(Database::ACCOUNT_USER, $email, $mapArr);
         return $login; # Return Account_User Object
     }
 
@@ -167,11 +166,12 @@ class Account_User {
     }
 
     // -- Generate Token (Multi-Function Usage) ~ Not Sure If This Should Be In `Account_User` Class -- //
-    public static function get_token(int $length): string {
+    public static function generate_token(int $length): string {
         $token = "";
         $token_repo = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Upper Case
         $token_repo .= "abcdefghijklmnopqrstuvwxyz"; // Lower Case
         $token_repo .= "0123456789"; // Digits
+        $token_repo .= ".-_~!+,*:@"; // Special Chars
         $max = strlen($token_repo);
 
         for ($i = 0; $i < $length; $i++) {
@@ -184,7 +184,7 @@ class Account_User {
     // -- Load User Data (Retrieve & Return User Data) -- //
     public static function load_user_data(array $credentialArr): mixed {
         $db = new DbQuery();
-        $user_data = $db->query_exact_match(self::ACCOUNT_USER, $credentialArr);
+        $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $credentialArr);
         if ($user_data != NULL) {
             return new Account_User($user_data['session'], $user_data['firstname'], $user_data['lastname'], $user_data['gender'],
                     $user_data['dob'], $user_data['contactnumber'], $user_data['address'], $user_data['usertype'],
@@ -196,7 +196,7 @@ class Account_User {
     // -- Authenticate & Return The User Data If Authenticated Successfully -- //
     public static function authenticate_user(array $credentialArr): bool {
         $db = new DbQuery();
-        $user_data = $db->query_exact_match(self::ACCOUNT_USER, $credentialArr);
+        $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $credentialArr);
         if ($user_data != NULL) {
             return True;
         }
@@ -206,7 +206,7 @@ class Account_User {
     //  -- Check If The User Exist In The Database -- //
     public static function check_user_exist(string $email /* , string $contactnumber */): bool {
         $db = new DbQuery();
-        $emails_found = $db->query_exact_match(self::ACCOUNT_USER, array('email' => $email));
+        $emails_found = $db->query_exact_match(Database::ACCOUNT_USER, array('email' => $email));
         //$contactnumbers_found = $db->query_exact_match(self::ACCOUNT_USER, array('contactnumber' => $contactnumber));
         //if (($emails_found !== NULL) || ($contactnumbers_found !== NULL)) {
         if (($emails_found !== NULL)) {
@@ -225,12 +225,30 @@ class Account_User {
                 "token" => ""
             )
         );
-        $db->modify_map_field(self::ACCOUNT_USER, $email, $mapArr);
+        $db->modify_map_field(Database::ACCOUNT_USER, $email, $mapArr);
     }
 
     // -- To Update The Generated Token To Database (Valid For 24 Hours) -- //
-    public static function request_password_reset(string $email) {
+    public static function request_password_reset(string $email, string $token) {
+        $userDataArr["passwordreset"] = array(
+            "passwordtoken" => $token,
+            "requestedon" => Time::get_current_date()
+        );
         $db = new DbQuery();
+        $db->modify_map_field(Database::ACCOUNT_USER, $email, $userDataArr);
+    }
+    
+    // -- Validate Password Token -- //
+    public static function validate_password_token(string $email, string $token) {
+        $exist = self::check_user_exist($email);
+        # Need To Make Sure The Email Is Valid
+        if ($exist) {
+            $conditionArr['email'] = $email;
+            $conditionArr['passwordreset']['passwordtoken'] = $token;
+            $db  = new DbQuery();
+            $db->query_exact_match(Database::ACCOUNT_USER, $conditionArr);
+        }
+        return false;
     }
 
     // -- Password Change -- //
@@ -241,6 +259,8 @@ class Account_User {
     // -- Password Reset -- //
     public static function reset_password() {
         // Need To Send OTP Via Email To User.
+        
+        # Need To Reset The Fields In The `passwordreset` To Empty
     }
 
 }
