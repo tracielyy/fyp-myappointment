@@ -71,10 +71,11 @@ require_once '../resources/config.php';
 
                 // -- Generate Token (Security) # NOT IMPLEMENTED YET#
                 $token_length = 25; # Size Not Determined Yet
-                $token = Account_User::get_token($token_length);
+                $token = Account_User::generate_token($token_length);
                 # -- Token Expiry Date Needs To Be Set -- #
                 // -- Password Reset Link With Token (To Be Added To The Email Message)
-                $unique_password_url = "http://localhost/MyAppointment/public/debugpasswordreset.php";
+                // <link>?token=<passwordtoken>&email=<email>
+                $unique_password_url = "http://localhost/MyAppointment/public/debugpasswordreset.php?token={$token}&email={$resetArr["email"]}";
                 $request_another_url = "http://localhost/MyAppointment/public/debugpasswordreset.php";
 
 
@@ -110,6 +111,7 @@ require_once '../resources/config.php';
                 $mail->AltBody = $message;
                 $mail->send();
                 $msg = "Successfully sent";
+                Account_User::request_password_reset($to,$token);
             } else {
                 $msg = "This email does not exist";
             }
