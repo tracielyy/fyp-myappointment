@@ -51,5 +51,3 @@ class Medical_Record {
 
 
 }
-
-?>

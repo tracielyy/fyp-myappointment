@@ -28,13 +28,21 @@ class Medical_Facility {
 
     # Medical Facility Operating Hours
     private array $operatinghours = array('opening' => '', 'closing' => '');
+    
+    # DATABASE CONSTANT
+    protected const MEDICAL_FACILITY = "Medical_Facility";
 
-    // -- Constructor
-    public function __construct() {
+    // -- Constructor -- //
+    public function __construct(string $facilityname, string $address,
+            string $contactnumber, array $operatinghours) {
+        $this->facilityname = $facilityname;
+        $this->address = $address;
+        $this->contactnumber = $contactnumber;
+        $this->operatinghours = $operatinghours;
         
     }
 
-    // -- Getters
+    // -- Getters -- //
     public function get_facilityid(): string {
         return $this->facilityid;
     }
@@ -63,7 +71,7 @@ class Medical_Facility {
         return $this->operatinghours['closing'];
     }
 
-    // -- Setters
+    // -- Setters -- //
     public function set_facilityname(string $facilityname) {
         $this->facilityname = $facilityname;
     }
@@ -111,11 +119,18 @@ class Medical_Facility {
         
     }
 
-    // -- When A Certain Facility Is Requested To Be Displayed -- //
-    public static function get_facility_by_id() {
+    // -- When A Certain Facility Is Requested To Be Displayed  (NOT DOCUMENT ID) -- //
+    public static function get_facility_by_id(string $facilityid) {
+        # Create Facility Array
+        $arr['facilityid'] = $facilityid;
         
+        # Query For Facility
+        $db = new DbQuery();
+        $facility = $db->query_exact_match(self::MEDICAL_FACILITY, $arr);
+        if ($facility != NULL) {
+            return $facility;
+        }
     }
 
 }
 ?>
-

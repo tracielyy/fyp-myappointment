@@ -10,6 +10,8 @@
 require_once '../resources/config.php';
 require_once 'Appointment_Record.php';
 require_once 'Account_User.php';
+require_once UTILS_PATH . '/DbQuery.php';
+require_once UTILS_PATH . '/Database.php';
 
 class Patient extends Account_User {
 
@@ -35,7 +37,7 @@ class Patient extends Account_User {
     //============================================
     // Insert New Patient To Firestore
     public static function create_patient(array $userDataArr) {
-        $db = new Database();
+        $db = new DbQuery();
         $userDataArr['session'] = array(
             "sessionid" => "",
             "isloggedin" => false,
@@ -57,7 +59,7 @@ class Patient extends Account_User {
 
     // Retrieve Patient Appointment Record
     public static function get_patient_appointment_record() {
-        
+
     }
 
 //    // Getters
