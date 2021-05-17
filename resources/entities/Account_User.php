@@ -1,13 +1,13 @@
 <!-- 
     Developed By FYP-21-S2-24
 -->
-
 <?php
 /*
  * @author yanying (Tracy)
  */
 /* Load Config File */
 require_once '../resources/config.php';
+require_once UTILS_PATH . '/DbQuery.php';
 require_once UTILS_PATH . '/Database.php';
 require_once ENUMS_PATH . '/Appointment_Status.php';
 
@@ -26,7 +26,7 @@ class Account_User {
     private string $createdon; // Date which the account is created
     private array $session;
     // Future Possible
-    private boolean $enabled; # disabled || enabled
+    private bool $enabled; # disabled || enabled
 
     protected const ACCOUNT_USER = "Account_User"; //  'protected' Access For Subclasses.
 
@@ -125,7 +125,7 @@ class Account_User {
         $this->password = $password;  // Security Measures & Conditions NOT Applied.
     }
 
-    // Use For Debugging/ Logging Purpose
+    // -- Use For Debugging/ Logging Purpose -- //
     public function __toString(): string {
         $str = nl2br('First Name: ' . $this->firstname . PHP_EOL . 'Last Name: ' . $this->lastname . PHP_EOL . 'Email: ' . $this->email .
                 PHP_EOL . 'User Type: ' . $this->usertype . PHP_EOL . 'Gender: ' . $this->gender . PHP_EOL . 'DOB: ' . $this->dob .
@@ -136,10 +136,8 @@ class Account_User {
     //============================================
     //      Methods Accessing Firestore Database 
     //============================================
-    // Triggered When The The User Clicks On "Login"
+    // -- Change Login Status When User Already Authenticated -- //
     public static function login(string $email, string $sessionid, string $token): mixed {
-        // Successfully Authenticated
-
         $mapArr = array(
             "session" => array(
                 "sessionid" => $sessionid,
@@ -147,13 +145,13 @@ class Account_User {
                 "token" => $token
             )
         );
-        $db = new Database();
+        $db = new DbQuery();
 
         $login = $db->modify_map_field(self::ACCOUNT_USER, $email, $mapArr);
         return $login; # Return Account_User Object
     }
 
-    // Check If There Are Any Other Login Session
+    //  -- Check If There Are Any Other Login Session -- //
     public static function check_session(array $db_session, string $sessionid, string $token): bool {
         // Session Status 
         if ($db_session['isloggedin'] == false) {
@@ -168,7 +166,7 @@ class Account_User {
         }
     }
 
-    // Generate Token (Multi-Function Usage) -- Not Sure If This Should Be In `Account_User` Class
+    // -- Generate Token (Multi-Function Usage) ~ Not Sure If This Should Be In `Account_User` Class -- //
     public static function get_token(int $length): string {
         $token = "";
         $token_repo = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Upper Case
@@ -183,9 +181,9 @@ class Account_User {
         return $token;
     }
 
-    // Load User Data
+    // -- Load User Data (Retrieve & Return User Data) -- //
     public static function load_user_data(array $credentialArr): mixed {
-        $db = new Database();
+        $db = new DbQuery();
         $user_data = $db->query_exact_match(self::ACCOUNT_USER, $credentialArr);
         if ($user_data != NULL) {
             return new Account_User($user_data['session'], $user_data['firstname'], $user_data['lastname'], $user_data['gender'],
@@ -195,9 +193,9 @@ class Account_User {
         return NULL;
     }
 
-    // Authenticate & Return The User Data If Authenticated Successfully
+    // -- Authenticate & Return The User Data If Authenticated Successfully -- //
     public static function authenticate_user(array $credentialArr): bool {
-        $db = new Database();
+        $db = new DbQuery();
         $user_data = $db->query_exact_match(self::ACCOUNT_USER, $credentialArr);
         if ($user_data != NULL) {
             return True;
@@ -205,9 +203,9 @@ class Account_User {
         return False;
     }
 
-    // Check If The User Exist In The Database
+    //  -- Check If The User Exist In The Database -- //
     public static function check_user_exist(string $email /* , string $contactnumber */): bool {
-        $db = new Database();
+        $db = new DbQuery();
         $emails_found = $db->query_exact_match(self::ACCOUNT_USER, array('email' => $email));
         //$contactnumbers_found = $db->query_exact_match(self::ACCOUNT_USER, array('contactnumber' => $contactnumber));
         //if (($emails_found !== NULL) || ($contactnumbers_found !== NULL)) {
@@ -219,7 +217,7 @@ class Account_User {
 
     // Triggered When User Clicks On "Logout"
     public static function session_logout(string $email) {
-        $db = new Database();
+        $db = new DbQuery();
         $mapArr = array(
             "session" => array(
                 "sessionid" => "",
@@ -230,17 +228,17 @@ class Account_User {
         $db->modify_map_field(self::ACCOUNT_USER, $email, $mapArr);
     }
 
-    // To Update The Generated Token To Database (Valid For 24 Hours)
+    // -- To Update The Generated Token To Database (Valid For 24 Hours) -- //
     public static function request_password_reset(string $email) {
-        $db = new Database();
+        $db = new DbQuery();
     }
 
-    // Password Change
-    public static function change_password() {
+    // -- Password Change -- //
+    public static function change_password(string $email) {
         // Need To Send Verification Email To User.
     }
 
-    // Password Reset
+    // -- Password Reset -- //
     public static function reset_password() {
         // Need To Send OTP Via Email To User.
     }
