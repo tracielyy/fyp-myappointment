@@ -43,10 +43,12 @@ class Patient extends Account_User {
             "isloggedin" => false,
             "token" => ""
         );
-        $userDataArr["reset"] = array(
-            "token" => "",
+        
+        $userDataArr["passwordreset"] = array(
+            "passwordtoken" => "",
             "requestedon" => ""
         );
+        
         $userDataArr['usertype'] = self::PATIENT;
         $userDataArr['createdon'] = (string) date("d-m-Y");
         $db->insert_data(parent::ACCOUNT_USER, $userDataArr);

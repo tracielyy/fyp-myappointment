@@ -106,7 +106,7 @@ class DbQuery {
     public function get_nested_collection(string $collection, string $subcollection, array $conditionArr, array $subconditionArr) {
         // Getting The Condition Keys
         $condition = array_key_first($conditionArr); # Outer Condition
-        $subcondition = array_key_first($subconditionArr); # Inner Condition
+//        $subcondition = array_key_first($subconditionArr); # Inner Condition
         # Collection
         $query = $this->db->collection($collection);
         $query = $query->where($condition, "=", $conditionArr[$condition])->limit(1);
@@ -122,18 +122,19 @@ class DbQuery {
         $sub_cols = $sub_col_ref->collection($subcollection);
 
         # Sub-Collection
-
-        $sub_cols = $sub_cols->where($subcondition, "=", $subconditionArr[$subcondition])->limit(1);
-
+        foreach ($subconditionArr as $subcondition => $value) {
+            $sub_cols = $sub_cols->where($subcondition, "=", $value);
+        }
         $sub_snapshot = $sub_cols->documents();
+
+        # Create An Array To Store The Document Data
+        $doc_arr = array();
         foreach ($sub_snapshot as $doc) {
             if ($doc->exists()) {
-                return $doc->data(); //  -- Returning the Data
+                $doc_arr[] = $doc->data(); //  -- Storing Each Document Data In Array
             }
         }
-
-
-        return NULL;
+        return $doc_arr;  // -- Return Array Of Document Datas
     }
 
 //    // Get Firestore Document Wihout Knowing Document ID

@@ -9,11 +9,10 @@ abstract class Appointment_Status {
 
     // -- Status Visible To Patient -- //
     const MISSED = "Missed";
-    const OPEN = "Open";
     const UPCOMING = "Upcoming";
     
     // -- Status Not Visible To Patient -- //
-    const SEEN = "Seen";
+    const COMPLETED = "Completed";
 
 }
 ?>
