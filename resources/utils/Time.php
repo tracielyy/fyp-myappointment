@@ -6,17 +6,30 @@
  * @author yanying (Tracy)
  */
 
+# Set It To Singapore TimeZone #
+date_default_timezone_set('Asia/Singapore');
+
 class Time {
 
-    private string $date;
-    private string $time;
+    private ?string $date;
+    private ?string $time;
 
-    function __construct(string $date = "", string $time = "") {
-        if ($date == "") {
-            $this->date = (string) date("d-m-Y");
+    private const DATE_FORMAT_DEFAULT = "d-m-Y";
+    private const TIME_FORMAT_DEFAULT = "H:i:s";
+
+    // -- Constructor -- //
+    function __construct(?string $date = NULL, ?string $time = NULL) {
+
+        if ($date == NULL) {
+            $this->date = (string) date(self::DATE_FORMAT_DEFAULT);
+        } else {
+            $this->date = $date;
         }
-        if ($time == "") {
-            $this->time = (string) date("H:i:s"); // Default 24 Hours with seconds
+
+        if ($time == NULL) {
+            $this->time = (string) date(self::TIME_FORMAT_DEFAULT); // -- Default 24 Hours with seconds
+        } else {
+            $this->time = $time;
         }
     }
 
@@ -29,6 +42,10 @@ class Time {
         return $this->date;
     }
 
+    public function get_full_date() {
+        return $this->date . " " . $this->time;
+    }
+
     // Some static methods
     public static function get_current_date(): string {
         return (string) date("d-m-Y");
@@ -36,6 +53,19 @@ class Time {
 
     public static function get_current_time(): string {
         return (string) date("H:i:s");
+    }
+
+    // -- Find Difference In Date & Time -- //
+    public static function datetime_second_diff(Time $current, Time $comparison) {
+        
+        # Make Time Object To DateTime Object To Use The Functions
+        $now = new DateTime($current->get_full_date());
+        $given_date = new DateTime($comparison->get_full_date());
+        
+        # Get The Difference In The Dates
+        $interval_seconds = $now->getTimestamp() - $given_date->getTimestamp();
+
+        return $interval_seconds;
     }
 
     // -- Convert The Date & Time -- //

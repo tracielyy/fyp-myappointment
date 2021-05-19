@@ -88,7 +88,7 @@ require_once '../resources/config.php';
 
                     // Check If There Is Any "token" generated
                     if (!isset($_SESSION['token'])) {
-                        $token_length = 10;  // Default Session Token Length
+                        $token_length = 15;  // Default Session Token Length
                         $_SESSION['token'] = Account_User::get_token($token_length);
                     }
 

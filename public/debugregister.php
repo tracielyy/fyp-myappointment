@@ -18,6 +18,7 @@ require_once '../resources/config.php';
         <?php
         require_once ENTITIES_PATH . '/Account_User.php';
         require_once ENTITIES_PATH . '/Patient.php';
+        require_once UTILS_PATH . '/Regex.php';
         // Code here
         ?>
 
@@ -46,17 +47,7 @@ require_once '../resources/config.php';
 
             // Some Variables
             $err_firstname = $err_lastname = $err_gender = $err_contactnumber = $err_address = $err_dob = $err_password = $err_confirmpassword = $err_email = "";
-            // -- Regex
-            $contact_number_pattern = "/^[689]{1}[0-9]{7}$/"; // Singapore phone number length
-            $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
-            $name_pattern = "/^(?![ .]+$)[a-zA-Z ,]*$/";
-            $password_pattern = "/^" . // Pattern Match From Start Of String
-                    "(?=.*[0-9])" . // At Least 1 Digit
-                    "(?=.*[a-z])" . // At Least 1 Lower Case Char
-                    "(?=.*[A-Z])" . // At Least 1 Upper Case Char
-                    "(?=.*[\*\.!@\$%^&\(\)\{\}\[\]:;<>,.\?\/\~_\+-=\|])" . // At Least 1 Special Chars
-                    ".{8,32}" . // 8 To 32 Chars In Total
-                    "$/";                                                             // Pattern Match To End Of String
+
             // Upon clicking "Login" Button 
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -78,7 +69,7 @@ require_once '../resources/config.php';
                 if (empty($registerArr['firstname'])) {
                     $err_firstname = "Field Cannot Be Empty";
                     echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
-                } else if (!preg_match($name_pattern, $registerArr['firstname'])) {
+                } else if (!Regex::validate_name($registerArr['firstname'])) {
                     $err_firstname = "Invalid";
                     echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
                 } else {
@@ -88,7 +79,7 @@ require_once '../resources/config.php';
                 // -- Last Name
                 if (empty($registerArr['lastname'])) {
                     $err_lastname = "Field Cannot Be Empty";
-                } else if (!preg_match($name_pattern, $registerArr['lastname'])) {
+                } else if (!Regex::validate_name($registerArr['lastname'])) {
                     $err_lastname = "Invalid";
                 } else {
                     $validArr['lastname'] = True; // Pass Validation
@@ -97,7 +88,7 @@ require_once '../resources/config.php';
                 // -- Contact Number Validation
                 if (empty($registerArr['contactnumber'])) {
                     $err_contactnumber = "Field Cannot Be Empty";
-                } else if (!preg_match($contact_number_pattern, $registerArr['contactnumber'])) {
+                } else if (!Regex::validate_phone($registerArr['contactnumber'])) {
                     $err_contactnumber = "Invalid";
                 } else {
                     $validArr['contactnumber'] = True; // Pass Validation
@@ -140,7 +131,7 @@ require_once '../resources/config.php';
                 if (empty($registerArr['email'])) {
                     // Store Some Error Message
                     $err_email = "Field Cannot Be Empty";
-                } else if (!preg_match($email_pattern, $registerArr['email'])) {
+                } else if (!Regex::validate_email($registerArr['email'])) {
                     // Store Some Error Message
                     $err_email = "Invalid";
                 } else {
@@ -151,7 +142,7 @@ require_once '../resources/config.php';
                 if (empty($registerArr['password'])) {
                     // Store Some Error Message
                     $err_password = "Field Cannot Be Empty";
-                } else if (!preg_match($password_pattern, $registerArr['password'])) {
+                } else if (!Regex::validate_password($registerArr['password'])) {
                     // Store Some Error Message
                     $err_password = "Invalid";
                 } else {

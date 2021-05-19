@@ -11,24 +11,25 @@ use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
 class Email extends PHPMailer {
-    private const SYSMAIL = "tracieqwynn@gmail.com";
 
+    private const SYSMAIL = "fyp.21.s2.24@gmail.com";
+    private const APP_PASSWORD = "rzylfksaoemejptd";
 
+    // -- Construct -- //
     public function __construct($exceptions = null) {
         parent::__construct($exceptions);
         $this->isSMTP();
         $this->Host = 'smtp.gmail.com';
         $this->SMTPAuth = true;
         $this->Username = self::SYSMAIL;
-        $this->Password = 'tdeguawjiftvobjk'; /* @tracieqwynn's App Password */
+        $this->Password = self::APP_PASSWORD; /* @fyp-21-s2-24's App Password */
         $this->SMTPSecure = 'tls';
         $this->Port = 587;
-        // Default Receipient Settings
+
+        // -- Default Receipient Settings -- //
         $this->From = self::SYSMAIL;
         $this->FromName = "MyAppointment FYP-21-S2-24";
-        
     }
-
 
     // -- Override Parent send() -- //
     public function send() {

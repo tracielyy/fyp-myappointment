@@ -19,6 +19,7 @@ require_once '../resources/config.php';
         <?php
         require_once ENTITIES_PATH . '/Account_User.php';
         require_once UTILS_PATH . '/Email.php';
+        require_once UTILS_PATH . '/Regex.php';
 
 
         // Used to store correct data
@@ -50,7 +51,7 @@ require_once '../resources/config.php';
             // -- Email Validation
             if (empty($resetArr['email'])) {
                 // Store Some Error Message
-            } else if (!preg_match($email_pattern, $resetArr['email'])) {
+            } else if (!Regex::validate_email($resetArr['email'])) {
                 // Store Some Error Message
             } else {
                 $validArr['email'] = True; // Pass Validation
@@ -111,7 +112,7 @@ require_once '../resources/config.php';
                 $mail->AltBody = $message;
                 $mail->send();
                 $msg = "Successfully sent";
-                Account_User::request_password_reset($to,$token);
+                Account_User::request_password_reset($to, $token);
             } else {
                 $msg = "This email does not exist";
             }
