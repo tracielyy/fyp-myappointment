@@ -29,6 +29,9 @@ class Account_User {
     // Future Possible
     private bool $enabled; # disabled || enabled
 
+    // CONSTANTS
+    private const PASSWORD_RESET = "passwordreset";
+
     // Constructor
     public function __construct(array $session, string $firstname, string $lastname, string $gender, string $dob,
             string $contactnumber, string $address, string $usertype, string $createdon, string $email, string $password = NULL) {
@@ -137,6 +140,8 @@ class Account_User {
     //============================================
     // -- Change Login Status When User Already Authenticated -- //
     public static function login(string $email, string $sessionid, string $token): mixed {
+
+        # Create Array Fields To Update To Google Cloud Firestore
         $mapArr = array(
             "session" => array(
                 "sessionid" => $sessionid,
@@ -144,19 +149,22 @@ class Account_User {
                 "token" => $token
             )
         );
-        $db = new DbQuery();
 
+        # Update Session Field After Success Authentication
+        $db = new DbQuery();
         $login = $db->modify_map_field(Database::ACCOUNT_USER, $email, $mapArr);
         return $login; # Return Account_User Object
     }
 
     //  -- Check If There Are Any Other Login Session -- //
     public static function check_session(array $db_session, string $sessionid, string $token): bool {
-        // Session Status 
+
+        #  Session Status 
         if ($db_session['isloggedin'] == false) {
             return true;
         } else {
-            // Compare Token
+
+            # Compare Token
             if ($db_session['token'] == $token && $db_session['sessionid'] == $sessionid) {
                 return true;
             } else {
@@ -171,9 +179,10 @@ class Account_User {
         $token_repo = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Upper Case
         $token_repo .= "abcdefghijklmnopqrstuvwxyz"; // Lower Case
         $token_repo .= "0123456789"; // Digits
-        $token_repo .= ".-_~!+,*:@"; // Special Chars
+        $token_repo .= ".-_~!,*:@"; // Special Chars (Plus Sign NOT Included)
         $max = strlen($token_repo);
 
+        # Randomly Pick From The Indexes Of `$token_repo`
         for ($i = 0; $i < $length; $i++) {
             $token .= $token_repo[random_int(0, $max - 1)];
         }
@@ -230,36 +239,119 @@ class Account_User {
 
     // -- To Update The Generated Token To Database (Valid For 24 Hours) -- //
     public static function request_password_reset(string $email, string $token) {
+        # Create A Time Object
+        $time = new Time();
+
+        # Create An Array To Store `passwordreset` Fields
         $userDataArr["passwordreset"] = array(
             "passwordtoken" => $token,
-            "requestedon" => Time::get_current_date()
+            "requestedon" => array(
+                "date" => $time->get_date(),
+                "time" => $time->get_time()
+            )
         );
+
+        # Update The Array To Database
         $db = new DbQuery();
         $db->modify_map_field(Database::ACCOUNT_USER, $email, $userDataArr);
     }
-    
+
     // -- Validate Password Token -- //
-    public static function validate_password_token(string $email, string $token) {
-        $exist = self::check_user_exist($email);
+    public static function validate_password_token(string $email, string $passwordtoken) {
+
         # Need To Make Sure The Email Is Valid
+        $exist = self::check_user_exist($email);
         if ($exist) {
+
+            # Store Email In An Array
             $conditionArr['email'] = $email;
-            $conditionArr['passwordreset']['passwordtoken'] = $token;
-            $db  = new DbQuery();
-            $db->query_exact_match(Database::ACCOUNT_USER, $conditionArr);
+
+            # Retrieving `passwordreset` Map Fields
+            $db = new DbQuery();
+            $mapData = $db->get_map_field(Database::ACCOUNT_USER, $conditionArr, self::PASSWORD_RESET);
+
+            # Validate The Database's Requested Dates
+            if (self::verify_requested_date($mapData['requestedon']['date'], $mapData['requestedon']['time'])) {
+                $currentDate = new Time();
+                $requestedon = new Time($mapData['requestedon']['date'], $mapData['requestedon']['time']);
+
+                # Get token duration (Since Request)
+                $duration = (int) Time::datetime_second_diff($currentDate, $requestedon);
+                $originaltoken = $mapData["passwordtoken"];
+
+                echo $requestedon->get_current_date();
+
+                # Return bool On Validity
+                return self::verify_token($originaltoken, $passwordtoken, $duration);
+            }
+
+
+            return false;
         }
         return false;
     }
 
+    // -- Check If Given Token Is Valid -- //
+    private static function verify_token(string $originaltoken, string $emailtoken, int $duration) {
+
+        # Set Valid Duration As 24 Hours In Seconds -- (86,400 Seconds)
+        $valid_duration = 24 * 60 * 60;
+
+        # Check If Token Match & Duration Validity Suffice
+        if (($originaltoken == $emailtoken ) && ($duration < $valid_duration)) {
+            return true;
+        }
+        return false;
+    }
+
+    // -- Check If The Date Is Correct (Further Regex Needed -- NOT IMPLEMENTED) -- //
+    private static function verify_requested_date(string $date, string $time): bool {
+
+        # Sanitize The String 
+        $date = self::clean_input($date);
+        $time = self::clean_input($time);
+
+        # Checks date & time
+        if ($date !== "" && $time !== "") {
+            return true;
+        }
+        return false;
+    }
+
+    // -- String Cleaning -- //
+    private static function clean_input(string $input) {
+        $input = trim($input);  // Remove leading and trailing whitespace 
+        $input = stripslashes($input);  // Remove '\' (slashes)
+        $input = htmlspecialchars($input);  // Treat special chars as HTML entities
+        $input = strtolower($input);    // All chars to lowercase
+        return $input;
+    }
+
     // -- Password Change -- //
-    public static function change_password(string $email) {
+    public static function change_password(string $email, string $password): bool {
+
+        # Condition Array (EMAIL)
+        $conditionArr['email'] = $email;
+
+        # Changed Array (PASSWORD)
+        $changedArr['password'] = $password;
+
         // Need To Send Verification Email To User.
+        $db = new DbQuery();
+        $db->modify_field(Database::ACCOUNT_USER, $conditionArr, $changedArr);
+
+        # Retrieve Document Again To Check Changes
+        $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $conditionArr);
+
+        if ($user_data['password'] == $password) {
+            return true;
+        }
+        return false;
     }
 
     // -- Password Reset -- //
     public static function reset_password() {
         // Need To Send OTP Via Email To User.
-        
         # Need To Reset The Fields In The `passwordreset` To Empty
     }
 

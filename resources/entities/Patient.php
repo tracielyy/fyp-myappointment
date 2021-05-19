@@ -46,7 +46,10 @@ class Patient extends Account_User {
         
         $userDataArr["passwordreset"] = array(
             "passwordtoken" => "",
-            "requestedon" => ""
+            "requestedon" => array(
+                "date" => "",
+                "time" => ""
+            )
         );
         
         $userDataArr['usertype'] = self::PATIENT;

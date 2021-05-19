@@ -13,7 +13,7 @@ use PHPMailer\PHPMailer\Exception;
 class Email extends PHPMailer {
 
     private const SYSMAIL = "fyp.21.s2.24@gmail.com";
-    private const APP_PASSWORD = "bvggvsbnrvdektra";
+    private const APP_PASSWORD = "rzylfksaoemejptd";
 
     // -- Construct -- //
     public function __construct($exceptions = null) {
