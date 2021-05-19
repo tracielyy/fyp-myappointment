@@ -12,7 +12,7 @@ require_once '../resources/config.php';
 use Google\Cloud\Firestore\FirestoreClient;
 use Google\Cloud\Firestore\DocumentReference;
 use Google\Cloud\Firestore\CollectionReference;
-use \Google\Cloud\Firestore\DocumentSnapshot;
+use Google\Cloud\Firestore\DocumentSnapshot;
 
 require '../vendor/autoload.php';
 
@@ -29,7 +29,7 @@ class DbQuery {
     }
 
     // -- Get Unique Firestore Document In Specific Collection -- //
-    public function get_document(string $collection, string $id) {
+    public function get_document(string $collection, string $id): ?array {
 
         # Collection Reference
         $collection_ref = $this->db->collection($collection);
@@ -57,7 +57,7 @@ class DbQuery {
     }
 
     // -- Get DocumentSnapshot -- //
-    private function document_query(string $collection, array $conditionArr): DocumentSnapshot {
+    private function document_query(string $collection, array $conditionArr)/* [nullable]: DocumentSnapshot */ {
         # Collection Reference
         $query = $this->db->collection($collection);
 
@@ -72,16 +72,19 @@ class DbQuery {
             if ($document->exists()) {
                 return $document; //  -- Returning the  Whole Document
             }
+            return null;
         }
     }
 
     // -- Get Firestore Document Wihout Knowing Document ID -- //
-    public function query_exact_match(string $collection, array $conditionArr): array {
+    public function query_exact_match(string $collection, array $conditionArr): ?array {
 
         # Get Document Data From DocumentSnapshot
-        $data = $this->document_query($collection, $conditionArr)->data();
-
-        return $data;
+        $doc_ref = $this->document_query($collection, $conditionArr);
+        if ($doc_ref !== NULL) {
+            return $doc_ref->data();
+        }
+        return null;
     }
 
     // -- Insert Data: return success status  (Adding New Document To Collection) -- //
@@ -98,7 +101,7 @@ class DbQuery {
     }
 
     // -- Modify Field(s) [Modify A Field In A Document] -- //
-    public function modify_field(string $collection, array $conditionArr, array $changedArr) {
+    public function modify_field(string $collection, array $conditionArr, array $changedArr): void {
 
         # Get Document ID From DocumentSnapshot
         $doc_id = $this->document_query($collection, $conditionArr)->id();
@@ -142,7 +145,7 @@ class DbQuery {
     }
 
     // -- Update Multiple Map Field Values -- //
-    private function update_map_values(DocumentReference $doc_ref, array $mapArr) {
+    private function update_map_values(DocumentReference $doc_ref, array $mapArr): void {
 
         # Array (Outside)
         foreach ($mapArr as $fieldArr => $value) {
