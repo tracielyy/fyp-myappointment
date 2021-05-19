@@ -99,31 +99,31 @@ class Account_User {
     }
 
     // Setters
-    public function set_firstname(string $firstname) {
+    public function set_firstname(string $firstname): void {
         $this->firstname = $firstname;
     }
 
-    public function set_lastname(string $lastname) {
+    public function set_lastname(string $lastname): void {
         $this->lastname = $lastname;
     }
 
-    public function set_email(string $email) {
+    public function set_email(string $email): void {
         $this->email = $email;
     }
 
-    public function set_gender(string $gender) {
+    public function set_gender(string $gender): void {
         $this->gender = $gender;
     }
 
-    public function set_dob(string $dob) {
+    public function set_dob(string $dob): void {
         $this->dob = $dob;
     }
 
-    public function set_address(string $address) {
+    public function set_address(string $address): void {
         $this->address = $address;
     }
 
-    public function set_password($password) {
+    public function set_password($password): void {
         $this->password = $password;  // Security Measures & Conditions NOT Applied.
     }
 
@@ -191,7 +191,7 @@ class Account_User {
     }
 
     // -- Load User Data (Retrieve & Return User Data) -- //
-    public static function load_user_data(array $credentialArr): mixed {
+    public static function load_user_data(array $credentialArr): ?Account_User {
         $db = new DbQuery();
         $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $credentialArr);
         if ($user_data != NULL) {
@@ -257,7 +257,7 @@ class Account_User {
     }
 
     // -- Validate Password Token -- //
-    public static function validate_password_token(string $email, string $passwordtoken) {
+    public static function validate_password_token(string $email, string $passwordtoken): bool {
 
         # Need To Make Sure The Email Is Valid
         $exist = self::check_user_exist($email);
@@ -292,7 +292,7 @@ class Account_User {
     }
 
     // -- Check If Given Token Is Valid -- //
-    private static function verify_token(string $originaltoken, string $emailtoken, int $duration) {
+    private static function verify_token(string $originaltoken, string $emailtoken, int $duration): bool {
 
         # Set Valid Duration As 24 Hours In Seconds -- (86,400 Seconds)
         $valid_duration = 24 * 60 * 60;
@@ -319,7 +319,7 @@ class Account_User {
     }
 
     // -- String Cleaning -- //
-    private static function clean_input(string $input) {
+    private static function clean_input(string $input) : string {
         $input = trim($input);  // Remove leading and trailing whitespace 
         $input = stripslashes($input);  // Remove '\' (slashes)
         $input = htmlspecialchars($input);  // Treat special chars as HTML entities
