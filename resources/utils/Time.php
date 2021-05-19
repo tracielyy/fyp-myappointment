@@ -88,6 +88,12 @@ class Time {
         }
         return (string) date($format, strtotime($time_24hours));
     }
+    
+    // -- Change Format -- //
+    public static function date_format_change(){
+        
+    }
+    
 
 }
 ?>
