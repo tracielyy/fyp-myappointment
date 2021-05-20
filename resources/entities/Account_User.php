@@ -322,14 +322,14 @@ class Account_User {
             "requestedon" => array(
                 "date" => $time->get_date(),
                 "time" => $time->get_time()
+            ),
+            "tokenusage" => array(
+                "used" => false,
+                "usedon" => array(
+                    "date" => "",
+                    "time" => ""
+                )
             )
-//            "tokenusage" => array(
-//                "used" => false,
-//                "usedon" => array(
-//                    "date" => "",
-//                    "time" => ""
-//                )
-//            )
         );
 
         # Update The Array To Database
@@ -437,18 +437,17 @@ class Account_User {
         $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $conditionArr);
 
         # Update Token Usage (WIP)
-//        $tokenusage = array(
-//            "passwordreset" => array(
-//                "tokenusage" => array(
-//                    "used" => false,
-//                    "usedon" => array(
-//                        "date" => "",
-//                        "time" => ""
-//                    )
-//                )
-//            )
-//        );
-//        $db->modify_map_field(Database::ACCOUNT_USER, $email, $tokenusage);
+        $time = new Time();
+        $tokenusage["passwordreset"] = array(
+            "tokenusage" => array(
+                "used" => true,
+                "usedon" => array(
+                    "date" => $time->get_current_date(),
+                    "time" => $time->get_current_time()
+                )
+            )
+        );
+        $db->modify_map_field(Database::ACCOUNT_USER, $conditionArr, $tokenusage);
 
         if ($user_data['credentials']['password'] == $password) {
             return true;
