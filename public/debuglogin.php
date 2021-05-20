@@ -101,11 +101,13 @@ require_once UTILS_PATH . '/Time.php';
                         $session_logon_allowed = Account_User::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
 
                         if ($session_logon_allowed) {
-                            Account_User::login($auth_user->get_email(), session_id(), $_SESSION['token']);
+                            $login_status= Account_User::login($auth_user->get_email(), session_id(), $_SESSION['token']); # Error
                             $auth_user = Account_User::load_user_data($loginArr); // Reload After Login Session Update
                             $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
                             //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
                             echo nl2br(PHP_EOL . "Success" . PHP_EOL);
+                            echo $auth_user. "<br/>";
+                            echo (int)$login_status;
 
                             // -- Clear Fields
                             $loginArr = array(

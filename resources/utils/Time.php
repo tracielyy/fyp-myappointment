@@ -6,7 +6,7 @@
  * @author yanying (Tracy)
  */
 
-# Set It To Singapore TimeZone #
+# --  Set It To Singapore TimeZone -- #
 date_default_timezone_set('Asia/Singapore');
 
 class Time {
@@ -33,7 +33,7 @@ class Time {
         }
     }
 
-    // Getters
+    // -- Getters -- //
     public function get_time() {
         return $this->time;
     }
@@ -56,7 +56,7 @@ class Time {
     }
 
     // -- Find Difference In Date & Time -- //
-    public static function datetime_second_diff(Time $current, Time $comparison) {
+    public static function datetime_second_diff(Time $current, Time $comparison): int {
         
         # Make Time Object To DateTime Object To Use The Functions
         $now = new DateTime($current->get_full_date());

@@ -47,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
         if (Account_User::check_user_exist($email)) {
             echo "User Exist";
 
-
             # Cross Check `token` With Google Cloud Firestore
             $validURL = Account_User::validate_password_token($email, $token);
             if ($validURL) {
@@ -130,7 +129,7 @@ setcookie($url_name, $url_value, time() + 3600);
                     // -- Need To Email To Inform Password Change -- //
                     // -- Recipient
                     $to = $_COOKIE['email'];
-                    $to_name = "Patient";
+                    $to_name = Account_User::retrieve_user_fullname($to);
 
                     // -- Email Subject
                     $subject = "FYP-21-S2-24: Password has been changed";
@@ -144,7 +143,7 @@ setcookie($url_name, $url_value, time() + 3600);
 
 
                     // -- Message
-                    $message = "<span style='color:black;'>Hi,{$break}";
+                    $message = "<span style='color:black;'>Hi {$to_name}, {$break}";
                     $message .= "Your password was recently changed on  {$timestamp->get_date()} {$time_12hour} {$break}";
                     $message .= "If you are aware of this change, please disregard this email. {$break}";
                     $message .= "If it wasn't you who changed it, please reply to this email as someone else may have access to your account. {$break}";
