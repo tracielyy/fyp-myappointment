@@ -13,6 +13,7 @@ require_once '../resources/config.php';
 require_once ENTITIES_PATH . '/Account_User.php';
 require_once UTILS_PATH . '/Email.php';
 require_once UTILS_PATH . '/Regex.php';
+require_once UTILS_PATH . '/Time.php';
 
 // -- Misc Variables -- //
 $msg = "";
@@ -121,14 +122,49 @@ setcookie($url_name, $url_value, time() + 3600);
             /* ------------ End Validation ------------ */
             if (!in_array(FALSE, $validArr)) {
                 echo "Password Pass";
+
                 // -- Store The Password To Database -- //
                 echo $_COOKIE['email'];
-                if (Account_User::change_password($_COOKIE['email'], $resetArr['password'])){
+                if (Account_User::change_password($_COOKIE['email'], $resetArr['password'])) {
+
+                    // -- Need To Email To Inform Password Change -- //
+                    // -- Recipient
+                    $to = $_COOKIE['email'];
+                    $to_name = "Patient";
+
+                    // -- Email Subject
+                    $subject = "FYP-21-S2-24: Password has been changed";
+
+
+                    // -- Miscellaneous
+                    $break = "<br/><br/>";
+                    $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
+                    $timestamp = new Time();
+                    $time_12hour = Time::to_12hours($timestamp->get_time(), true);
+
+
+                    // -- Message
+                    $message = "<span style='color:black;'>Hi,{$break}";
+                    $message .= "Your password was recently changed on  {$timestamp->get_date()} {$time_12hour} {$break}";
+                    $message .= "If you are aware of this change, please disregard this email. {$break}";
+                    $message .= "If it wasn't you who changed it, please reply to this email as someone else may have access to your account. {$break}";
+                    $message .= "{$sign_off}</span>";
+
+                    // -- Create New Email Object
+                    $mail = new Email();
+                    $mail->addAddress($to, $to_name);
+
+                    // -- Content
+                    $mail->isHTML(true);
+                    $mail->Subject = $subject;
+                    $mail->Body = $message;
+                    $mail->AltBody = $message;
+                    $mail->send();
+
                     echo "Password Changed Successfully";
                 } else {
                     echo "Password Changed FAIL";
                 }
-                
             } else {
                 $location = "Location:{$_COOKIE['url']}";
                 header($location);

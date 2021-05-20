@@ -99,31 +99,31 @@ class Account_User {
     }
 
     // Setters
-    public function set_firstname(string $firstname) {
+    public function set_firstname(string $firstname): void {
         $this->firstname = $firstname;
     }
 
-    public function set_lastname(string $lastname) {
+    public function set_lastname(string $lastname): void {
         $this->lastname = $lastname;
     }
 
-    public function set_email(string $email) {
+    public function set_email(string $email): void {
         $this->email = $email;
     }
 
-    public function set_gender(string $gender) {
+    public function set_gender(string $gender): void {
         $this->gender = $gender;
     }
 
-    public function set_dob(string $dob) {
+    public function set_dob(string $dob): void {
         $this->dob = $dob;
     }
 
-    public function set_address(string $address) {
+    public function set_address(string $address): void {
         $this->address = $address;
     }
 
-    public function set_password($password) {
+    public function set_password($password): void {
         $this->password = $password;  // Security Measures & Conditions NOT Applied.
     }
 
@@ -139,7 +139,7 @@ class Account_User {
     //      Methods Accessing Firestore Database 
     //============================================
     // -- Change Login Status When User Already Authenticated -- //
-    public static function login(string $email, string $sessionid, string $token): mixed {
+    public static function login(string $email, string $sessionid, string $token): bool {
 
         # Create Array Fields To Update To Google Cloud Firestore
         $mapArr = array(
@@ -153,7 +153,7 @@ class Account_User {
         # Update Session Field After Success Authentication
         $db = new DbQuery();
         $login = $db->modify_map_field(Database::ACCOUNT_USER, $email, $mapArr);
-        return $login; # Return Account_User Object
+        return $login; # -- Return Bool (Success or Failure) -- #
     }
 
     //  -- Check If There Are Any Other Login Session -- //
@@ -191,9 +191,13 @@ class Account_User {
     }
 
     // -- Load User Data (Retrieve & Return User Data) -- //
-    public static function load_user_data(array $credentialArr): mixed {
+    public static function load_user_data(array $credentialArr): ?Account_User {
+
+        # Retrieve User From Given Credentials
         $db = new DbQuery();
         $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $credentialArr);
+
+        # Store Any User Data In `Account_User` Object
         if ($user_data != NULL) {
             return new Account_User($user_data['session'], $user_data['firstname'], $user_data['lastname'], $user_data['gender'],
                     $user_data['dob'], $user_data['contactnumber'], $user_data['address'], $user_data['usertype'],
@@ -204,8 +208,12 @@ class Account_User {
 
     // -- Authenticate & Return The User Data If Authenticated Successfully -- //
     public static function authenticate_user(array $credentialArr): bool {
+
+        # Query For User Using Given Credentials
         $db = new DbQuery();
         $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $credentialArr);
+
+        # Check If There Are Any User Returned From The Query
         if ($user_data != NULL) {
             return True;
         }
@@ -214,19 +222,22 @@ class Account_User {
 
     //  -- Check If The User Exist In The Database -- //
     public static function check_user_exist(string $email /* , string $contactnumber */): bool {
+
+        # Query For User With The Given Email
         $db = new DbQuery();
         $emails_found = $db->query_exact_match(Database::ACCOUNT_USER, array('email' => $email));
-        //$contactnumbers_found = $db->query_exact_match(self::ACCOUNT_USER, array('contactnumber' => $contactnumber));
-        //if (($emails_found !== NULL) || ($contactnumbers_found !== NULL)) {
+
+        # Check If There Are Any Value Returned
         if (($emails_found !== NULL)) {
             return True;  // There is existing user
         }
         return False;
     }
 
-    // Triggered When User Clicks On "Logout"
+    // -- Triggered When User Clicks On "Logout" -- // 
     public static function session_logout(string $email) {
-        $db = new DbQuery();
+
+        # Declare Session Array With Logged Out Values
         $mapArr = array(
             "session" => array(
                 "sessionid" => "",
@@ -234,6 +245,9 @@ class Account_User {
                 "token" => ""
             )
         );
+
+        # Update Session Array
+        $db = new DbQuery();
         $db->modify_map_field(Database::ACCOUNT_USER, $email, $mapArr);
     }
 
@@ -257,7 +271,7 @@ class Account_User {
     }
 
     // -- Validate Password Token -- //
-    public static function validate_password_token(string $email, string $passwordtoken) {
+    public static function validate_password_token(string $email, string $passwordtoken): bool {
 
         # Need To Make Sure The Email Is Valid
         $exist = self::check_user_exist($email);
@@ -272,6 +286,8 @@ class Account_User {
 
             # Validate The Database's Requested Dates
             if (self::verify_requested_date($mapData['requestedon']['date'], $mapData['requestedon']['time'])) {
+
+                # Set The Dates
                 $currentDate = new Time();
                 $requestedon = new Time($mapData['requestedon']['date'], $mapData['requestedon']['time']);
 
@@ -284,15 +300,13 @@ class Account_User {
                 # Return bool On Validity
                 return self::verify_token($originaltoken, $passwordtoken, $duration);
             }
-
-
             return false;
         }
         return false;
     }
 
     // -- Check If Given Token Is Valid -- //
-    private static function verify_token(string $originaltoken, string $emailtoken, int $duration) {
+    private static function verify_token(string $originaltoken, string $emailtoken, int $duration): bool {
 
         # Set Valid Duration As 24 Hours In Seconds -- (86,400 Seconds)
         $valid_duration = 24 * 60 * 60;
@@ -319,7 +333,7 @@ class Account_User {
     }
 
     // -- String Cleaning -- //
-    private static function clean_input(string $input) {
+    private static function clean_input(string $input): string {
         $input = trim($input);  // Remove leading and trailing whitespace 
         $input = stripslashes($input);  // Remove '\' (slashes)
         $input = htmlspecialchars($input);  // Treat special chars as HTML entities

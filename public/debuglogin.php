@@ -3,9 +3,19 @@
 -->
 <!-- This File Is Solely Used For Debugging -->
 <?php
+//# Debug Start Session (Do Not Copy) #
+//session_start();
+//$_SESSION = array();
+//session_destroy();
+//# Debug Start Session (Do Not Copy) #
+
 session_start();
 /* Load Config File */
 require_once '../resources/config.php';
+require_once ENTITIES_PATH . '/Account_User.php';
+require_once UTILS_PATH . '/Email.php';
+require_once UTILS_PATH . '/Regex.php';
+require_once UTILS_PATH . '/Time.php';
 ?>
 <html>
     <head>
@@ -18,16 +28,12 @@ require_once '../resources/config.php';
     <body>
         <!-- PHP Script -->
         <?php
-        require_once ENTITIES_PATH . '/Account_User.php';
         // Code here
         ?>
 
         <!-- HTML Page Design -->
         <div>
             <!-- Navigation -->
-
-
-
             <!-- Debug Test For Users -->
             <!-- Hint: Explode & Implode For Date Of Birth (DD-MM-YYYY) If there is other preferred string format (e.g. '/') -->
             <?php
@@ -40,9 +46,6 @@ require_once '../resources/config.php';
             // -- Msg Variables
             $msg = "";
 
-            // -- Regex
-            $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
-
             $validArr = array();
 
             // -- When Redirect or Load The Page
@@ -51,8 +54,6 @@ require_once '../resources/config.php';
                     echo unserialize($_SESSION["user"]);
                 }
             }
-
-
 
             // Upon clicking "Login" Button
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -72,7 +73,7 @@ require_once '../resources/config.php';
                 // -- Email Validation
                 if (empty($loginArr['email'])) {
                     // Store Some Error Message
-                } else if (!preg_match($email_pattern, $loginArr['email'])) {
+                } else if (!Regex::validate_email($loginArr['email'])) {
                     // Store Some Error Message
                 } else {
                     $validArr['email'] = True; // Pass Validation
@@ -83,21 +84,22 @@ require_once '../resources/config.php';
 
                 /* ------------ End Validation ------------ */
                 if (!in_array(FALSE, $validArr)) {
-                    // Start Authenticating User (boolean)
+                    // -- Start Authenticating User (boolean)
                     $auth = Account_User::authenticate_user($loginArr);
 
-                    // Check If There Is Any "token" generated
+                    // -- Check If There Is Any "token" generated
                     if (!isset($_SESSION['token'])) {
                         $token_length = 15;  // Default Session Token Length
-                        $_SESSION['token'] = Account_User::get_token($token_length);
+                        $_SESSION['token'] = Account_User::generate_token($token_length);
                     }
 
-                    // Check If There Are Any Other Login Session (Terminate Other Session?)
-                    $auth_user = Account_User::load_user_data($loginArr);
-                    $session_logon_allowed = Account_User::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
-
-                    // User Authenticated
+                    // -- User Authenticated
                     if ($auth) {
+
+                        // -- Check If There Are Any Other Login Session (Terminate Other Session?)
+                        $auth_user = Account_User::load_user_data($loginArr);
+                        $session_logon_allowed = Account_User::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
+
                         if ($session_logon_allowed) {
                             Account_User::login($auth_user->get_email(), session_id(), $_SESSION['token']);
                             $auth_user = Account_User::load_user_data($loginArr); // Reload After Login Session Update
@@ -105,7 +107,7 @@ require_once '../resources/config.php';
                             //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
                             echo nl2br(PHP_EOL . "Success" . PHP_EOL);
 
-                            // Clear Fields
+                            // -- Clear Fields
                             $loginArr = array(
                                 'email' => '',
                                 'password' => '',
