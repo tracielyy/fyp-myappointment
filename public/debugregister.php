@@ -44,6 +44,18 @@ require_once '../resources/config.php';
                 'confirmpassword' => ''
             );
 
+            // -- Storage Array -- //
+            $patient_register = array(
+                'profile' => array(
+                    'name' => array('firstname' => '', 'lastname' => ''),
+                    'contactnumber' => '',
+                    'address' => '',
+                    'dob' => '',
+                    'gender' => ''
+                ),
+                'credentials' => array('email' => '', 'password' => '')
+            );
+
 
             // Some Variables
             $err_firstname = $err_lastname = $err_gender = $err_contactnumber = $err_address = $err_dob = $err_password = $err_confirmpassword = $err_email = "";
@@ -168,11 +180,23 @@ require_once '../resources/config.php';
                     // > Check If User Already Exist (Email & Contact Number)
                     $exist = Account_User::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
                     if (!$exist) {
+
+                        /* Load To Patient Registration Array */
+                        foreach ($registerArr as $key => $value) {
+
+                            # Loading Of Basic Profile Information
+                            if (isset($patient_register['profile'][$key])) {
+                                $patient_register['profile'][$key] = htmlspecialchars($value);
+                            } else if (isset($patient_register['credentials'][$key])) {
+                                $patient_register['credentials'][$key] = htmlspecialchars($value);
+                            } else if (isset($patient_register['profile']['name'][$key])) {
+                                $patient_register['profile']['name'][$key] = htmlspecialchars($value);
+                            }
+                        }
+
                         // > Salt Generation (?)
                         // > Need To Encrypt The Password Then Store In Database
-                        unset($registerArr["confirmpassword"]); // We do not need to store 'confirmpassword'
-                        Patient::create_patient($registerArr);
-
+                        Patient::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
                         // Reset Information
                         $registerArr = array(
                             'firstname' => '',

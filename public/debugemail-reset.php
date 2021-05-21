@@ -71,7 +71,7 @@ require_once '../resources/config.php';
                 // -- Email Subject
                 $subject = "FYP-21-S2-24: Password Reset";
 
-                // -- Generate Token (Security) # NOT IMPLEMENTED YET#
+                // -- Generate Token (Security) 
                 $token_length = 25; # Size Not Determined Yet
                 $token = Account_User::generate_token($token_length);
                 # -- Token Expiry Date Needs To Be Set -- #
@@ -104,7 +104,7 @@ require_once '../resources/config.php';
 
                 // -- Create New Email Object
                 $mail = new Email();
-                $mail->addAddress($to, $to_name);
+                $mail->addAddress($to);
 
                 // -- Content
                 $mail->isHTML(true);

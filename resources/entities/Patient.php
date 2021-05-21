@@ -10,15 +10,18 @@
 require_once '../resources/config.php';
 require_once 'Appointment_Record.php';
 require_once 'Account_User.php';
+require_once ENUMS_PATH . '/User_Type.php';
 require_once UTILS_PATH . '/DbQuery.php';
 require_once UTILS_PATH . '/Database.php';
+require_once UTILS_PATH . '/Time.php';
 
 class Patient extends Account_User {
 
     // Properties
     protected const PATIENT = "Patient";
 
-    //private $appointment_record = array();  // Appointment_Record Object
+    //private $appointment_records= array();  // Appointment_Record Object
+    //private $medical_records = array();
     // Constructor
     public function __construct($session, $firstname, $lastname, $gender, $dob,
             $contactnumber, $address, $usertype, $createdon, $email, $password = NULL) {
@@ -35,26 +38,20 @@ class Patient extends Account_User {
     //============================================
     //      Methods Accessing Firestore Database 
     //============================================
-    // Insert New Patient To Firestore
+    // -- Insert New Patient To Firestore -- //
     public static function create_patient(array $userDataArr) {
+        
+        # Declaration Of Basic Information To Include To Account_User
+        $account_user_arr = parent::account_creation_array(User_Type::PATIENT);
+
+        # Load Basic Account User Fields & Values To Array
+        foreach ($account_user_arr as $field => $value) {
+            $userDataArr[$field] = $value;
+        }
+
+        # Add Patient Data To Database
         $db = new DbQuery();
-        $userDataArr['session'] = array(
-            "sessionid" => "",
-            "isloggedin" => false,
-            "token" => ""
-        );
-        
-        $userDataArr["passwordreset"] = array(
-            "passwordtoken" => "",
-            "requestedon" => array(
-                "date" => "",
-                "time" => ""
-            )
-        );
-        
-        $userDataArr['usertype'] = self::PATIENT;
-        $userDataArr['createdon'] = (string) date("d-m-Y");
-        $db->insert_data(parent::ACCOUNT_USER, $userDataArr);
+        $db->insert_data(Database::ACCOUNT_USER, $userDataArr);
     }
 
     // Retrieve Patients Medical Record (Per Doctor Visit?)
@@ -64,7 +61,7 @@ class Patient extends Account_User {
 
     // Retrieve Patient Appointment Record
     public static function get_patient_appointment_record() {
-
+        
     }
 
 //    // Getters

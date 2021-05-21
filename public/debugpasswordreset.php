@@ -151,7 +151,7 @@ setcookie($url_name, $url_value, time() + 3600);
 
                     // -- Create New Email Object
                     $mail = new Email();
-                    $mail->addAddress($to, $to_name);
+                    $mail->addAddress($to);
 
                     // -- Content
                     $mail->isHTML(true);

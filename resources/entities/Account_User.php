@@ -147,15 +147,11 @@ class Account_User {
         );
 
         # Create Array Fields To Update To Google Cloud Firestore
-        $mapArr["session"] = array(
-            "sessionid" => $sessionid,
-            "isloggedin" => true,
-            "token" => $token
-        );
+        $session_arr = self::used_session_array($sessionid, $token);
 
         # Update Session Field After Success Authentication
         $db = new DbQuery();
-        $login = $db->modify_map_field(Database::ACCOUNT_USER, $emailArr, $mapArr);
+        $login = $db->modify_map_field(Database::ACCOUNT_USER, $emailArr, $session_arr);
         return $login; # -- Return Bool (Success or Failure) -- #
     }
 
@@ -207,7 +203,8 @@ class Account_User {
 
         # Filter & Return Full Name
         if ($user_data !== NULL) {
-            $full_name = $user_data['firstname'] . " " . $user_data['lastname'];
+            $name_arr = $user_data['profile']['name'];
+            $full_name = $name_arr['firstname'] . " " . $name_arr['lastname'];
             return $full_name;
         }
         return null;
@@ -227,9 +224,13 @@ class Account_User {
 
         # Store Any User Data In `Account_User` Object
         if ($user_data != NULL) {
-            return new Account_User($user_data['session'], $user_data['firstname'], $user_data['lastname'], $user_data['gender'],
-                    $user_data['dob'], $user_data['contactnumber'], $user_data['address'], $user_data['usertype'],
-                    $user_data['createdon'], $user_data['credentials']['email']);
+            $profile_arr = $user_data['profile'];
+            $credentials_arr = $user_data['credentials'];
+            $session_arr = $user_data['session'];
+            $accountdetails_arr = $user_data['accountdetails'];
+            return new Account_User($session_arr, $profile_arr['name']['firstname'], $profile_arr['name']['lastname'],
+                    $profile_arr['gender'], $profile_arr['dob'], $profile_arr['contactnumber'], $profile_arr['address'],
+                    $accountdetails_arr['usertype'], $accountdetails_arr['createdon'], $credentials_arr['email']);
         }
         return NULL;
     }
@@ -282,15 +283,11 @@ class Account_User {
         );
 
         # Declare Session Array With Logged Out Values
-        $mapArr["session"] = array(
-            "sessionid" => "",
-            "isloggedin" => false,
-            "token" => ""
-        );
+        $session_arr = self::fresh_session_array();
 
         # Update Session Array
         $db = new DbQuery();
-        $db->modify_map_field(Database::ACCOUNT_USER, $emailArr, $mapArr);
+        $db->modify_map_field(Database::ACCOUNT_USER, $emailArr, $session_arr);
     }
 
     // -- To Update The Generated Token To Database (Valid For 24 Hours) -- //
@@ -301,28 +298,12 @@ class Account_User {
             'email' => $email
         );
 
-        # Create A Time Object
-        $time = new Time();
-
-        # Create An Array To Store `passwordreset` Fields
-        $userDataArr["passwordreset"] = array(
-            "passwordtoken" => $token,
-            "requestedon" => array(
-                "date" => $time->get_date(),
-                "time" => $time->get_time()
-            ),
-            "tokenusage" => array(
-                "used" => false,
-                "usedon" => array(
-                    "date" => "",
-                    "time" => ""
-                )
-            )
-        );
+        # Get Fresh Set Of Password Reset Array For New Password Reset
+        $passwordreset_arr = self::fresh_passwordreset_array($token);
 
         # Update The Array To Database
         $db = new DbQuery();
-        $db->modify_map_field(Database::ACCOUNT_USER, $emailArr, $userDataArr);
+        $db->modify_map_field(Database::ACCOUNT_USER, $emailArr, $passwordreset_arr);
     }
 
     // -- Validate Password Token -- //
@@ -333,15 +314,13 @@ class Account_User {
         if ($exist) {
 
             # Store Email In An Array
-            $conditionArr = array(
-                "credentials" => array(
-                    'email' => $email
-                )
+            $email_arr["credentials"] = array(
+                'email' => $email
             );
 
             # Retrieving `passwordreset` Map Fields
             $db = new DbQuery();
-            $mapData = $db->get_map_field(Database::ACCOUNT_USER, $conditionArr, self::PASSWORD_RESET);
+            $mapData = $db->get_map_field(Database::ACCOUNT_USER, $email_arr, self::PASSWORD_RESET);
 
             # Validate The Database's Requested Dates
             if (self::verify_requested_date($mapData['requestedon']['date'], $mapData['requestedon']['time'])) {
@@ -357,7 +336,7 @@ class Account_User {
                 echo $requestedon->get_current_date();
 
                 # Return bool On Validity
-                return self::verify_token($originaltoken, $passwordtoken, $duration, $mapData['tokenusage']['used']);
+                return self::verify_token($originaltoken, $passwordtoken, $duration, $mapData['used']);
             }
             return false;
         }
@@ -421,16 +400,9 @@ class Account_User {
         $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $conditionArr);
 
         # Update Token Usage (WIP)
-        $time = new Time();
-        $tokenusage["passwordreset"] = array("tokenusage" => array(
-                "used" => true,
-                "usedon" => array(
-                    "date" => $time->get_current_date(),
-                    "time" => $time->get_current_time()
-                )
-            )
-        );
-        $db->modify_map_field(Database::ACCOUNT_USER, $conditionArr, $tokenusage);
+        $passwordreset_arr = self::used_passwordreset_array();
+
+        $db->modify_map_field(Database::ACCOUNT_USER, $conditionArr, $passwordreset_arr);
 
         return self::string_equal($user_data['credentials']['password'], $password);  // -- Bool -- //
     }
@@ -443,10 +415,78 @@ class Account_User {
         return false;
     }
 
-    // -- Password Reset -- //
-    public static function reset_password() {
-        // Need To Send OTP Via Email To User.
-        # Need To Reset The Fields In The `passwordreset` To Empty
+    /*
+     * --------------------------
+     * Default Array Creations
+     * --------------------------
+     */
+
+    public static function account_creation_array(string $usertype): array {
+        $user_data_arr['accountdetails'] = array(
+            'usertype' => $usertype,
+            'createdon' => Time::get_current_date(),
+            'verified' => false
+        );
+        $data_arr = array_merge($user_data_arr, self::fresh_session_array(), self::fresh_passwordreset_array());
+        return $data_arr;
+    }
+
+    public static function fresh_session_array(): array {
+        $session_arr["session"] = array(
+            "sessionid" => "",
+            "isloggedin" => false,
+            "token" => ""
+        );
+        return $session_arr;
+    }
+
+    public static function used_session_array(string $sessionid, string $token): array {
+        $session_arr["session"] = array(
+            "sessionid" => $sessionid,
+            "isloggedin" => true,
+            "token" => $token
+        );
+        return $session_arr;
+    }
+
+    public static function fresh_passwordreset_array(?string $passwordtoken = ""): array {
+
+        # Create New Time Object
+        $time = new Time();
+
+        # Creating Password Reset Array
+        $passwordreset_arr['passwordreset'] = array(
+            "passwordtoken" => $passwordtoken,
+            "requestedon" => array(
+                "date" => $time->get_date(),
+                "time" => $time->get_time()
+            ),
+            "used" => false,
+            "usedon" => array(
+                "date" => "",
+                "time" => ""
+            )
+        );
+        return $passwordreset_arr;
+    }
+
+    public static function used_passwordreset_array(): array {
+        # Create New Time Object
+        $time = new Time();
+
+        $passwordreset_arr["passwordreset"] = array(
+//            "passwordtoken" => "",
+//            "requestedon" => array(
+//                "date" => "",
+//                "time" => ""
+//            ),
+            "used" => true,
+            "usedon" => array(
+                "date" => $time->get_current_date(),
+                "time" => $time->get_current_time()
+            )
+        );
+        return $passwordreset_arr;
     }
 
 }
