@@ -66,6 +66,7 @@ require_once '../resources/config.php';
             if ($user_exist) {
                 // -- Recipient
                 $to = $resetArr['email'];
+                $to_name = Account_User::retrieve_user_fullname($resetArr['email']);
 
                 // -- Email Subject
                 $subject = "FYP-21-S2-24: Password Reset";
@@ -91,7 +92,7 @@ require_once '../resources/config.php';
                 $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
 
                 // -- Message
-                $message = "<span style='color:black;'>Hi,{$break}";
+                $message = "<span style='color:black;'>Hi {$to_name},{$break}";
                 $message .= "We have received a request to reset the password for the MyAppointment account associated with {$user_email}. {$break}";
                 $message .= "You can reset your password by clicking {$reset_password} or copy the link below in your browser:<br/>";
                 $message .= "{$reset_password_url}{$break}";
@@ -103,7 +104,7 @@ require_once '../resources/config.php';
 
                 // -- Create New Email Object
                 $mail = new Email();
-                $mail->addAddress($to);
+                $mail->addAddress($to, $to_name);
 
                 // -- Content
                 $mail->isHTML(true);

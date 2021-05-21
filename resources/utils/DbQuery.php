@@ -58,12 +58,20 @@ class DbQuery {
 
     // -- Get DocumentSnapshot -- //
     private function document_query(string $collection, array $conditionArr)/* [nullable]: DocumentSnapshot */ {
+
         # Collection Reference
         $query = $this->db->collection($collection);
 
         # Iterate Through The Given `$conditionArr` (Array)
-        foreach ($conditionArr as $condition => $condition_value) {
-            $query = $query->where($condition, "=", $condition_value)->limit(1);
+        foreach ($conditionArr as $mapCondition => $value) {
+
+            # Inner Loop For Maps
+            foreach ($conditionArr[$mapCondition] as $condition => $condition_value) {
+
+                # Get The Path To The Map Fields
+                $condition_path = $mapCondition . "." . $condition;
+                $query = $query->where($condition_path, "=", $condition_value)->limit(1);
+            }
         }
         $snapshot = $query->documents();
 
@@ -118,28 +126,25 @@ class DbQuery {
     }
 
     // -- Modify Map Fields (EMAIL) -- //
-    public function modify_map_field(string $collection, string $email, array $mapArr): bool {
+    public function modify_map_field(string $collection, array $conditionArr, array $mapArr): bool {
 
         # Collection Reference
         $collection_ref = $this->db->collection($collection);
 
         # Search Document Via `email` Condition
-        $get_query = $collection_ref->where("email", "=", $email)->limit(1);
-        $snapshot = $get_query->documents();
+        $document = $this->document_query($collection, $conditionArr);
 
-        # Iterate Through Array Of Documents
-        foreach ($snapshot as $document) {
-            if ($document->exists()) {
+        # Check If Document Exist
+        if ($document->exists()) {
 
-                # Getting The Document Reference
-                $doc_id = $document->id();
-                $doc_ref = $collection_ref->document($doc_id);
+            # Getting The Document Reference
+            $doc_id = $document->id();
+            $doc_ref = $collection_ref->document($doc_id);
 
-                # Updating The Map Values With Attained Document ID
-                self::update_map_values($doc_ref, $mapArr);
+            # Updating The Map Values With Attained Document ID
+            self::update_map_values($doc_ref, $mapArr);
 
-                return True;
-            }
+            return True;
         }
         return False;
     }
@@ -149,6 +154,7 @@ class DbQuery {
 
         # Array (Outside)
         foreach ($mapArr as $fieldArr => $value) {
+
 
             # Iterating Through Each Field In Array To Update
             foreach ($mapArr[$fieldArr] as $field => $field_value) {
@@ -163,11 +169,6 @@ class DbQuery {
             }
         }
     }
-
-    // -- Get Fields Of Map Type -- //
-//    public function get_map_field(DocumentReference $doc_ref, array $mapArr) {
-//        
-//    }
 
     private function get_map_values(DocumentReference $doc_ref, array $mapArr) {
         foreach ($mapArr as $fieldArr => $value) {

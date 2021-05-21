@@ -114,7 +114,7 @@ class Appointment_Record {
     }
 
     // -- Get Upcoming Appointment By Patient (Array Of Appointment_Record) -- //
-    public static function get_upcoming_appointments(array $email) {
+    public static function get_upcoming_appointments(array $email): array {
         # List Of Upcoming Appointments
         $upcoming_arr = array();
 
@@ -136,14 +136,13 @@ class Appointment_Record {
     }
 
     // -- Get Missed Appointment By Patient (Array Of Appointment Record)  last 14 days -- //
-    public static function get_missed_appointments(array $email) {
+    public static function get_missed_appointments(array $email): array {
         # List Of Upcoming Appointments
         $missed_arr = array();
 
         # Set Various Subconditions
         $subconditions['appointmentstatus'] = Appointment_Status::MISSED;
         # Date TBC
-        
         # Query For Missed Appointment Records (Need To Query For Last 14 Days)
         $db = new DbQuery();
         $record_list = $db->get_nested_collection(Database::ACCOUNT_USER, Database::APPOINTMENT_RECORD,
