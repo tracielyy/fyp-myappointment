@@ -56,6 +56,7 @@ class DbQuery {
         return $doc_ref;
     }
 
+
     // -- Get DocumentSnapshot -- //
     private function document_query(string $collection, array $conditionArr)/* [nullable]: DocumentSnapshot */ {
 
@@ -65,12 +66,17 @@ class DbQuery {
         # Iterate Through The Given `$conditionArr` (Array)
         foreach ($conditionArr as $mapCondition => $value) {
 
-            # Inner Loop For Maps
-            foreach ($conditionArr[$mapCondition] as $condition => $condition_value) {
+            if (is_array($conditionArr[$mapCondition])) {
+                # Inner Loop For Maps
+                foreach ($conditionArr[$mapCondition] as $condition => $condition_value) {
 
-                # Get The Path To The Map Fields
-                $condition_path = $mapCondition . "." . $condition;
-                $query = $query->where($condition_path, "=", $condition_value)->limit(1);
+                    # Get The Path To The Map Fields
+                    $condition_path = $mapCondition . "." . $condition;
+                    $query = $query->where($condition_path, "=", $condition_value)->limit(1);
+                }
+            } else {
+                $condition_path = $mapCondition;
+                $query = $query->where($condition_path, "=", $value)->limit(1);
             }
         }
         $snapshot = $query->documents();
@@ -191,19 +197,17 @@ class DbQuery {
     public function get_nested_collection(string $collection, string $subcollection, array $conditionArr, array $subconditionArr): array {
 
         # Getting The Condition Keys
-        $condition = array_key_first($conditionArr); # Outer Condition
+//        $condition = array_key_first($conditionArr); # Outer Condition
         //$subcondition = array_key_first($subconditionArr); # Inner Condition
         # Collection
-        $query = $this->db->collection($collection);
-        $query = $query->where($condition, "=", $conditionArr[$condition])->limit(1);
-        $snapshot = $query->documents();
+        $doc_snapshot = $this->document_query($collection, $conditionArr);
 
         # Iterate Through An Array Of Documents
-        foreach ($snapshot as $document) {
-            if ($document->exists()) {
-                $doc_id = $document->id();
-            }
+
+        if ($doc_snapshot->exists()) {
+            $doc_id = $doc_snapshot->id();
         }
+
 
         # Using ID
         $sub_col_ref = $this->db->collection($collection)->document($doc_id);
