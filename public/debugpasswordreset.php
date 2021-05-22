@@ -139,12 +139,13 @@ setcookie($url_name, $url_value, time() + 3600);
                     $break = "<br/><br/>";
                     $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
                     $timestamp = new Time();
-                    $time_12hour = Time::to_12hours($timestamp->get_time(), true);
+                    $date = Time::date_format_change($timestamp->get_date());
+                    $time_12hour = Time::to_12hours($timestamp->get_time(), false);
 
 
                     // -- Message
                     $message = "<span style='color:black;'>Hi {$to_name}, {$break}";
-                    $message .= "Your password was recently changed on  {$timestamp->get_date()} {$time_12hour} {$break}";
+                    $message .= "Your password was recently changed on {$date} at {$time_12hour} (Singapore Standard Time).{$break}";
                     $message .= "If you are aware of this change, please disregard this email. {$break}";
                     $message .= "If it wasn't you who changed it, please reply to this email as someone else may have access to your account. {$break}";
                     $message .= "{$sign_off}</span>";
