@@ -12,6 +12,7 @@ require_once '../resources/config.php';
 use Google\Cloud\Firestore\FirestoreClient;
 use Google\Cloud\Firestore\DocumentReference;
 use Google\Cloud\Firestore\CollectionReference;
+use Google\Cloud\Firestore\Query;
 use Google\Cloud\Firestore\DocumentSnapshot;
 
 require '../vendor/autoload.php';
@@ -56,6 +57,16 @@ class DbQuery {
         return $doc_ref;
     }
 
+    // -- For Document Inner Maps -- //
+    private function nested_condition(CollectionReference $query, array $conditionArr, string $key): Query{
+        foreach ($conditionArr[$key] as $condition => $condition_value) {
+
+            # Get The Path To The Map Fields
+            $condition_path = $key . "." . $condition;
+            $query = $query->where($condition_path, "=", $condition_value)->limit(1);
+        }
+        return $query;
+    }
 
     // -- Get DocumentSnapshot -- //
     private function document_query(string $collection, array $conditionArr)/* [nullable]: DocumentSnapshot */ {
@@ -67,13 +78,9 @@ class DbQuery {
         foreach ($conditionArr as $mapCondition => $value) {
 
             if (is_array($conditionArr[$mapCondition])) {
-                # Inner Loop For Maps
-                foreach ($conditionArr[$mapCondition] as $condition => $condition_value) {
 
-                    # Get The Path To The Map Fields
-                    $condition_path = $mapCondition . "." . $condition;
-                    $query = $query->where($condition_path, "=", $condition_value)->limit(1);
-                }
+                # Inner Loop For Maps
+                $query = $this->nested_condition($query, $conditionArr, $mapCondition);
             } else {
                 $condition_path = $mapCondition;
                 $query = $query->where($condition_path, "=", $value)->limit(1);
