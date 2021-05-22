@@ -39,8 +39,8 @@ class Patient extends Account_User {
     //      Methods Accessing Firestore Database 
     //============================================
     // -- Insert New Patient To Firestore -- //
-    public static function create_patient(array $userDataArr) {
-        
+    public static function create_patient(array $userDataArr): void {
+
         # Declaration Of Basic Information To Include To Account_User
         $account_user_arr = parent::account_creation_array(User_Type::PATIENT);
 
@@ -54,13 +54,13 @@ class Patient extends Account_User {
         $db->insert_data(Database::ACCOUNT_USER, $userDataArr);
     }
 
-    // Retrieve Patients Medical Record (Per Doctor Visit?)
-    public static function get_patient_medical_record() {
-        
-    }
-
-    // Retrieve Patient Appointment Record
-    public static function get_patient_appointment_record() {
+    // -- Edit Patient Information (Make Sure Patient Has To Provide Credentials For The Change) -- //
+    public static function edit_patient_profile(array $credentials_arr, array $profile_changed_arr): void {
+        # Double Check If Patient Exist
+        $user_data = parent::load_user_data($credentials_arr);
+        if ($user_data !== null){
+            # TBC #
+        }
         
     }
 

@@ -415,6 +415,24 @@ class Account_User {
         return false;
     }
 
+    public static function check_user_type(string $allowed_usertype, string $given_usertype): bool {
+        if ($allowed_usertype === $given_usertype) {
+            return true;
+        }
+        return false;
+    }
+
+    /*
+     * --------------------------
+     * Functions To Be Modified By Sub-classes
+     * --------------------------
+     */
+
+
+
+
+
+
     /*
      * --------------------------
      * Default Array Creations

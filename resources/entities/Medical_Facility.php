@@ -16,6 +16,7 @@ require_once ENUMS_PATH . '/Appointment_Status.php';
 require_once ENTITIES_PATH . '/Medical_Facility.php';
 require_once UTILS_PATH . '/DbQuery.php';
 require_once UTILS_PATH . '/Database.php';
+require_once UTILS_PATH . '/Time.php';
 
 class Medical_Facility {
 
@@ -33,7 +34,7 @@ class Medical_Facility {
     private string $contactnumber;
 
     # Medical Facility Operating Hours
-    private array $operatinghours = array('opening' => '', 'closing' => '');
+    private array $operatinghours = array('opening' => '', 'closing' => '', 'nonstop'=> false);
 
     # DATABASE CONSTANT
 
@@ -66,6 +67,10 @@ class Medical_Facility {
         return $this->contactnumber;
     }
 
+    public function get_nonstop(): bool {
+        return $this->nonstop;
+    }
+
     public function get_operatinghours(): array {
         return $this->operatinghours;
     }
@@ -77,21 +82,30 @@ class Medical_Facility {
     public function get_closinghour(): string {
         return $this->operatinghours['closing'];
     }
+    
+    public function display_operatinghours(): string {
+        if ($this->operatinghours['nonstop'] == false){
+            return Time::to_12hours($this->operatinghours['opening'], false) . 
+                    ' - '. Time::to_12hours($this->operatinghours['closing'], false);
+        } else {
+            return '24 Hours';
+        }
+    }
 
     // -- Setters -- //
-    public function set_facilityname(string $facilityname) {
+    public function set_facilityname(string $facilityname): void {
         $this->facilityname = $facilityname;
     }
 
-    public function set_address(string $address) {
+    public function set_address(string $address): void {
         $this->address = $address;
     }
 
-    public function set_contactnumber(string $contactnumber) {
+    public function set_contactnumber(string $contactnumber): void {
         $this->contactnumber = $contactnumber;
     }
 
-    public function set_operatinghours(string $openinghour, string $closinghour) {
+    public function set_operatinghours(string $openinghour, string $closinghour): void {
         $this->operatinghours['opening'] = $openinghour;
         $this->operatinghours['closing'] = $closinghour;
     }
@@ -107,8 +121,7 @@ class Medical_Facility {
     //  -- Use For Debugging/ Logging Purpose -- //
     public function __toString(): string {
         $str = nl2br(PHP_EOL . 'Facility ID: ' . $this->facilityid . PHP_EOL . 'Facility Name: ' . $this->facilityname . PHP_EOL . 'Address: ' . $this->address .
-                PHP_EOL . 'Contact Number: ' . $this->contactnumber . PHP_EOL . 'Opening Hour: ' . $this->operatinghours['opening'] .
-                PHP_EOL . 'Closing Hour: ' . $this->operatinghours['closing']);
+                PHP_EOL . 'Contact Number: ' . $this->contactnumber . PHP_EOL . $this->display_operatinghours());
         return $str;
     }
 
