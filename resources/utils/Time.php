@@ -18,7 +18,7 @@ class Time {
     private ?string $date;
     private ?string $time;
 
-   // -- Date Formats -- // 
+    // -- Date Formats -- // 
     private const DATE_FORMAT_DEFAULT = "d-m-Y";
     private const DATE_FORMAT_SLASH = "d/m/Y";
 
@@ -57,6 +57,12 @@ class Time {
 
     public function get_full_date() {
         return $this->date . " " . $this->time;
+    }
+
+    // -- Use For Debugging/ Logging Purpose -- //
+    public function __toString(): string {
+        $str = nl2br(PHP_EOL . 'Date ' . $this->date . PHP_EOL . 'Time ' . $this->time);
+        return $str;
     }
 
     // Some static methods
