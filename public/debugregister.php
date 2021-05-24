@@ -210,6 +210,8 @@ require_once '../resources/config.php';
                             'confirmpassword' => ''
                         );
                         echo "<br/> Success Registration <br/>";
+                        // -- Need To Send A Email To Ask Patient To Verify Email -- //
+                        
                     } else {
                         echo "User already exist";
                     }
