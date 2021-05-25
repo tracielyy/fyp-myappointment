@@ -86,7 +86,7 @@ class Email extends PHPMailer {
         $message = "<span style='color:black;'>Hi {$to_name},{$break}";
         $message .= "We have received a request to reset the password for the MyAppointment account associated with {$user_email}. {$break}";
         $message .= "You can reset your password by clicking {$reset_password} or copy the link below in your browser:<br/>";
-        $message .= "{$reset_password_url}{$break}";
+        $message .= "{$reset_password_url}{$break}" . self::set_mailbutton("Change Password", $unique_password_url) . "{$break}";
         $message .= "If you did make this request, please disregard this email. ";
         $message .= "Please note that your password will not change unless you click the link above and create a new one. ";
         $message .= "This link will expire in one day. If your link has expired, you can always {$request_another}. {$break}";
@@ -137,16 +137,44 @@ class Email extends PHPMailer {
         $date = Time::date_format_change($timestamp->get_date());
         $time_12hour = Time::to_12hours($timestamp->get_time(), false);
 
-
         // -- Message
         $message = "<span style='color:black;'>Hi {$to_name}, {$break}";
-        $message .= "Thanks for registering for an account on MyAppointment.{$break}";
-        $message .= "To complete your registration and start booking an appointment, please verify your email address {$user_email} {$break}";
+        $message .= "MyAppointment needs to verify your email address before you can start making any appointment.{$break}";
+        $message .= "Please verify your email address {$user_email} {$break}";
         $message .= "{$sign_off}</span>";
-        
+
         self::sendEmail($to, $subject, $message);
     }
 
+    public static function set_mailbutton(string $button_name, string $url) {
+        $button = '<div>
+            <!--[if mso]>
+            <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="' . $url . '" style="height:40px;v-text-anchor:middle;width:300px;" arcsize="10%" stroke="f" fillcolor="#d62828">
+              <w:anchorlock/>
+              <center style="color:#ffffff;font-family:sans-serif;font-size:16px;font-weight:bold;padding: 8px 12px;">
+                ' . $button_name . '
+              </center>
+            </v:roundrect>
+            <![endif]-->
+            <![if!mso]>
+            <table cellspacing = "0" cellpadding = "0"> <tr>
+            <td align = "center" bgcolor = "#d62828" style = "padding: 8px 12px; text-decoration:none !important; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; color: #ffffff; display: block;">
+                <a href = "' . $url . '" style = "font-size:16px; font-weight: bold; font-family:sans-serif; text-decoration:none !important; line-height:40px; width:100%; display:inline-block">
+                    <span style = "color:#ffffff ; text-decoration:none !important;">' . $button_name . ' </span>
+                </a>
+            </td>
+            </tr> </table>
+        <![endif]>
+        </div>';
+        return $button;
+    }
+
+//                <![if!mso]>#ffffff
+//            <![endif]>
+
+    /*           <span style = "color:black ; text-decoration:none !important;">' .  . '
+      </span>
+     * */
 }
 ?>
 
