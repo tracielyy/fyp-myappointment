@@ -7,6 +7,7 @@ session_start();
 /* Load Config File */
 require_once '../resources/config.php';
 ?>
+
 <html>
     <head>
         <title>FYP-21-S2-24</title>
@@ -16,6 +17,9 @@ require_once '../resources/config.php';
     <body>
         <!-- PHP Script -->
         <?php
+        /* 
+         *  This File Contains Functions To Be Used By Admin For Record Maintainence
+         */
         require_once ENTITIES_PATH . '/Account_User.php';
         require_once ENTITIES_PATH . '/Patient.php';
         require_once UTILS_PATH . '/Regex.php';
@@ -24,12 +28,15 @@ require_once '../resources/config.php';
 
         <!-- HTML Page Design -->
         <div>
-            <!-- Navigation -->
 
+            <!-- Add Admin -->
+            
+            <!-- Add Medical Personnel -->
+            
+            <!-- Search & Delete Medical Personnel -->
+            
+            <!-- Add Medical Facility -->
 
-
-            <!-- Debug Test For Users -->
-            <!-- Hint: Explode & Implode For Date Of Birth (DD-MM-YYYY) If there is other preferred string format (e.g. '/') -->
             <?php
             // Used to store correct data
             $registerArr = array(

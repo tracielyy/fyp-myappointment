@@ -5,6 +5,9 @@
 <?php
 /* Load Config File */
 require_once '../resources/config.php';
+require_once ENTITIES_PATH . '/Account_User.php';
+require_once UTILS_PATH . '/Email.php';
+require_once UTILS_PATH . '/Regex.php';
 ?>
 <html>
     <head>
@@ -17,11 +20,6 @@ require_once '../resources/config.php';
     <body>
         <!-- PHP Script -->
         <?php
-        require_once ENTITIES_PATH . '/Account_User.php';
-        require_once UTILS_PATH . '/Email.php';
-        require_once UTILS_PATH . '/Regex.php';
-
-
         // Used to store correct data
         $resetArr = array(
             'email' => '',
@@ -65,15 +63,15 @@ require_once '../resources/config.php';
             // -- Invoke Email Send To User To Reset Password
             if ($user_exist) {
 
-                
+
                 // -- Generate Token (Security) 
                 $token_length = 25; # Size Not Determined Yet
                 $token = Account_User::generate_token($token_length);
-                
+
                 // -- Send Emaill With Token To User 
                 $to = $resetArr['email'];
                 Email::template_passwordreset($to, $token);
-                
+
                 $msg = "Successfully sent";
                 // -- Updating The Token To The Database
                 Account_User::request_password_reset($to, $token);
