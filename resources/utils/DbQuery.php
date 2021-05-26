@@ -58,7 +58,7 @@ class DbQuery {
     }
 
     // -- For Document Inner Maps -- //
-    private function nested_condition(CollectionReference $query, array $conditionArr, string $key): Query{
+    private function nested_condition(CollectionReference $query, array $conditionArr, string $key): Query {
         foreach ($conditionArr[$key] as $condition => $condition_value) {
 
             # Get The Path To The Map Fields
@@ -236,6 +236,49 @@ class DbQuery {
             }
         }
         return $doc_arr;  // -- Return Array Of Document Datas
+    }
+
+    // -- Get All The Documents In A Collection -- //
+    public function get_all_documents(string $collection): array {
+
+        # Collection Reference 
+        $collection_ref = $this->db->collection($collection);
+
+        # Create An Array To Store The Document Data
+        $doc_arr = array();
+
+        # DocumentSnapshots Of All The Documents
+        $documents = $collection_ref->documents();
+
+        # Iterate Through & Add To Array
+        foreach ($documents as $doc) {
+            if ($doc->exists()) {
+                $doc_arr[] = $doc->data();
+            }
+        }
+
+        return $doc_arr;
+    }
+
+    public function get_all_documents_ordered(string $collection, string $orderBy): array {
+        # Collection Reference 
+        $collection_ref = $this->db->collection($collection);
+
+        # Create An Array To Store The Document Data
+        $doc_arr = array();
+
+        # DocumentSnapshots Of All The Documents
+        $query = $collection_ref->orderBy($orderBy);
+        $documents = $query->documents();
+
+        # Iterate Through & Add To Array
+        foreach ($documents as $doc) {
+            if ($doc->exists()) {
+                $doc_arr[] = $doc->data();
+            }
+        }
+
+        return $doc_arr;
     }
 
 }

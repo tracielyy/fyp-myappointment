@@ -34,7 +34,7 @@ class Medical_Facility {
     private string $contactnumber;
 
     # Medical Facility Operating Hours
-    private array $operatinghours = array('opening' => '', 'closing' => '', 'nonstop'=> false);
+    private array $operatinghours = array('opening' => '', 'closing' => '', 'nonstop' => false);
 
     # DATABASE CONSTANT
 
@@ -82,11 +82,11 @@ class Medical_Facility {
     public function get_closinghour(): string {
         return $this->operatinghours['closing'];
     }
-    
+
     public function display_operatinghours(): string {
-        if ($this->operatinghours['nonstop'] == false){
-            return Time::to_12hours($this->operatinghours['opening'], false) . 
-                    ' - '. Time::to_12hours($this->operatinghours['closing'], false);
+        if ($this->operatinghours['nonstop'] == false) {
+            return Time::to_12hours($this->operatinghours['opening'], false) .
+                    ' - ' . Time::to_12hours($this->operatinghours['closing'], false);
         } else {
             return '24 Hours';
         }
@@ -131,7 +131,21 @@ class Medical_Facility {
     //============================================
     // -- When User Request To Display All Medical Facilities -- //
     public static function display_all_facilities() {
+        # Create An Array To Store Medical_Facility Objects
+        $mf_arr = array ();
         
+        # Query For Facility
+        $db = new DbQuery();
+        $facility_list = $db->get_all_documents_ordered(Database::MEDICAL_FACILITY, 'facilityid');
+        if (!empty($facility_list)) {
+            foreach ($facility_list as $facility) {
+                $facility_object = new Medical_Facility($facility['facilityid'], $facility['facilityname'], $facility['address'],
+                        $facility['contactnumber'], $facility['operatinghours']);
+                $mf_arr[] = $facility_object;
+            }
+
+            return $mf_arr;
+        }
     }
 
     // -- When User Request To Display Facilities By Certain Location -- //

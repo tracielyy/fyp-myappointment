@@ -6,6 +6,25 @@
 session_start();
 /* Load Config File */
 require_once '../resources/config.php';
+require_once ENUMS_PATH . '/User_Type.php';
+require_once ENTITIES_PATH . '/Account_User.php';
+require_once ENTITIES_PATH . '/Patient.php';
+require_once UTILS_PATH . '/Regex.php';
+
+// Filter away invalid users
+if (isset($_SESSION["user"])) {
+    $user = unserialize($_SESSION["user"]);
+    $user_email = $user->get_email();
+    $user_type = $user->get_usertype();
+
+    // -- Make Sure The User Is Admin -- //
+    if ($user_type == User_Type::ADMIN) {
+        $facility_list = Medical_Facility::display_all_facilities();
+        
+    }
+} else {
+    echo '<script>alert("ACCESS DENIED"); window.location.href = "Index.php";</script>';
+}
 ?>
 
 <html>
@@ -17,28 +36,19 @@ require_once '../resources/config.php';
     <body>
         <!-- PHP Script -->
         <?php
-        /* 
+        /*
          *  This File Contains Functions To Be Used By Admin For Record Maintainence
          */
-        require_once ENTITIES_PATH . '/Account_User.php';
-        require_once ENTITIES_PATH . '/Patient.php';
-        require_once UTILS_PATH . '/Regex.php';
-        // Code here
+// Code here
         ?>
 
         <!-- HTML Page Design -->
         <div>
 
-            <!-- Add Admin -->
-            
-            <!-- Add Medical Personnel -->
-            
-            <!-- Search & Delete Medical Personnel -->
-            
-            <!-- Add Medical Facility -->
+
 
             <?php
-            // Used to store correct data
+// -- Arrays For Field Displays -- //
             $registerArr = array(
                 'firstname' => '',
                 'lastname' => '',
@@ -51,7 +61,15 @@ require_once '../resources/config.php';
                 'confirmpassword' => ''
             );
 
-            // -- Storage Array -- //
+            $facility = array(
+                'facilityname' => '',
+                'address' => '',
+                'contactnumber' => '',
+                'opening' => '',
+                'closing' => ''
+            );
+
+// -- Storage Array -- //
             $patient_register = array(
                 'profile' => array(
                     'firstname' => '',
@@ -68,10 +86,10 @@ require_once '../resources/config.php';
             );
 
 
-            // Some Variables
+// Some Variables
             $err_firstname = $err_lastname = $err_gender = $err_contactnumber = $err_address = $err_dob = $err_password = $err_confirmpassword = $err_email = "";
 
-            // Upon clicking "Login" Button 
+// Upon clicking "Login" Button 
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 /* Load Data to Array */
@@ -229,6 +247,7 @@ require_once '../resources/config.php';
             }
             ?>
 
+            <p>Add </p>
             <!-- Form -->
             <form  method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
 
@@ -277,7 +296,99 @@ require_once '../resources/config.php';
                 <button type="submit" value ="register_admin">Register Admin</button><br/>
             </form>
 
+
+            <!-- Add Admin -->
+
+            <!-- Add Medical Personnel -->
+
+            <!-- 
+                        >>> Search & Delete Medical Personnel <<<
+            -->
+            <form>
+
+            </form>
+
+
+            <!-- 
+                        >>> Add Medical Facility <<<
+            -->
+            <p>Add Medical Facility</p>
+            <form>
+
+                <!-- Facility Name --> 
+                <input type="text" name="facilityname" placeholder="Facility Name" value="<?php echo htmlspecialchars($facility['facilityname']); ?>"/><br/>
+
+                <!-- Facility Address --> 
+                <input type="text" name="address" placeholder="Address" value="<?php echo htmlspecialchars($facility['address']); ?>"/><br/>
+
+                <!-- 24 Hours?? --> 
+                <input type="checkbox" name="nonstop" placeholder="Address" value="<?php echo htmlspecialchars($facility['operatinghours']['nonstop']); ?>"/><br/>
+
+                <!-- Operating Hours (Opening) --> 
+                <input type="text" name="opening" placeholder="Opening Hour" value="<?php echo htmlspecialchars($facility['operatinghours']['opening']); ?>"/><br/>
+
+                <!-- Operating Hours (Closing) --> 
+                <input type="text" name="closing" placeholder="Date Of Birth" value="<?php echo htmlspecialchars($facility['operatinghours']['closing']); ?>"/><br/>
+
+                <!-- Facility Contact Number --> 
+                <input type="text" name="contactnumber" placeholder="Date Of Birth" value="<?php echo htmlspecialchars($facility['contactnumber']); ?>"/><br/>
+
+                <!-- Add Facility Button -->
+                <button type="submit" value ="add-facility">Add Medical Facility</button><br/>
+            </form>
+
         </div>
+
+        <p>Display All Facilities</p>
+        <div>
+            <?php
+            // There is record found
+            if (!empty($facility_list)) {
+                // Count of all records
+                $facility_count = count($facility_list);
+                $cols = 1;
+                $rows = $facility_count;
+
+                // Create Table
+                echo "<form method ='post' action='";
+                echo htmlspecialchars($_SERVER['PHP_SELF']);
+                echo "'>";
+
+
+                echo "<table border='1'>";
+
+                // Headers
+                echo "<tr>";
+                echo "
+                    <th>Facility Id</th>
+                    <th>Facility Name</th>
+                    <th>Address</th>
+                    <th>Contact Number</th>";
+
+                foreach ($facility_list as $facility) {
+
+
+                    echo "<tr>";
+                    echo "<td >{$facility->get_facilityid()}</td>";
+                    echo "<td >{$facility->get_facilityname()}</td>";
+                    echo "<td >{$facility->get_address()}</td>";
+                    echo "<td>{$facility->get_contactnumber()}</td>";
+
+
+
+
+                    echo "</tr>";
+                }
+
+                echo "</table>";
+                echo "</form>";
+            } else {
+                echo "<p>NO RECORD(S) FOUND</p>";
+            }
+            ?>
+        </div>
+
+
 
     </body>
 </html>
