@@ -38,7 +38,7 @@ class Medical_Facility {
     private string $contactnumber;
 
     # Medical Facility Operating Hours
-    private array $operatinghours = array('opening' => '', 'closing' => '', 'nonstop' => false);
+    private array $operatinghours = array('opening' => '', 'closing' => '', 'is24hours' => false);
 
     # DATABASE CONSTANT
 
@@ -72,8 +72,8 @@ class Medical_Facility {
         return $this->contactnumber;
     }
 
-    public function get_nonstop(): bool {
-        return $this->nonstop;
+    public function get_is24hours(): bool {
+        return $this->is24hour;
     }
 
     public function get_operatinghours(): array {
@@ -89,7 +89,7 @@ class Medical_Facility {
     }
 
     public function display_operatinghours(): string {
-        if ($this->operatinghours['nonstop'] == false) {
+        if ($this->operatinghours['is24hours'] == false) {
             return Time::to_12hours($this->operatinghours['opening'], false) .
                     ' - ' . Time::to_12hours($this->operatinghours['closing'], false);
         } else {

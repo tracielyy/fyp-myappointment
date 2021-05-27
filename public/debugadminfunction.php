@@ -70,7 +70,7 @@ if (!$valid_user) {
             'facilityname' => '',
             'address' => '',
             'contactnumber' => '',
-            'operatinghours' => array('opening' => '', 'closing' => '', 'nonstop' => false)
+            'operatinghours' => array('opening' => '', 'closing' => '', 'is24hours' => false)
         );
 
         // -- Storage Array -- //
@@ -118,7 +118,7 @@ if (!$valid_user) {
                             foreach ($_POST[$key] as $k => $v) {
 
                                 # --- Load To Facility Array -- #
-                                if ($k == 'nonstop') {
+                                if ($k == 'is24hours') {
                                     $v = (bool) json_decode($v);
                                     $facility[$key][$k] = $v;
                                 } else {
@@ -377,9 +377,9 @@ if (!$valid_user) {
 
                 <!-- 24 Hours?? (Slider) ??--> 
                 Non-stop?
-                <input type="checkbox" name="operatinghours[nonstop]" value="1" 
+                <input type="checkbox" name="operatinghours[is24hours]" value="1" 
                 <?php
-                if ($facility['operatinghours']['nonstop']) {
+                if ($facility['operatinghours']['is24hours']) {
                     echo "checked = 'checked'";
                 }
                 ?>/><br/>
