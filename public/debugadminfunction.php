@@ -20,7 +20,7 @@ if (isset($_SESSION["user"])) {
     $user_type = $user->get_usertype();
 
     // -- Make Sure The User Is Admin -- //
-    if ($user_type == User_Type::ADMIN) {
+    if (User_Type::check_user_type(User_Type::ADMIN, $user_type)) {
         $valid_user = true;
         $facility_list = Medical_Facility::display_all_facilities();
     }
@@ -400,7 +400,7 @@ if (!$valid_user) {
 
 
         <h3>Display All Facilities</h3>
-<!--        <p>Last Facility ID: <?php //echo Medical_Facility::get_last_medical_id();         ?></p>-->
+<!--        <p>Last Facility ID: <?php //echo Medical_Facility::get_last_medical_id();          ?></p>-->
         <div>
             <?php
 // There is record found
