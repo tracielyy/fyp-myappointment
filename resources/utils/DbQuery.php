@@ -281,5 +281,27 @@ class DbQuery {
         return $doc_arr;
     }
 
+    // -- Get ONLY ONE Document -- //
+    public function get_document_ordered(string $collection, string $orderBy, bool $asc) {
+        # Collection Reference 
+        $collection_ref = $this->db->collection($collection);
+
+        # DocumentSnapshots Of All The Documents
+        if ($asc) {
+            $query = $collection_ref->orderBy($orderBy)->limit(1);
+        } else {
+            $query = $collection_ref->orderBy($orderBy, 'DESC')->limit(1);
+        }
+
+        $documents = $query->documents();
+
+        # Iterate Through & Add To Array
+        foreach ($documents as $doc) {
+            if ($doc->exists()) {
+                return $doc->data();
+            }
+        }
+    }
+
 }
 ?>

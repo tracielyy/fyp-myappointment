@@ -11,7 +11,9 @@ require_once ENTITIES_PATH . '/Account_User.php';
 require_once ENTITIES_PATH . '/Patient.php';
 require_once UTILS_PATH . '/Regex.php';
 
-// Filter away invalid users
+$valid_user = false;
+
+// -- Filter Away Invalid Users -- //
 if (isset($_SESSION["user"])) {
     $user = unserialize($_SESSION["user"]);
     $user_email = $user->get_email();
@@ -19,10 +21,13 @@ if (isset($_SESSION["user"])) {
 
     // -- Make Sure The User Is Admin -- //
     if ($user_type == User_Type::ADMIN) {
+        $valid_user = true;
         $facility_list = Medical_Facility::display_all_facilities();
-        
     }
-} else {
+}
+
+// -- Check If Is Admin (VALID USER) -- //    
+if (!$valid_user) {
     echo '<script>alert("ACCESS DENIED"); window.location.href = "Index.php";</script>';
 }
 ?>
@@ -39,214 +44,264 @@ if (isset($_SESSION["user"])) {
         /*
          *  This File Contains Functions To Be Used By Admin For Record Maintainence
          */
-// Code here
         ?>
 
         <!-- HTML Page Design -->
-        <div>
 
 
 
-            <?php
-// -- Arrays For Field Displays -- //
-            $registerArr = array(
+
+
+        <?php
+        // -- Arrays For Field Displays -- //
+        $registerArr = array(
+            'firstname' => '',
+            'lastname' => '',
+            'contactnumber' => '',
+            'address' => '',
+            'dob' => '',
+            'gender' => '',
+            'email' => '',
+            'password' => '',
+            'confirmpassword' => ''
+        );
+
+        $facility = array(
+            'facilityname' => '',
+            'address' => '',
+            'contactnumber' => '',
+            'operatinghours' => array('opening' => '', 'closing' => '', 'nonstop' => false)
+        );
+
+        // -- Storage Array -- //
+        $patient_register = array(
+            'profile' => array(
                 'firstname' => '',
                 'lastname' => '',
                 'contactnumber' => '',
                 'address' => '',
                 'dob' => '',
-                'gender' => '',
+                'gender' => ''
+            ),
+            'credentials' => array(
                 'email' => '',
-                'password' => '',
-                'confirmpassword' => ''
-            );
-
-            $facility = array(
-                'facilityname' => '',
-                'address' => '',
-                'contactnumber' => '',
-                'opening' => '',
-                'closing' => ''
-            );
-
-// -- Storage Array -- //
-            $patient_register = array(
-                'profile' => array(
-                    'firstname' => '',
-                    'lastname' => '',
-                    'contactnumber' => '',
-                    'address' => '',
-                    'dob' => '',
-                    'gender' => ''
-                ),
-                'credentials' => array(
-                    'email' => '',
-                    'password' => ''
-                )
-            );
+                'password' => ''
+            )
+        );
 
 
-// Some Variables
-            $err_firstname = $err_lastname = $err_gender = $err_contactnumber = $err_address = $err_dob = $err_password = $err_confirmpassword = $err_email = "";
+        // Some Variables
+        $err_firstname = $err_lastname = $err_gender = $err_contactnumber = $err_address = $err_dob = $err_password = $err_confirmpassword = $err_email = "";
 
-// Upon clicking "Login" Button 
-            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        //==============================
+        //                          Functions
+        //==============================
+        // Upon clicking "Login" Button 
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-                /* Load Data to Array */
+            # ============================= #
+            ### ----  Add Facility Button Is Triggered ---- ###
+            # ============================= #
+            if (isset($_POST["add-facility-btn"])) {
+
+                //==============================
+                //              Load Data Into Array
+                //==============================
                 foreach ($_POST as $key => $value) {
-                    if (isset($registerArr[$key])) {
-                        $registerArr[$key] = htmlspecialchars($value);
-                        $validArr[$key] = False; // Set All Field Validation Check As False
-                    }
-                }
 
-                // 
+                    # -- Check If The Key Is Set -- #
+                    if (isset($facility[$key])) {
 
+                        # -- Check If There Is An Inner Array -- #
+                        if (is_array($value)) {
+                            echo $key;
+                            foreach ($_POST[$key] as $k => $v) {
 
-
-                /* ------------ Start Validation ------------ */
-
-                // -- First Name
-                if (empty($registerArr['firstname'])) {
-                    $err_firstname = "Field Cannot Be Empty";
-                    echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
-                } else if (!Regex::validate_name($registerArr['firstname'])) {
-                    $err_firstname = "Invalid";
-                    echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
-                } else {
-                    $validArr['firstname'] = True; // Pass Validation
-                }
-
-                // -- Last Name
-                if (empty($registerArr['lastname'])) {
-                    $err_lastname = "Field Cannot Be Empty";
-                } else if (!Regex::validate_name($registerArr['lastname'])) {
-                    $err_lastname = "Invalid";
-                } else {
-                    $validArr['lastname'] = True; // Pass Validation
-                }
-
-                // -- Contact Number Validation
-                if (empty($registerArr['contactnumber'])) {
-                    $err_contactnumber = "Field Cannot Be Empty";
-                } else if (!Regex::validate_phone($registerArr['contactnumber'])) {
-                    $err_contactnumber = "Invalid";
-                } else {
-                    $validArr['contactnumber'] = True; // Pass Validation
-                }
-
-                // -- Gender Validation (Just Make Sure Either Male Or Female Is 'Checked')
-                if (empty($registerArr['gender'])) {
-                    // Store Some Error Message
-                    $err_gender = "Not Selected";
-                } else if (!($registerArr['gender'] == 'F' || $registerArr['gender'] == 'M')) {
-                    // Store Some Error Message
-                    $err_gender = "Invalid";
-                } else {
-                    $validArr['gender'] = True; // Pass Validation
-                }
-
-                // -- Date Of Birth (DOB) Validation
-                if (empty($registerArr['dob'])) {
-                    $err_dob = "Field Cannot Be Empty";
-                } else {
-                    $validArr['dob'] = True; // Pass Validation
-                }
-                /*
-                  -- DOB (Data Accuracy) --
-                  > Check Leap Year For 29th Feb
-                  > Check Months (01-12)
-                 */
-
-
-
-                // -- Address Validation (Unsure Of What Further Validation To Be Done)
-                if (empty($registerArr['address'])) {
-                    $err_address = "Field Cannot Be Empty";
-                } else {
-                    $validArr['address'] = True; // Pass Validation
-                }
-
-
-                // -- Email Validation
-                if (empty($registerArr['email'])) {
-                    // Store Some Error Message
-                    $err_email = "Field Cannot Be Empty";
-                } else if (!Regex::validate_email($registerArr['email'])) {
-                    // Store Some Error Message
-                    $err_email = "Invalid";
-                } else {
-                    $validArr['email'] = True; // Pass Validation
-                }
-
-                // -- Password Validation
-                if (empty($registerArr['password'])) {
-                    // Store Some Error Message
-                    $err_password = "Field Cannot Be Empty";
-                } else if (!Regex::validate_password($registerArr['password'])) {
-                    // Store Some Error Message
-                    $err_password = "Invalid";
-                } else {
-                    $validArr['password'] = True; // Pass Validation
-                }
-
-                // -- Confirm Password Validation (Check if it is the same as 'Password')
-                if (empty($registerArr['confirmpassword'])) {
-                    // Store Some Error Message
-                    $err_confirmpassword = "Field Cannot Be Empty";
-                } else if ($registerArr['confirmpassword'] !== $registerArr['password']) {
-                    // Store Some Error Message
-                    $err_confirmpassword = "Password Does Not Match";
-                } else {
-                    $validArr['confirmpassword'] = True; // Pass Validation
-                }
-
-
-                /* ------------ End Validation ------------ */
-
-                // If Valid User Information (After Validation)
-                if (!in_array(False, $validArr)) {
-                    // > Check If User Already Exist (Email & Contact Number)
-                    $exist = Account_User::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
-                    if (!$exist) {
-
-                        /* Load To Patient Registration Array */
-                        foreach ($registerArr as $key => $value) {
-
-                            # Loading Of Basic Profile Information
-                            if (isset($patient_register['profile'][$key])) {
-                                $patient_register['profile'][$key] = htmlspecialchars($value);
-                            } else if (isset($patient_register['credentials'][$key])) {
-                                $patient_register['credentials'][$key] = htmlspecialchars($value);
+                                # --- Load To Facility Array -- #
+                                if ($k == 'nonstop') {
+                                    $v = (bool) json_decode($v);
+                                    $facility[$key][$k] = $v;
+                                } else {
+                                    $facility[$key][$k] = htmlspecialchars($v);
+                                }
                             }
+                        } else {
+                            # --- Load To Facility Array -- #
+                            $facility[$key] = htmlspecialchars($value);
+                            $validArr[$key] = False; // Set All Field Validation Check As False
+                            echo $facility[$key];
                         }
-
-                        // > Salt Generation (?)
-                        // > Need To Encrypt The Password Then Store In Database
-                        Patient::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
-                        // Reset Information
-                        $registerArr = array(
-                            'firstname' => '',
-                            'lastname' => '',
-                            'contactnumber' => '',
-                            'address' => '',
-                            'dob' => '',
-                            'gender' => '',
-                            'email' => '',
-                            'password' => '',
-                            'confirmpassword' => ''
-                        );
-                        echo "<br/> Success Registration <br/>";
-                    } else {
-                        echo "User already exist";
                     }
-                } else {
-                    // Any Actions Or Displays For Errors
-                    echo "<div style='color:red;'>Register Fail!</div>";
                 }
+                //==============================
+                //           Validate & Check All The Fields
+                //==============================
+                //==============================
+                //         Add The Medical Facility To Database
+                //==============================
+//                if (!in_array(False, $validArr)) {
+//                    
+//                }
+                Medical_Facility::create_medical_facility($facility);
             }
-            ?>
-
+            # ==================================== #
+            ### ----  Add Medical Personnel Button Is Triggered ---- ###
+            # ==================================== #
+//                /* Load Data to Array */
+//                foreach ($_POST as $key => $value) {
+//                    if (isset($registerArr[$key])) {
+//                        $registerArr[$key] = htmlspecialchars($value);
+//                        $validArr[$key] = False; // Set All Field Validation Check As False
+//                    }
+//                }
+//
+//                // 
+//
+//
+//
+//                /* ------------ Start Validation ------------ */
+//
+//                // -- First Name
+//                if (empty($registerArr['firstname'])) {
+//                    $err_firstname = "Field Cannot Be Empty";
+//                    echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
+//                } else if (!Regex::validate_name($registerArr['firstname'])) {
+//                    $err_firstname = "Invalid";
+//                    echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
+//                } else {
+//                    $validArr['firstname'] = True; // Pass Validation
+//                }
+//
+//                // -- Last Name
+//                if (empty($registerArr['lastname'])) {
+//                    $err_lastname = "Field Cannot Be Empty";
+//                } else if (!Regex::validate_name($registerArr['lastname'])) {
+//                    $err_lastname = "Invalid";
+//                } else {
+//                    $validArr['lastname'] = True; // Pass Validation
+//                }
+//
+//                // -- Contact Number Validation
+//                if (empty($registerArr['contactnumber'])) {
+//                    $err_contactnumber = "Field Cannot Be Empty";
+//                } else if (!Regex::validate_phone($registerArr['contactnumber'])) {
+//                    $err_contactnumber = "Invalid";
+//                } else {
+//                    $validArr['contactnumber'] = True; // Pass Validation
+//                }
+//
+//                // -- Gender Validation (Just Make Sure Either Male Or Female Is 'Checked')
+//                if (empty($registerArr['gender'])) {
+//                    // Store Some Error Message
+//                    $err_gender = "Not Selected";
+//                } else if (!($registerArr['gender'] == 'F' || $registerArr['gender'] == 'M')) {
+//                    // Store Some Error Message
+//                    $err_gender = "Invalid";
+//                } else {
+//                    $validArr['gender'] = True; // Pass Validation
+//                }
+//
+//                // -- Date Of Birth (DOB) Validation
+//                if (empty($registerArr['dob'])) {
+//                    $err_dob = "Field Cannot Be Empty";
+//                } else {
+//                    $validArr['dob'] = True; // Pass Validation
+//                }
+//                /*
+//                  -- DOB (Data Accuracy) --
+//                  > Check Leap Year For 29th Feb
+//                  > Check Months (01-12)
+//                 */
+//
+//
+//
+//                // -- Address Validation (Unsure Of What Further Validation To Be Done)
+//                if (empty($registerArr['address'])) {
+//                    $err_address = "Field Cannot Be Empty";
+//                } else {
+//                    $validArr['address'] = True; // Pass Validation
+//                }
+//
+//
+//                // -- Email Validation
+//                if (empty($registerArr['email'])) {
+//                    // Store Some Error Message
+//                    $err_email = "Field Cannot Be Empty";
+//                } else if (!Regex::validate_email($registerArr['email'])) {
+//                    // Store Some Error Message
+//                    $err_email = "Invalid";
+//                } else {
+//                    $validArr['email'] = True; // Pass Validation
+//                }
+//
+//                // -- Password Validation
+//                if (empty($registerArr['password'])) {
+//                    // Store Some Error Message
+//                    $err_password = "Field Cannot Be Empty";
+//                } else if (!Regex::validate_password($registerArr['password'])) {
+//                    // Store Some Error Message
+//                    $err_password = "Invalid";
+//                } else {
+//                    $validArr['password'] = True; // Pass Validation
+//                }
+//
+//                // -- Confirm Password Validation (Check if it is the same as 'Password')
+//                if (empty($registerArr['confirmpassword'])) {
+//                    // Store Some Error Message
+//                    $err_confirmpassword = "Field Cannot Be Empty";
+//                } else if ($registerArr['confirmpassword'] !== $registerArr['password']) {
+//                    // Store Some Error Message
+//                    $err_confirmpassword = "Password Does Not Match";
+//                } else {
+//                    $validArr['confirmpassword'] = True; // Pass Validation
+//                }
+//
+//
+//                /* ------------ End Validation ------------ */
+//
+//                // If Valid User Information (After Validation)
+//                if (!in_array(False, $validArr)) {
+//                    // > Check If User Already Exist (Email & Contact Number)
+//                    $exist = Account_User::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
+//                    if (!$exist) {
+//
+//                        /* Load To Patient Registration Array */
+//                        foreach ($registerArr as $key => $value) {
+//
+//                            # Loading Of Basic Profile Information
+//                            if (isset($patient_register['profile'][$key])) {
+//                                $patient_register['profile'][$key] = htmlspecialchars($value);
+//                            } else if (isset($patient_register['credentials'][$key])) {
+//                                $patient_register['credentials'][$key] = htmlspecialchars($value);
+//                            }
+//                        }
+//
+//                        // > Salt Generation (?)
+//                        // > Need To Encrypt The Password Then Store In Database
+//                        Patient::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
+//                        // Reset Information
+//                        $registerArr = array(
+//                            'firstname' => '',
+//                            'lastname' => '',
+//                            'contactnumber' => '',
+//                            'address' => '',
+//                            'dob' => '',
+//                            'gender' => '',
+//                            'email' => '',
+//                            'password' => '',
+//                            'confirmpassword' => ''
+//                        );
+//                        echo "<br/> Success Registration <br/>";
+//                    } else {
+//                        echo "User already exist";
+//                    }
+//                } else {
+//                    // Any Actions Or Displays For Errors
+//                    echo "<div style='color:red;'>Register Fail!</div>";
+//                }
+        }
+        ?>
+        <div>
             <p>Add </p>
             <!-- Form -->
             <form  method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
@@ -292,28 +347,27 @@ if (isset($_SESSION["user"])) {
                 <input type="password" name="confirmpassword" placeholder="Confirm Password" value="<?php echo htmlspecialchars($registerArr['confirmpassword']); ?>"/><br/>
 
                 <!-- Registration Submission -->
-                <button type="submit" value ="register_medicalpersonnel">Register Medical Personnel</button><br/>
-                <button type="submit" value ="register_admin">Register Admin</button><br/>
+                <button type="submit" name="register-medicalpersonnel" value ="register-medicalpersonnel-btn">Register Medical Personnel</button><br/>
+                <button type="submit" name="register-admin" value ="register-admin-btn">Register Admin</button><br/>
             </form>
+        </div>
 
+        <!-- Add Admin -->
 
-            <!-- Add Admin -->
+        <!-- Add Medical Personnel -->
 
-            <!-- Add Medical Personnel -->
+        <!-- 
+                    >>> Search & Delete Medical Personnel <<<
+        -->
 
-            <!-- 
-                        >>> Search & Delete Medical Personnel <<<
-            -->
-            <form>
+        <!-- 
+                    >>> Add Medical Facility <<<
+        -->
+        <div>
 
-            </form>
+            <h3> Add Medical Facility</h3>
 
-
-            <!-- 
-                        >>> Add Medical Facility <<<
-            -->
-            <p>Add Medical Facility</p>
-            <form>
+            <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
 
                 <!-- Facility Name --> 
                 <input type="text" name="facilityname" placeholder="Facility Name" value="<?php echo htmlspecialchars($facility['facilityname']); ?>"/><br/>
@@ -321,28 +375,35 @@ if (isset($_SESSION["user"])) {
                 <!-- Facility Address --> 
                 <input type="text" name="address" placeholder="Address" value="<?php echo htmlspecialchars($facility['address']); ?>"/><br/>
 
-                <!-- 24 Hours?? --> 
-                <input type="checkbox" name="nonstop" placeholder="Address" value="<?php echo htmlspecialchars($facility['operatinghours']['nonstop']); ?>"/><br/>
+                <!-- 24 Hours?? (Slider) ??--> 
+                Non-stop?
+                <input type="checkbox" name="operatinghours[nonstop]" value="1" 
+                <?php
+                if ($facility['operatinghours']['nonstop']) {
+                    echo "checked = 'checked'";
+                }
+                ?>/><br/>
 
                 <!-- Operating Hours (Opening) --> 
-                <input type="text" name="opening" placeholder="Opening Hour" value="<?php echo htmlspecialchars($facility['operatinghours']['opening']); ?>"/><br/>
+                <input type="text" name="operatinghours[opening]" placeholder="Opening Hour" value="<?php echo htmlspecialchars($facility['operatinghours']['opening']); ?>"/><br/>
 
                 <!-- Operating Hours (Closing) --> 
-                <input type="text" name="closing" placeholder="Date Of Birth" value="<?php echo htmlspecialchars($facility['operatinghours']['closing']); ?>"/><br/>
+                <input type="text" name="operatinghours[closing]" placeholder="Closing Hour" value="<?php echo htmlspecialchars($facility['operatinghours']['closing']); ?>"/><br/>
 
                 <!-- Facility Contact Number --> 
-                <input type="text" name="contactnumber" placeholder="Date Of Birth" value="<?php echo htmlspecialchars($facility['contactnumber']); ?>"/><br/>
+                <input type="text" name="contactnumber" placeholder="Contact Number" value="<?php echo htmlspecialchars($facility['contactnumber']); ?>"/><br/>
 
                 <!-- Add Facility Button -->
-                <button type="submit" value ="add-facility">Add Medical Facility</button><br/>
+                <p><button type="submit" name="add-facility-btn" value ="add-facility">Add Medical Facility</button></p>
             </form>
-
         </div>
 
-        <p>Display All Facilities</p>
+
+        <h3>Display All Facilities</h3>
+<!--        <p>Last Facility ID: <?php //echo Medical_Facility::get_last_medical_id();         ?></p>-->
         <div>
             <?php
-            // There is record found
+// There is record found
             if (!empty($facility_list)) {
                 // Count of all records
                 $facility_count = count($facility_list);
@@ -354,7 +415,6 @@ if (isset($_SESSION["user"])) {
                 echo htmlspecialchars($_SERVER['PHP_SELF']);
                 echo "'>";
 
-
                 echo "<table border='1'>";
 
                 // Headers
@@ -364,18 +424,14 @@ if (isset($_SESSION["user"])) {
                     <th>Facility Name</th>
                     <th>Address</th>
                     <th>Contact Number</th>";
-
+                echo "</tr>";
                 foreach ($facility_list as $facility) {
-
 
                     echo "<tr>";
                     echo "<td >{$facility->get_facilityid()}</td>";
                     echo "<td >{$facility->get_facilityname()}</td>";
                     echo "<td >{$facility->get_address()}</td>";
                     echo "<td>{$facility->get_contactnumber()}</td>";
-
-
-
 
                     echo "</tr>";
                 }
