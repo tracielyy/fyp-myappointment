@@ -16,6 +16,7 @@ require_once ENTITIES_PATH . '/Account_User.php';
 require_once UTILS_PATH . '/Email.php';
 require_once UTILS_PATH . '/Regex.php';
 require_once UTILS_PATH . '/Time.php';
+require_once UTILS_PATH . '/StringUtils.php';
 ?>
 <html>
     <head>
@@ -90,7 +91,7 @@ require_once UTILS_PATH . '/Time.php';
                     // -- Check If There Is Any "token" generated
                     if (!isset($_SESSION['token'])) {
                         $token_length = 15;  // Default Session Token Length
-                        $_SESSION['token'] = Account_User::generate_token($token_length);
+                        $_SESSION['token'] = StringUtils::generate_token($token_length);
                     }
 
                     // -- User Authenticated

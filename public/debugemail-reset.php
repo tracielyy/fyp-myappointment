@@ -8,6 +8,7 @@ require_once '../resources/config.php';
 require_once ENTITIES_PATH . '/Account_User.php';
 require_once UTILS_PATH . '/Email.php';
 require_once UTILS_PATH . '/Regex.php';
+require_once UTILS_PATH . '/StringUtils.php';
 ?>
 <html>
     <head>
@@ -66,7 +67,7 @@ require_once UTILS_PATH . '/Regex.php';
 
                 // -- Generate Token (Security) 
                 $token_length = 25; # Size Not Determined Yet
-                $token = Account_User::generate_token($token_length);
+                $token = StringUtils::generate_token($token_length);
 
                 // -- Send Emaill With Token To User 
                 $to = $resetArr['email'];

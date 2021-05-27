@@ -10,6 +10,8 @@ require_once '../resources/config.php';
 require_once UTILS_PATH . '/DbQuery.php';
 require_once UTILS_PATH . '/Database.php';
 require_once UTILS_PATH . '/Time.php';
+require_once UTILS_PATH . '/ArrayCreation.php';
+require_once UTILS_PATH . '/StringUtils.php';
 require_once ENUMS_PATH . '/Appointment_Status.php';
 
 class Account_User {
@@ -147,7 +149,7 @@ class Account_User {
         );
 
         # Create Array Fields To Update To Google Cloud Firestore
-        $session_arr = self::used_session_array($sessionid, $token);
+        $session_arr = ArrayCreation::used_session_array($sessionid, $token);
 
         # Update Session Field After Success Authentication
         $db = new DbQuery();
@@ -164,30 +166,11 @@ class Account_User {
         } else {
 
             # Compare Token
-            if ($db_session['token'] == $token && $db_session['sessionid'] == $sessionid) {
-                return true;
-            } else {
-                return false;
-            }
+            return ($db_session['token'] == $token && $db_session['sessionid'] == $sessionid);
         }
     }
 
-    // -- Generate Token (Multi-Function Usage) ~ Not Sure If This Should Be In `Account_User` Class -- //
-    public static function generate_token(int $length): string {
-        $token = "";
-        $token_repo = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Upper Case
-        $token_repo .= "abcdefghijklmnopqrstuvwxyz"; // Lower Case
-        $token_repo .= "0123456789"; // Digits
-        $token_repo .= ".-_~!,*:@"; // Special Chars (Plus Sign NOT Included)
-        $max = strlen($token_repo);
 
-        # Randomly Pick From The Indexes Of `$token_repo`
-        for ($i = 0; $i < $length; $i++) {
-            $token .= $token_repo[random_int(0, $max - 1)];
-        }
-
-        return $token;
-    }
 
     // -- Get User Full Name -- //
     public static function retrieve_user_fullname(string $email): ?string {
@@ -283,7 +266,7 @@ class Account_User {
         );
 
         # Declare Session Array With Logged Out Values
-        $session_arr = self::fresh_session_array();
+        $session_arr = ArrayCreation::fresh_session_array();
 
         # Update Session Array
         $db = new DbQuery();
@@ -299,7 +282,7 @@ class Account_User {
         );
 
         # Get Fresh Set Of Password Reset Array For New Password Reset
-        $passwordreset_arr = self::fresh_passwordreset_array($token);
+        $passwordreset_arr = ArrayCreation::fresh_passwordreset_array($token);
 
         # Update The Array To Database
         $db = new DbQuery();
@@ -360,23 +343,14 @@ class Account_User {
     private static function verify_requested_date(string $date, string $time): bool {
 
         # Sanitize The String 
-        $date = self::clean_input($date);
-        $time = self::clean_input($time);
+        $date = StringUtils::clean_input($date);
+        $time = StringUtils::clean_input($time);
 
         # Checks date & time
         if ($date !== "" && $time !== "") {
             return true;
         }
         return false;
-    }
-
-    // -- String Cleaning -- //
-    private static function clean_input(string $input): string {
-        $input = trim($input);  // Remove leading and trailing whitespace 
-        $input = stripslashes($input);  // Remove '\' (slashes)
-        $input = htmlspecialchars($input);  // Treat special chars as HTML entities
-        $input = strtolower($input);    // All chars to lowercase
-        return $input;
     }
 
     // -- Password Change -- //
@@ -404,110 +378,18 @@ class Account_User {
 
         $db->modify_map_field(Database::ACCOUNT_USER, $conditionArr, $passwordreset_arr);
 
-        return self::string_equal($user_data['credentials']['password'], $password);  // -- Bool -- //
+        return StringUtils::string_equal($user_data['credentials']['password'], $password);  // -- Bool -- //
     }
 
-    // -- Private Function For String Comparison -- //
-    private static function string_equal(string $str1, string $str2): bool {
-        if ($str1 == $str2) {
-            return true;
-        }
-        return false;
-    }
-
-
-    
-    
     // -- Update Profile Information -- //
-    public static function update_profile () {
+    public static function update_profile() {
         
     }
-    
 
     /*
      * --------------------------
      * Functions To Be Modified By Sub-classes
      * --------------------------
      */
-
-
-
-
-
-
-    /*
-     * --------------------------
-     * Default Array Creations
-     * --------------------------
-     */
-
-    public static function account_creation_array(string $usertype): array {
-        $user_data_arr['accountdetails'] = array(
-            'usertype' => $usertype,
-            'createdon' => Time::get_current_date(),
-            'verified' => false
-        );
-        $data_arr = array_merge($user_data_arr, self::fresh_session_array(), self::fresh_passwordreset_array());
-        return $data_arr;
-    }
-
-    public static function fresh_session_array(): array {
-        $session_arr["session"] = array(
-            "sessionid" => "",
-            "isloggedin" => false,
-            "token" => ""
-        );
-        return $session_arr;
-    }
-
-    public static function used_session_array(string $sessionid, string $token): array {
-        $session_arr["session"] = array(
-            "sessionid" => $sessionid,
-            "isloggedin" => true,
-            "token" => $token
-        );
-        return $session_arr;
-    }
-
-    public static function fresh_passwordreset_array(?string $passwordtoken = ""): array {
-
-        # Create New Time Object
-        $time = new Time();
-
-        # Creating Password Reset Array
-        $passwordreset_arr['passwordreset'] = array(
-            "passwordtoken" => $passwordtoken,
-            "requestedon" => array(
-                "date" => $time->get_date(),
-                "time" => $time->get_time()
-            ),
-            "used" => false,
-            "usedon" => array(
-                "date" => "",
-                "time" => ""
-            )
-        );
-        return $passwordreset_arr;
-    }
-
-    public static function used_passwordreset_array(): array {
-        # Create New Time Object
-        $time = new Time();
-
-        $passwordreset_arr["passwordreset"] = array(
-//            "passwordtoken" => "",
-//            "requestedon" => array(
-//                "date" => "",
-//                "time" => ""
-//            ),
-            "used" => true,
-            "usedon" => array(
-                "date" => $time->get_current_date(),
-                "time" => $time->get_current_time()
-            )
-        );
-        return $passwordreset_arr;
-    }
-
 }
 ?>
