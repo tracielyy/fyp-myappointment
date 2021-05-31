@@ -1,7 +1,3 @@
-<!-- 
-    Developed By FYP-21-S2-24
-   
--->
 <?php
 /*
  * @author yanying (Tracy)
