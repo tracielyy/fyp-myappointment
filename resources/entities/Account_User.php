@@ -138,7 +138,7 @@ class Account_User {
     //      Methods Accessing Firestore Database 
     //============================================
     // -- Change Login Status When User Already Authenticated -- //
-    public static function login(string $email, string $sessionid, string $token): bool {
+    public static function login(string $email, string $sessionid, string $token, string $ipaddress): bool {
 
         # Email Array
         $emailArr ["credentials"] = array(
@@ -146,7 +146,7 @@ class Account_User {
         );
 
         # Create Array Fields To Update To Google Cloud Firestore
-        $session_arr = ArrayCreation::used_session_array($sessionid, $token);
+        $session_arr = ArrayCreation::used_session_array($sessionid, $token, $ipaddress);
 
         # Update Session Field After Success Authentication
         $db = new DbQuery();
