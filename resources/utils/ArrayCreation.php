@@ -8,11 +8,15 @@ class ArrayCreation {
      */
 
     public static function account_creation_array(string $usertype): array {
+        
+        # Account Details Array
         $user_data_arr['accountdetails'] = array(
             'usertype' => $usertype,
             'createdon' => Time::get_current_date(),
             'verified' => false
         );
+        
+        # Merge All The Arrays
         $data_arr = array_merge($user_data_arr, self::fresh_session_array(), self::fresh_passwordreset_array());
         return $data_arr;
     }
@@ -21,16 +25,18 @@ class ArrayCreation {
         $session_arr["session"] = array(
             "sessionid" => "",
             "isloggedin" => false,
-            "token" => ""
+            "token" => "",
+            "ipaddress" => ""
         );
         return $session_arr;
     }
 
-    public static function used_session_array(string $sessionid, string $token): array {
+    public static function used_session_array(string $sessionid, string $token, string $ipaddress): array {
         $session_arr["session"] = array(
             "sessionid" => $sessionid,
             "isloggedin" => true,
-            "token" => $token
+            "token" => $token,
+            "ipaddress" =>$ipaddress
         );
         return $session_arr;
     }
