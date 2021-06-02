@@ -1,50 +1,48 @@
-<!--
-   Developed By FYP-21-S2-24
--->
+<!DOCTYPE html>
 <?php
 session_start();
 /* Load Config File */
 require_once '../resources/config.php';
+require_once ENTITIES_PATH . '/Account_User.php';
+require_once UTILS_PATH . '/Email.php';
+require_once UTILS_PATH . '/Regex.php';
+require_once UTILS_PATH . '/Time.php';
+require_once UTILS_PATH . '/StringUtils.php';
 ?>
 
 <html>
     <head>
         <!-- Title -->
         <title>FYP-21-S2-24</title>
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
         <!-- Styling -->
         <?php include COMPONENT_PATH . '/bootstrap.php'; ?>
         <link rel="stylesheet" href="./css/loginRegister.css"/> 
-
-
     </head>
     <body>
-        <!-- Logic & Validation -->
-        <?php
-        require_once ENTITIES_PATH . '/Account_User.php';
-        require_once ENTITIES_PATH . '/Patient.php';
 
+
+        <?php
         // Used to store correct data
         $loginArr = array(
             'email' => '',
             'password' => '',
         );
 
-        // -- Error Message
+        // -- Msg Variables
         $err_msg = "";
 
-        // -- Regex
-        $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
+        $validArr = array();
 
         // -- When Redirect or Load The Page
         if ($_SERVER['REQUEST_METHOD'] == "GET") {
-            // If the user is logged in
             if (isset($_SESSION["user"])) {
-                // Redirect User to home page / patient  page
-                //header("Location:'index");
+                echo unserialize($_SESSION["user"]);
             }
         }
-
-
 
         // Upon clicking "Login" Button
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -64,53 +62,71 @@ require_once '../resources/config.php';
             // -- Email Validation
             if (empty($loginArr['email'])) {
                 // Store Some Error Message
-            } else if (!preg_match($email_pattern, $loginArr['email'])) {
+            } else if (!Regex::validate_email($loginArr['email'])) {
                 // Store Some Error Message
             } else {
                 $validArr['email'] = True; // Pass Validation
             }
-            
-            // -- Password 
-            $validArr["password"] = True;  // Default Password Valid
+
+            // Password
+            $validArr["password"] = True;
 
             /* ------------ End Validation ------------ */
+            if (!in_array(FALSE, $validArr)) {
 
-            // Start Authenticating User (boolean)
-            $auth = Account_User::authenticate_user($loginArr);
+                # -- Start Authenticating User (boolean)
+                $auth = Account_User::authenticate_user($loginArr);
 
-            // Check If There Is Any "token" generated
-            if (!isset($_SESSION['token'])) {
-                $token_length = 10;
-                $_SESSION['token'] = Account_User::generate_token($token_length);
-            }
+                # -- Check If There Is Any "token" generated ---
+                if (!isset($_SESSION['token'])) {
 
-            // Check If There Are Any Other Login Session (Terminate Other Session?)
-            $auth_user = Account_User::load_user_data($loginArr);
-            $session_logon_allowed = Account_User::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
+                    // Default Session Token Length
+                    $token_length = 15;
+                    $_SESSION['token'] = StringUtils::generate_token($token_length);
+                }
 
-            // User Authenticated
-            if ($auth) {
-                if ($session_logon_allowed) {
-                    Account_User::login($auth_user->get_email(), session_id(), $_SESSION['token']);
-                    $auth_user = Account_User::load_user_data($loginArr); // Reload After Login Session Update
-                    $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
-                    //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
-                    $err_msg = "Success";
+                # -- User Authenticated ----
+                if ($auth) {
 
-                    // Clear Fields
-                    $loginArr = array(
-                        'email' => '',
-                        'password' => '',
-                    );
+                    # -- Check If There Are Any Other Login Session (Terminate Other Session?)
+                    $auth_user = Account_User::load_user_data($loginArr);
+                    $session_logon_allowed = Account_User::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
+
+                    # -- Get IP Address ---
+                    // whether ip is from share internet
+                    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+                        $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+                    }
+                    //whether ip is from proxy
+                    elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                        $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+                    }
+                    //whether ip is from remote address
+                    else {
+                        $ipaddress = $_SERVER['REMOTE_ADDR'];
+                    }
+
+                    if ($session_logon_allowed) {
+
+                        $login_status = Account_User::login($auth_user->get_email(), session_id(), $_SESSION['token'], $ipaddress); # Error
+                        $auth_user = Account_User::load_user_data($loginArr); // Reload After Login Session Update
+                        //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
+                        # -- Clear Fields
+                        $loginArr = array(
+                            'email' => '',
+                            'password' => '',
+                        );
+                    } else {
+                        $msg = "Account is logged in at another location";
+                    }
                 } else {
-                    $err_msg = "Account is logged in at another location";
+                    $msg = "Invalid Credentials!";
                 }
             } else {
-                $err_msg = "Invalid Credentials!";
+                // When Validation Fails
             }
         }
         ?>
-
         <!-- HTML Page Design -->
         <div>
             <!-- Navigation -->

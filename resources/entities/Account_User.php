@@ -1,6 +1,3 @@
-<!-- 
-    Developed By FYP-21-S2-24
--->
 <?php
 /*
  * @author yanying (Tracy)
@@ -10,6 +7,8 @@ require_once '../resources/config.php';
 require_once UTILS_PATH . '/DbQuery.php';
 require_once UTILS_PATH . '/Database.php';
 require_once UTILS_PATH . '/Time.php';
+require_once UTILS_PATH . '/ArrayCreation.php';
+require_once UTILS_PATH . '/StringUtils.php';
 require_once ENUMS_PATH . '/Appointment_Status.php';
 
 class Account_User {
@@ -139,27 +138,19 @@ class Account_User {
     //      Methods Accessing Firestore Database 
     //============================================
     // -- Change Login Status When User Already Authenticated -- //
-    public static function login(string $email, string $sessionid, string $token): bool {
+    public static function login(string $email, string $sessionid, string $token, string $ipaddress): bool {
 
         # Email Array
-        $emailArr = array(
-            "credentials" => array(
-                'email' => $email
-            )
+        $emailArr ["credentials"] = array(
+            'email' => $email
         );
 
         # Create Array Fields To Update To Google Cloud Firestore
-        $mapArr = array(
-            "session" => array(
-                "sessionid" => $sessionid,
-                "isloggedin" => true,
-                "token" => $token
-            )
-        );
+        $session_arr = ArrayCreation::used_session_array($sessionid, $token, $ipaddress);
 
         # Update Session Field After Success Authentication
         $db = new DbQuery();
-        $login = $db->modify_map_field(Database::ACCOUNT_USER, $emailArr, $mapArr);
+        $login = $db->modify_map_field(Database::ACCOUNT_USER, $emailArr, $session_arr);
         return $login; # -- Return Bool (Success or Failure) -- #
     }
 
@@ -172,39 +163,18 @@ class Account_User {
         } else {
 
             # Compare Token
-            if ($db_session['token'] == $token && $db_session['sessionid'] == $sessionid) {
-                return true;
-            } else {
-                return false;
-            }
+            return ($db_session['token'] == $token && $db_session['sessionid'] == $sessionid);
         }
     }
 
-    // -- Generate Token (Multi-Function Usage) ~ Not Sure If This Should Be In `Account_User` Class -- //
-    public static function generate_token(int $length): string {
-        $token = "";
-        $token_repo = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Upper Case
-        $token_repo .= "abcdefghijklmnopqrstuvwxyz"; // Lower Case
-        $token_repo .= "0123456789"; // Digits
-        $token_repo .= ".-_~!,*:@"; // Special Chars (Plus Sign NOT Included)
-        $max = strlen($token_repo);
 
-        # Randomly Pick From The Indexes Of `$token_repo`
-        for ($i = 0; $i < $length; $i++) {
-            $token .= $token_repo[random_int(0, $max - 1)];
-        }
-
-        return $token;
-    }
 
     // -- Get User Full Name -- //
     public static function retrieve_user_fullname(string $email): ?string {
 
         # Assign Email To Array
-        $emailArr = array(
-            "credentials" => array(
-                'email' => $email
-            )
+        $emailArr ["credentials"] = array(
+            'email' => $email
         );
 
         # Retrieve `Account_User` Object
@@ -213,7 +183,8 @@ class Account_User {
 
         # Filter & Return Full Name
         if ($user_data !== NULL) {
-            $full_name = $user_data['firstname'] . " " . $user_data['lastname'];
+            $name_arr = $user_data['profile']['name'];
+            $full_name = $name_arr['firstname'] . " " . $name_arr['lastname'];
             return $full_name;
         }
         return null;
@@ -233,9 +204,13 @@ class Account_User {
 
         # Store Any User Data In `Account_User` Object
         if ($user_data != NULL) {
-            return new Account_User($user_data['session'], $user_data['firstname'], $user_data['lastname'], $user_data['gender'],
-                    $user_data['dob'], $user_data['contactnumber'], $user_data['address'], $user_data['usertype'],
-                    $user_data['createdon'], $user_data['credentials']['email']);
+            $profile_arr = $user_data['profile'];
+            $credentials_arr = $user_data['credentials'];
+            $session_arr = $user_data['session'];
+            $accountdetails_arr = $user_data['accountdetails'];
+            return new Account_User($session_arr, $profile_arr['name']['firstname'], $profile_arr['name']['lastname'],
+                    $profile_arr['gender'], $profile_arr['dob'], $profile_arr['contactnumber'], $profile_arr['address'],
+                    $accountdetails_arr['usertype'], $accountdetails_arr['createdon'], $credentials_arr['email']);
         }
         return NULL;
     }
@@ -262,16 +237,15 @@ class Account_User {
     //  -- Check If The User Exist In The Database  -- //
     public static function check_user_exist(string $email /* , string $contactnumber */): bool {
 
-        # Create Credentials Array
-        $credentialsArr = array(
-            "credentials" => array(
-                'email' => $email
-            )
+        # Email Array
+        $emailArr ["credentials"] = array(
+            'email' => $email
         );
+
 
         # Query For User With The Given Email
         $db = new DbQuery();
-        $emails_found = $db->query_exact_match(Database::ACCOUNT_USER, $credentialsArr);
+        $emails_found = $db->query_exact_match(Database::ACCOUNT_USER, $emailArr);
 
         # Check If There Are Any Value Returned
         if (($emails_found !== NULL)) {
@@ -282,59 +256,34 @@ class Account_User {
 
     // -- Triggered When User Clicks On "Logout" -- // 
     public static function session_logout(string $email) {
+
         # Email Array
-        $emailArr = array(
-            "credentials" => array(
-                'email' => $email
-            )
+        $emailArr ["credentials"] = array(
+            'email' => $email
         );
 
         # Declare Session Array With Logged Out Values
-        $mapArr = array(
-            "session" => array(
-                "sessionid" => "",
-                "isloggedin" => false,
-                "token" => ""
-            )
-        );
+        $session_arr = ArrayCreation::fresh_session_array();
 
         # Update Session Array
         $db = new DbQuery();
-        $db->modify_map_field(Database::ACCOUNT_USER, $emailArr, $mapArr);
+        $db->modify_map_field(Database::ACCOUNT_USER, $emailArr, $session_arr);
     }
 
     // -- To Update The Generated Token To Database (Valid For 24 Hours) -- //
     public static function request_password_reset(string $email, string $token) {
 
         # Email Array
-        $emailArr = array(
-            "credentials" => array(
-                'email' => $email
-            )
+        $emailArr ["credentials"] = array(
+            'email' => $email
         );
 
-        # Create A Time Object
-        $time = new Time();
-
-        # Create An Array To Store `passwordreset` Fields
-        $userDataArr["passwordreset"] = array(
-            "passwordtoken" => $token,
-            "requestedon" => array(
-                "date" => $time->get_date(),
-                "time" => $time->get_time()
-            ),
-            "tokenusage" => array(
-                "used" => false,
-                "usedon" => array(
-                    "date" => "",
-                    "time" => ""
-                )
-            )
-        );
+        # Get Fresh Set Of Password Reset Array For New Password Reset
+        $passwordreset_arr = ArrayCreation::fresh_passwordreset_array($token);
 
         # Update The Array To Database
         $db = new DbQuery();
-        $db->modify_map_field(Database::ACCOUNT_USER, $emailArr, $userDataArr);
+        $db->modify_map_field(Database::ACCOUNT_USER, $emailArr, $passwordreset_arr);
     }
 
     // -- Validate Password Token -- //
@@ -345,15 +294,13 @@ class Account_User {
         if ($exist) {
 
             # Store Email In An Array
-            $conditionArr = array(
-                "credentials" => array(
-                    'email' => $email
-                )
+            $email_arr["credentials"] = array(
+                'email' => $email
             );
 
             # Retrieving `passwordreset` Map Fields
             $db = new DbQuery();
-            $mapData = $db->get_map_field(Database::ACCOUNT_USER, $conditionArr, self::PASSWORD_RESET);
+            $mapData = $db->get_map_field(Database::ACCOUNT_USER, $email_arr, self::PASSWORD_RESET);
 
             # Validate The Database's Requested Dates
             if (self::verify_requested_date($mapData['requestedon']['date'], $mapData['requestedon']['time'])) {
@@ -369,7 +316,7 @@ class Account_User {
                 echo $requestedon->get_current_date();
 
                 # Return bool On Validity
-                return self::verify_token($originaltoken, $passwordtoken, $duration);
+                return self::verify_token($originaltoken, $passwordtoken, $duration, $mapData['used']);
             }
             return false;
         }
@@ -377,13 +324,13 @@ class Account_User {
     }
 
     // -- Check If Given Token Is Valid -- //
-    private static function verify_token(string $originaltoken, string $emailtoken, int $duration): bool {
+    private static function verify_token(string $originaltoken, string $emailtoken, int $duration, bool $tokenstatus): bool {
 
         # Set Valid Duration As 1 Hour In Seconds -- (86,400 Seconds Changed To 3600 Seconds)
         $valid_duration = 60 * 60;
 
         # Check If Token Match & Duration Validity Suffice
-        if (($originaltoken == $emailtoken ) && ($duration < $valid_duration)) {
+        if (($originaltoken == $emailtoken ) && ($duration < $valid_duration) && (!$tokenstatus)) {
             return true;
         }
         return false;
@@ -393,8 +340,8 @@ class Account_User {
     private static function verify_requested_date(string $date, string $time): bool {
 
         # Sanitize The String 
-        $date = self::clean_input($date);
-        $time = self::clean_input($time);
+        $date = StringUtils::clean_input($date);
+        $time = StringUtils::clean_input($time);
 
         # Checks date & time
         if ($date !== "" && $time !== "") {
@@ -403,30 +350,17 @@ class Account_User {
         return false;
     }
 
-    // -- String Cleaning -- //
-    private static function clean_input(string $input): string {
-        $input = trim($input);  // Remove leading and trailing whitespace 
-        $input = stripslashes($input);  // Remove '\' (slashes)
-        $input = htmlspecialchars($input);  // Treat special chars as HTML entities
-        $input = strtolower($input);    // All chars to lowercase
-        return $input;
-    }
-
     // -- Password Change -- //
     public static function change_password(string $email, string $password): bool {
 
         # Condition Array (EMAIL)
-        $conditionArr = array(
-            "credentials" => array(
-                'email' => $email
-            )
+        $conditionArr['credentials'] = array(
+            'email' => $email
         );
 
         # Changed Array (PASSWORD)
-        $changedArr = array(
-            "credentials" => array(
-                'password' => $password
-            )
+        $changedArr['credentials'] = array(
+            'password' => $password
         );
 
         // Need To Send Verification Email To User.
@@ -437,29 +371,22 @@ class Account_User {
         $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $conditionArr);
 
         # Update Token Usage (WIP)
-        $time = new Time();
-        $tokenusage["passwordreset"] = array(
-            "tokenusage" => array(
-                "used" => true,
-                "usedon" => array(
-                    "date" => $time->get_current_date(),
-                    "time" => $time->get_current_time()
-                )
-            )
-        );
-        $db->modify_map_field(Database::ACCOUNT_USER, $conditionArr, $tokenusage);
+        $passwordreset_arr = self::used_passwordreset_array();
 
-        if ($user_data['credentials']['password'] == $password) {
-            return true;
-        }
-        return false;
+        $db->modify_map_field(Database::ACCOUNT_USER, $conditionArr, $passwordreset_arr);
+
+        return StringUtils::string_equal($user_data['credentials']['password'], $password);  // -- Bool -- //
     }
 
-    // -- Password Reset -- //
-    public static function reset_password() {
-        // Need To Send OTP Via Email To User.
-        # Need To Reset The Fields In The `passwordreset` To Empty
+    // -- Update Profile Information -- //
+    public static function update_profile() {
+        
     }
 
+    /*
+     * --------------------------
+     * Functions To Be Modified By Sub-classes
+     * --------------------------
+     */
 }
 ?>

@@ -3,7 +3,7 @@
 - Module: CSIT 321 - Project
 - Group Number: FYP-21-S2-24
 
-Group Member:
+# Group Member:
 
 - Ling Yan Ying  (Team Leader | Back-End Developer | Software Tester)
 - Kadek Anantawijaya Swadharma (Lead Developer | Software Designer)
@@ -16,7 +16,7 @@ Group Member:
 # Reminder
 - composer update  
 
-# Folders Explanation:
-
+# Folders & Files Explanation:
+- '.htaccess' is to restrict access to certain folders.
 
 

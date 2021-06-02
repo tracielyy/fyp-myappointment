@@ -16,6 +16,7 @@ require_once ENTITIES_PATH . '/Account_User.php';
 require_once UTILS_PATH . '/Email.php';
 require_once UTILS_PATH . '/Regex.php';
 require_once UTILS_PATH . '/Time.php';
+require_once UTILS_PATH . '/StringUtils.php';
 ?>
 <html>
     <head>
@@ -84,32 +85,49 @@ require_once UTILS_PATH . '/Time.php';
 
                 /* ------------ End Validation ------------ */
                 if (!in_array(FALSE, $validArr)) {
-                    // -- Start Authenticating User (boolean)
+
+                    # -- Start Authenticating User (boolean)
                     $auth = Account_User::authenticate_user($loginArr);
 
-                    // -- Check If There Is Any "token" generated
+                    # -- Check If There Is Any "token" generated ---
                     if (!isset($_SESSION['token'])) {
-                        $token_length = 15;  // Default Session Token Length
-                        $_SESSION['token'] = Account_User::generate_token($token_length);
+
+                        // Default Session Token Length
+                        $token_length = 15;
+                        $_SESSION['token'] = StringUtils::generate_token($token_length);
                     }
 
-                    // -- User Authenticated
+                    # -- User Authenticated ----
                     if ($auth) {
 
-                        // -- Check If There Are Any Other Login Session (Terminate Other Session?)
+                        # -- Check If There Are Any Other Login Session (Terminate Other Session?)
                         $auth_user = Account_User::load_user_data($loginArr);
                         $session_logon_allowed = Account_User::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
 
+                        # -- Get IP Address ---
+                        // whether ip is from share internet
+                        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+                            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+                        }
+                        //whether ip is from proxy
+                        elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+                        }
+                        //whether ip is from remote address
+                        else {
+                            $ipaddress = $_SERVER['REMOTE_ADDR'];
+                        }
+
                         if ($session_logon_allowed) {
-                            $login_status= Account_User::login($auth_user->get_email(), session_id(), $_SESSION['token']); # Error
+                            $login_status = Account_User::login($auth_user->get_email(), session_id(), $_SESSION['token'], $ipaddress); # Error
                             $auth_user = Account_User::load_user_data($loginArr); // Reload After Login Session Update
                             $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
                             //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
                             echo nl2br(PHP_EOL . "Success" . PHP_EOL);
-                            echo $auth_user. "<br/>";
-                            echo (int)$login_status;
+                            echo $auth_user . "<br/>";
+                            echo (int) $login_status;
 
-                            // -- Clear Fields
+                            # -- Clear Fields
                             $loginArr = array(
                                 'email' => '',
                                 'password' => '',

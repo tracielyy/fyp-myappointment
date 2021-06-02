@@ -1,7 +1,5 @@
-<!--
-   Developed By FYP-21-S2-24
--->
 <!-- This is web app's home page -->
+<!DOCTYPE html>
 <?php
 /* Load Config File */
 require_once '../resources/config.php';
@@ -10,7 +8,9 @@ require_once '../resources/config.php';
     <head>
         <!-- This Is The Home Page -->
         <title>FYP-21-S2-24: Home</title>
-
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <!-- Styling -->
         <?php include COMPONENT_PATH . '/bootstrap.php' ?>

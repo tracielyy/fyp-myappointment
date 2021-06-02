@@ -1,6 +1,3 @@
-<!--
-   Developed By FYP-21-S2-24
--->
 <!DOCTYPE html>
 <?php
 session_start();
@@ -10,13 +7,13 @@ require_once '../resources/config.php';
 <html lang="en">
     <head>
         <?php require COMPONENT_PATH . '/bootstrap.php' ?>
-        
+
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="./css/loginRegister.css"/> 
         <title>Register</title>
-        
+
 
     </head>
 
@@ -181,11 +178,10 @@ require_once '../resources/config.php';
             if (!$exist) {
                 // > Salt is in built in the hash php std library function
                 // > Hashing the password to be stored in the database
-                
                 //  From php doc: The used algorithm, cost and salt are returned as part of the hash. Therefore, 
                 //all information that's needed to verify the hash is included in it. This allows the password_verify() function to verify 
                 //the hash without needing separate storage for the salt or algorithm information.
-                password_hash('sha256',$registerArr['password']);
+                password_hash('sha256', $registerArr['password']);
                 // > Need To Encrypt The Password Then Store In Database
                 unset($registerArr["confirmpassword"]); // We do not need to store 'confirmpassword'
                 Patient::create_patient($registerArr);
@@ -260,16 +256,16 @@ require_once '../resources/config.php';
 
                                         <!-- Gender -->
                                         <input class="form-check-input" type="radio" id="Female" name="gender" value="F" <?php
-                                        if ($registerArr['gender'] == "F") {
-                                            echo "checked";
-                                        }
-                                        ?> /><label for="Female" class="btnLabel">Female</label>
+        if ($registerArr['gender'] == "F") {
+            echo "checked";
+        }
+        ?> /><label for="Female" class="btnLabel">Female</label>
 
                                         <input class="form-check-input" type="radio" name="gender" id="Male" value="M" <?php
                                         if ($registerArr['gender'] == "M") {
                                             echo "checked";
                                         }
-                                        ?> />
+        ?> />
                                         <label for="Male">Male</label>
                                         </select><br />
 

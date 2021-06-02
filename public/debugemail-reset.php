@@ -5,6 +5,10 @@
 <?php
 /* Load Config File */
 require_once '../resources/config.php';
+require_once ENTITIES_PATH . '/Account_User.php';
+require_once UTILS_PATH . '/Email.php';
+require_once UTILS_PATH . '/Regex.php';
+require_once UTILS_PATH . '/StringUtils.php';
 ?>
 <html>
     <head>
@@ -17,11 +21,6 @@ require_once '../resources/config.php';
     <body>
         <!-- PHP Script -->
         <?php
-        require_once ENTITIES_PATH . '/Account_User.php';
-        require_once UTILS_PATH . '/Email.php';
-        require_once UTILS_PATH . '/Regex.php';
-
-
         // Used to store correct data
         $resetArr = array(
             'email' => '',
@@ -64,55 +63,18 @@ require_once '../resources/config.php';
 
             // -- Invoke Email Send To User To Reset Password
             if ($user_exist) {
-                // -- Recipient
-                $to = $resetArr['email'];
-                $to_name = Account_User::retrieve_user_fullname($resetArr['email']);
 
-                // -- Email Subject
-                $subject = "FYP-21-S2-24: Password Reset";
 
-                // -- Generate Token (Security) # NOT IMPLEMENTED YET#
+                // -- Generate Token (Security) 
                 $token_length = 25; # Size Not Determined Yet
-                $token = Account_User::generate_token($token_length);
-                # -- Token Expiry Date Needs To Be Set -- #
-                // -- Password Reset Link With Token (To Be Added To The Email Message)
-                // <link>?token=<passwordtoken>&email=<email>
-                $unique_password_url = "http://localhost/MyAppointment/public/debugpasswordreset.php?token={$token}&email={$resetArr["email"]}";
-                $request_another_url = "http://localhost/MyAppointment/public/debugpasswordreset.php";
+                $token = StringUtils::generate_token($token_length);
 
+                // -- Send Emaill With Token To User 
+                $to = $resetArr['email'];
+                Email::template_passwordreset($to, $token);
 
-                // -- Clickable Links
-                $user_email = "<a href=mailto:{$resetArr["email"]}>{$resetArr["email"]}</a>";
-                $reset_password = "<a href={$unique_password_url} style='color:red; text-decoration:none;'>here</a>";
-                $reset_password_url = "<a href={$unique_password_url}>{$unique_password_url}</a>";
-                $request_another = "<a href={$request_another_url} style='color:teal;'>request another</a>";
-
-                // -- Miscellaneous
-                $break = "<br/><br/>";
-                $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
-
-                // -- Message
-                $message = "<span style='color:black;'>Hi {$to_name},{$break}";
-                $message .= "We have received a request to reset the password for the MyAppointment account associated with {$user_email}. {$break}";
-                $message .= "You can reset your password by clicking {$reset_password} or copy the link below in your browser:<br/>";
-                $message .= "{$reset_password_url}{$break}";
-                $message .= "If you did make this request, please disregard this email. ";
-                $message .= "Please note that your password will not change unless you click the link above and create a new one. ";
-                $message .= "This link will expire in one day. If your link has expired, you can always {$request_another}. {$break}";
-                $message .= "If you have requested multiple reset emails, please make sure you click the link inside the most recent email.{$break}";
-                $message .= "{$sign_off}</span>";
-
-                // -- Create New Email Object
-                $mail = new Email();
-                $mail->addAddress($to, $to_name);
-
-                // -- Content
-                $mail->isHTML(true);
-                $mail->Subject = $subject;
-                $mail->Body = $message;
-                $mail->AltBody = $message;
-                $mail->send();
                 $msg = "Successfully sent";
+                // -- Updating The Token To The Database
                 Account_User::request_password_reset($to, $token);
             } else {
                 $msg = "This email does not exist";

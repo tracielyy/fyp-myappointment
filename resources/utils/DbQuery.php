@@ -1,7 +1,3 @@
-<!-- 
-    Developed By FYP-21-S2-24
--->
-
 <?php
 /*
  * @author yanying (Tracy)
@@ -12,6 +8,7 @@ require_once '../resources/config.php';
 use Google\Cloud\Firestore\FirestoreClient;
 use Google\Cloud\Firestore\DocumentReference;
 use Google\Cloud\Firestore\CollectionReference;
+use Google\Cloud\Firestore\Query;
 use Google\Cloud\Firestore\DocumentSnapshot;
 
 require '../vendor/autoload.php';
@@ -56,6 +53,17 @@ class DbQuery {
         return $doc_ref;
     }
 
+    // -- For Document Inner Maps -- //
+    private function nested_condition(CollectionReference $query, array $conditionArr, string $key): Query {
+        foreach ($conditionArr[$key] as $condition => $condition_value) {
+
+            # Get The Path To The Map Fields
+            $condition_path = $key . "." . $condition;
+            $query = $query->where($condition_path, "=", $condition_value)->limit(1);
+        }
+        return $query;
+    }
+
     // -- Get DocumentSnapshot -- //
     private function document_query(string $collection, array $conditionArr)/* [nullable]: DocumentSnapshot */ {
 
@@ -65,12 +73,13 @@ class DbQuery {
         # Iterate Through The Given `$conditionArr` (Array)
         foreach ($conditionArr as $mapCondition => $value) {
 
-            # Inner Loop For Maps
-            foreach ($conditionArr[$mapCondition] as $condition => $condition_value) {
+            if (is_array($conditionArr[$mapCondition])) {
 
-                # Get The Path To The Map Fields
-                $condition_path = $mapCondition . "." . $condition;
-                $query = $query->where($condition_path, "=", $condition_value)->limit(1);
+                # Inner Loop For Maps
+                $query = $this->nested_condition($query, $conditionArr, $mapCondition);
+            } else {
+                $condition_path = $mapCondition;
+                $query = $query->where($condition_path, "=", $value)->limit(1);
             }
         }
         $snapshot = $query->documents();
@@ -191,19 +200,17 @@ class DbQuery {
     public function get_nested_collection(string $collection, string $subcollection, array $conditionArr, array $subconditionArr): array {
 
         # Getting The Condition Keys
-        $condition = array_key_first($conditionArr); # Outer Condition
+//        $condition = array_key_first($conditionArr); # Outer Condition
         //$subcondition = array_key_first($subconditionArr); # Inner Condition
         # Collection
-        $query = $this->db->collection($collection);
-        $query = $query->where($condition, "=", $conditionArr[$condition])->limit(1);
-        $snapshot = $query->documents();
+        $doc_snapshot = $this->document_query($collection, $conditionArr);
 
         # Iterate Through An Array Of Documents
-        foreach ($snapshot as $document) {
-            if ($document->exists()) {
-                $doc_id = $document->id();
-            }
+
+        if ($doc_snapshot->exists()) {
+            $doc_id = $doc_snapshot->id();
         }
+
 
         # Using ID
         $sub_col_ref = $this->db->collection($collection)->document($doc_id);
@@ -225,6 +232,71 @@ class DbQuery {
             }
         }
         return $doc_arr;  // -- Return Array Of Document Datas
+    }
+
+    // -- Get All The Documents In A Collection -- //
+    public function get_all_documents(string $collection): array {
+
+        # Collection Reference 
+        $collection_ref = $this->db->collection($collection);
+
+        # Create An Array To Store The Document Data
+        $doc_arr = array();
+
+        # DocumentSnapshots Of All The Documents
+        $documents = $collection_ref->documents();
+
+        # Iterate Through & Add To Array
+        foreach ($documents as $doc) {
+            if ($doc->exists()) {
+                $doc_arr[] = $doc->data();
+            }
+        }
+
+        return $doc_arr;
+    }
+
+    public function get_all_documents_ordered(string $collection, string $orderBy): array {
+        # Collection Reference 
+        $collection_ref = $this->db->collection($collection);
+
+        # Create An Array To Store The Document Data
+        $doc_arr = array();
+
+        # DocumentSnapshots Of All The Documents
+        $query = $collection_ref->orderBy($orderBy);
+        $documents = $query->documents();
+
+        # Iterate Through & Add To Array
+        foreach ($documents as $doc) {
+            if ($doc->exists()) {
+                $doc_arr[] = $doc->data();
+            }
+        }
+
+        return $doc_arr;
+    }
+
+    // -- Get ONLY ONE Document -- //
+    public function get_document_ordered(string $collection, string $orderBy, bool $asc) {
+        # Collection Reference 
+        $collection_ref = $this->db->collection($collection);
+
+        # DocumentSnapshots Of All The Documents
+        if ($asc) {
+            $query = $collection_ref->orderBy($orderBy)->limit(1);
+        } else {
+            $query = $collection_ref->orderBy($orderBy, 'DESC')->limit(1);
+        }
+
+        $documents = $query->documents();
+
+        # Iterate Through & Add To Array
+        foreach ($documents as $doc) {
+            if ($doc->exists()) {
+                return $doc->data();
+            }
+        }
     }
 
 }
