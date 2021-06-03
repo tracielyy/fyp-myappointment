@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @author yanying (Tracy)
  */
@@ -9,6 +10,7 @@ require_once UTILS_PATH . '/Database.php';
 require_once UTILS_PATH . '/Time.php';
 require_once UTILS_PATH . '/ArrayCreation.php';
 require_once UTILS_PATH . '/StringUtils.php';
+require_once UTILS_PATH . '/Session.php';
 require_once ENUMS_PATH . '/Appointment_Status.php';
 
 class Account_User {
@@ -24,7 +26,7 @@ class Account_User {
     private string $dob;       // Date of birth -- DDMMYYYY
     private string $usertype;
     private string $createdon; // Date which the account is created
-    private array $session;
+    private Session $session; // Session Object
     // Future Possible
     private bool $enabled; # disabled || enabled
 
@@ -32,7 +34,7 @@ class Account_User {
     private const PASSWORD_RESET = "passwordreset";
 
     // Constructor
-    public function __construct(array $session, string $firstname, string $lastname, string $gender, string $dob,
+    public function __construct(Session $session, string $firstname, string $lastname, string $gender, string $dob,
             string $contactnumber, string $address, string $usertype, string $createdon, string $email, string $password = NULL) {
 
         $this->session = $session;
@@ -49,7 +51,7 @@ class Account_User {
     }
 
     // Getters
-    public function get_session(): array {
+    public function get_session(): Session {
         return $this->session;
     }
 
@@ -155,19 +157,17 @@ class Account_User {
     }
 
     //  -- Check If There Are Any Other Login Session -- //
-    public static function check_session(array $db_session, string $sessionid, string $token): bool {
+    public static function check_session(Session $db_session, string $sessionid, string $token): bool {
 
         #  Session Status 
-        if ($db_session['isloggedin'] == false) {
+        if ($db_session->get_isloggedin() == false) {
             return true;
         } else {
 
             # Compare Token
-            return ($db_session['token'] == $token && $db_session['sessionid'] == $sessionid);
+            return ($db_session->get_token() == $token && $db_session->get_sessionid() == $sessionid);
         }
     }
-
-
 
     // -- Get User Full Name -- //
     public static function retrieve_user_fullname(string $email): ?string {
@@ -208,7 +208,11 @@ class Account_User {
             $credentials_arr = $user_data['credentials'];
             $session_arr = $user_data['session'];
             $accountdetails_arr = $user_data['accountdetails'];
-            return new Account_User($session_arr, $profile_arr['name']['firstname'], $profile_arr['name']['lastname'],
+
+            # Session Object
+            $session_obj = new Session($session_arr['isloggedin'], $session_arr['sessionid'], $session_arr['token'], $session_arr['ipaddress']);
+
+            return new Account_User($session_obj, $profile_arr['name']['firstname'], $profile_arr['name']['lastname'],
                     $profile_arr['gender'], $profile_arr['dob'], $profile_arr['contactnumber'], $profile_arr['address'],
                     $accountdetails_arr['usertype'], $accountdetails_arr['createdon'], $credentials_arr['email']);
         }
@@ -350,6 +354,10 @@ class Account_User {
         return false;
     }
 
+    #-------------------------------------------------------------------------#
+    # -- Information Update -------------------------------------------------#
+    #-------------------------------------------------------------------------#
+
     // -- Password Change -- //
     public static function change_password(string $email, string $password): bool {
 
@@ -378,9 +386,43 @@ class Account_User {
         return StringUtils::string_equal($user_data['credentials']['password'], $password);  // -- Bool -- //
     }
 
-    // -- Update Profile Information -- //
-    public static function update_profile() {
+    // -- Change Email -- //
+    public static function change_email(string $cur_email, string $new_email, string $password): bool {
+
+        # Credential Array (The Condition To Fulfil
+        $credentials['credentials'] = array(
+            'email' => $cur_email,
+            'password' => $password
+        );
+
+        # Changed Array
+        $update_arr['credentials'] = array(
+            'email' => $new_email
+        );
+
+        # Update User Email        
+        $db = new DbQuery();
+        $changed = $db->modify_map_field(Database::ACCOUNT_USER, $credentials, $update_arr);
+
+        # Return Boolean (Success or Failure)
+        return $changed;
+    }
+
+    // -- Update Profile Information (Names, Contact, Address) -- //
+    public static function update_general_profile(array $profile_arr, string $email, string $password) {
+
+        # Credential Array
+        $credentials['credentials'] = array(
+            'email' => $email,
+            'password' => $password
+        );
         
+        # Update User Profile
+        $db = new DbQuery();
+        $changed = $db->modify_map_field(Database::ACCOUNT_USER, $credentials, $profile_arr);
+        
+        # Return Boolean (Success or Failure)
+        return $changed;
     }
 
     /*
@@ -389,4 +431,5 @@ class Account_User {
      * --------------------------
      */
 }
+
 ?>
