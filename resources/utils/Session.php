@@ -61,6 +61,13 @@ class Session {
         $this->ipaddress = $ipaddress;
     }
 
+    // -- Use For Debugging/ Logging Purpose -- //
+    public function __toString(): string {
+        $str = nl2br('Session ID ' . $this->sessionid . PHP_EOL . '$token: ' . $this->token .
+                PHP_EOL . 'IP Address: ' . $this->ipaddress . PHP_EOL);
+        return $str;
+    }
+
 }
 
 ?>
