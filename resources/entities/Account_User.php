@@ -320,7 +320,7 @@ class Account_User {
                 echo $requestedon->get_current_date();
 
                 # Return bool On Validity
-                return self::verify_token($originaltoken, $passwordtoken, $duration, $mapData['used']);
+                return self::verify_token($originaltoken, $passwordtoken, $duration, $mapData['tokenused']);
             }
             return false;
         }

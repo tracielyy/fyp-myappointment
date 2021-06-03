@@ -3,6 +3,9 @@
 session_start();
 /* Load Config File */
 require_once '../resources/config.php';
+require_once ENTITIES_PATH . '/Account_User.php';
+require_once ENTITIES_PATH . '/Patient.php';
+require_once UTILS_PATH . '/Regex.php';
 ?>
 <html lang="en">
     <head>
@@ -19,10 +22,6 @@ require_once '../resources/config.php';
 
     <!-- Logic & Validation -->
     <?php
-    require_once ENTITIES_PATH . '/Account_User.php';
-    require_once ENTITIES_PATH . '/Patient.php';
-
-
     // Used to store correct data
     $registerArr = array(
         'firstname' => '',
@@ -36,20 +35,22 @@ require_once '../resources/config.php';
         'confirmpassword' => ''
     );
 
+    // -- Storage Array -- //
+    $patient_register = array(
+        'profile' => array(
+            'name' => array('firstname' => '', 'lastname' => ''),
+            'contactnumber' => '',
+            'address' => '',
+            'dob' => '',
+            'gender' => ''
+        ),
+        'credentials' => array('email' => '', 'password' => '')
+    );
+
 
     // Some Variables
     $err_firstname = $err_lastname = $err_gender = $err_contactnumber = $err_address = $err_dob = $err_password = $err_confirmpassword = $err_email = "";
-    // -- Regex
-    $contact_number_pattern = "/^[689]{1}[0-9]{7}$/"; // Singapore phone number length
-    $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
-    $name_pattern = "/^(?![ .]+$)[a-zA-Z ,]*$/";
-    $password_pattern = "/^" . // Pattern Match From Start Of String
-            "(?=.*[0-9])" . // At Least 1 Digit
-            "(?=.*[a-z])" . // At Least 1 Lower Case Char
-            "(?=.*[A-Z])" . // At Least 1 Upper Case Char
-            "(?=.*[\*\.!@\$%^&\(\)\{\}\[\]:;<>,.\?\/\~_\+-=\|])" . // At Least 1 Special Chars
-            ".{8,32}" . // 8 To 32 Chars In Total
-            "$/";    // Pattern Match To End Of String
+
     // Upon clicking "Login" Button 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -71,7 +72,7 @@ require_once '../resources/config.php';
         if (empty($registerArr['firstname'])) {
             $err_firstname = "Field Cannot Be Empty";
             echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
-        } else if (!preg_match($name_pattern, $registerArr['firstname'])) {
+        } else if (!Regex::validate_name($registerArr['firstname'])) {
             $err_firstname = "Invalid";
             echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
         } else {
@@ -81,10 +82,8 @@ require_once '../resources/config.php';
         // -- Last Name
         if (empty($registerArr['lastname'])) {
             $err_lastname = "Field Cannot Be Empty";
-            echo "<style type='text/css'> #lastname{border:1.5px solid red;}</style>";
-        } else if (!preg_match($name_pattern, $registerArr['lastname'])) {
+        } else if (!Regex::validate_name($registerArr['lastname'])) {
             $err_lastname = "Invalid";
-            echo "<style type='text/css'> #lastname{border:1.5px solid red;}</style>";
         } else {
             $validArr['lastname'] = True; // Pass Validation
         }
@@ -92,18 +91,18 @@ require_once '../resources/config.php';
         // -- Contact Number Validation
         if (empty($registerArr['contactnumber'])) {
             $err_contactnumber = "Field Cannot Be Empty";
-            echo "<style type='text/css'> #contactnumber{border:1.5px solid red;}</style>";
-        } else if (!preg_match($contact_number_pattern, $registerArr['contactnumber'])) {
+        } else if (!Regex::validate_phone($registerArr['contactnumber'])) {
             $err_contactnumber = "Invalid";
-            echo "<style type='text/css'> #contactnumber{border:1.5px solid red;}</style>";
         } else {
             $validArr['contactnumber'] = True; // Pass Validation
         }
 
         // -- Gender Validation (Just Make Sure Either Male Or Female Is 'Checked')
         if (empty($registerArr['gender'])) {
+            // Store Some Error Message
             $err_gender = "Not Selected";
         } else if (!($registerArr['gender'] == 'F' || $registerArr['gender'] == 'M')) {
+            // Store Some Error Message
             $err_gender = "Invalid";
         } else {
             $validArr['gender'] = True; // Pass Validation
@@ -112,7 +111,6 @@ require_once '../resources/config.php';
         // -- Date Of Birth (DOB) Validation
         if (empty($registerArr['dob'])) {
             $err_dob = "Field Cannot Be Empty";
-            echo "<style type='text/css'> #dob{border:1.5px solid red;}</style>";
         } else {
             $validArr['dob'] = True; // Pass Validation
         }
@@ -127,7 +125,6 @@ require_once '../resources/config.php';
         // -- Address Validation (Unsure Of What Further Validation To Be Done)
         if (empty($registerArr['address'])) {
             $err_address = "Field Cannot Be Empty";
-            echo "<style type='text/css'> #address{border:1.5px solid red;}</style>";
         } else {
             $validArr['address'] = True; // Pass Validation
         }
@@ -135,11 +132,11 @@ require_once '../resources/config.php';
 
         // -- Email Validation
         if (empty($registerArr['email'])) {
+            // Store Some Error Message
             $err_email = "Field Cannot Be Empty";
-            echo "<style type='text/css'> #email{border:1.5px solid red;}</style>";
-        } else if (!preg_match($email_pattern, $registerArr['email'])) {
+        } else if (!Regex::validate_email($registerArr['email'])) {
+            // Store Some Error Message
             $err_email = "Invalid";
-            echo "<style type='text/css'> #email{border:1.5px solid red;}</style>";
         } else {
             $validArr['email'] = True; // Pass Validation
         }
@@ -148,22 +145,20 @@ require_once '../resources/config.php';
         if (empty($registerArr['password'])) {
             // Store Some Error Message
             $err_password = "Field Cannot Be Empty";
-            echo "<style type='text/css'> #password{border:1.5px solid red;}</style>";
-        } else if (!preg_match($password_pattern, $registerArr['password'])) {
+        } else if (!Regex::validate_password($registerArr['password'])) {
             // Store Some Error Message
             $err_password = "Invalid";
-            echo "<style type='text/css'> #password{border:1.5px solid red;}</style>";
         } else {
             $validArr['password'] = True; // Pass Validation
         }
 
         // -- Confirm Password Validation (Check if it is the same as 'Password')
         if (empty($registerArr['confirmpassword'])) {
+            // Store Some Error Message
             $err_confirmpassword = "Field Cannot Be Empty";
-            echo "<style type='text/css'> #confirmpassword{border:1.5px solid red;}</style>";
         } else if ($registerArr['confirmpassword'] !== $registerArr['password']) {
+            // Store Some Error Message
             $err_confirmpassword = "Password Does Not Match";
-            echo "<style type='text/css'> #confirmpassword{border:1.5px solid red;}</style>";
         } else {
             $validArr['confirmpassword'] = True; // Pass Validation
         }
@@ -176,16 +171,23 @@ require_once '../resources/config.php';
             // > Check If User Already Exist (Email & Contact Number)
             $exist = Account_User::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
             if (!$exist) {
-                // > Salt is in built in the hash php std library function
-                // > Hashing the password to be stored in the database
-                //  From php doc: The used algorithm, cost and salt are returned as part of the hash. Therefore, 
-                //all information that's needed to verify the hash is included in it. This allows the password_verify() function to verify 
-                //the hash without needing separate storage for the salt or algorithm information.
-                password_hash('sha256', $registerArr['password']);
-                // > Need To Encrypt The Password Then Store In Database
-                unset($registerArr["confirmpassword"]); // We do not need to store 'confirmpassword'
-                Patient::create_patient($registerArr);
 
+                /* Load To Patient Registration Array */
+                foreach ($registerArr as $key => $value) {
+
+                    # Loading Of Basic Profile Information
+                    if (isset($patient_register['profile'][$key])) {
+                        $patient_register['profile'][$key] = htmlspecialchars($value);
+                    } else if (isset($patient_register['credentials'][$key])) {
+                        $patient_register['credentials'][$key] = htmlspecialchars($value);
+                    } else if (isset($patient_register['profile']['name'][$key])) {
+                        $patient_register['profile']['name'][$key] = htmlspecialchars($value);
+                    }
+                }
+
+                // > Salt Generation (?)
+                // > Need To Encrypt The Password Then Store In Database
+                Patient::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
                 // Reset Information
                 $registerArr = array(
                     'firstname' => '',
@@ -199,11 +201,13 @@ require_once '../resources/config.php';
                     'confirmpassword' => ''
                 );
                 echo "<br/> Success Registration <br/>";
+                // -- Need To Send A Email To Ask Patient To Verify Email -- //
             } else {
                 echo "User already exist";
             }
         } else {
             // Any Actions Or Displays For Errors
+            echo "<div style='color:red;'>Register Fail!</div>";
         }
     }
     ?>
@@ -256,16 +260,16 @@ require_once '../resources/config.php';
 
                                         <!-- Gender -->
                                         <input class="form-check-input" type="radio" id="Female" name="gender" value="F" <?php
-        if ($registerArr['gender'] == "F") {
-            echo "checked";
-        }
-        ?> /><label for="Female" class="btnLabel">Female</label>
+                                        if ($registerArr['gender'] == "F") {
+                                            echo "checked";
+                                        }
+                                        ?> /><label for="Female" class="btnLabel">Female</label>
 
                                         <input class="form-check-input" type="radio" name="gender" id="Male" value="M" <?php
                                         if ($registerArr['gender'] == "M") {
                                             echo "checked";
                                         }
-        ?> />
+                                        ?> />
                                         <label for="Male">Male</label>
                                         </select><br />
 

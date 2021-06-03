@@ -10,6 +10,7 @@ require_once ENUMS_PATH . '/User_Type.php';
 require_once UTILS_PATH . '/DbQuery.php';
 require_once UTILS_PATH . '/Database.php';
 require_once UTILS_PATH . '/Time.php';
+require_once UTILS_PATH . '/ArrayCreation.php';
 
 class Patient extends Account_User {
 
@@ -38,7 +39,7 @@ class Patient extends Account_User {
     public static function create_patient(array $userDataArr): void {
 
         # Declaration Of Basic Information To Include To Account_User
-        $account_user_arr = parent::account_creation_array(User_Type::PATIENT);
+        $account_user_arr = ArrayCreation::account_creation_array(User_Type::PATIENT);
 
         # Load Basic Account User Fields & Values To Array
         foreach ($account_user_arr as $field => $value) {

@@ -72,8 +72,8 @@ class Email extends PHPMailer {
         # -- Token Expiry Date Needs To Be Set -- #
         // -- Password Reset Link With Token (To Be Added To The Email Message)
         // <link>?token=<passwordtoken>&email=<email>
-        $unique_password_url = "http://localhost/MyAppointment/public/debugpasswordreset.php?token={$token}&email={$to}";
-        $request_another_url = "http://localhost/MyAppointment/public/debugemail-reset.php";
+        $unique_password_url = "https://myappointment.tracieqwynn.tech/debugpasswordreset.php?token={$token}&email={$to}";
+        $request_another_url = "https://myappointment.tracieqwynn.tech/debugemail-reset.php";
 
 
         // -- Clickable Links
