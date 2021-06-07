@@ -25,7 +25,7 @@ class Account_User {
     private string $contactnumber; // Unsure whether to use 'int' or 'string' -- Is Foreign Number Allowed?
     private string $dob;       // Date of birth -- DDMMYYYY
     private string $usertype;
-    private string $createdon; // Date which the account is created
+    private Time $createdon; // Date which the account is created
     private Session $session; // Session Object
     // Future Possible
     private bool $enabled; # disabled || enabled
@@ -35,7 +35,7 @@ class Account_User {
 
     // Constructor
     public function __construct(Session $session, string $firstname, string $lastname, string $gender, string $dob,
-            string $contactnumber, string $address, string $usertype, string $createdon, string $email, string $password = NULL) {
+            string $contactnumber, string $address, string $usertype, Time $createdon, string $email, string $password = NULL) {
 
         $this->session = $session;
         $this->firstname = $firstname;
@@ -212,9 +212,12 @@ class Account_User {
             # Session Object
             $session_obj = new Session($session_arr['isloggedin'], $session_arr['sessionid'], $session_arr['token'], $session_arr['ipaddress']);
 
+            # Time Object
+            $time_obj = new Time($accountdetails_arr['createdon']['date'], $accountdetails_arr['createdon']['time']);
+
             return new Account_User($session_obj, $profile_arr['name']['firstname'], $profile_arr['name']['lastname'],
                     $profile_arr['gender'], $profile_arr['dob'], $profile_arr['contactnumber'], $profile_arr['address'],
-                    $accountdetails_arr['usertype'], $accountdetails_arr['createdon'], $credentials_arr['email']);
+                    $accountdetails_arr['usertype'], $time_obj, $credentials_arr['email']);
         }
         return NULL;
     }
@@ -245,7 +248,6 @@ class Account_User {
         $emailArr ["credentials"] = array(
             'email' => $email
         );
-
 
         # Query For User With The Given Email
         $db = new DbQuery();
@@ -416,11 +418,11 @@ class Account_User {
             'email' => $email,
             'password' => $password
         );
-        
+
         # Update User Profile
         $db = new DbQuery();
         $changed = $db->modify_map_field(Database::ACCOUNT_USER, $credentials, $profile_arr);
-        
+
         # Return Boolean (Success or Failure)
         return $changed;
     }
