@@ -147,6 +147,7 @@ class Email extends PHPMailer {
 
         // -- Message
         $message = "<span style='color:black;'>Hi {$to_name}, {$break}";
+        
         $message .= "MyAppointment needs to verify your email address before you can start making any appointment.{$break}";
         $message .= "Please verify your email address {$user_email} {$break}";
         $message .= "{$sign_off}</span>";
