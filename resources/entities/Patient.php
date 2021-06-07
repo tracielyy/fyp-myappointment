@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @author yanying (Tracy)
  */
@@ -15,8 +16,6 @@ require_once UTILS_PATH . '/ArrayCreation.php';
 class Patient extends Account_User {
 
     // Properties
-    protected const PATIENT = "Patient";
-
     //private $appointment_records= array();  // Appointment_Record Object
     //private $medical_records = array();
     // Constructor
@@ -52,13 +51,17 @@ class Patient extends Account_User {
     }
 
     // -- Edit Patient Information (Make Sure Patient Has To Provide Credentials For The Change) -- //
-    public static function edit_patient_profile(array $credentials_arr, array $profile_changed_arr): void {
-        # Double Check If Patient Exist
+    public static function edit_patient_profile(array $credentials_arr, array $profile_changed_arr): bool {
+
+        # Double Check If Patient Exist For The Given Credentials
         $user_data = parent::load_user_data($credentials_arr);
-        if ($user_data !== null){
-            # TBC #
+        if ($user_data !== null) {
+
+            # Modify The Patient Profile Based On The Given Array
+            $db = new DbQuery();
+            return $db->modify_map_field(Database::ACCOUNT_USER, $credentials_arr, $profile_changed_arr);
         }
-        
+        return false;
     }
 
 //    // Getters
@@ -72,4 +75,5 @@ class Patient extends Account_User {
 //        $this->$appointment_record = new Appointment_Record(); // Params TBC
 //    }
 }
+
 ?>
