@@ -356,6 +356,23 @@ class Account_User {
         return false;
     }
 
+    
+    // -- Verify Account (Email Verification) --//
+    public static function email_verified(string $email): bool {
+
+        # Condition Array (EMAIL)
+        $conditionArr['credentials'] = array(
+            'email' => $email
+        );
+
+        # Changed Array (VERIFIED)
+        $changedArr['accountdetails'] = ArrayCreation::account_verified_array();
+
+        # Update From `Not Verified` To `Verified`
+        $db = new DbQuery();
+        return $db->modify_map_field(Database::ACCOUNT_USER, $conditionArr, $changedArr);
+    }
+
     #-------------------------------------------------------------------------#
     # -- Information Update -------------------------------------------------#
     #-------------------------------------------------------------------------#
@@ -373,7 +390,7 @@ class Account_User {
             'password' => $password
         );
 
-        // Need To Send Verification Email To User.
+        # Update The New Password
         $db = new DbQuery();
         $db->modify_map_field(Database::ACCOUNT_USER, $conditionArr, $changedArr);
 

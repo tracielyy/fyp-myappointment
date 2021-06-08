@@ -7,7 +7,7 @@ class ArrayCreation {
      * --------------------------
      */
 
-    public static function account_creation_array(string $usertype): array {
+    public static function account_creation_array(string $usertype, string $vtoken): array {
 
         # Create New Time Object
         $time = new Time();
@@ -19,7 +19,10 @@ class ArrayCreation {
                 'date' => $time->get_date(),
                 'time' => $time->get_time()
             ),
-            'verified' => false
+            'verification' => array(
+                'verified' => false,
+                'vtoken' => $vtoken
+            )
         );
 
         # Merge All The Arrays
@@ -27,7 +30,20 @@ class ArrayCreation {
         return $data_arr;
     }
 
+    public static function account_verified_array(): array {
+
+        # Verified Array
+        $verification['verification'] = array(
+            'verified' => true,
+            'vtoken' => ''
+        );
+
+        return $verification;
+    }
+
     public static function fresh_session_array(): array {
+
+        # Reset The Session Array
         $session_arr["session"] = array(
             "sessionid" => "",
             "isloggedin" => false,
@@ -38,6 +54,8 @@ class ArrayCreation {
     }
 
     public static function used_session_array(string $sessionid, string $token, string $ipaddress): array {
+
+        # Fill The Session Array With Relevant Data
         $session_arr["session"] = array(
             "sessionid" => $sessionid,
             "isloggedin" => true,
