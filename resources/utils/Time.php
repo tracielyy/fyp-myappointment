@@ -64,11 +64,11 @@ class Time {
 
     // Some static methods
     public static function get_current_date(): string {
-        return (string) date("d-m-Y");
+        return (string) date(self::DATE_FORMAT_DEFAULT);
     }
 
     public static function get_current_time(): string {
-        return (string) date("H:i:s");
+        return (string) date(self::TIME_FORMAT_DEFAULT);
     }
 
     // -- Find Difference In Date & Time -- //

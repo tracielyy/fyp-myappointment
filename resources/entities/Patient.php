@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @author yanying (Tracy)
  */
@@ -10,12 +11,11 @@ require_once ENUMS_PATH . '/User_Type.php';
 require_once UTILS_PATH . '/DbQuery.php';
 require_once UTILS_PATH . '/Database.php';
 require_once UTILS_PATH . '/Time.php';
+require_once UTILS_PATH . '/ArrayCreation.php';
 
 class Patient extends Account_User {
 
     // Properties
-    protected const PATIENT = "Patient";
-
     //private $appointment_records= array();  // Appointment_Record Object
     //private $medical_records = array();
     // Constructor
@@ -38,7 +38,7 @@ class Patient extends Account_User {
     public static function create_patient(array $userDataArr): void {
 
         # Declaration Of Basic Information To Include To Account_User
-        $account_user_arr = parent::account_creation_array(User_Type::PATIENT);
+        $account_user_arr = ArrayCreation::account_creation_array(User_Type::PATIENT);
 
         # Load Basic Account User Fields & Values To Array
         foreach ($account_user_arr as $field => $value) {
@@ -51,13 +51,17 @@ class Patient extends Account_User {
     }
 
     // -- Edit Patient Information (Make Sure Patient Has To Provide Credentials For The Change) -- //
-    public static function edit_patient_profile(array $credentials_arr, array $profile_changed_arr): void {
-        # Double Check If Patient Exist
+    public static function edit_patient_profile(array $credentials_arr, array $profile_changed_arr): bool {
+
+        # Double Check If Patient Exist For The Given Credentials
         $user_data = parent::load_user_data($credentials_arr);
-        if ($user_data !== null){
-            # TBC #
+        if ($user_data !== null) {
+
+            # Modify The Patient Profile Based On The Given Array
+            $db = new DbQuery();
+            return $db->modify_map_field(Database::ACCOUNT_USER, $credentials_arr, $profile_changed_arr);
         }
-        
+        return false;
     }
 
 //    // Getters
@@ -71,4 +75,5 @@ class Patient extends Account_User {
 //        $this->$appointment_record = new Appointment_Record(); // Params TBC
 //    }
 }
+
 ?>

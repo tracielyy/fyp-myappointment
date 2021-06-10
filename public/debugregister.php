@@ -6,6 +6,9 @@
 session_start();
 /* Load Config File */
 require_once '../resources/config.php';
+require_once ENTITIES_PATH . '/Account_User.php';
+require_once ENTITIES_PATH . '/Patient.php';
+require_once UTILS_PATH . '/Regex.php';
 ?>
 <html>
     <head>
@@ -16,9 +19,6 @@ require_once '../resources/config.php';
     <body>
         <!-- PHP Script -->
         <?php
-        require_once ENTITIES_PATH . '/Account_User.php';
-        require_once ENTITIES_PATH . '/Patient.php';
-        require_once UTILS_PATH . '/Regex.php';
         // Code here
         ?>
 
@@ -211,7 +211,6 @@ require_once '../resources/config.php';
                         );
                         echo "<br/> Success Registration <br/>";
                         // -- Need To Send A Email To Ask Patient To Verify Email -- //
-                        
                     } else {
                         echo "User already exist";
                     }
@@ -237,16 +236,16 @@ require_once '../resources/config.php';
                 <!-- Gender -->
                 <label for="gender">Select Gender: </label>
                 <input type="radio" id="Female" name="gender" value="F"<?php
-                if ($registerArr['gender'] == "F") {
-                    echo "checked";
-                }
-                ?>/><label for="Female" class="btnLabel">Female</label>
+            if ($registerArr['gender'] == "F") {
+                echo "checked";
+            }
+            ?>/><label for="Female" class="btnLabel">Female</label>
 
                 <input type="radio" name="gender" id="Male" value="M" <?php
-                       if ($registerArr['gender'] == "M") {
-                           echo "checked";
-                       }
-                       ?> /><label for="Male">Male</label>
+                if ($registerArr['gender'] == "M") {
+                    echo "checked";
+                }
+            ?> /><label for="Male">Male</label>
                 </select><br/>
 
 

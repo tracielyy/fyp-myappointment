@@ -72,8 +72,8 @@ class Email extends PHPMailer {
         # -- Token Expiry Date Needs To Be Set -- #
         // -- Password Reset Link With Token (To Be Added To The Email Message)
         // <link>?token=<passwordtoken>&email=<email>
-        $unique_password_url = "http://localhost/MyAppointment/public/debugpasswordreset.php?token={$token}&email={$to}";
-        $request_another_url = "http://localhost/MyAppointment/public/debugemail-reset.php";
+        $unique_password_url = "https://myappointment.tracieqwynn.tech/debugpasswordreset.php?token={$token}&email={$to}";
+        $request_another_url = "https://myappointment.tracieqwynn.tech/debugemail-reset.php";
 
 
         // -- Clickable Links
@@ -147,11 +147,22 @@ class Email extends PHPMailer {
 
         // -- Message
         $message = "<span style='color:black;'>Hi {$to_name}, {$break}";
+        $message .= "Thank you for registering with FYP-21-S2-24's MyAppointment. {$break}";
         $message .= "MyAppointment needs to verify your email address before you can start making any appointment.{$break}";
         $message .= "Please verify your email address {$user_email} {$break}";
         $message .= "{$sign_off}</span>";
 
         self::sendEmail($to, $subject, $message);
+    }
+
+    // -- Sent When User Book An Appointment (Show Appointment Schedule) -- //
+    public static function template_bookappointment() {
+        
+    }
+
+    // -- Sent When User Reschedule Their Appointment -- //
+    public static function template_rescheduleappointment() {
+        
     }
 
     // -- Create Button For Email: VML Used For MSO -- //
