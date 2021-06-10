@@ -20,9 +20,9 @@ class AdminFunctions {
     public static function create_medical_personnel(array $admin_email, $medical_personnel): bool {
 
         # -- Double Check If The One Performing The Action Is `ADMIN` -- #
-        if (self::check_admin($admin_email)) {
-            // Create Medical Personnel
-        }
+        if (self::check_admin($admin_email)) :
+        // Create Medical Personnel
+        endif;
         return false;
     }
 
@@ -30,9 +30,9 @@ class AdminFunctions {
     public static function remove_medical_personnel(array $admin_email, $medical_personnel): bool {
 
         # -- Double Check If The One Performing The Action Is `ADMIN` -- #
-        if (self::check_admin($admin_email)) {
-            // Remove Medical Personnel
-        }
+        if (self::check_admin($admin_email)) :
+        // Remove Medical Personnel
+        endif;
         return false;
     }
 
@@ -44,9 +44,9 @@ class AdminFunctions {
         $admin_user = $db->query_exact_match(Database::ACCOUNT_USER, $email);
 
         # -- Check If It Match The `Admin` User_Type -- #
-        if ($admin_user['accountdetails']['usertype'] == User_Type::ADMIN) {
+        if ($admin_user['accountdetails']['usertype'] == User_Type::ADMIN) :
             return true;
-        }
+        endif;
         return false;
     }
 
@@ -62,7 +62,7 @@ class AdminFunctions {
         $patient_arr = array();
 
         # -- Double Check If User Is Admin -- #
-        if (self::check_admin($email)) {
+        if (self::check_admin($email)) :
 
             # -- Conditions -- #
             $condition['accountdetails'] = array('usertype' => User_Type::MEDICAL_PERSONNEL);
@@ -75,11 +75,10 @@ class AdminFunctions {
             $patient_list = $db->get_filtered_documents_ordered(Database::ACCOUNT_USER, $condition, $orderedBy, true);
 
             # -- Loop & Placed Patient Object To Array -- #
-            if (count($patient_list) > 0) {
-                echo "omg";
+            if (count($patient_list) > 0) :
                 $patient_arr = AdminFunctions::initialise_practitioner_arr($patient_list);
-            }
-        }
+            endif;
+        endif;
 
         return $patient_arr;
     }
@@ -91,7 +90,7 @@ class AdminFunctions {
         $practitioner_arr = array();
 
         # -- Loop & Store In The Container -- #
-        foreach ($practitioner_list as $practitioner) {
+        foreach ($practitioner_list as $practitioner):
 
             # -- Session -- #
             $session = $practitioner['session'];
@@ -104,12 +103,13 @@ class AdminFunctions {
             # -- Practitioner (Medical_Personnel)  -- #
             $profile = $practitioner['profile'];
             $practitioner_obj = new Medical_Personnel($session_obj, $profile['name']['firstname'], $profile['name']['lastname'], $profile['gender'], $profile['dob'],
-                    $profile['contactnumber'], $profile['address'], $practitioner['accountdetails']['usertype'], $createdon_obj, 
+                    $profile['contactnumber'], $profile['address'], $practitioner['accountdetails']['usertype'], $createdon_obj,
                     $practitioner['practionerinfo'], $practitioner['credentials']['email']);
 
             # -- Add To Practioner Object Array -- #
             $practitioner_arr[] = $practitioner_obj;
-        }
+
+        endforeach;
         return $practitioner_arr;
     }
 
@@ -128,7 +128,7 @@ class AdminFunctions {
         $patient_arr = array();
 
         # -- Double Check If User Is Admin -- #
-        if (self::check_admin($email)) {
+        if (self::check_admin($email)) :
 
             # -- Conditions -- #
             $condition['accountdetails'] = array('usertype' => User_Type::PATIENT);
@@ -141,11 +141,11 @@ class AdminFunctions {
             $patient_list = $db->get_filtered_documents_ordered(Database::ACCOUNT_USER, $condition, $orderedBy, true);
 
             # -- Loop & Placed Patient Object To Array -- #
-            if (count($patient_list) > 0) {
+            if (count($patient_list) > 0) :
                 echo "omg";
                 $patient_arr = AdminFunctions::initialise_patient_arr($patient_list);
-            }
-        }
+            endif;
+        endif;
 
         return $patient_arr;
     }
@@ -157,7 +157,7 @@ class AdminFunctions {
         $patient_arr = array();
 
         # -- Loop & Store In The Container -- #
-        foreach ($patient_list as $patient) {
+        foreach ($patient_list as $patient) :
 
             # -- Session -- #
             $session = $patient['session'];
@@ -174,7 +174,8 @@ class AdminFunctions {
 
             # -- Add To Patient Object Array -- #
             $patient_arr[] = $patient_obj;
-        }
+
+        endforeach;
         return $patient_arr;
     }
 
@@ -224,26 +225,25 @@ class AdminFunctions {
         # -- Query For Facility -- #
         $db = new DbQuery();
         $facility_list = $db->get_all_documents_ordered(Database::MEDICAL_FACILITY, 'facilityid');
-        if (!empty($facility_list)) {
+        if (!empty($facility_list)) :
 
             # -- Loop & Placed Facility To Array -- #
-            foreach ($facility_list as $facility) {
+            foreach ($facility_list as $facility) :
                 $facility_object = new Medical_Facility($facility['facilityname'], $facility['address'],
                         $facility['contactnumber'], $facility['operatinghours'], $facility['facilityid']);
                 $mf_arr[] = $facility_object;
-            }
+            endforeach;
 
             return $mf_arr;
-        }
+        endif;
     }
 
-    // -- When User Request To Display Facilities By Certain Location -- //
+// -- When User Request To Display Facilities By Certain Location -- //
     public static function display_facilities_by_location() {
         
     }
 
-
-
+// -- Admin To Change practitionerinfo -- //
 }
 
 ?>

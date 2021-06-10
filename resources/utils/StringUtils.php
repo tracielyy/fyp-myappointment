@@ -13,9 +13,9 @@ class StringUtils {
 
     // -- Private Function For String Comparison -- //
     public static function string_equal(string $str1, string $str2): bool {
-        if ($str1 == $str2) {
+        if ($str1 == $str2):
             return true;
-        }
+        endif;
         return false;
     }
 
@@ -29,9 +29,9 @@ class StringUtils {
         $max = strlen($token_repo);
 
         # Randomly Pick From The Indexes Of `$token_repo`
-        for ($i = 0; $i < $length; $i++) {
+        for ($i = 0; $i < $length; $i++) :
             $token .= $token_repo[random_int(0, $max - 1)];
-        }
+        endfor;
 
         return $token;
     }

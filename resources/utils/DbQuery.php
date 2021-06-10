@@ -35,11 +35,11 @@ class DbQuery {
         # Document Reference
         $doc_ref = $collection_ref->document($id);
         $snapshot = $doc_ref->snapshot();
-        if ($snapshot->exists()) {
+        if ($snapshot->exists()) :
             return $snapshot->data();
-        } else {
-            return NULL;
-        }
+        endif;
+        
+        return NULL;
     }
 
     // -- Get Document Reference Via Document ID -- //
@@ -56,12 +56,12 @@ class DbQuery {
 
     // -- For Document Inner Maps -- //
     private function nested_condition(CollectionReference $query, array $conditionArr, string $key): Query {
-        foreach ($conditionArr[$key] as $condition => $condition_value) {
+        foreach ($conditionArr[$key] as $condition => $condition_value) :
 
             # Get The Path To The Map Fields
             $condition_path = $key . "." . $condition;
             $query = $query->where($condition_path, "=", $condition_value);
-        }
+        endforeach;
         return $query;
     }
 
@@ -72,7 +72,7 @@ class DbQuery {
         $query = $this->db->collection($collection);
 
         # Iterate Through The Given `$conditionArr` (Array)
-        foreach ($conditionArr as $mapCondition => $value) {
+        foreach ($conditionArr as $mapCondition => $value) :
 
             if (is_array($conditionArr[$mapCondition])) {
 
@@ -84,16 +84,19 @@ class DbQuery {
                 $condition_path = $mapCondition;
                 $query = $query->where($condition_path, "=", $value)->limit(1);
             }
-        }
+        endforeach;
         $snapshot = $query->documents();
 
         # Iterate Through An Array Of Documents
-        foreach ($snapshot as $document) {
-            if ($document->exists()) {
+        foreach ($snapshot as $document) :
+
+            if ($document->exists()) :
                 return $document; //  -- Returning the Whole Document
-            }
+            endif;
+
             return null;
-        }
+
+        endforeach;
     }
 
     // -- Get Firestore Document Wihout Knowing Document ID -- //
@@ -103,9 +106,10 @@ class DbQuery {
         $doc_ref = $this->document_query($collection, $conditionArr);
 
         # If The `DocumentRefence` Is Retrieved Then Return It's Data
-        if ($doc_ref !== NULL) {
+        if ($doc_ref !== NULL) :
             return $doc_ref->data();
-        }
+        endif;
+
         return null;
     }
 
@@ -116,9 +120,10 @@ class DbQuery {
         $collection_ref = $this->db->collection($collection);
 
         # Adding New Set Of Document To Collection Using `CollectionReference`
-        if ($collection_ref->add($data_info) !== NULL) {
+        if ($collection_ref->add($data_info) !== NULL) :
             return True;
-        }
+        endif;
+
         return False;
     }
 
@@ -132,11 +137,11 @@ class DbQuery {
         $doc_ref = $this->get_doc_ref($collection, $doc_id);
 
         # Modify The Document Via `DocumentReference`
-        foreach ($changedArr as $field => $value) {
+        foreach ($changedArr as $field => $value) :
             $doc_ref->update([
                 ['path' => $field, 'value' => $value]
             ]);
-        }
+        endforeach;
     }
 
     // -- Modify Map Fields (EMAIL) -- //
@@ -149,7 +154,7 @@ class DbQuery {
         $document = $this->document_query($collection, $conditionArr);
 
         # Check If Document Exist
-        if ($document->exists()) {
+        if ($document->exists()) :
 
             # Getting The Document Reference
             $doc_id = $document->id();
@@ -159,7 +164,7 @@ class DbQuery {
             self::update_map_values($doc_ref, $mapArr);
 
             return True;
-        }
+        endif;
         return False;
     }
 
@@ -167,11 +172,11 @@ class DbQuery {
     private function update_map_values(DocumentReference $doc_ref, array $mapArr): void {
 
         # Array (Outside)
-        foreach ($mapArr as $fieldArr => $value) {
+        foreach ($mapArr as $fieldArr => $value) :
 
 
             # Iterating Through Each Field In Array To Update
-            foreach ($mapArr[$fieldArr] as $field => $field_value) {
+            foreach ($mapArr[$fieldArr] as $field => $field_value) :
 
                 # Path For Each Field In Map Data Types
                 $path = $fieldArr . "." . $field;
@@ -180,8 +185,8 @@ class DbQuery {
                 $doc_ref->update([
                     ['path' => $path, 'value' => $field_value]
                 ]);
-            }
-        }
+            endforeach;
+        endforeach;
     }
 
     private function get_map_values(DocumentReference $doc_ref, array $mapArr) {
@@ -212,9 +217,9 @@ class DbQuery {
 
         # Iterate Through An Array Of Documents
 
-        if ($doc_snapshot->exists()) {
+        if ($doc_snapshot->exists()) :
             $doc_id = $doc_snapshot->id();
-        }
+        endif;
 
 
         # Using ID
@@ -222,40 +227,42 @@ class DbQuery {
         $sub_cols = $sub_col_ref->collection($subcollection);
 
         # Sub-Collection
-        foreach ($subconditionArr as $subcondition => $value) {
+        foreach ($subconditionArr as $subcondition => $value) :
             $sub_cols = $sub_cols->where($subcondition, "=", $value);
-        }
+        endforeach;
         $sub_snapshot = $sub_cols->documents();
 
         # Create An Array To Store The Document Data
         $doc_arr = array();
 
         # Iterate Through An Array Of Documents
-        foreach ($sub_snapshot as $doc) {
-            if ($doc->exists()) {
+        foreach ($sub_snapshot as $doc) :
+            if ($doc->exists()) :
                 $doc_arr[] = $doc->data(); //  -- Storing Each Document Data In Array
-            }
-        }
+            endif;
+        endforeach;
+
         return $doc_arr;  // -- Return Array Of Document Datas
     }
 
     private function get_ordered_by(Query $query, array $orderedBy, bool $asc): Query {
 
-        foreach ($orderedBy as $orderBy => $o) {
-            foreach ($orderedBy[$orderBy] as $order => $ovalue) {
+        foreach ($orderedBy as $orderBy => $o) :
+            foreach ($orderedBy[$orderBy] as $order => $ovalue) :
                 if ($asc) {
                     $query = $query->orderBy($orderBy . "." . $ovalue);
                 } else {
                     $query = $query->orderBy($orderBy . "." . $ovalue, 'DESC');
                 }
-            }
-        }
+            endforeach;
+        endforeach;
+
         return $query;
     }
 
     // -- Get All The Document With Certain Condition (An Array)-- //
     public function get_filtered_documents_ordered(string $collection, array $conditions, array $orderedBy, bool $asc): array {
-        
+
         # -- Collection Reference -- #
         $collection_ref = $this->db->collection($collection);
 
@@ -273,11 +280,13 @@ class DbQuery {
         $snapshot = $query->documents();
 
         # -- Iterate Through An Array Of Documents -- #
-        foreach ($snapshot as $document) {
-            if ($document->exists()) {
+        foreach ($snapshot as $document) :
+
+            if ($document->exists()) :
                 $doc_arr[] = $document->data();
-            }
-        }
+            endif;
+
+        endforeach;
 
         return $doc_arr;
     }
@@ -295,11 +304,11 @@ class DbQuery {
         $documents = $collection_ref->documents();
 
         # Iterate Through & Add To Array
-        foreach ($documents as $doc) {
-            if ($doc->exists()) {
+        foreach ($documents as $doc) :
+            if ($doc->exists()) :
                 $doc_arr[] = $doc->data();
-            }
-        }
+            endif;
+        endforeach;
 
         return $doc_arr;
     }
@@ -318,11 +327,11 @@ class DbQuery {
         $documents = $query->documents();
 
         # Iterate Through & Add To Array
-        foreach ($documents as $doc) {
-            if ($doc->exists()) {
+        foreach ($documents as $doc) :
+            if ($doc->exists()) :
                 $doc_arr[] = $doc->data();
-            }
-        }
+            endif;
+        endforeach;
 
         return $doc_arr;
     }

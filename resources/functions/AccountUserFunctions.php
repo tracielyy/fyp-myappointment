@@ -26,13 +26,12 @@ class AccountUserFunctions {
     public static function check_session(Session $db_session, string $sessionid, string $token): bool {
 
         #  Session Status 
-        if ($db_session->get_isloggedin() == false) {
+        if ($db_session->get_isloggedin() == false) :
             return true;
-        } else {
+        endif;
 
-            # Compare Token
-            return ($db_session->get_token() == $token && $db_session->get_sessionid() == $sessionid);
-        }
+        # Compare Token
+        return ($db_session->get_token() == $token && $db_session->get_sessionid() == $sessionid);
     }
 
     // -- Get User Full Name -- //
@@ -48,11 +47,11 @@ class AccountUserFunctions {
         $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $emailArr);
 
         # Filter & Return Full Name
-        if ($user_data !== NULL) {
+        if ($user_data !== NULL):
             $name_arr = $user_data['profile']['name'];
             $full_name = $name_arr['firstname'] . " " . $name_arr['lastname'];
             return $full_name;
-        }
+        endif;
         return null;
     }
 
@@ -69,7 +68,7 @@ class AccountUserFunctions {
         $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $credentials);
 
         # Store Any User Data In `Account_User` Object
-        if ($user_data != NULL) {
+        if ($user_data != NULL):
             $profile_arr = $user_data['profile'];
             $credentials_arr = $user_data['credentials'];
             $session_arr = $user_data['session'];
@@ -84,7 +83,8 @@ class AccountUserFunctions {
             return new Account_User($session_obj, $profile_arr['name']['firstname'], $profile_arr['name']['lastname'],
                     $profile_arr['gender'], $profile_arr['dob'], $profile_arr['contactnumber'], $profile_arr['address'],
                     $accountdetails_arr['usertype'], $time_obj, $credentials_arr['email']);
-        }
+        endif;
+
         return NULL;
     }
 
@@ -101,9 +101,10 @@ class AccountUserFunctions {
         $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $credentials);
 
         # Check If There Are Any User Returned From The Query
-        if ($user_data != NULL) {
+        if ($user_data != NULL):
             return True;
-        }
+        endif;
+
         return False;
     }
 
@@ -120,9 +121,10 @@ class AccountUserFunctions {
         $emails_found = $db->query_exact_match(Database::ACCOUNT_USER, $emailArr);
 
         # Check If There Are Any Value Returned
-        if (($emails_found !== NULL)) {
+        if (($emails_found !== NULL)):
             return True;  // There is existing user
-        }
+        endif;
+
         return False;
     }
 
@@ -163,7 +165,7 @@ class AccountUserFunctions {
 
         # Need To Make Sure The Email Is Valid
         $exist = self::check_user_exist($email);
-        if ($exist) {
+        if ($exist):
 
             # Store Email In An Array
             $email_arr["credentials"] = array(
@@ -175,7 +177,7 @@ class AccountUserFunctions {
             $mapData = $db->get_map_field(Database::ACCOUNT_USER, $email_arr, self::PASSWORD_RESET);
 
             # Validate The Database's Requested Dates
-            if (self::verify_requested_date($mapData['requestedon']['date'], $mapData['requestedon']['time'])) {
+            if (self::verify_requested_date($mapData['requestedon']['date'], $mapData['requestedon']['time'])):
 
                 # Set The Dates
                 $currentDate = new Time();
@@ -189,9 +191,11 @@ class AccountUserFunctions {
 
                 # Return bool On Validity
                 return self::verify_token($originaltoken, $passwordtoken, $duration, $mapData['tokenused']);
-            }
+
+            endif;
             return false;
-        }
+
+        endif;
         return false;
     }
 
@@ -216,9 +220,10 @@ class AccountUserFunctions {
         $time = StringUtils::clean_input($time);
 
         # Checks date & time
-        if ($date !== "" && $time !== "") {
+        if ($date !== "" && $time !== ""):
             return true;
-        }
+        endif;
+
         return false;
     }
 
@@ -241,6 +246,20 @@ class AccountUserFunctions {
     #-------------------------------------------------------------------------#
     # -- Information Update -------------------------------------------------#
     #-------------------------------------------------------------------------#
+
+    // -- Edit Patient Information (Make Sure Patient Has To Provide Credentials For The Change) -- //
+    public static function edit_basic_profile(array $credentials_arr, array $profile_changed_arr): bool {
+
+        # Double Check If Patient Exist For The Given Credentials
+        $user_data = self::load_user_data($credentials_arr);
+        if ($user_data !== null):
+
+            # Modify The Patient Profile Based On The Given Array
+            $db = new DbQuery();
+            return $db->modify_map_field(Database::ACCOUNT_USER, $credentials_arr, $profile_changed_arr);
+        endif;
+        return false;
+    }
 
     // -- Password Change -- //
     public static function change_password(string $email, string $password): bool {
@@ -317,11 +336,11 @@ class AccountUserFunctions {
         # Query For Facility
         $db = new DbQuery();
         $facility = $db->query_exact_match(Database::MEDICAL_FACILITY, $arr);
-        if ($facility != NULL) {
+        if ($facility != NULL):
             $facility_object = new Medical_Facility($facility['facilityname'], $facility['address'],
                     $facility['contactnumber'], $facility['operatinghours'], $facility['facilityid']);
             return $facility_object;
-        }
+        endif;
     }
 
     /*

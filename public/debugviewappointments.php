@@ -13,10 +13,10 @@ require_once FUNCTIONS_PATH . '/PatientFunctions.php';
 require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
 // -- Check If User Is Signed In (When Redirect or Load The Page) -- //
-if ($_SERVER['REQUEST_METHOD'] == "GET") {
+if ($_SERVER['REQUEST_METHOD'] == "GET") :
     echo "hello";
-    if (isset($_SESSION["user"])) {
-        
+    if (isset($_SESSION["user"])) :
+
         $user = unserialize($_SESSION["user"]);
         $user_type = $user->get_usertype();
         echo $user . "<br/>";
@@ -34,13 +34,13 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
                 echo "<br/>____________________<br/>";
                 echo "<div style='color:red;'>UPCOMING APPT</div>";
                 echo "<br/>____________________<br/>";
-                foreach ($upcoming_arr as $record) {
+                foreach ($upcoming_arr as $record):
                     echo "<br/>--------------------<br/>";
                     echo $record; // Implicitly calling toString
                     //echo "This is my appointment status " . $record->get_appointmentstatus(); // Return String
                     //$record->get_facility(); will return `Medical_Facility` object
                     // echo "Location Name: " . $record->get_facility()->get_address();
-                }
+                endforeach;
             }
 
             // -- Missed Appointments -- //
@@ -52,18 +52,18 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
                 echo "<br/>____________________<br/>";
                 echo "<div style='color:red;'>MISSED APPT</div>";
                 echo "<br/>____________________<br/>";
-                foreach ($missed_arr as $record) {
+                foreach ($missed_arr as $record):
                     echo "<br/>--------------------<br/>";
                     echo $record; // Implicitly calling toString
-//echo "This is my appointment status " . $record->get_appointmentstatus(); // Return String
-//$record->get_facility(); will return `Medical_Facility` object
-// echo "Location Name: " . $record->get_facility()->get_address();
-                }
+                    //echo "This is my appointment status " . $record->get_appointmentstatus(); // Return String
+                    //$record->get_facility(); will return `Medical_Facility` object
+                    // echo "Location Name: " . $record->get_facility()->get_address();
+                endforeach;
             }
         } else {
-# Possible Redirect To Index.php
+            # Possible Redirect To Index.php
             header("Location:debugIndex.php");
         }
-    }
-}
+    endif;
+endif;
 ?>

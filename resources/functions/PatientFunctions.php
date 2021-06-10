@@ -24,27 +24,13 @@ class PatientFunctions {
         $account_user_arr = ArrayCreation::account_creation_array(User_Type::PATIENT);
 
         # Load Basic Account User Fields & Values To Array
-        foreach ($account_user_arr as $field => $value) {
+        foreach ($account_user_arr as $field => $value) :
             $userDataArr[$field] = $value;
-        }
+        endforeach;
 
         # Add Patient Data To Database
         $db = new DbQuery();
         $db->insert_data(Database::ACCOUNT_USER, $userDataArr);
-    }
-
-    // -- Edit Patient Information (Make Sure Patient Has To Provide Credentials For The Change) -- //
-    public static function edit_patient_profile(array $credentials_arr, array $profile_changed_arr): bool {
-
-        # Double Check If Patient Exist For The Given Credentials
-        $user_data = AccountUserFunctions::load_user_data($credentials_arr);
-        if ($user_data !== null) {
-
-            # Modify The Patient Profile Based On The Given Array
-            $db = new DbQuery();
-            return $db->modify_map_field(Database::ACCOUNT_USER, $credentials_arr, $profile_changed_arr);
-        }
-        return false;
     }
 
     //============================================
