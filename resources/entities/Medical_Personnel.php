@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @author yanying (Tracy)
  */
@@ -20,20 +21,18 @@ class Medical_Personnel extends Account_User {
     private string $licensenumber;
 
     // -- Constructor -- //
-    public function __construct(string $firstname, string $lastname, string $gender, string $dob,
-            string $contactnumber, string $address, string $usertype, string $createdon,
+    public function __construct(Session $session, string $firstname, string $lastname, string $gender, string $dob,
+            string $contactnumber, string $address, string $usertype, Time $createdon,
             array $practionerinfo, string $email, ?string $password = NULL) {
 
         # -- Parent Constructor -- #
-        parent::__construct($firstname, $lastname, $gender, $dob, $contactnumber, $address,
+        parent::__construct($session, $firstname, $lastname, $gender, $dob, $contactnumber, $address,
                 $usertype, $createdon, $email, $password);
 
         # -- Medical_Personnel's Properties Assignment -- #
-        $this->facilityids = $practionerinfo['facilityids']; 
+        $this->facilityids = $practionerinfo['facilityids'];
         $this->roletype = $practionerinfo['roletype'];
         $this->licensenumber = $practionerinfo['licensenumber'];
-            
-        
     }
 
     // -- Getters
@@ -46,9 +45,29 @@ class Medical_Personnel extends Account_User {
     }
 
     // -- Setters
-    // Use For Debugging/ Logging Purpose
+    // -- Use For Debugging/ Logging Purpose -- //
     public function __toString(): string {
-        return parent::__toString();
+        $str = parent::__toString();
+        $str .= nl2br('License Number: ' . $this->licensenumber . PHP_EOL . 'Role Type: ' . $this->roletype .
+                PHP_EOL . 'Facility IDs: ');
+
+        # -- Counter Variables -- #
+        $count = count($facilityids);
+        $counter = 0;
+
+        # -- Loop & Display Each Facility IDs -- #
+        foreach ($facilityids as $facilityid) {
+
+            # Increment
+            $counter++;
+            $str .= $facilityid;
+
+            # If The Id Is Not The Last Element
+            if ($counter != $count) {
+                $str .= ",";
+            }
+        }
+        return $str;
     }
 
     //============================================
@@ -60,4 +79,5 @@ class Medical_Personnel extends Account_User {
     }
 
 }
+
 ?>

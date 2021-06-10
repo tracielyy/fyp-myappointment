@@ -9,10 +9,10 @@ class ArrayCreation {
 
     public static function account_creation_array(string $usertype, string $vtoken): array {
 
-        # Create New Time Object
+        # -- Create New Time Object -- #
         $time = new Time();
 
-        # Account Details Array
+        # -- Account Details Array -- #
         $user_data_arr['accountdetails'] = array(
             'usertype' => $usertype,
             'createdon' => array(
@@ -25,14 +25,14 @@ class ArrayCreation {
             )
         );
 
-        # Merge All The Arrays
+        # -- Merge All The Arrays -- #
         $data_arr = array_merge($user_data_arr, self::fresh_session_array(), self::fresh_passwordreset_array());
         return $data_arr;
     }
 
     public static function account_verified_array(): array {
 
-        # Verified Array
+        # -- Verified Array -- #
         $verification['verification'] = array(
             'verified' => true,
             'vtoken' => ''
@@ -43,7 +43,7 @@ class ArrayCreation {
 
     public static function fresh_session_array(): array {
 
-        # Reset The Session Array
+        # -- Reset The Session Array -- #
         $session_arr["session"] = array(
             "sessionid" => "",
             "isloggedin" => false,
@@ -55,7 +55,7 @@ class ArrayCreation {
 
     public static function used_session_array(string $sessionid, string $token, string $ipaddress): array {
 
-        # Fill The Session Array With Relevant Data
+        # -- Fill The Session Array With Relevant Data -- #
         $session_arr["session"] = array(
             "sessionid" => $sessionid,
             "isloggedin" => true,
@@ -67,10 +67,10 @@ class ArrayCreation {
 
     public static function fresh_passwordreset_array(?string $passwordtoken = ""): array {
 
-        # Create New Time Object
+        # -- Create New Time Object -- #
         $time = new Time();
 
-        # Creating Password Reset Array
+        #-- Creating Password Reset Array -- #
         $passwordreset_arr['passwordreset'] = array(
             "passwordtoken" => $passwordtoken,
             "requestedon" => array(
@@ -87,7 +87,8 @@ class ArrayCreation {
     }
 
     public static function used_passwordreset_array(): array {
-        # Create New Time Object
+        
+        # -- Create New Time Object -- #
         $time = new Time();
 
         $passwordreset_arr["passwordreset"] = array(

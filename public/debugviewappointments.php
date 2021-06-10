@@ -9,10 +9,14 @@ require_once '../resources/config.php';
 require_once ENTITIES_PATH . '/Account_User.php';
 require_once ENTITIES_PATH . '/Appointment_Record.php';
 require_once ENUMS_PATH . '/User_Type.php';
+require_once FUNCTIONS_PATH . '/PatientFunctions.php';
+require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
 // -- Check If User Is Signed In (When Redirect or Load The Page) -- //
 if ($_SERVER['REQUEST_METHOD'] == "GET") {
+    echo "hello";
     if (isset($_SESSION["user"])) {
+        
         $user = unserialize($_SESSION["user"]);
         $user_type = $user->get_usertype();
         echo $user . "<br/>";
@@ -22,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
             $email['credentials']['email'] = $user->get_email();
             //            $email = array ("credentials"=> array("email" => $user->get_email()));
             // -- Upcoming Appointments -- //
-            $upcoming_arr = Appointment_Record::get_upcoming_appointments($email);
+            $upcoming_arr = PatientFunctions::get_upcoming_appointments($email);
             if ($upcoming_arr == NULL) {
                 echo "<br/>No Upcoming Appointments";
             } else {
@@ -40,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
             }
 
             // -- Missed Appointments -- //
-            $missed_arr = Appointment_Record::get_missed_appointments($email);
+            $missed_arr = PatientFunctions::get_missed_appointments($email);
             if ($missed_arr == NULL) {
                 echo "<br/>No Missed Appointments";
             } else {

@@ -19,11 +19,16 @@ require_once UTILS_PATH . '/StringUtils.php';
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <!-- Styling -->
+<<<<<<< HEAD
         <?php include COMPONENT_PATH . '/bootstrap.php'; ?>
         
         <style>
         <?php include './css/loginRegister.css'; ?>
         </style>
+=======
+        <?php include COMPONENTS_PATH . '/bootstrap.php'; ?>
+        <link rel="stylesheet" href="./css/loginRegister.css"/> 
+>>>>>>> 05f67fede8d9b091c954fd2beae88cfa98bdb415
     </head>
     <body>
 
@@ -133,7 +138,7 @@ require_once UTILS_PATH . '/StringUtils.php';
         <!-- HTML Page Design -->
         <div>
             <!-- Navigation -->
-            <?php include COMPONENT_PATH . '/navbar.php' ?>
+            <?php include COMPONENTS_PATH . '/navbar.php' ?>
 
             <!-- Login Card -->
             <div class="center row m-4">

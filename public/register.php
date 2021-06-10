@@ -8,6 +8,11 @@ require_once ENTITIES_PATH . '/Patient.php';
 require_once UTILS_PATH . '/Regex.php';
 ?>
 <html lang="en">
+<<<<<<< HEAD
+=======
+    <head>
+        <?php require COMPONENTS_PATH . '/bootstrap.php' ?>
+>>>>>>> 05f67fede8d9b091c954fd2beae88cfa98bdb415
 
 <head>
     <?php require COMPONENT_PATH . '/bootstrap.php' ?>

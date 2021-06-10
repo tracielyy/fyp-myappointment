@@ -9,7 +9,7 @@
         <!-- Title -->
         <title>FYP-21-S2-24: Book Appointment</title>
         <!-- Styling -->
-        <?php require COMPONENT_PATH . '/bootstrap.php' ?>
+        <?php require COMPONENTS_PATH . '/bootstrap.php' ?>
     </head>
     <body>
         <!-- PHP Logic (Validation) -->

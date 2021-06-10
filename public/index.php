@@ -13,7 +13,7 @@ require_once '../resources/config.php';
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <!-- Styling -->
-        <?php include COMPONENT_PATH . '/bootstrap.php' ?>
+        <?php include COMPONENTS_PATH . '/bootstrap.php' ?>
 
     </head>
     <body>
@@ -23,7 +23,7 @@ require_once '../resources/config.php';
         <!-- HTML Page Design -->
         <div>
             <!-- Navigation -->  
-            <?php include_once COMPONENT_PATH . '/navbar.php' ?>
+            <?php include_once COMPONENTS_PATH . '/navbar.php' ?>
 
             <!-- Test Echo -->
             <?php echo "index.php displayed correctly"; ?>

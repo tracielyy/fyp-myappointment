@@ -9,13 +9,14 @@ require_once ENTITIES_PATH . '/Account_User.php';
 require_once UTILS_PATH . '/Email.php';
 require_once UTILS_PATH . '/Regex.php';
 require_once UTILS_PATH . '/StringUtils.php';
+require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?>
 <html>
     <head>
         <!-- Title -->
         <title>FYP-21-S2-24: Password Reset</title>
         <!-- Styling -->
-        <?php require COMPONENT_PATH . '/bootstrap.php' ?>
+        <?php require COMPONENTS_PATH . '/bootstrap.php' ?>
 
     </head>
     <body>
@@ -75,7 +76,7 @@ require_once UTILS_PATH . '/StringUtils.php';
 
                 $msg = "Successfully sent";
                 // -- Updating The Token To The Database
-                Account_User::request_password_reset($to, $token);
+                AccountUserFunctions::request_password_reset($to, $token);
             } else {
                 $msg = "This email does not exist";
             }

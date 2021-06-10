@@ -14,7 +14,7 @@ require_once ENUMS_PATH . '/User_Type.php';
         <!-- Title -->
         <title>FYP-21-S2-24</title>
         <!-- Styling -->
-        <?php require COMPONENT_PATH . '/bootstrap.php' ?>
+        <?php require COMPONENTS_PATH . '/bootstrap.php' ?>
 
     </head>
     <body>
