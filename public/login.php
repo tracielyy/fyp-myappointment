@@ -19,8 +19,16 @@ require_once UTILS_PATH . '/StringUtils.php';
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <!-- Styling -->
+<<<<<<< HEAD
+        <?php include COMPONENT_PATH . '/bootstrap.php'; ?>
+        
+        <style>
+        <?php include './css/loginRegister.css'; ?>
+        </style>
+=======
         <?php include COMPONENTS_PATH . '/bootstrap.php'; ?>
         <link rel="stylesheet" href="./css/loginRegister.css"/> 
+>>>>>>> 05f67fede8d9b091c954fd2beae88cfa98bdb415
     </head>
     <body>
 
@@ -133,42 +141,47 @@ require_once UTILS_PATH . '/StringUtils.php';
             <?php include COMPONENTS_PATH . '/navbar.php' ?>
 
             <!-- Login Card -->
-            <div class="row m-4" ></div>
-            <div class="center container col-md-6 col-lg-4">
-                <div class="my-5 col-sm-12">
-                    <div class="shadow card p-2 rounded1">
-                        <div class="card-body m-1">
-                            <h1 class="card-title px-1 py-3">Login</h1>
-                            <div class="px-1">
-                                <!-- Form -->
-                                <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-                                    <div class="row pb-2">
-                                        <div class="col">
-                                            Email:
+            <div class="center row m-4">
+                <div class="container col-md-6 col-lg-4">
+                    <div class="my-5 col-sm-12">
+                        <div class="shadow card p-2 rounded1">
+                            <div class="card-body m-1">
+                                <h1 class="card-title px-1 py-3">Login</h1>
+                                <div class="px-1">
+                                    <!-- Form -->
+                                    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                                        <div class="row pb-2">
+                                            <div class="col">
+                                                Email:
+                                            </div>
+                                            <div class="col">
+                                                <!-- EMAIL -->
+                                                <input type="email" class="form-control" name="email" required
+                                                    placeholder="Email" value="<?php echo $loginArr['email']; ?>" />
+                                            </div>
                                         </div>
-                                        <div class="col">
-                                            <!-- EMAIL -->
-                                            <input type="email" class="form-control" name="email" required placeholder="Email"  value="<?php echo $loginArr['email']; ?>"/>
+                                        <div class="row">
+                                            <div class="col">Password: </div>
+                                            <div class="col">
+                                                <!-- PASSWORD -->
+                                                <input type="password" class="form-control" name="password"
+                                                    placeholder="Password"
+                                                    value="<?php echo $loginArr['password']; ?>" />
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">Password: </div>
-                                        <div class="col">
-                                            <!-- PASSWORD -->
-                                            <input type="password" class="form-control" name="password" placeholder="Password" value="<?php echo $loginArr['password']; ?>"/>
+                                        <div class="row">
+                                            <div class="col ">
+                                            </div>
+                                            <!-- Login Submission -->
+                                            <div class="col py-3"><button class="btn btn-primary" type="submit"
+                                                    style="float: right" ;>Login</button><br /></div>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col ">
-                                        </div>
-                                        <!-- Login Submission -->
-                                        <div class="col py-3"><button class="btn btn-primary" type="submit" style="float: right";>Login</button><br /></div>
-                                    </div>
 
-                                </form>
+                                    </form>
+                                </div>
                             </div>
+                            <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                         </div>
-                        <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                     </div>
                 </div>
             </div>
