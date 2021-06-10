@@ -9,7 +9,7 @@ require_once UTILS_PATH . '/Regex.php';
 ?>
 <html lang="en">
     <head>
-        <?php require COMPONENT_PATH . '/bootstrap.php' ?>
+        <?php require COMPONENTS_PATH . '/bootstrap.php' ?>
 
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">

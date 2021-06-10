@@ -12,6 +12,7 @@ require_once UTILS_PATH . '/DbQuery.php';
 require_once UTILS_PATH . '/Database.php';
 require_once UTILS_PATH . '/Time.php';
 require_once UTILS_PATH . '/ArrayCreation.php';
+require_once UTILS_PATH . '/Session.php';
 
 class Patient extends Account_User {
 
@@ -19,8 +20,8 @@ class Patient extends Account_User {
     //private $appointment_records= array();  // Appointment_Record Object
     //private $medical_records = array();
     // Constructor
-    public function __construct($session, $firstname, $lastname, $gender, $dob,
-            $contactnumber, $address, $usertype, $createdon, $email, $password = NULL) {
+    public function __construct(Session $session, $firstname, $lastname, $gender, $dob,
+            $contactnumber, $address, $usertype, Time $createdon, $email, $password = NULL) {
 
         parent::__construct($session, $firstname, $lastname, $gender, $dob, $contactnumber, $address,
                 $usertype, $createdon, $email, $password);
@@ -34,7 +35,7 @@ class Patient extends Account_User {
     //============================================
     //      Methods Accessing Firestore Database 
     //============================================
-    // -- Insert New Patient To Firestore -- //
+    // -- Insert New Patient To Firestore (Upon Registration) -- //
     public static function create_patient(array $userDataArr): void {
 
         # Declaration Of Basic Information To Include To Account_User

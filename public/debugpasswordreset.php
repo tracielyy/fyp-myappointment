@@ -68,7 +68,7 @@ setcookie($url_name, $url_value, time() + 3600);
         <!-- Title -->
         <title>FYP-21-S2-24: Password Reset</title>
         <!-- Styling -->
-        <?php require COMPONENT_PATH . '/bootstrap.php' ?>
+        <?php require COMPONENTS_PATH . '/bootstrap.php' ?>
 
     </head>
     <body>

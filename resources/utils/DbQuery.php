@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @author yanying (Tracy)
  */
@@ -59,7 +60,7 @@ class DbQuery {
 
             # Get The Path To The Map Fields
             $condition_path = $key . "." . $condition;
-            $query = $query->where($condition_path, "=", $condition_value)->limit(1);
+            $query = $query->where($condition_path, "=", $condition_value);
         }
         return $query;
     }
@@ -76,8 +77,10 @@ class DbQuery {
             if (is_array($conditionArr[$mapCondition])) {
 
                 # Inner Loop For Maps
-                $query = $this->nested_condition($query, $conditionArr, $mapCondition);
+                $query = $this->nested_condition($query, $conditionArr, $mapCondition)->limit(1);
             } else {
+
+                # If It Is Not A Map
                 $condition_path = $mapCondition;
                 $query = $query->where($condition_path, "=", $value)->limit(1);
             }
@@ -87,7 +90,7 @@ class DbQuery {
         # Iterate Through An Array Of Documents
         foreach ($snapshot as $document) {
             if ($document->exists()) {
-                return $document; //  -- Returning the  Whole Document
+                return $document; //  -- Returning the Whole Document
             }
             return null;
         }
@@ -98,6 +101,8 @@ class DbQuery {
 
         # Get Document Data From DocumentSnapshot
         $doc_ref = $this->document_query($collection, $conditionArr);
+
+        # If The `DocumentRefence` Is Retrieved Then Return It's Data
         if ($doc_ref !== NULL) {
             return $doc_ref->data();
         }
@@ -110,7 +115,7 @@ class DbQuery {
         # Collection Reference
         $collection_ref = $this->db->collection($collection);
 
-        # Adding New Set Of Document To Collection
+        # Adding New Set Of Document To Collection Using `CollectionReference`
         if ($collection_ref->add($data_info) !== NULL) {
             return True;
         }
@@ -126,7 +131,7 @@ class DbQuery {
         # Get Document Reference
         $doc_ref = $this->get_doc_ref($collection, $doc_id);
 
-        # Modify The Document Via Document Reference
+        # Modify The Document Via `DocumentReference`
         foreach ($changedArr as $field => $value) {
             $doc_ref->update([
                 ['path' => $field, 'value' => $value]
@@ -234,6 +239,49 @@ class DbQuery {
         return $doc_arr;  // -- Return Array Of Document Datas
     }
 
+    private function get_ordered_by(Query $query, array $orderedBy, bool $asc): Query {
+
+        foreach ($orderedBy as $orderBy => $o) {
+            foreach ($orderedBy[$orderBy] as $order => $ovalue) {
+                if ($asc) {
+                    $query = $query->orderBy($orderBy . "." . $ovalue);
+                } else {
+                    $query = $query->orderBy($orderBy . "." . $ovalue, 'DESC');
+                }
+            }
+        }
+        return $query;
+    }
+
+    // -- Get All The Document With Certain Condition (An Array)-- //
+    public function get_filtered_documents_ordered(string $collection, array $conditions, array $orderedBy, bool $asc): array {
+        
+        # -- Collection Reference -- #
+        $collection_ref = $this->db->collection($collection);
+
+        # -- Create An Array To Store The Document Data -- #
+        $doc_arr = array();
+
+        # -- DocumentSnapShots Of All The Documents -- #
+        foreach ($conditions as $condition => $cvalue) {
+            $query = $this->nested_condition($collection_ref, $conditions, $condition);
+        }
+
+        // (Need To Create Composite Index In Google Cloud Console) //
+        # -- DocumentSnapshots Of All The Documents -- #
+        $query = $this->get_ordered_by($query, $orderedBy, $asc);
+        $snapshot = $query->documents();
+
+        # -- Iterate Through An Array Of Documents -- #
+        foreach ($snapshot as $document) {
+            if ($document->exists()) {
+                $doc_arr[] = $document->data();
+            }
+        }
+
+        return $doc_arr;
+    }
+
     // -- Get All The Documents In A Collection -- //
     public function get_all_documents(string $collection): array {
 
@@ -256,7 +304,9 @@ class DbQuery {
         return $doc_arr;
     }
 
+    // -- Gell All The Documents In A Collection In Order -- //
     public function get_all_documents_ordered(string $collection, string $orderBy): array {
+
         # Collection Reference 
         $collection_ref = $this->db->collection($collection);
 
@@ -279,6 +329,7 @@ class DbQuery {
 
     // -- Get ONLY ONE Document -- //
     public function get_document_ordered(string $collection, string $orderBy, bool $asc) {
+
         # Collection Reference 
         $collection_ref = $this->db->collection($collection);
 
@@ -300,4 +351,5 @@ class DbQuery {
     }
 
 }
+
 ?>

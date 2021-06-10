@@ -131,78 +131,7 @@ class Medical_Facility {
     }
 
     // DATABASE CONSTANT
-    //============================================
-    //      Methods Accessing Firestore Database 
-    //============================================
-    // -- Create Medical_Facility -- //
-    public static function create_medical_facility(array $facilitydata_arr) {
-        # Medical Facility's ID
-        $current_id = "";
-
-        # Facility ID (Increment From The Last ID
-        $last_id = self::get_last_medical_id();
-
-        # Check If Database Have Any Facility ID (Any Medical_Facility Record)
-        if ($last_id !== null) {
-            $current_id = ++$last_id;
-        } else {
-            $current_id = self::FACILITY_ID;
-        }
-        
-        # Set Facility's ID
-        $facilitydata_arr['facilityid'] = $current_id;
-        
-        # -- Store The Facility To Database -- #
-        $db = new DbQuery();
-        $db->insert_data(Database::MEDICAL_FACILITY, $facilitydata_arr);
-    }
-
-    private static function get_last_medical_id(): ?string {
-        # Query For Last Facility ID
-        $db = new DbQuery();
-        $last_id_facilty = $db->get_document_ordered(Database::MEDICAL_FACILITY, 'facilityid', false);
-        $last_id = $last_id_facilty['facilityid'];
-        return $last_id;
-    }
-
-    // -- When User Request To Display All Medical Facilities -- //
-    public static function display_all_facilities(): array {
-        # Create An Array To Store Medical_Facility Objects
-        $mf_arr = array();
-
-        # Query For Facility
-        $db = new DbQuery();
-        $facility_list = $db->get_all_documents_ordered(Database::MEDICAL_FACILITY, 'facilityid');
-        if (!empty($facility_list)) {
-            foreach ($facility_list as $facility) {
-                $facility_object = new Medical_Facility($facility['facilityname'], $facility['address'],
-                        $facility['contactnumber'], $facility['operatinghours'], $facility['facilityid']);
-                $mf_arr[] = $facility_object;
-            }
-
-            return $mf_arr;
-        }
-    }
-
-    // -- When User Request To Display Facilities By Certain Location -- //
-    public static function display_facilities_by_location() {
-        
-    }
-
-    // -- When A Certain Facility Is Requested To Be Displayed  (NOT DOCUMENT ID) -- //
-    public static function get_facility_by_id(string $facilityid): ?Medical_Facility {
-        # Create Facility Array
-        $arr['facilityid'] = $facilityid;
-
-        # Query For Facility
-        $db = new DbQuery();
-        $facility = $db->query_exact_match(Database::MEDICAL_FACILITY, $arr);
-        if ($facility != NULL) {
-            $facility_object = new Medical_Facility($facility['facilityname'], $facility['address'],
-                    $facility['contactnumber'], $facility['operatinghours'], $facility['facilityid']);
-            return $facility_object;
-        }
-    }
+    
 
 }
 ?>

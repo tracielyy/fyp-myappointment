@@ -7,19 +7,29 @@ require_once ENUMS_PATH . '/User_Type.php';
 require_once ENTITIES_PATH . '/Account_User.php';
 require_once ENTITIES_PATH . '/Patient.php';
 require_once UTILS_PATH . '/Regex.php';
+require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
+require_once FUNCTIONS_PATH . '/AdminFunctions.php';
 
 $valid_user = false;
 
 // -- Filter Away Invalid Users -- //
 if (isset($_SESSION["user"])) {
+
+    # -- Get The LoggedIn User -- #
     $user = unserialize($_SESSION["user"]);
     $user_email = $user->get_email();
     $user_type = $user->get_usertype();
 
     // -- Make Sure The User Is Admin -- //
     if (User_Type::check_user_type(User_Type::ADMIN, $user_type)) {
+
+        # -- Turn The `Switch` On -- #
         $valid_user = true;
-        $facility_list = Medical_Facility::display_all_facilities();
+
+        # -- Retrieve All Information For Viewing -- #
+        $facility_list = AdminFunctions::display_all_facilities();
+        $patient_list = AdminFunctions::display_all_patients($user_email);
+        $practitioner_list = AdminFunctions::display_all_practitioner($user_email);
     }
 }
 
@@ -315,16 +325,16 @@ if (!$valid_user) {
                 <!-- Gender -->
                 <label for="gender">Select Gender: </label>
                 <input type="radio" id="Female" name="gender" value="F"<?php
-                if ($registerArr['gender'] == "F") {
-                    echo "checked";
-                }
-                ?>/><label for="Female" class="btnLabel">Female</label>
+        if ($registerArr['gender'] == "F") {
+            echo "checked";
+        }
+        ?>/><label for="Female" class="btnLabel">Female</label>
 
                 <input type="radio" name="gender" id="Male" value="M" <?php
-                       if ($registerArr['gender'] == "M") {
-                           echo "checked";
-                       }
-                       ?> /><label for="Male">Male</label>
+                if ($registerArr['gender'] == "M") {
+                    echo "checked";
+                }
+        ?> /><label for="Male">Male</label>
                 </select><br/>
 
 
@@ -396,25 +406,115 @@ if (!$valid_user) {
         </div>
 
 
-        <h3>Display All Facilities</h3>
-<!--        <p>Last Facility ID: <?php //echo Medical_Facility::get_last_medical_id();          ?></p>-->
+        <h3>Display All Medical Personnel</h3>
         <div>
             <?php
-// There is record found
-            if (!empty($facility_list)) {
-                // Count of all records
-                $facility_count = count($facility_list);
-                $cols = 1;
-                $rows = $facility_count;
+            # -- Display All The Medical Personnel -- #
+            if (!empty($practitioner_list)) {
 
-                // Create Table
+                // -- Count All Medical_Personnel Records
+                $practitioner_count = count($practitioner_list);
+                $cols = 1;
+                $rows = $practitioner_count;
+
+                // -- Create Table
                 echo "<form method ='post' action='";
                 echo htmlspecialchars($_SERVER['PHP_SELF']);
                 echo "'>";
 
                 echo "<table border='1'>";
 
-                // Headers
+                // -- Headers
+                echo "<tr>";
+                echo "
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>User Type</th>";
+                echo "</tr>";
+                foreach ($practitioner_list as $practitioner) {
+
+                    echo "<tr>";
+                    echo "<td >{$practitioner->get_firstname()}</td>";
+                    echo "<td >{$practitioner->get_lastname()}</td>";
+                    echo "<td >{$practitioner->get_email()}</td>";
+                    echo "<td>{$practitioner->get_usertype()}</td>";
+                    echo "</tr>";
+                }
+
+                echo "</table>";
+                echo "</form>";
+            } else {
+                echo "<p>NO RECORD(S) FOUND</p>";
+            }
+            ?>
+        </div>
+
+
+        <h3>Display All Patients</h3>
+        <div>
+            <?php
+            # -- Display All The  Patients -- #
+            if (!empty($patient_list)) {
+
+                // -- Count All Medical_Personnel Records
+                $patient_count = count($patient_list);
+                $cols = 1;
+                $rows = $patient_count;
+
+                // -- Create Table
+                echo "<form method ='post' action='";
+                echo htmlspecialchars($_SERVER['PHP_SELF']);
+                echo "'>";
+
+                echo "<table border='1'>";
+
+                // -- Headers
+                echo "<tr>";
+                echo "
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>User Type</th>";
+                echo "</tr>";
+                foreach ($patient_list as $patient) {
+
+                    echo "<tr>";
+                    echo "<td >{$patient->get_firstname()}</td>";
+                    echo "<td >{$patient->get_lastname()}</td>";
+                    echo "<td >{$patient->get_email()}</td>";
+                    echo "<td>{$patient->get_usertype()}</td>";
+                    echo "</tr>";
+                }
+
+                echo "</table>";
+                echo "</form>";
+            } else {
+                echo "<p>NO RECORD(S) FOUND</p>";
+            }
+            ?>
+        </div>
+
+        <h3>Display All Facilities</h3>
+        <!--        <p>Last Facility ID: <?php //echo Medical_Facility::get_last_medical_id();              ?></p>-->
+        <div>
+            <?php
+            # -- Display All The Medical Facilities -- #
+            if (!empty($facility_list)) {
+
+                // -- Count All Facility Records
+                $facility_count = count($facility_list);
+                $cols = 1;
+                $rows = $facility_count;
+
+                // -- Create Table
+                echo "<form method ='post' action='";
+                echo htmlspecialchars($_SERVER['PHP_SELF']);
+                echo "'>";
+
+                echo "<table border='1'>";
+
+                // -- Headers
                 echo "<tr>";
                 echo "
                     <th>Facility Id</th>
@@ -429,7 +529,6 @@ if (!$valid_user) {
                     echo "<td >{$facility->get_facilityname()}</td>";
                     echo "<td >{$facility->get_address()}</td>";
                     echo "<td>{$facility->get_contactnumber()}</td>";
-
                     echo "</tr>";
                 }
 

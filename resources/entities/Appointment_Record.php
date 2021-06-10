@@ -90,74 +90,7 @@ class Appointment_Record {
         return $str;
     }
 
-    //============================================
-    //      Methods Accessing Firestore Database 
-    //============================================
-    // -- Create Appointment -- //
-    public static function create_appointment(array $appointment_info): void {
-
-
-        $appointment_info['createdon'] = (string) date("d-m-Y");
-
-        $db = new DbQuery();
-        $db->insert_data(self::APPOINTMENT_RECORD, $appointment_info);
-    }
-
-    private static function get_patient_appointment(array $email, array $appointmentstatus): array {
-        # Array Of Appointments
-        $appointment_arr = array();
-
-        # Query For Upcoming Appointment Records
-        $db = new DbQuery();
-        $record_list = $db->get_nested_collection(Database::ACCOUNT_USER, Database::APPOINTMENT_RECORD,
-                $email, $appointmentstatus);
-
-        # Create Appointment Record Object List
-        foreach ($record_list as $record) {
-            $facility = Medical_Facility::get_facility_by_id($record['facilityid']);
-            $scheduledon = new Time($record['scheduledon']['date'], $record['scheduledon']['time']);
-            $createdon = new Time($record['createdon']['date'], $record['createdon']['time']);
-            $record_object = new Appointment_Record($createdon, $scheduledon, $record['appointmentid'], $record['appointmenttype'],
-                    $facility);
-            $appointment_arr[] = $record_object;
-        }
-        return $appointment_arr;
-    }
-
-    // -- Get Upcoming Appointment By Patient (Array Of Appointment_Record) -- //
-    public static function get_upcoming_appointments(array $email): array {
-
-        # Set Default Appointment Status
-        $appointmentstatus['appointmentstatus'] = Appointment_Status::UPCOMING;
-
-        # Retrieving List Of Upcoming Appointments
-        $upcoming_arr = self::get_patient_appointment($email, $appointmentstatus);
-
-        return $upcoming_arr;
-    }
-
-    // -- Get Missed Appointment By Patient (Array Of Appointment Record)  last 14 days -- //
-    public static function get_missed_appointments(array $email): array {
-
-        # Set Default Appointment Status
-        $appointmentstatus['appointmentstatus'] = Appointment_Status::MISSED;
-
-        # Retrieving List Of Missed Appointments
-        $missed_arr = self::get_patient_appointment($email, $appointmentstatus);
-
-        return $missed_arr;
-    }
-
-    // -- Update Appointment Status (e.g. Upcoming > Missed) -- //
-    private static function change_appointment_status() {
-        
-    }
-
-    // -- Remove Appointment_Record When User `Cancel` Their Appointment
-    public static function cancel_appointment(string $email, string $appointmentid) {
-        
-    }
-
+   
     // -- Set Appointment Reminder -- //
 }
 ?>

@@ -19,7 +19,7 @@ require_once UTILS_PATH . '/StringUtils.php';
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <!-- Styling -->
-        <?php include COMPONENT_PATH . '/bootstrap.php'; ?>
+        <?php include COMPONENTS_PATH . '/bootstrap.php'; ?>
         <link rel="stylesheet" href="./css/loginRegister.css"/> 
     </head>
     <body>
@@ -130,7 +130,7 @@ require_once UTILS_PATH . '/StringUtils.php';
         <!-- HTML Page Design -->
         <div>
             <!-- Navigation -->
-            <?php include COMPONENT_PATH . '/navbar.php' ?>
+            <?php include COMPONENTS_PATH . '/navbar.php' ?>
 
             <!-- Login Card -->
             <div class="row m-4" ></div>
