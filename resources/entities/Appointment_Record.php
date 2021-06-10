@@ -56,7 +56,7 @@ class Appointment_Record {
         return $this->appointmentstatus;
     }
 
-    public function get_scheduledon(): Time {
+    public function get_scheduledon() : Time {
         return $this->scheduledon;
     }
 

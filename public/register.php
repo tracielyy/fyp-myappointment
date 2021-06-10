@@ -5,20 +5,25 @@ session_start();
 require_once '../resources/config.php';
 ?>
 <html lang="en">
-    <head>
-        <?php require COMPONENT_PATH . '/bootstrap.php' ?>
 
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="./css/loginRegister.css"/> 
-        <title>Register</title>
+<head>
+    <?php require COMPONENT_PATH . '/bootstrap.php' ?>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+    <?php include './css/loginRegister.css';
+    ?>
+    </style>
+    <title>Register</title>
 
 
-    </head>
+</head>
 
-    <!-- Logic & Validation -->
-    <?php
+<!-- Logic & Validation -->
+<?php
     require_once ENTITIES_PATH . '/Account_User.php';
     require_once ENTITIES_PATH . '/Patient.php';
 
@@ -208,12 +213,12 @@ require_once '../resources/config.php';
     }
     ?>
 
-    <body>
-        <!-- Navigation -->
-        <?php require COMPONENT_PATH . '/navbar.php' ?>
+<body>
+    <!-- Navigation -->
+    <?php require COMPONENT_PATH . '/navbar.php' ?>
 
-        <!-- Registration -->
-        <div class="row m-4"></div>
+    <!-- Registration -->
+    <div class="row m-4">
         <div class="container col-md-10 col-lg-6">
             <div class="col-auto">
                 <div class="shadow card p-2 rounded1">
@@ -229,13 +234,15 @@ require_once '../resources/config.php';
                                 <div class="row pb-3">
                                     <div class="col">
                                         <!-- First Name -->
-                                        <input id="firstname" class="form-control" type="text" name="firstname" placeholder="First Name"
-                                               value="<?php echo htmlspecialchars($registerArr['firstname']); ?>" />
+                                        <input id="firstname" class="form-control" type="text" name="firstname"
+                                            placeholder="First Name"
+                                            value="<?php echo htmlspecialchars($registerArr['firstname']); ?>" />
                                     </div>
                                     <div class="col">
                                         <!-- Last Name -->
-                                        <input id="lastname" class="form-control" type="text" name="lastname" placeholder="Last Name"
-                                               value="<?php echo htmlspecialchars($registerArr['lastname']); ?>" />
+                                        <input id="lastname" class="form-control" type="text" name="lastname"
+                                            placeholder="Last Name"
+                                            value="<?php echo htmlspecialchars($registerArr['lastname']); ?>" />
 
                                     </div>
                                 </div>
@@ -248,24 +255,25 @@ require_once '../resources/config.php';
                                 <div class="row">
                                     <div class="col">
                                         <!-- Date Of Birth -->
-                                        <input id="dob" class="form-control" type="text" name="dob" placeholder="Date Of Birth"
-                                               value="<?php echo htmlspecialchars($registerArr['dob']); ?>" /><br />
+                                        <input id="dob" class="form-control" type="text" name="dob"
+                                            placeholder="Date Of Birth"
+                                            value="<?php echo htmlspecialchars($registerArr['dob']); ?>" /><br />
                                     </div>
                                     <div class="col py-2">
 
 
                                         <!-- Gender -->
                                         <input class="form-check-input" type="radio" id="Female" name="gender" value="F" <?php
-        if ($registerArr['gender'] == "F") {
-            echo "checked";
-        }
-        ?> /><label for="Female" class="btnLabel">Female</label>
+                                        if ($registerArr['gender'] == "F") {
+                                            echo "checked";
+                                        }
+                                        ?> /><label for="Female" class="btnLabel">Female</label>
 
                                         <input class="form-check-input" type="radio" name="gender" id="Male" value="M" <?php
                                         if ($registerArr['gender'] == "M") {
                                             echo "checked";
                                         }
-        ?> />
+                                        ?> />
                                         <label for="Male">Male</label>
                                         </select><br />
 
@@ -280,13 +288,15 @@ require_once '../resources/config.php';
                                 <div class="row">
                                     <div class="col">
                                         <!-- Email -->
-                                        <input id="email" class="form-control" type="text" name="email" placeholder="Email"
-                                               value="<?php echo htmlspecialchars($registerArr['email']); ?>" /><br />
+                                        <input id="email" class="form-control" type="text" name="email"
+                                            placeholder="Email"
+                                            value="<?php echo htmlspecialchars($registerArr['email']); ?>" /><br />
                                     </div>
                                     <div class="col">
                                         <!-- Contact Number -->
-                                        <input id="contactnumber" class="form-control" type="text" name="contactnumber" placeholder="Contact Number"
-                                               value="<?php echo htmlspecialchars($registerArr['contactnumber']); ?>" /><br />
+                                        <input id="contactnumber" class="form-control" type="text" name="contactnumber"
+                                            placeholder="Contact Number"
+                                            value="<?php echo htmlspecialchars($registerArr['contactnumber']); ?>" /><br />
                                     </div>
                                 </div>
 
@@ -298,8 +308,9 @@ require_once '../resources/config.php';
                                 <div class="row">
                                     <div class="col">
                                         <!-- Address -->
-                                        <input id="address" class="form-control" type="text" name="address" placeholder="Address"
-                                               value="<?php echo htmlspecialchars($registerArr['address']); ?>" /><br />
+                                        <input id="address" class="form-control" type="text" name="address"
+                                            placeholder="Address"
+                                            value="<?php echo htmlspecialchars($registerArr['address']); ?>" /><br />
                                     </div>
                                     <div class="col"></div>
                                 </div>
@@ -312,21 +323,24 @@ require_once '../resources/config.php';
                                 <div class="row">
                                     <div class="col">
                                         <!-- Password -->
-                                        <input id="password" class="form-control" type="password" name="password" placeholder="Password"
-                                               value="<?php echo htmlspecialchars($registerArr['password']); ?>" /><br />
+                                        <input id="password" class="form-control" type="password" name="password"
+                                            placeholder="Password"
+                                            value="<?php echo htmlspecialchars($registerArr['password']); ?>" /><br />
                                     </div>
                                     <div class="col">
                                         <!-- Confirmation Password -->
-                                        <input id="confirmpassword" class="form-control" type="password" name="confirmpassword" placeholder="Confirm Password"
-                                               value="<?php echo htmlspecialchars($registerArr['confirmpassword']); ?>" /><br /></div>
+                                        <input id="confirmpassword" class="form-control" type="password"
+                                            name="confirmpassword" placeholder="Confirm Password"
+                                            value="<?php echo htmlspecialchars($registerArr['confirmpassword']); ?>" /><br />
+                                    </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col ">
                                     </div>
                                     <!-- Registration Submission -->
-                                    <div class="col py-3"><button class="btn btn-primary" type="submit" style="float: right"
-                                                                  ;>Register</button><br /></div>
+                                    <div class="col py-3"><button class="btn btn-primary" type="submit"
+                                            style="float: right" ;>Register</button><br /></div>
                                 </div>
                             </form>
                         </div>
@@ -335,8 +349,9 @@ require_once '../resources/config.php';
                 </div>
             </div>
         </div>
+    </div>
 
 
-    </body>
+</body>
 
 </html>
