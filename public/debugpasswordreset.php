@@ -14,6 +14,8 @@ require_once ENTITIES_PATH . '/Account_User.php';
 require_once UTILS_PATH . '/Email.php';
 require_once UTILS_PATH . '/Regex.php';
 require_once UTILS_PATH . '/Time.php';
+require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
+require_once FUNCTIONS_PATH . '/AdminFunctions.php';
 
 // -- Misc Variables -- //
 $msg = "";
@@ -44,11 +46,11 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
         $url_value .= "?token={$token}&email={$email}";
 
         # Cross Check `email` With Google Cloud Firestore
-        if (Account_User::check_user_exist($email)) {
+        if (AccountUserFunctions::check_user_exist($email)) {
             echo "User Exist";
 
             # Cross Check `token` With Google Cloud Firestore
-            $validURL = Account_User::validate_password_token($email, $token);
+            $validURL = AccountUserFunctions::validate_password_token($email, $token);
             if ($validURL) {
                 
             }
@@ -124,7 +126,7 @@ setcookie($url_name, $url_value, time() + 3600);
 
                 // -- Store The Password To Database -- //
                 echo $_COOKIE['email'];
-                if (Account_User::change_password($_COOKIE['email'], $resetArr['password'])) {
+                if (AccountUserFunctions::change_password($_COOKIE['email'], $resetArr['password'])) {
 
                     // -- Need To Email To Inform Password Change -- //
                     $to = $_COOKIE['email'];

@@ -61,7 +61,7 @@ class PatientFunctions {
             $scheduledon = new Time($record['scheduledon']['date'], $record['scheduledon']['time']);
             $createdon = new Time($record['createdon']['date'], $record['createdon']['time']);
             $record_object = new Appointment_Record($createdon, $scheduledon, $record['appointmentid'], $record['appointmenttype'],
-                    $facility);
+                    $facility, $record['appointmentstatus']);
             $appointment_arr[] = $record_object;
         }
         return $appointment_arr;

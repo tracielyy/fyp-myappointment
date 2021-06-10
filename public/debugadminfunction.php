@@ -149,7 +149,7 @@ endif;
 //                if (!in_array(False, $validArr)) {
 //                    
 //                }
-                Medical_Facility::create_medical_facility($facility);
+                AdminFunctions::create_medical_facility($facility);
             endif;
         # ==================================== #
         ### ----  Add Medical Personnel Button Is Triggered ---- ###
