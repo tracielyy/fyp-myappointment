@@ -227,7 +227,7 @@ require_once UTILS_PATH . '/Regex.php';
 
     <!-- Registration -->
     <div class="row m-4">
-        <div class="container col-md-10 col-lg-6">
+        <div class="container center col-md-10 col-lg-6">
             <div class="col-auto">
                 <div class="shadow card p-2 rounded1">
                     <div class="card-body m-2">
