@@ -74,16 +74,16 @@ class DbQuery {
         # Iterate Through The Given `$conditionArr` (Array)
         foreach ($conditionArr as $mapCondition => $value) :
 
-            if (is_array($conditionArr[$mapCondition])) {
+            if (is_array($conditionArr[$mapCondition])):
 
                 # Inner Loop For Maps
                 $query = $this->nested_condition($query, $conditionArr, $mapCondition)->limit(1);
-            } else {
+            else:
 
                 # If It Is Not A Map
                 $condition_path = $mapCondition;
                 $query = $query->where($condition_path, "=", $value)->limit(1);
-            }
+            endif;
         endforeach;
         $snapshot = $query->documents();
 
@@ -126,7 +126,6 @@ class DbQuery {
 
         return False;
     }
-
 
     // -- Modify Map Fields (EMAIL) -- //
     public function modify_field(string $collection, array $conditionArr, array $mapArr): bool {
@@ -241,7 +240,7 @@ class DbQuery {
     }
 
     // -- Update Nested Collection's Document -- //
-    public function modify_nested_collection(string $collection, string $subcollection, array $conditionArr, array $subconditionArr): array {
+    public function modify_nested_collection(string $collection, string $subcollection, array $conditionArr, array $subconditionArr, array $changedArr): bool {
 
         # Getting The Condition Keys
 //        $condition = array_key_first($conditionArr); # Outer Condition
@@ -265,28 +264,32 @@ class DbQuery {
         endforeach;
         $sub_snapshot = $sub_cols->documents();
 
-        # Create An Array To Store The Document Data
-        $doc_arr = array();
-
         # Iterate Through An Array Of Documents
         foreach ($sub_snapshot as $doc) :
             if ($doc->exists()) :
-                $doc_arr[] = $doc->data(); //  -- Storing Each Document Data In Array
+
+                # Getting The Document Reference
+                $doc_id = $doc->id();
+                $doc_ref = $sub_col_ref->document($doc_id);
+
+                # Update The Values Of The Retrieved DocumentReference
+                $this->update_values($doc_ref, $changedArr);
+                return true;
             endif;
         endforeach;
 
-        return $doc_arr;  // -- Return Array Of Document Datas
+        return false;
     }
 
     private function get_ordered_by(Query $query, array $orderedBy, bool $asc): Query {
 
         foreach ($orderedBy as $orderBy => $o) :
             foreach ($orderedBy[$orderBy] as $order => $ovalue) :
-                if ($asc) {
+                if ($asc):
                     $query = $query->orderBy($orderBy . "." . $ovalue);
-                } else {
+                else:
                     $query = $query->orderBy($orderBy . "." . $ovalue, 'DESC');
-                }
+                endif;
             endforeach;
         endforeach;
 

@@ -105,22 +105,42 @@ class PatientFunctions {
         
     }
 
-    public static function reschedule_appointment(array $scheduledon) {
+    public static function reschedule_appointment(string $email, string $appointmentid, array $scheduledon) {
 
-        # Create An Array To Update Appointment Record
-        # Update The Scheduled Timing
+        # Conditions (For Outer Collection)
+        $condition['credentials'] = array('email' => $email);
+
+        # Sub-Conditions (For Inner Collection)
+        $subcondition = array('appointmentid' => $appointmentid);
+
         # RESET Default Appointment Status (To Cater To MISSED Appointments)
         $changed_info['appointmentstatus'] = Appointment_Status::UPCOMING;
+
+        # Add The Rescheduled Time To Array
+        $changed_info['scheduledon'] = $scheduledon;
+
+        # Update The Modified Information
+        $db = new DbQuery();
+        return $db->modify_nested_collection(Database::ACCOUNT_USER, Database::APPOINTMENT_RECORD,
+                        $condition, $subcondition, $changed_info);
     }
 
     // -- Update Appointment_Record When User `Cancel` Their Appointment
-    public static function cancel_appointment(string $email, string $appointmentid) {
+    public static function cancel_appointment(string $email, string $appointmentid): bool {
 
-        # Conditions
-        $condition = "";
+        # Conditions (For Outer Collection)
+        $condition['credentials'] = array('email' => $email);
+
+        # Sub-Conditions (For Inner Collection)
+        $subcondition = array('appointmentid' => $appointmentid);
 
         # SET Appointment Status To Cancelled After Patient Cancel Appointment
         $changed_info['appointmentstatus'] = Appointment_Status::CANCELLED;
+
+        # Update The Modified Information In The Database
+        $db = new DbQuery();
+        return $db->modify_nested_collection(Database::ACCOUNT_USER, Database::APPOINTMENT_RECORD,
+                        $condition, $subcondition, $changed_info);
     }
 
 }

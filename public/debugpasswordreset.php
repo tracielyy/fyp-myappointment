@@ -128,6 +128,8 @@ setcookie($url_name, $url_value, time() + 3600);
                 echo $_COOKIE['email'];
                 if (AccountUserFunctions::change_password($_COOKIE['email'], $resetArr['password'])) {
 
+                    // -- Possible Termination Of Other Sessions -- //
+                    
                     // -- Need To Email To Inform Password Change -- //
                     $to = $_COOKIE['email'];
                     Email::template_passwordchanged($to);
