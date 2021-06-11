@@ -10,25 +10,39 @@ require_once FUNCTIONS_PATH . '/PatientFunctions.php';
 require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?>
 <html lang="en">
+<<<<<<< HEAD
 
 <head>
     <?php require COMPONENTS_PATH . '/bootstrap.php' ?>
+=======
 
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <head>
+        <?php require COMPONENTS_PATH . '/bootstrap.php' ?>
 
-    <style>
-    <?php include './css/loginRegister.css';
-    ?>
-    </style>
-    <title>Register</title>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+>>>>>>> 9c570d69ab2276672837f682ad69da6081178d7c
 
+        <style>
+        <?php include './css/loginRegister.css'; ?>
+        </style>
+
+        <title>Register</title>
+
+<<<<<<< HEAD
 </head>
 
 <!-- Logic & Validation -->
 <?php
 
+=======
+
+    </head>
+
+    <!-- Logic & Validation -->
+    <?php
+>>>>>>> 9c570d69ab2276672837f682ad69da6081178d7c
 
 
     // Used to store correct data
@@ -178,7 +192,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
         // If Valid User Information (After Validation)
         if (!in_array(False, $validArr)) {
             // > Check If User Already Exist (Email & Contact Number)
-            $exist = Account_User::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
+            $exist = AccountUserFunctions::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
             if (!$exist) {
 
                 /* Load To Patient Registration Array */
@@ -196,7 +210,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
                 // > Salt Generation (?)
                 // > Need To Encrypt The Password Then Store In Database
-                Patient::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
+                PatientFunctions::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
                 // Reset Information
                 $registerArr = array(
                     'firstname' => '',
@@ -221,6 +235,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
     }
     ?>
 
+<<<<<<< HEAD
 <body>
     <!-- Navigation -->
     <?php require COMPONENTS_PATH . '/navbar.php' ?>
@@ -245,14 +260,42 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                                         <input id="firstname" class="form-control" type="text" name="firstname"
                                             placeholder="First Name"
                                             value="<?php echo htmlspecialchars($registerArr['firstname']); ?>" />
-                                    </div>
-                                    <div class="col">
-                                        <!-- Last Name -->
-                                        <input id="lastname" class="form-control" type="text" name="lastname"
-                                            placeholder="Last Name"
-                                            value="<?php echo htmlspecialchars($registerArr['lastname']); ?>" />
+=======
+    <body>
+        <!-- Navigation -->
+        <?php require COMPONENTS_PATH . '/navbar.php' ?>
 
+        <!-- Registration -->
+        <div class="row m-4">
+            <div class="container center col-md-10 col-lg-6">
+                <div class="col-auto">
+                    <div class="shadow card p-2 rounded1">
+                        <div class="card-body m-2">
+                            <h1 class="card-title px-5 py-3">Register</h1>
+                            <div class="px-5">
+                                <!-- Form -->
+                                <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                                    <div class="row">
+                                        <div class="col">First Name</div>
+                                        <div class="col">Last Name</div>
+>>>>>>> 9c570d69ab2276672837f682ad69da6081178d7c
                                     </div>
+                                    <div class="row pb-3">
+                                        <div class="col">
+                                            <!-- First Name -->
+                                            <input id="firstname" class="form-control" type="text" name="firstname"
+                                                   placeholder="First Name"
+                                                   value="<?php echo htmlspecialchars($registerArr['firstname']); ?>" />
+                                        </div>
+                                        <div class="col">
+                                            <!-- Last Name -->
+                                            <input id="lastname" class="form-control" type="text" name="lastname"
+                                                   placeholder="Last Name"
+                                                   value="<?php echo htmlspecialchars($registerArr['lastname']); ?>" />
+
+                                        </div>
+                                    </div>
+<<<<<<< HEAD
                                 </div>
 
                                 <div class="row">
@@ -275,16 +318,47 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                                             echo "checked";
                                         }
                                         ?> /><label for="Female" class="btnLabel">Female</label>
+=======
 
-                                        <input class="form-check-input" type="radio" name="gender" id="Male" value="M" <?php
-                                        if ($registerArr['gender'] == "M") {
-                                            echo "checked";
-                                        }
-                                        ?> />
-                                        <label for="Male">Male</label>
-                                        </select><br />
-
+                                    <div class="row">
+                                        <div class="col">Date of Birth</div>
+                                        <div class="col">Select Gender:</div>
                                     </div>
+>>>>>>> 9c570d69ab2276672837f682ad69da6081178d7c
+
+                                    <div class="row">
+                                        <div class="col">
+                                            <!-- Date Of Birth -->
+                                            <input id="dob" class="form-control" type="text" name="dob"
+                                                   placeholder="Date Of Birth"
+                                                   value="<?php echo htmlspecialchars($registerArr['dob']); ?>" /><br />
+                                        </div>
+                                        <div class="col py-2">
+
+
+                                            <!-- Gender -->
+                                            <input class="form-check-input" type="radio" id="Female" name="gender" value="F" <?php
+                                            if ($registerArr['gender'] == "F") {
+                                                echo "checked";
+                                            }
+                                            ?> /><label for="Female" class="btnLabel">Female</label>
+
+                                            <input class="form-check-input" type="radio" name="gender" id="Male" value="M" <?php
+                                            if ($registerArr['gender'] == "M") {
+                                                echo "checked";
+                                            }
+                                            ?> />
+                                            <label for="Male">Male</label>
+                                            </select><br />
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col">Email</div>
+                                        <div class="col">Contact Number</div>
+                                    </div>
+<<<<<<< HEAD
                                 </div>
 
                                 <div class="row">
@@ -298,13 +372,29 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                                         <input id="email" class="form-control" type="text" name="email"
                                             placeholder="Email"
                                             value="<?php echo htmlspecialchars($registerArr['email']); ?>" /><br />
+=======
+
+                                    <div class="row">
+                                        <div class="col">
+                                            <!-- Email -->
+                                            <input id="email" class="form-control" type="text" name="email"
+                                                   placeholder="Email"
+                                                   value="<?php echo htmlspecialchars($registerArr['email']); ?>" /><br />
+                                        </div>
+                                        <div class="col">
+                                            <!-- Contact Number -->
+                                            <input id="contactnumber" class="form-control" type="text" name="contactnumber"
+                                                   placeholder="Contact Number"
+                                                   value="<?php echo htmlspecialchars($registerArr['contactnumber']); ?>" /><br />
+                                        </div>
+>>>>>>> 9c570d69ab2276672837f682ad69da6081178d7c
                                     </div>
-                                    <div class="col">
-                                        <!-- Contact Number -->
-                                        <input id="contactnumber" class="form-control" type="text" name="contactnumber"
-                                            placeholder="Contact Number"
-                                            value="<?php echo htmlspecialchars($registerArr['contactnumber']); ?>" /><br />
+
+                                    <div class="row">
+                                        <div class="col">Address</div>
+                                        <div class="col"></div>
                                     </div>
+<<<<<<< HEAD
                                 </div>
 
                                 <div class="row d-none d-lg-block">
@@ -333,15 +423,40 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                                         <input id="password" class="form-control" type="password" name="password"
                                             placeholder="Password"
                                             value="<?php echo htmlspecialchars($registerArr['password']); ?>" /><br />
-                                    </div>
-                                    <div class="col">
-                                        <!-- Confirmation Password -->
-                                        <input id="confirmpassword" class="form-control" type="password"
-                                            name="confirmpassword" placeholder="Confirm Password"
-                                            value="<?php echo htmlspecialchars($registerArr['confirmpassword']); ?>" /><br />
-                                    </div>
-                                </div>
+=======
 
+                                    <div class="row">
+                                        <div class="col">
+                                            <!-- Address -->
+                                            <input id="address" class="form-control" type="text" name="address"
+                                                   placeholder="Address"
+                                                   value="<?php echo htmlspecialchars($registerArr['address']); ?>" /><br />
+                                        </div>
+                                        <div class="col"></div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col">Password</div>
+                                        <div class="col">Confirm Password</div>
+>>>>>>> 9c570d69ab2276672837f682ad69da6081178d7c
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col">
+                                            <!-- Password -->
+                                            <input id="password" class="form-control" type="password" name="password"
+                                                   placeholder="Password"
+                                                   value="<?php echo htmlspecialchars($registerArr['password']); ?>" /><br />
+                                        </div>
+                                        <div class="col">
+                                            <!-- Confirmation Password -->
+                                            <input id="confirmpassword" class="form-control" type="password"
+                                                   name="confirmpassword" placeholder="Confirm Password"
+                                                   value="<?php echo htmlspecialchars($registerArr['confirmpassword']); ?>" /><br />
+                                        </div>
+                                    </div>
+
+<<<<<<< HEAD
                                 <div class="row pt-2">
                                     <div class="d-grid gap-2 d-lg-block">
                                     <!-- Registration Submission -->
@@ -349,15 +464,25 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                                             style="float: right" ;>Register</button><br />
                                 </div>
                             </form>
+=======
+                                    <div class="row">
+                                        <div class="col ">
+                                        </div>
+                                        <!-- Registration Submission -->
+                                        <div class="col py-3"><button class="btn btn-primary" type="submit"
+                                                                      style="float: right" ;>Register</button><br /></div>
+                                    </div>
+                                </form>
+                            </div>
+>>>>>>> 9c570d69ab2276672837f682ad69da6081178d7c
                         </div>
+                        <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                     </div>
-                    <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                 </div>
             </div>
         </div>
-    </div>
 
 
-</body>
+    </body>
 
 </html>

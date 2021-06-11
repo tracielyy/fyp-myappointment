@@ -10,6 +10,7 @@ abstract class Appointment_Status {
     
     // -- Status Not Visible To Patient -- //
     const COMPLETED = "Completed";
+    const CANCELLED = "Cancelled";
 
 }
 ?>

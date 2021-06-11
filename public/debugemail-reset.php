@@ -10,6 +10,7 @@ require_once UTILS_PATH . '/Email.php';
 require_once UTILS_PATH . '/Regex.php';
 require_once UTILS_PATH . '/StringUtils.php';
 require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
+require_once FUNCTIONS_PATH . '/AdminFunctions.php';
 ?>
 <html>
     <head>
@@ -60,7 +61,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
             /* ------------ End Validation ------------ */
 
             // -- Make Sure It Is A Valid Patient/Medical Personnel (Can Admin Reset Password???)
-            $user_exist = Account_User::check_user_exist($resetArr['email']);
+            $user_exist = AccountUserFunctions::check_user_exist($resetArr['email']);
 
             // -- Invoke Email Send To User To Reset Password
             if ($user_exist) {

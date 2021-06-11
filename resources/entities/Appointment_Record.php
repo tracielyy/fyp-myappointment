@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @author yanying (Tracy)
  */
@@ -34,12 +35,17 @@ class Appointment_Record {
     protected const APPOINTMENT_RECORD = "Appointment_Record";
 
     // Constructor
-    function __construct(Time $createdon, Time $scheduledon, string $appointmentid, string $appointmenttype, Medical_Facility $facility) {
+    function __construct(Time $createdon, Time $scheduledon, string $appointmentid, string $appointmenttype,
+            Medical_Facility $facility, ?string $appointmentstatus) {
         $this->createdon = $createdon;
         $this->scheduledon = $scheduledon;
         $this->appointmentid = $appointmentid;
         $this->appointmenttype = $appointmenttype;
-        $this->appointmentstatus = Appointment_Status::UPCOMING;
+        if ($appointmentstatus == null) {
+            $this->appointmentstatus = Appointment_Status::UPCOMING;
+        } else {
+            $this->appointmentstatus = $appointmentstatus;
+        }
         $this->facility = $facility; // -- Medical_Facility Object -- //
     }
 
@@ -56,7 +62,7 @@ class Appointment_Record {
         return $this->appointmentstatus;
     }
 
-    public function get_scheduledon() : Time {
+    public function get_scheduledon(): Time {
         return $this->scheduledon;
     }
 
@@ -90,7 +96,7 @@ class Appointment_Record {
         return $str;
     }
 
-   
     // -- Set Appointment Reminder -- //
 }
+
 ?>

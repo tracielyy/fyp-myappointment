@@ -17,6 +17,7 @@ require_once UTILS_PATH . '/Email.php';
 require_once UTILS_PATH . '/Regex.php';
 require_once UTILS_PATH . '/Time.php';
 require_once UTILS_PATH . '/StringUtils.php';
+require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?>
 <html>
     <head>
@@ -87,7 +88,7 @@ require_once UTILS_PATH . '/StringUtils.php';
                 if (!in_array(FALSE, $validArr)) {
 
                     # -- Start Authenticating User (boolean)
-                    $auth = Account_User::authenticate_user($loginArr);
+                    $auth = AccountUserFunctions::authenticate_user($loginArr);
 
                     # -- Check If There Is Any "token" generated ---
                     if (!isset($_SESSION['token'])) {
@@ -101,8 +102,8 @@ require_once UTILS_PATH . '/StringUtils.php';
                     if ($auth) {
 
                         # -- Check If There Are Any Other Login Session (Terminate Other Session?)
-                        $auth_user = Account_User::load_user_data($loginArr);
-                        $session_logon_allowed = Account_User::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
+                        $auth_user = AccountUserFunctions::load_user_data($loginArr);
+                        $session_logon_allowed = AccountUserFunctions::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
 
                         # -- Get IP Address ---
                         // whether ip is from share internet
@@ -119,8 +120,8 @@ require_once UTILS_PATH . '/StringUtils.php';
                         }
 
                         if ($session_logon_allowed) {
-                            $login_status = Account_User::login($auth_user->get_email(), session_id(), $_SESSION['token'], $ipaddress); # Error
-                            $auth_user = Account_User::load_user_data($loginArr); // Reload After Login Session Update
+                            $login_status = AccountUserFunctions::login($auth_user->get_email(), session_id(), $_SESSION['token'], $ipaddress); # Error
+                            $auth_user = AccountUserFunctions::load_user_data($loginArr); // Reload After Login Session Update
                             $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
                             //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
                             echo nl2br(PHP_EOL . "Success" . PHP_EOL);

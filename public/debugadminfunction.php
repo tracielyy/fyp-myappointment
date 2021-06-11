@@ -13,7 +13,7 @@ require_once FUNCTIONS_PATH . '/AdminFunctions.php';
 $valid_user = false;
 
 // -- Filter Away Invalid Users -- //
-if (isset($_SESSION["user"])) {
+if (isset($_SESSION["user"])) :
 
     # -- Get The LoggedIn User -- #
     $user = unserialize($_SESSION["user"]);
@@ -21,7 +21,7 @@ if (isset($_SESSION["user"])) {
     $user_type = $user->get_usertype();
 
     // -- Make Sure The User Is Admin -- //
-    if (User_Type::check_user_type(User_Type::ADMIN, $user_type)) {
+    if (User_Type::check_user_type(User_Type::ADMIN, $user_type)) :
 
         # -- Turn The `Switch` On -- #
         $valid_user = true;
@@ -30,13 +30,13 @@ if (isset($_SESSION["user"])) {
         $facility_list = AdminFunctions::display_all_facilities();
         $patient_list = AdminFunctions::display_all_patients($user_email);
         $practitioner_list = AdminFunctions::display_all_practitioner($user_email);
-    }
-}
+    endif;
+endif;
 
 // -- Check If Is Admin (VALID USER) -- //    
-if (!$valid_user) {
+if (!$valid_user) :
     echo '<script>alert("ACCESS DENIED"); window.location.href = "Index.php";</script>';
-}
+endif;
 ?>
 
 <html>
@@ -104,25 +104,25 @@ if (!$valid_user) {
         //                          Functions
         //==============================
         // Upon clicking "Login" Button 
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") :
 
             # ============================= #
             ### ----  Add Facility Button Is Triggered ---- ###
             # ============================= #
-            if (isset($_POST["add-facility-btn"])) {
+            if (isset($_POST["add-facility-btn"])) :
 
                 //==============================
                 //              Load Data Into Array
                 //==============================
-                foreach ($_POST as $key => $value) {
+                foreach ($_POST as $key => $value):
 
                     # -- Check If The Key Is Set -- #
-                    if (isset($facility[$key])) {
+                    if (isset($facility[$key])) :
 
                         # -- Check If There Is An Inner Array -- #
                         if (is_array($value)) {
                             echo $key;
-                            foreach ($_POST[$key] as $k => $v) {
+                            foreach ($_POST[$key] as $k => $v) :
 
                                 # --- Load To Facility Array -- #
                                 if ($k == 'is24hours') {
@@ -131,15 +131,15 @@ if (!$valid_user) {
                                 } else {
                                     $facility[$key][$k] = htmlspecialchars($v);
                                 }
-                            }
+                            endforeach;
                         } else {
                             # --- Load To Facility Array -- #
                             $facility[$key] = htmlspecialchars($value);
                             $validArr[$key] = False; // Set All Field Validation Check As False
                             echo $facility[$key];
                         }
-                    }
-                }
+                    endif;
+                endforeach;
                 //==============================
                 //           Validate & Check All The Fields
                 //==============================
@@ -149,11 +149,11 @@ if (!$valid_user) {
 //                if (!in_array(False, $validArr)) {
 //                    
 //                }
-                Medical_Facility::create_medical_facility($facility);
-            }
-            # ==================================== #
-            ### ----  Add Medical Personnel Button Is Triggered ---- ###
-            # ==================================== #
+                AdminFunctions::create_medical_facility($facility);
+            endif;
+        # ==================================== #
+        ### ----  Add Medical Personnel Button Is Triggered ---- ###
+        # ==================================== #
 //                /* Load Data to Array */
 //                foreach ($_POST as $key => $value) {
 //                    if (isset($registerArr[$key])) {
@@ -306,7 +306,7 @@ if (!$valid_user) {
 //                    // Any Actions Or Displays For Errors
 //                    echo "<div style='color:red;'>Register Fail!</div>";
 //                }
-        }
+        endif;
         ?>
         <div>
             <p>Add </p>
@@ -325,16 +325,16 @@ if (!$valid_user) {
                 <!-- Gender -->
                 <label for="gender">Select Gender: </label>
                 <input type="radio" id="Female" name="gender" value="F"<?php
-        if ($registerArr['gender'] == "F") {
-            echo "checked";
-        }
-        ?>/><label for="Female" class="btnLabel">Female</label>
+                if ($registerArr['gender'] == "F") :
+                    echo "checked";
+                endif;
+                ?>/><label for="Female" class="btnLabel">Female</label>
 
                 <input type="radio" name="gender" id="Male" value="M" <?php
-                if ($registerArr['gender'] == "M") {
-                    echo "checked";
-                }
-        ?> /><label for="Male">Male</label>
+                       if ($registerArr['gender'] == "M") :
+                           echo "checked";
+                       endif;
+                       ?> /><label for="Male">Male</label>
                 </select><br/>
 
 
@@ -386,9 +386,9 @@ if (!$valid_user) {
                 Non-stop?
                 <input type="checkbox" name="operatinghours[is24hours]" value="1" 
                 <?php
-                if ($facility['operatinghours']['is24hours']) {
+                if ($facility['operatinghours']['is24hours']) :
                     echo "checked = 'checked'";
-                }
+                endif;
                 ?>/><br/>
 
                 <!-- Operating Hours (Opening) --> 
@@ -432,7 +432,7 @@ if (!$valid_user) {
                     <th>Email</th>
                     <th>User Type</th>";
                 echo "</tr>";
-                foreach ($practitioner_list as $practitioner) {
+                foreach ($practitioner_list as $practitioner) :
 
                     echo "<tr>";
                     echo "<td >{$practitioner->get_firstname()}</td>";
@@ -440,7 +440,8 @@ if (!$valid_user) {
                     echo "<td >{$practitioner->get_email()}</td>";
                     echo "<td>{$practitioner->get_usertype()}</td>";
                     echo "</tr>";
-                }
+
+                endforeach;
 
                 echo "</table>";
                 echo "</form>";
@@ -477,7 +478,7 @@ if (!$valid_user) {
                     <th>Email</th>
                     <th>User Type</th>";
                 echo "</tr>";
-                foreach ($patient_list as $patient) {
+                foreach ($patient_list as $patient) :
 
                     echo "<tr>";
                     echo "<td >{$patient->get_firstname()}</td>";
@@ -485,7 +486,8 @@ if (!$valid_user) {
                     echo "<td >{$patient->get_email()}</td>";
                     echo "<td>{$patient->get_usertype()}</td>";
                     echo "</tr>";
-                }
+
+                endforeach;
 
                 echo "</table>";
                 echo "</form>";
@@ -496,7 +498,7 @@ if (!$valid_user) {
         </div>
 
         <h3>Display All Facilities</h3>
-        <!--        <p>Last Facility ID: <?php //echo Medical_Facility::get_last_medical_id();              ?></p>-->
+        <!--        <p>Last Facility ID: <?php //echo Medical_Facility::get_last_medical_id();                          ?></p>-->
         <div>
             <?php
             # -- Display All The Medical Facilities -- #
@@ -522,7 +524,7 @@ if (!$valid_user) {
                     <th>Address</th>
                     <th>Contact Number</th>";
                 echo "</tr>";
-                foreach ($facility_list as $facility) {
+                foreach ($facility_list as $facility) :
 
                     echo "<tr>";
                     echo "<td >{$facility->get_facilityid()}</td>";
@@ -530,7 +532,8 @@ if (!$valid_user) {
                     echo "<td >{$facility->get_address()}</td>";
                     echo "<td>{$facility->get_contactnumber()}</td>";
                     echo "</tr>";
-                }
+
+                endforeach;
 
                 echo "</table>";
                 echo "</form>";

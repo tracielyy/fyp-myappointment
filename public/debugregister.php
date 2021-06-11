@@ -9,6 +9,8 @@ require_once '../resources/config.php';
 require_once ENTITIES_PATH . '/Account_User.php';
 require_once ENTITIES_PATH . '/Patient.php';
 require_once UTILS_PATH . '/Regex.php';
+require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
+require_once FUNCTIONS_PATH . '/PatientFunctions.php';
 ?>
 <html>
     <head>
@@ -178,7 +180,7 @@ require_once UTILS_PATH . '/Regex.php';
                 // If Valid User Information (After Validation)
                 if (!in_array(False, $validArr)) {
                     // > Check If User Already Exist (Email & Contact Number)
-                    $exist = Account_User::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
+                    $exist = AccountUserFunctions::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
                     if (!$exist) {
 
                         /* Load To Patient Registration Array */
@@ -196,7 +198,7 @@ require_once UTILS_PATH . '/Regex.php';
 
                         // > Salt Generation (?)
                         // > Need To Encrypt The Password Then Store In Database
-                        Patient::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
+                        PatientFunctions::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
                         // Reset Information
                         $registerArr = array(
                             'firstname' => '',
