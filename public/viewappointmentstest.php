@@ -127,7 +127,7 @@
                                                                 <button type="button" class="btn btn-danger col-12">Cancel</button>
                                                             </div> <!-- BUTTON CANCEL COLUMN -->
                                                             <div class="col">
-                                                                <button type="button" class="btn btn-info col-12">Reschedule</button>
+                                                                <button type="button" class="btn btn-info col-12" >Reschedule</button>
                                                             </div> <!-- BUTTON RESCEHDULE COLUMN -->
                                                         </div> <!-- BUTTON ROW-->
                                                     </div> <!-- CARD BODY -->

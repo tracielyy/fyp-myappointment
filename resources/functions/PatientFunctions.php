@@ -54,6 +54,7 @@ class PatientFunctions {
         return $db->insert_data(self::APPOINTMENT_RECORD, $appointment_info);
     }
 
+    // -- Retrieve Of Appointment Records Of Certain Type -- //
     private static function get_patient_appointment(array $email, array $appointmentstatus): array {
 
         # Array Of Appointments
@@ -105,6 +106,7 @@ class PatientFunctions {
         
     }
 
+    // -- Update The Patient's Appointment Schedule -- //
     public static function reschedule_appointment(string $email, string $appointmentid, array $scheduledon) {
 
         # Conditions (For Outer Collection)
