@@ -4,18 +4,15 @@ session_start();
 /* Load Config File */
 require_once '../resources/config.php';
 require_once ENTITIES_PATH . '/Account_User.php';
-require_once ENTITIES_PATH . '/Patient.php';
-require_once UTILS_PATH . '/Regex.php';
+require_once ENTITIES_PATH . '/Appointment_Record.php';
+require_once ENUMS_PATH . '/User_Type.php';
+require_once FUNCTIONS_PATH . '/PatientFunctions.php';
+require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?>
 <html lang="en">
-<<<<<<< HEAD
-=======
-    <head>
-        <?php require COMPONENTS_PATH . '/bootstrap.php' ?>
->>>>>>> 05f67fede8d9b091c954fd2beae88cfa98bdb415
 
 <head>
-    <?php require COMPONENT_PATH . '/bootstrap.php' ?>
+    <?php require COMPONENTS_PATH . '/bootstrap.php' ?>
 
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -27,13 +24,11 @@ require_once UTILS_PATH . '/Regex.php';
     </style>
     <title>Register</title>
 
-
 </head>
 
 <!-- Logic & Validation -->
 <?php
-    require_once ENTITIES_PATH . '/Account_User.php';
-    require_once ENTITIES_PATH . '/Patient.php';
+
 
 
     // Used to store correct data
@@ -228,7 +223,7 @@ require_once UTILS_PATH . '/Regex.php';
 
 <body>
     <!-- Navigation -->
-    <?php require COMPONENT_PATH . '/navbar.php' ?>
+    <?php require COMPONENTS_PATH . '/navbar.php' ?>
 
     <!-- Registration -->
     <div class="row m-4">
@@ -241,8 +236,8 @@ require_once UTILS_PATH . '/Regex.php';
                             <!-- Form -->
                             <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                                 <div class="row">
-                                    <div class="col">First Name</div>
-                                    <div class="col">Last Name</div>
+                                    <div class="col d-none d-lg-block">First Name</div>
+                                    <div class="col d-none d-lg-block">Last Name</div>
                                 </div>
                                 <div class="row pb-3">
                                     <div class="col">
@@ -261,8 +256,8 @@ require_once UTILS_PATH . '/Regex.php';
                                 </div>
 
                                 <div class="row">
-                                    <div class="col">Date of Birth</div>
-                                    <div class="col">Select Gender:</div>
+                                    <div class="col d-none d-lg-block">Date of Birth</div>
+                                    <div class="col d-none d-lg-block">Select Gender:</div>
                                 </div>
 
                                 <div class="row">
@@ -273,7 +268,6 @@ require_once UTILS_PATH . '/Regex.php';
                                             value="<?php echo htmlspecialchars($registerArr['dob']); ?>" /><br />
                                     </div>
                                     <div class="col py-2">
-
 
                                         <!-- Gender -->
                                         <input class="form-check-input" type="radio" id="Female" name="gender" value="F" <?php
@@ -294,8 +288,8 @@ require_once UTILS_PATH . '/Regex.php';
                                 </div>
 
                                 <div class="row">
-                                    <div class="col">Email</div>
-                                    <div class="col">Contact Number</div>
+                                    <div class="col d-none d-lg-block">Email</div>
+                                    <div class="col d-none d-lg-block">Contact Number</div>
                                 </div>
 
                                 <div class="row">
@@ -313,7 +307,7 @@ require_once UTILS_PATH . '/Regex.php';
                                     </div>
                                 </div>
 
-                                <div class="row">
+                                <div class="row d-none d-lg-block">
                                     <div class="col">Address</div>
                                     <div class="col"></div>
                                 </div>
@@ -329,8 +323,8 @@ require_once UTILS_PATH . '/Regex.php';
                                 </div>
 
                                 <div class="row">
-                                    <div class="col">Password</div>
-                                    <div class="col">Confirm Password</div>
+                                    <div class="col d-none d-lg-block">Password</div>
+                                    <div class="col d-none d-lg-block">Confirm Password</div>
                                 </div>
 
                                 <div class="row">
@@ -348,12 +342,11 @@ require_once UTILS_PATH . '/Regex.php';
                                     </div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col ">
-                                    </div>
+                                <div class="row pt-2">
+                                    <div class="d-grid gap-2 d-lg-block">
                                     <!-- Registration Submission -->
-                                    <div class="col py-3"><button class="btn btn-primary" type="submit"
-                                            style="float: right" ;>Register</button><br /></div>
+                                   <button class="btn btn-primary" type="submit"
+                                            style="float: right" ;>Register</button><br />
                                 </div>
                             </form>
                         </div>
