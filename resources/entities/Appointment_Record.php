@@ -36,7 +36,7 @@ class Appointment_Record {
 
     // Constructor
     function __construct(Time $createdon, Time $scheduledon, string $appointmentid, string $appointmenttype,
-            Medical_Facility $facility, string $appointmentstatus) {
+            Medical_Facility $facility, ?string $appointmentstatus) {
         $this->createdon = $createdon;
         $this->scheduledon = $scheduledon;
         $this->appointmentid = $appointmentid;
