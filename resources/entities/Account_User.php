@@ -30,8 +30,7 @@ class Account_User {
     // Future Possible
     private bool $enabled; # disabled || enabled
 
-    // CONSTANTS
-    private const PASSWORD_RESET = "passwordreset";
+
 
     // Constructor
     public function __construct(Session $session, string $firstname, string $lastname, string $gender, string $dob,

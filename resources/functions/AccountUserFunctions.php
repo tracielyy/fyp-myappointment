@@ -2,6 +2,9 @@
 
 class AccountUserFunctions {
 
+    // CONSTANTS
+    private const PASSWORD_RESET = "passwordreset";
+
     //============================================
     //      Methods Accessing Firestore Database 
     //============================================
@@ -18,7 +21,7 @@ class AccountUserFunctions {
 
         # Update Session Field After Success Authentication
         $db = new DbQuery();
-        $login = $db->modify_map_field(Database::ACCOUNT_USER, $emailArr, $session_arr);
+        $login = $db->modify_field(Database::ACCOUNT_USER, $emailArr, $session_arr);
         return $login; # -- Return Bool (Success or Failure) -- #
     }
 
@@ -141,7 +144,7 @@ class AccountUserFunctions {
 
         # Update Session Array
         $db = new DbQuery();
-        $db->modify_map_field(Database::ACCOUNT_USER, $emailArr, $session_arr);
+        $db->modify_field(Database::ACCOUNT_USER, $emailArr, $session_arr);
     }
 
     // -- To Update The Generated Token To Database (Valid For 24 Hours) -- //
@@ -157,7 +160,7 @@ class AccountUserFunctions {
 
         # Update The Array To Database
         $db = new DbQuery();
-        $db->modify_map_field(Database::ACCOUNT_USER, $emailArr, $passwordreset_arr);
+        $db->modify_field(Database::ACCOUNT_USER, $emailArr, $passwordreset_arr);
     }
 
     // -- Validate Password Token -- //
@@ -240,7 +243,7 @@ class AccountUserFunctions {
 
         # Update From `Not Verified` To `Verified`
         $db = new DbQuery();
-        return $db->modify_map_field(Database::ACCOUNT_USER, $conditionArr, $changedArr);
+        return $db->modify_field(Database::ACCOUNT_USER, $conditionArr, $changedArr);
     }
 
     #-------------------------------------------------------------------------#
@@ -256,7 +259,7 @@ class AccountUserFunctions {
 
             # Modify The Patient Profile Based On The Given Array
             $db = new DbQuery();
-            return $db->modify_map_field(Database::ACCOUNT_USER, $credentials_arr, $profile_changed_arr);
+            return $db->modify_field(Database::ACCOUNT_USER, $credentials_arr, $profile_changed_arr);
         endif;
         return false;
     }
@@ -276,15 +279,15 @@ class AccountUserFunctions {
 
         # Update The New Password
         $db = new DbQuery();
-        $db->modify_map_field(Database::ACCOUNT_USER, $conditionArr, $changedArr);
+        $db->modify_field(Database::ACCOUNT_USER, $conditionArr, $changedArr);
 
         # Retrieve Document Again To Check Changes
         $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $conditionArr);
 
         # Update Token Usage (WIP)
-        $passwordreset_arr = self::used_passwordreset_array();
+        $passwordreset_arr = ArrayCreation::used_passwordreset_array();
 
-        $db->modify_map_field(Database::ACCOUNT_USER, $conditionArr, $passwordreset_arr);
+        $db->modify_field(Database::ACCOUNT_USER, $conditionArr, $passwordreset_arr);
 
         return StringUtils::string_equal($user_data['credentials']['password'], $password);  // -- Bool -- //
     }
@@ -305,7 +308,7 @@ class AccountUserFunctions {
 
         # Update User Email        
         $db = new DbQuery();
-        $changed = $db->modify_map_field(Database::ACCOUNT_USER, $credentials, $update_arr);
+        $changed = $db->modify_field(Database::ACCOUNT_USER, $credentials, $update_arr);
 
         # Return Boolean (Success or Failure)
         return $changed;
@@ -322,7 +325,7 @@ class AccountUserFunctions {
 
         # Update User Profile
         $db = new DbQuery();
-        $changed = $db->modify_map_field(Database::ACCOUNT_USER, $credentials, $profile_arr);
+        $changed = $db->modify_field(Database::ACCOUNT_USER, $credentials, $profile_arr);
 
         # Return Boolean (Success or Failure)
         return $changed;
