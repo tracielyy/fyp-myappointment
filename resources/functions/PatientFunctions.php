@@ -37,16 +37,25 @@ class PatientFunctions {
     //      Appointments
     //============================================
     // -- Create Appointment -- //
-    public static function create_appointment(array $appointment_info): void {
+    public static function create_appointment(array $appointment_info): bool {
 
+        # SET Appointment Creation Time
+        $createdon = new Time();
+        $appointment_info['createdon'] = array(
+            'date' => $createdon->get_date(),
+            'time' => $createdon->get_time()
+        );
 
-        $appointment_info['createdon'] = (string) date("d-m-Y");
+        # SET Default Appointment Status
+        $appointment_info['appointmentstatus'] = Appointment_Status::UPCOMING;
 
+        # Add The AppointmentRecord To The Database
         $db = new DbQuery();
-        $db->insert_data(self::APPOINTMENT_RECORD, $appointment_info);
+        return $db->insert_data(self::APPOINTMENT_RECORD, $appointment_info);
     }
 
     private static function get_patient_appointment(array $email, array $appointmentstatus): array {
+
         # Array Of Appointments
         $appointment_arr = array();
 
@@ -56,14 +65,14 @@ class PatientFunctions {
                 $email, $appointmentstatus);
 
         # Create Appointment Record Object List
-        foreach ($record_list as $record) {
+        foreach ($record_list as $record) :
             $facility = AccountUserFunctions::get_facility_by_id($record['facilityid']);
             $scheduledon = new Time($record['scheduledon']['date'], $record['scheduledon']['time']);
             $createdon = new Time($record['createdon']['date'], $record['createdon']['time']);
             $record_object = new Appointment_Record($createdon, $scheduledon, $record['appointmentid'], $record['appointmenttype'],
                     $facility, $record['appointmentstatus']);
             $appointment_arr[] = $record_object;
-        }
+        endforeach;
         return $appointment_arr;
     }
 
@@ -92,13 +101,26 @@ class PatientFunctions {
     }
 
     // -- Update Appointment Status (e.g. Upcoming > Missed) -- //
-    private static function change_appointment_status() {
+    private static function update_appointment_missed() {
         
     }
 
-    // -- Remove Appointment_Record When User `Cancel` Their Appointment
+    public static function reschedule_appointment(array $scheduledon) {
+
+        # Create An Array To Update Appointment Record
+        # Update The Scheduled Timing
+        # RESET Default Appointment Status (To Cater To MISSED Appointments)
+        $changed_info['appointmentstatus'] = Appointment_Status::UPCOMING;
+    }
+
+    // -- Update Appointment_Record When User `Cancel` Their Appointment
     public static function cancel_appointment(string $email, string $appointmentid) {
-        
+
+        # Conditions
+        $condition = "";
+
+        # SET Appointment Status To Cancelled After Patient Cancel Appointment
+        $changed_info['appointmentstatus'] = Appointment_Status::CANCELLED;
     }
 
 }
