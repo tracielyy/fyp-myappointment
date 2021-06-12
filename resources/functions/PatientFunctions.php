@@ -30,14 +30,16 @@ class PatientFunctions {
 
         # Add Patient Data To Database
         $db = new DbQuery();
-        $db->insert_data(Database::ACCOUNT_USER, $userDataArr);
+        $db->insert_data(Database::ACCOUNT_USER, $userDataArr, true);
     }
 
     //============================================
     //      Appointments
     //============================================
     // -- Create Appointment -- //
-    public static function create_appointment(array $appointment_info): bool {
+    public static function create_appointment(string $email, array $appointment_info): bool {
+
+        $condition['credentials'] = array('email' => $email);
 
         # SET Appointment Creation Time
         $createdon = new Time();
@@ -48,10 +50,48 @@ class PatientFunctions {
 
         # SET Default Appointment Status
         $appointment_info['appointmentstatus'] = Appointment_Status::UPCOMING;
+        
+        # Get Appointment ID
+        $id = self::generate_appointment_id($condition);
+        $appointment_info['appointmentid'] = $id;
 
         # Add The AppointmentRecord To The Database
         $db = new DbQuery();
-        return $db->insert_data(self::APPOINTMENT_RECORD, $appointment_info);
+        return $db->insert_data(Database::APPOINTMENT_RECORD, $appointment_info, false, $id);
+    }
+
+    // -- User-Defined ID -- //
+    private static function generate_appointment_id(array $conditionArr) {
+
+        # To OrderBy The Appointment ID
+        $orderBy = array('appointmentid');
+
+        # Find The Last ID & Increment
+        $db = new DbQuery();
+        $last_id_appointment = $db->get_sub_document_ordered(Database::ACCOUNT_USER, Database::APPOINTMENT_RECORD, $conditionArr, $orderBy, false);
+
+        # If There Is Any Present ID In Database
+        if ($last_id_appointment !== null) :
+
+            $last_id = explode($last_id_appointment, "-");
+            $last_id_date = $last_id[1];
+
+            # Compare Year
+            $current_year = Time::get_current_year();
+            if ($last_id_date == $current_year):
+
+                # Increase The Number
+                $new_id = ++$last_id[2];
+                return $last_id[0] . "-" . $last_id[1] . "-" . $new_id;
+            else:
+                return $last_id[0] . "-" . $current_year . "-000";
+
+            endif;
+
+        # No ID Present In Database
+        else:
+            return "appt-" . $current_year . "-000";
+        endif;
     }
 
     // -- Retrieve Of Appointment Records Of Certain Type -- //

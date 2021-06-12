@@ -29,11 +29,8 @@ class DbQuery {
     // -- Get Unique Firestore Document In Specific Collection -- //
     public function get_document(string $collection, string $id): ?array {
 
-        # Collection Reference
-        $collection_ref = $this->db->collection($collection);
-
         # Document Reference
-        $doc_ref = $collection_ref->document($id);
+        $doc_ref = $this->db->collection($collection)->document($id);
         $snapshot = $doc_ref->snapshot();
         if ($snapshot->exists()) :
             return $snapshot->data();
@@ -102,17 +99,32 @@ class DbQuery {
     }
 
     // -- Insert Data: return success status  (Adding New Document To Collection) -- //
-    public function insert_data(string $collection, array $data_info): bool {
+    public function insert_data(string $collection, array $data_info, bool $auto_id, ?string $id): bool {
 
         # Collection Reference
         $collection_ref = $this->db->collection($collection);
 
-        # Adding New Set Of Document To Collection Using `CollectionReference`
-        if ($collection_ref->add($data_info) !== NULL) :
-            return True;
-        endif;
+        # Opt for Auto-Generated ID
+        if ($auto_id):
 
-        return False;
+            # Adding New Set Of Document To Collection Using `CollectionReference`
+            if ($collection_ref->add($data_info) !== NULL) :
+                return True;
+            endif;
+
+            return False;
+
+        # User Specified ID
+        else:
+
+            # Adding New Set Of Document To Collection Using `CollectionReference`
+            if ($collection_ref->document($id)->set($data_info) !== NULL) :
+                return True;
+            endif;
+
+            return False;
+
+        endif;
     }
 
     // -- Modify Map Fields (EMAIL) -- //
@@ -128,8 +140,7 @@ class DbQuery {
         if ($document->exists()) :
 
             # Getting The Document Reference
-            $doc_id = $document->id();
-            $doc_ref = $collection_ref->document($doc_id);
+            $doc_ref = $collection_ref->document($document->id());
 
             # Updating The Map Values With Attained Document ID
             $this->update_values($doc_ref, $mapArr);
@@ -163,7 +174,7 @@ class DbQuery {
 
             # Path For Each Field In Map Data Types
             $path = $fieldArr . "." . $field;
-            echo $path;
+
             # Update Each Value
             $doc_ref->update([
                 ['path' => $path, 'value' => $field_value]
@@ -187,6 +198,10 @@ class DbQuery {
         $doc_ref = $this->db->collection($collection)->document($doc_id);
         $sub_col_ref = $doc_ref->collection($subcollection); // -- Sub Collection Reference
         return $sub_col_ref;
+    }
+
+    private function sub_document_query() {
+        
     }
 
     private function get_sub_document(string $collection, string $subcollection, array $conditionArr, array $subconditionArr) {
@@ -381,9 +396,24 @@ class DbQuery {
         endforeach;
     }
 
-    // -- Delete Document From Collection -- //
-    public function delete_document(string $collection, array $conditions) {
-        
+    // -- Get Nested Collection Document Ordered -- //
+    public function get_sub_document_ordered(string $collection, string $subcollection, array $conditionArr, array $orderBy, bool $asc) {
+
+        # Query To Get The First Layer Document
+        $collection_ref = $this->db->collection($collection);
+        $doc_id = $this->document_query($collection_ref, $conditionArr)->id();
+
+        # Get Sub Document Via Sub Collection
+        $doc_ref = $collection_ref->document($doc_id);
+        $sub_col_ref = $doc_ref->collection($subcollection);
+        $sub_snapshot = $this->get_ordered_by($sub_col_ref, $orderBy, $asc)->limit(1);
+
+        # Return If There Is Any Document In DocumentSnapShot
+        foreach ($sub_snapshot as $sub_doc):
+            if ($sub_doc->exist()):
+                return $sub_doc->data();
+            endif;
+        endforeach;
     }
 
 }

@@ -55,9 +55,8 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                     # Pop Up To Ask For Double Confirm Before Cancelling #
                     PatientFunctions::cancel_appointment($user_email, $appointmentid);
 
-                // -- Missed Tab -- // 
                 elseif (isset($_POST['reschedule'])):
-
+                # Ask For Reschedule Date & Time (Could Be Some Pop-Up) -- Return Rescheduled Array #
                 endif;
 
             endif;
@@ -134,9 +133,9 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                                                         <br>Appointment Status:
                                                         <?php echo $record->get_appointmentstatus(); // Return Appointment status      ?>
                                                         <br>
-                                                        <br>Date: <?php echo $record->get_scheduledon()->get_date(); // Returns Date                                           ?>
-                                                        <br>Time: <?php echo $record->get_scheduledon()->get_time(); // Returns Date                                           ?>
-                                                        <br>Location:<?php echo $record->get_facility()->get_facilityname(); // Returns Date                                            ?>
+                                                        <br>Date: <?php echo $record->get_scheduledon()->get_date(); // Returns Date                                            ?>
+                                                        <br>Time: <?php echo $record->get_scheduledon()->get_time(); // Returns Date                                            ?>
+                                                        <br>Location:<?php echo $record->get_facility()->get_facilityname(); // Returns Date                                             ?>
 
                                                         <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                                         <br>Address: <?php echo $record->get_facility()->get_address(); ?>
@@ -182,9 +181,9 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                                                         <?php echo $record->get_appointmentid(); // Return Appointment ID       ?>
                                                         <br>Appointment Status:
                                                         <?php echo $record->get_appointmentstatus(); // Return Appointment status       ?>
-                                                        <br><br>Date:  <?php echo $record->get_scheduledon()->get_date(); // Returns Date                                         ?>
-                                                        <br>Time: <?php echo $record->get_scheduledon()->get_time(); // Returns Time                                           ?>
-                                                        <br>Location:<?php echo $record->get_facility()->get_facilityname(); // Returns Date                                           ?>
+                                                        <br><br>Date:  <?php echo $record->get_scheduledon()->get_date(); // Returns Date                                          ?>
+                                                        <br>Time: <?php echo $record->get_scheduledon()->get_time(); // Returns Time                                            ?>
+                                                        <br>Location:<?php echo $record->get_facility()->get_facilityname(); // Returns Date                                            ?>
 
                                                         <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                                         <br>Address: <?php echo $record->get_facility()->get_address(); ?>
