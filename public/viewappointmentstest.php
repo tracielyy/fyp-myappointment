@@ -98,28 +98,28 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
 
     <div class="mt-4">
         <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-upcoming" role="tabpanel" aria-labelledby="nav-upcoming-tab">
-                <?php    
+        <div class="tab-pane fade show active" id="nav-upcoming" role="tabpanel" aria-labelledby="nav-upcoming-tab">
+            <?php    
                         if ($upcoming_arr == null):
                             ?>
-                <br>
-                <p class="text-center text-muted display-6">No upcoming appointments </p>
-                </div>
-                <?php 
+            <br>
+            <p class="text-center text-muted display-6">No upcoming appointments </p>
+            </div>
+            <?php 
                         else:
                         ?>
-                <!-- Nav tabs -->
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 g-4">
-                    <?php // For Each Upcoming Appointment Record
+            <!-- Nav tabs -->
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 g-4">
+                <?php // For Each Upcoming Appointment Record
                             foreach ($upcoming_arr as $record):
                             ?>
-                    <div class="col">
-                        <div class="card" style="border-radius: 10px;">
-                            <div class="card-header">
-                                <?php echo $record->get_appointmenttype(); // Return String ?>
-                            </div> <!-- CARD HEADER -->
-                            <div class="card-body">
-                                Appointment ID:
+                <div class="col">
+                    <div class="card" style="border-radius: 10px;">
+                        <div class="card-header">
+                            <?php echo $record->get_appointmenttype(); // Return String ?>
+                        </div> <!-- CARD HEADER -->
+                        <div class="card-body">
+                        Appointment ID:
                                 <?php echo $record->get_appointmentid(); // Return Appointment ID ?>
                                 <br>Appointment Status:
                                 <?php echo $record->get_appointmentstatus(); // Return Appointment status ?>
@@ -132,15 +132,15 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
                                 <br>Address: <?php echo $record->get_facility()->get_address(); ?>
                                 <br>Contact Number:
                                 <?php echo $record->get_facility()->get_contactnumber(); ?>
-                                <div class="row m-2 text-center">
-                                    <div class="col">
-                                        <button type="button" class="btn btn-danger col-12" data-bs-toggle="modal" data-bs-target="#cancel">Cancel</button>
-                                    </div> <!-- BUTTON CANCEL COLUMN -->
-                                    <div class="col">
-                                        <button type="button" class="btn btn-info col-12">Reschedule</button>
-                                    </div> <!-- BUTTON RESCEHDULE COLUMN -->
-                                    <!-- Modal -->
-                                    <div class="modal fade" id="cancelappt" tabindex="-1" aria-labelledby="cancelappointment" aria-hidden="true">
+                            <div class="row m-2 text-center">
+                                <div class="col">
+                                    <button type="button" class="btn btn-danger col-12" data-bs-toggle="modal" data-bs-target="#cancelappt">Cancel</button>
+                                </div> <!-- BUTTON CANCEL COLUMN -->
+                                <div class="col">
+                                    <button type="button" class="btn btn-info col-12">Reschedule</button>
+                                </div> <!-- BUTTON RESCEHDULE COLUMN -->
+                                <!-- Modal -->
+                                <div class="modal fade" id="cancelappt" tabindex="-1" aria-labelledby="cancelappointment" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">
                                             <div class="modal-header">
@@ -160,15 +160,15 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
                                             </div>
                                         </div>
                                     </div> <!-- MODAL END -->
-                                </div> <!-- BUTTON ROW-->
-                            </div> <!-- CARD BODY -->
-                        </div> <!-- CARD -->
-                    </div> <!-- COLUMN CARD -->
-                    <?php endforeach;?>
-                </div>
+                            </div> <!-- BUTTON ROW-->
+                        </div> <!-- CARD BODY -->
+                    </div> <!-- CARD -->
+                </div> <!-- COLUMN CARD -->
+                <?php endforeach;?>
             </div>
-        </div> <!-- TAB FOR UPCOMING -->
+        </div><!-- TAB-MISSED-CONTENT -->
         <?php endif; ?>
+       
 
 
         <div class="tab-pane fade" id="nav-missed" role="tabpanel" aria-labelledby="nav-missed-tab">
