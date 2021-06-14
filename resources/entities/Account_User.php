@@ -30,8 +30,6 @@ class Account_User {
     // Future Possible
     private bool $enabled; # disabled || enabled
 
-
-
     // Constructor
     public function __construct(Session $session, string $firstname, string $lastname, string $gender, string $dob,
             string $contactnumber, string $address, string $usertype, Time $createdon, string $email, string $password = NULL) {
@@ -39,7 +37,12 @@ class Account_User {
         $this->session = $session;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
-        $this->gender = $gender;
+        if ($gender == 'F'):
+            $this->gender = 'Female';
+        else:
+            $this->gender = 'Male';
+        endif;
+
         $this->dob = $dob;
         $this->contactnumber = $contactnumber;
         $this->address = $address;
@@ -159,13 +162,13 @@ class Account_User {
     public static function check_session(Session $db_session, string $sessionid, string $token): bool {
 
         #  Session Status 
-        if ($db_session->get_isloggedin() == false) {
+        if ($db_session->get_isloggedin() == false):
             return true;
-        } else {
+        else :
 
             # Compare Token
             return ($db_session->get_token() == $token && $db_session->get_sessionid() == $sessionid);
-        }
+        endif;
     }
 
     // -- Get User Full Name -- //
@@ -181,11 +184,11 @@ class Account_User {
         $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $emailArr);
 
         # Filter & Return Full Name
-        if ($user_data !== NULL) {
+        if ($user_data !== NULL) :
             $name_arr = $user_data['profile']['name'];
             $full_name = $name_arr['firstname'] . " " . $name_arr['lastname'];
             return $full_name;
-        }
+        endif;
         return null;
     }
 
@@ -202,7 +205,8 @@ class Account_User {
         $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $credentials);
 
         # Store Any User Data In `Account_User` Object
-        if ($user_data != NULL) {
+        if ($user_data != NULL) :
+            
             $profile_arr = $user_data['profile'];
             $credentials_arr = $user_data['credentials'];
             $session_arr = $user_data['session'];
@@ -217,7 +221,7 @@ class Account_User {
             return new Account_User($session_obj, $profile_arr['name']['firstname'], $profile_arr['name']['lastname'],
                     $profile_arr['gender'], $profile_arr['dob'], $profile_arr['contactnumber'], $profile_arr['address'],
                     $accountdetails_arr['usertype'], $time_obj, $credentials_arr['email']);
-        }
+        endif;
         return NULL;
     }
 
@@ -234,9 +238,10 @@ class Account_User {
         $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $credentials);
 
         # Check If There Are Any User Returned From The Query
-        if ($user_data != NULL) {
+        if ($user_data != NULL) :
             return True;
-        }
+        endif;
+
         return False;
     }
 
@@ -253,9 +258,10 @@ class Account_User {
         $emails_found = $db->query_exact_match(Database::ACCOUNT_USER, $emailArr);
 
         # Check If There Are Any Value Returned
-        if (($emails_found !== NULL)) {
+        if (($emails_found !== NULL)) :
             return True;  // There is existing user
-        }
+        endif;
+
         return False;
     }
 
@@ -296,7 +302,7 @@ class Account_User {
 
         # Need To Make Sure The Email Is Valid
         $exist = self::check_user_exist($email);
-        if ($exist) {
+        if ($exist) :
 
             # Store Email In An Array
             $email_arr["credentials"] = array(
@@ -308,7 +314,7 @@ class Account_User {
             $mapData = $db->get_map_field(Database::ACCOUNT_USER, $email_arr, self::PASSWORD_RESET);
 
             # Validate The Database's Requested Dates
-            if (self::verify_requested_date($mapData['requestedon']['date'], $mapData['requestedon']['time'])) {
+            if (self::verify_requested_date($mapData['requestedon']['date'], $mapData['requestedon']['time'])):
 
                 # Set The Dates
                 $currentDate = new Time();
@@ -322,9 +328,11 @@ class Account_User {
 
                 # Return bool On Validity
                 return self::verify_token($originaltoken, $passwordtoken, $duration, $mapData['tokenused']);
-            }
+            endif;
+
             return false;
-        }
+        endif;
+        
         return false;
     }
 
@@ -335,9 +343,10 @@ class Account_User {
         $valid_duration = 60 * 60;
 
         # Check If Token Match & Duration Validity Suffice
-        if (($originaltoken == $emailtoken ) && ($duration < $valid_duration) && (!$tokenstatus)) {
+        if (($originaltoken == $emailtoken ) && ($duration < $valid_duration) && (!$tokenstatus)) :
             return true;
-        }
+        endif;
+        
         return false;
     }
 
@@ -349,13 +358,13 @@ class Account_User {
         $time = StringUtils::clean_input($time);
 
         # Checks date & time
-        if ($date !== "" && $time !== "") {
+        if ($date !== "" && $time !== ""):
             return true;
-        }
+        endif;
+        
         return false;
     }
 
-    
     // -- Verify Account (Email Verification) --//
     public static function email_verified(string $email): bool {
 

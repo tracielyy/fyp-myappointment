@@ -51,10 +51,13 @@ class AccountUserFunctions {
 
         # Filter & Return Full Name
         if ($user_data !== NULL):
+
             $name_arr = $user_data['profile']['name'];
             $full_name = $name_arr['firstname'] . " " . $name_arr['lastname'];
             return $full_name;
+
         endif;
+
         return null;
     }
 
@@ -72,6 +75,7 @@ class AccountUserFunctions {
 
         # Store Any User Data In `Account_User` Object
         if ($user_data != NULL):
+
             $profile_arr = $user_data['profile'];
             $credentials_arr = $user_data['credentials'];
             $session_arr = $user_data['session'];
@@ -112,7 +116,7 @@ class AccountUserFunctions {
     }
 
     //  -- Check If The User Exist In The Database  -- //
-    public static function check_user_exist(string $email /* , string $contactnumber */): bool {
+    public static function check_user_exist(string $email): bool {
 
         # Email Array
         $emailArr ["credentials"] = array(
@@ -209,9 +213,10 @@ class AccountUserFunctions {
         $valid_duration = 60 * 60;
 
         # Check If Token Match & Duration Validity Suffice
-        if (($originaltoken == $emailtoken ) && ($duration < $valid_duration) && (!$tokenstatus)) {
+        if (($originaltoken == $emailtoken ) && ($duration < $valid_duration) && (!$tokenstatus)) :
             return true;
-        }
+        endif;
+
         return false;
     }
 

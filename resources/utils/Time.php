@@ -26,6 +26,9 @@ class Time {
     # 12 Hours Format #
     private const TIME_FORMAT_AMPM = "h:i:s a";
     private const TIME_FORMAT_AMPM_NOSECONDS = "h:i a";
+    
+    # Year Format Default #
+    private const YEAR_FORMAT_DEFAULT = "Y";
 
     // -- Constructor -- //
     function __construct(?string $date = NULL, ?string $time = NULL) {
@@ -69,6 +72,10 @@ class Time {
 
     public static function get_current_time(): string {
         return (string) date(self::TIME_FORMAT_DEFAULT);
+    }
+    
+    public static function get_current_year():string {
+        return (string) date(self::YEAR_FORMAT_DEFAULT);
     }
 
     // -- Find Difference In Date & Time -- //
