@@ -12,22 +12,6 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?>
 
 <html>
-<<<<<<< HEAD
-=======
-    <head>
-        <!-- Title -->
-        <title>FYP-21-S2-24</title>
-
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-        <!-- Styling -->
-        <?php include COMPONENTS_PATH . '/bootstrap.php'; ?>
-        <link rel="stylesheet" href="./css/loginRegister.css"/> 
-
-    </head>
-    <body>
->>>>>>> 9c570d69ab2276672837f682ad69da6081178d7c
 
 <head>
     <!-- Title -->
@@ -58,6 +42,15 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
         <!-- Debug Test For Users -->
         <!-- Hint: Explode & Implode For Date Of Birth (DD-MM-YYYY) If there is other preferred string format (e.g. '/') -->
         <?php
+        // Code here
+        ?>
+
+        <!-- HTML Page Design -->
+        <div>
+            <!-- Navigation -->
+            <!-- Debug Test For Users -->
+            <!-- Hint: Explode & Implode For Date Of Birth (DD-MM-YYYY) If there is other preferred string format (e.g. '/') -->
+            <?php
             // Used to store correct data
             $loginArr = array(
                 'email' => '',
@@ -87,13 +80,8 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                     }
                 }
 
-<<<<<<< HEAD
                 // Possible Validation of Email Before Firestore Query
                 /* ------------ Start Validation ------------ */
-=======
-                # -- Start Authenticating User (boolean)
-                $auth = AccountUserFunctions::authenticate_user($loginArr);
->>>>>>> 9c570d69ab2276672837f682ad69da6081178d7c
 
 
                 // -- Email Validation
@@ -108,22 +96,15 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                 // Password
                 $validArr["password"] = True;
 
-<<<<<<< HEAD
                 /* ------------ End Validation ------------ */
                 if (!in_array(FALSE, $validArr)) {
-=======
-                    # -- Check If There Are Any Other Login Session (Terminate Other Session?)
-                    $auth_user = AccountUserFunctions::load_user_data($loginArr);
-                    $session_logon_allowed = AccountUserFunctions::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
->>>>>>> 9c570d69ab2276672837f682ad69da6081178d7c
 
                     # -- Start Authenticating User (boolean)
-                    $auth = Account_User::authenticate_user($loginArr);
+                    $auth = AccountUserFunctions::authenticate_user($loginArr);
 
                     # -- Check If There Is Any "token" generated ---
                     if (!isset($_SESSION['token'])) {
 
-<<<<<<< HEAD
                         // Default Session Token Length
                         $token_length = 15;
                         $_SESSION['token'] = StringUtils::generate_token($token_length);
@@ -133,8 +114,8 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                     if ($auth) {
 
                         # -- Check If There Are Any Other Login Session (Terminate Other Session?)
-                        $auth_user = Account_User::load_user_data($loginArr);
-                        $session_logon_allowed = Account_User::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
+                        $auth_user = AccountUserFunctions::load_user_data($loginArr);
+                        $session_logon_allowed = AccountUserFunctions::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
 
                         # -- Get IP Address ---
                         // whether ip is from share internet
@@ -151,8 +132,8 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                         }
 
                         if ($session_logon_allowed) {
-                            $login_status = Account_User::login($auth_user->get_email(), session_id(), $_SESSION['token'], $ipaddress); # Error
-                            $auth_user = Account_User::load_user_data($loginArr); // Reload After Login Session Update
+                            $login_status = AccountUserFunctions::login($auth_user->get_email(), session_id(), $_SESSION['token'], $ipaddress); # Error
+                            $auth_user = AccountUserFunctions::load_user_data($loginArr); // Reload After Login Session Update
                             $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
                             //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
                             echo nl2br(PHP_EOL . "Success" . PHP_EOL);
@@ -167,16 +148,6 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                         } else {
                             $msg = "Account is logged in at another location";
                         }
-=======
-                        $login_status = AccountUserFunctions::login($auth_user->get_email(), session_id(), $_SESSION['token'], $ipaddress); # Error
-                        $auth_user = AccountUserFunctions::load_user_data($loginArr); // Reload After Login Session Update
-                        //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
-                        # -- Clear Fields
-                        $loginArr = array(
-                            'email' => '',
-                            'password' => '',
-                        );
->>>>>>> 9c570d69ab2276672837f682ad69da6081178d7c
                     } else {
                         $msg = "Invalid Credentials!";
                     }

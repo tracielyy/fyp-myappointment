@@ -27,7 +27,7 @@
             <a class="nav-link" href="#">Create an Appointment</a>
           </li>
           <li class="nav-item">
-          <a class="nav-link" href="#">View Appointment</a>
+          <a class="nav-link" href="./viewappointmentstest.php">View Appointment</a> <!-- HREF NEED TO BE CHANGED -->
           </li>
         </ul>
         <div class="row mx-3">
