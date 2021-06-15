@@ -154,8 +154,8 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
                                                 <br> <br> <b> Warning: Action cannot be revoked </b>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-danger">Cancel</button>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" value="<?php echo $record->get_appointmentid(); ?>">Close</button>
+                                                <button type="submit" class="btn btn-danger" name= "cancel" value="<?php echo $record->get_appointmentid(); ?>">Cancel</button>
                                             </div>
                                             </div>
                                         </div>
@@ -227,8 +227,8 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
                                                 <br> <br> <b> Warning: Action cannot be revoked </b>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-danger">Cancel</button>
+                                                <button type="submit" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-danger">Cancel</button>
                                             </div>
                                             </div>
                                         </div>

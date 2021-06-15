@@ -11,6 +11,7 @@ use Google\Cloud\Firestore\DocumentReference;
 use Google\Cloud\Firestore\CollectionReference;
 use Google\Cloud\Firestore\Query;
 use Google\Cloud\Firestore\DocumentSnapshot;
+use Google\Cloud\Firestore\FieldValue;
 
 require '../vendor/autoload.php';
 
@@ -81,6 +82,11 @@ class DbQuery {
         return $doc_arr;
     }
 
+    // -- Modify Certain Fields -- //
+    public function update_document_by_path(string $doc_path, bool $filter, ?array $condition = null): array {
+        
+    }
+
     // -- For Document Inner Maps -- //
     private function nested_condition(CollectionReference $query, array $conditionArr, string $key): Query {
         foreach ($conditionArr[$key] as $condition => $condition_value) :
@@ -109,6 +115,19 @@ class DbQuery {
         endforeach;
     }
 
+    public function get_document_id(string $doc_path, array $conditionArr): ?string {
+        # Collection Reference
+        $collection_ref = $this->db->collection($doc_path);
+
+        # Get Document 
+        $doc_ref = $this->document_query($collection_ref, $conditionArr);
+
+        if ($doc_ref != null):
+            return $doc_ref->id();
+        endif;
+        return null;
+    }
+
     // -- Get Firestore Document Wihout Knowing Document ID -- //
     public function query_exact_match(string $collection, array $conditionArr): ?array {
 
@@ -127,10 +146,10 @@ class DbQuery {
     }
 
     // -- Insert Data: return success status  (Adding New Document To Collection) -- //
-    public function insert_data(string $collection, array $data_info, bool $auto_id, ?string $id): bool {
+    public function insert_data(string $doc_path, array $data_info, bool $auto_id, ?string $id): bool {
 
         # Collection Reference
-        $collection_ref = $this->db->collection($collection);
+        $collection_ref = $this->db->collection($doc_path);
 
         # Opt for Auto-Generated ID
         if ($auto_id):
@@ -176,6 +195,21 @@ class DbQuery {
             return True;
         endif;
         return False;
+    }
+
+    public function update_array_add(string $doc_path, string $doc_id, array $changedArr): void {
+
+        # Get The Document Reference
+        $doc_ref = $this->db->collection($doc_path)->document($doc_id);
+
+        # Modify The Document Via `DocumentReference`
+        foreach ($changedArr as $field => $v) :
+            foreach ($v as $val):
+                $doc_ref->update([
+                    ['path' => $field, 'value' => FieldValue::arrayUnion([$val])]
+                ]);
+            endforeach;
+        endforeach;
     }
 
     private function update_values(DocumentReference $doc_ref, array $changedArr): void {
@@ -314,15 +348,30 @@ class DbQuery {
     private function get_ordered_by(Query $query, array $orderedBy, bool $asc): Query {
 
         foreach ($orderedBy as $orderBy => $o) :
-            foreach ($orderedBy[$orderBy] as $order => $ovalue) :
-                if ($asc):
-                    $query = $query->orderBy($orderBy . "." . $ovalue);
-                else:
-                    $query = $query->orderBy($orderBy . "." . $ovalue, 'DESC');
-                endif;
-            endforeach;
+            if (is_array($o)):
+                $query = $this->nested_order_by($query, $orderedBy, $orderBy, $asc);
+            else:
+                $query = $this->asc_desc($query, $orderBy, $asc);
+            endif;
         endforeach;
 
+        return $query;
+    }
+
+    private function asc_desc(Query $query, $orderBy, bool $asc): Query {
+        if ($asc):
+            $query = $query->orderBy($orderBy);
+        else:
+            $query = $query->orderBy($orderBy, 'DESC');
+        endif;
+        return $query;
+    }
+
+    private function nested_order_by(Query $query, array $orderedBy, string $orderBy, bool $asc): Query {
+        foreach ($orderedBy[$orderBy] as $order => $ovalue) :
+            $by = $orderBy . "." . $ovalue;
+            $query = $this->asc_desc($query, $by, $asc);
+        endforeach;
         return $query;
     }
 

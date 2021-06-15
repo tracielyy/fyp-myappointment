@@ -95,9 +95,17 @@ class PatientFunctions {
 //        return $appointment_slots;
 //    }
     // -- Create Appointment -- //
-    public static function create_appointment_record(string $email, array $appointment_info): bool {
+    public static function create_appointment_record(string $email, array $booking_info): bool {
 
         $condition['credentials'] = array('email' => $email);
+
+        # SET Appointment Booking Information
+        $appointment_info['appointmenttype'] = $booking_info['appointmenttype'];
+        $appointment_info['facilityid'] = $booking_info['facilityid'];
+        $appointment_info['scheduledon'] = array(
+            'date' => $booking_info['date'],
+            'time' => $booking_info['time']
+        );
 
         # SET Appointment Creation Time
         $createdon = new Time();
@@ -115,7 +123,16 @@ class PatientFunctions {
 
         # Add The AppointmentRecord To The Database
         $db = new DbQuery();
-        return $db->insert_data(Database::APPOINTMENT_RECORD, $appointment_info, false, $id);
+        $user_doc_id = $db->get_document_id(Database::ACCOUNT_USER, $condition);
+        $appt_doc_path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
+        $user_appt_update = $db->insert_data($appt_doc_path, $appointment_info, false, $id);
+
+        # Update The Appointment Slot (Not Done)
+        $user_id_arr['patients'] = array($user_doc_id);
+        $slots_doc_path = Database::MEDICAL_FACILITY . "/" . $booking_info['facilityid'] . "/" .
+                $booking_info['appointmenttype'] . "/" . $booking_info['date'] . "/" . Database::SLOTS;
+        $appt_slot_update = $db->update_array_add($slots_doc_path, $booking_info['slotid'], $user_id_arr);
+        return ($user_appt_update && $appt_slot_update);
     }
 
     // -- User-Defined ID -- //
@@ -129,20 +146,20 @@ class PatientFunctions {
         $last_id_appointment = $db->get_sub_document_ordered(Database::ACCOUNT_USER, Database::APPOINTMENT_RECORD, $conditionArr, $orderBy, false);
 
         # If There Is Any Present ID In Database
+        $current_year = Time::get_current_year();
         if ($last_id_appointment !== null) :
 
             $last_id = explode($last_id_appointment, "-");
             $last_id_date = $last_id[1];
 
             # Compare Year
-            $current_year = Time::get_current_year();
             if ($last_id_date == $current_year):
 
                 # Increase The Number
                 $new_id = ++$last_id[2];
                 return $last_id[0] . "-" . $last_id[1] . "-" . $new_id;
             else:
-                return $last_id[0] . "-" . $current_year . "-000";
+                return $last_id[0] . "-" . $current_year . "-001";
 
             endif;
 

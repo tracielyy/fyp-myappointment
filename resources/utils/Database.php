@@ -9,6 +9,7 @@ class Database {
     const ACCOUNT_USER = "Account_User";
     const MEDICAL_FACILITY = "Medical_Facility";
     const APPOINTMENT_RECORD = "Appointment_Record";
+    const SLOTS = "Slots";
 
 }
 ?>
