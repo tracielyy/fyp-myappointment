@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @author yanying (Tracy)
  */
@@ -25,10 +26,14 @@ class Time {
 
     # 12 Hours Format #
     private const TIME_FORMAT_AMPM = "h:i:s a";
-    private const TIME_FORMAT_AMPM_NOSECONDS = "h:i a";
-    
+    private const TIME_FORMAT_AMPM_NOSECONDS = "h:i A";
+
     # Year Format Default #
     private const YEAR_FORMAT_DEFAULT = "Y";
+
+    # -- Alternative Date Format -- #
+    public const DATE_FORMAT_APPOINTMENT = "d M Y (D)";
+    public const CALENDAR_FORMAT_DEFAULT = "Y-m-d";
 
     // -- Constructor -- //
     function __construct(?string $date = NULL, ?string $time = NULL) {
@@ -73,8 +78,8 @@ class Time {
     public static function get_current_time(): string {
         return (string) date(self::TIME_FORMAT_DEFAULT);
     }
-    
-    public static function get_current_year():string {
+
+    public static function get_current_year(): string {
         return (string) date(self::YEAR_FORMAT_DEFAULT);
     }
 
@@ -113,9 +118,44 @@ class Time {
     }
 
     // -- Change Format -- //
-    public static function date_format_change(string $date) {
-        return (string) date(self::DATE_FORMAT_SLASH, strtotime($date));
+    public static function date_format_change(string $date, string $format = self::DATE_FORMAT_SLASH) {
+        return (string) date($format, strtotime($date));
+    }
+    
+    public static function date_format_default(string $date){
+        return (string) date(self::DATE_FORMAT_DEFAULT, strtotime($date));
+    }
+
+    // -- Get End Date Given Start & Interval -- //
+    public static function get_enddate(string $start, int $interval, string $format = self::DATE_FORMAT_DEFAULT) {
+        $enddate = (string) date($format, strtotime($start . ' + ' . (string) $interval . ' days'));
+        return $enddate;
+    }
+
+    // -- Get All Dates From Given Range -- //
+    public static function get_date_from_range(string $start, string $end, string $format = self::DATE_FORMAT_DEFAULT): array {
+
+        // Declare an empty array
+        $date_arr = array();
+
+        // Variable that store the date interval
+        // of period 1 day
+        $interval = new DateInterval('P1D');
+
+        $realEnd = new DateTime($end);
+        $realEnd->add($interval);
+
+        $period = new DatePeriod(new DateTime($start), $interval, $realEnd);
+
+        // Use loop to store date into array
+        foreach ($period as $date) {
+            $date_arr[] = (string) $date->format($format);
+        }
+
+        // Return the array elements
+        return $date_arr;
     }
 
 }
+
 ?>
