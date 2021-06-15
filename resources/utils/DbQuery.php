@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @author yanying (Tracy)
+ * @author yanying (Tracie)
  */
 /* Load Config File */
 require_once '../resources/config.php';
@@ -39,6 +39,48 @@ class DbQuery {
         return NULL;
     }
 
+    private function with_condition(CollectionReference $query, array $condition): Query {
+        # Iterate Through The Given `$condition` (Array)
+        foreach ($condition as $key => $value) :
+
+            if (is_array($value)):
+
+                # Inner Loop For Maps
+                $query = $this->nested_condition($query, $condition, $key)->limit(1);
+            else:
+
+                # If It Is Not A Map
+                $condition_path = $key;
+                $query = $query->where($condition_path, "=", $value)->limit(1);
+            endif;
+        endforeach;
+        return $query;
+    }
+
+    public function get_documents_by_path(string $doc_path, bool $filter, ?array $condition = null): array {
+
+        # Create Empty Array
+        $doc_arr = array();
+
+        # Collection Reference
+        $query = $this->db->collection($doc_path);
+
+        # Add Condition (WHERE Clause)
+        if ($filter):
+            $query = $this->with_condition($query, $condition);
+        endif;
+
+        $doc_snapshot = $query->documents();
+
+        foreach ($doc_snapshot as $doc):
+            if ($doc->exists()):
+                $doc_arr[] = $doc->data();
+            endif;
+
+        endforeach;
+        return $doc_arr;
+    }
+
     // -- For Document Inner Maps -- //
     private function nested_condition(CollectionReference $query, array $conditionArr, string $key): Query {
         foreach ($conditionArr[$key] as $condition => $condition_value) :
@@ -53,21 +95,7 @@ class DbQuery {
     // -- Get DocumentSnapshot -- //
     private function document_query(CollectionReference $query, array $conditionArr)/* [nullable]: DocumentSnapshot */ {
 
-        # Iterate Through The Given `$conditionArr` (Array)
-        foreach ($conditionArr as $mapCondition => $value) :
-
-            if (is_array($conditionArr[$mapCondition])):
-
-                # Inner Loop For Maps
-                $query = $this->nested_condition($query, $conditionArr, $mapCondition)->limit(1);
-            else:
-
-                # If It Is Not A Map
-                $condition_path = $mapCondition;
-                $query = $query->where($condition_path, "=", $value)->limit(1);
-            endif;
-        endforeach;
-        $snapshot = $query->documents();
+        $snapshot = $this->with_condition($query, $conditionArr)->documents();
 
         # Iterate Through An Array Of Documents
         foreach ($snapshot as $document) :

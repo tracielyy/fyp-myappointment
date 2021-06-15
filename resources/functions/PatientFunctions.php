@@ -6,6 +6,7 @@
 # -- Load Config File -- #
 require_once '../resources/config.php';
 require_once ENTITIES_PATH . '/Account_User.php';
+require_once ENTITIES_PATH . '/Appointment_Slot.php';
 require_once ENTITIES_PATH . '/Admin.php';
 require_once ENTITIES_PATH . '/Medical_Personnel.php';
 require_once ENUMS_PATH . '/User_Type.php';
@@ -36,8 +37,65 @@ class PatientFunctions {
     //============================================
     //      Appointments
     //============================================
+    public static function get_apptslots(string $facilityid, string $appointmenttype, string $date): array {
+
+        # Create Empty Appointment Slots Array
+        $appointment_slots = array();
+
+        $doc_path = Database::MEDICAL_FACILITY . "/" . $facilityid . "/" . $appointmenttype . "/";
+
+        $db = new DbQuery();
+
+        # - Filtering Of Full Slots NOT IMPLEMENTED - #
+
+        $path = $doc_path . $date . "/Slots";
+        $slot_list = $db->get_documents_by_path($path, false);
+
+        # Loop & Add Slots For Each `Date` Loop
+        foreach ($slot_list as $slots):
+            $appointment_time = new Time($date, $slots['time']);
+            $slot_obj = new Appointment_Slot($slots['slotid'], $appointment_time, $slots['patients'], $slots['doctors']);
+            $appointment_slots[] = $slot_obj;
+        endforeach;
+
+        return $appointment_slots;
+    }
+
+//    public static function get_apptslots_by_interval(string $facilityid, string $appointmenttype, int $days = 1): array {
+//
+//        # Create Empty Appointment Slots Array
+//        $appointment_slots = array();
+//
+//
+//        $doc_path = Database::MEDICAL_FACILITY . "/" . $facilityid . "/" . $appointmenttype . "/";
+//
+//        $current_date = Time::get_current_date();
+//        $start_date = Time::get_enddate($current_date, 1);
+//        $end_date = Time::get_enddate($start_date, $days);
+//        $date_arr = Time::get_date_from_range($start_date, $end_date);
+//
+//        # Loop Through Several Dates (Add Slots From Different Dates)
+//        $db = new DbQuery();
+//        foreach ($date_arr as $date):
+//
+//            # - Filtering Of Full Slots NOT IMPLEMENTED - #
+//
+//            $path = $doc_path . $date . "/Slots";
+//            $slot_list = $db->get_documents_by_path($path, false);
+//            
+//            # Loop & Add Slots For Each `Date` Loop
+//            foreach ($slot_list as $slots):
+//                $appointment_time = new Time ($date, $slots['time']);
+//                $slot_obj = new Appointment_Slot($slots['slotid'], $appointment_time, $slots['patients'], $slots['doctors']);
+//                $appointment_slots[] = $slot_obj;
+//            endforeach;
+//
+//        endforeach;
+//
+//        return $appointment_slots;
+//    }
     // -- Create Appointment -- //
-    public static function create_appointment(string $email, array $appointment_info): bool {
+    public static function create_appointment_record(string $email, array $appointment_info): bool {
 
         $condition['credentials'] = array('email' => $email);
 
@@ -50,7 +108,7 @@ class PatientFunctions {
 
         # SET Default Appointment Status
         $appointment_info['appointmentstatus'] = Appointment_Status::UPCOMING;
-        
+
         # Get Appointment ID
         $id = self::generate_appointment_id($condition);
         $appointment_info['appointmentid'] = $id;

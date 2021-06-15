@@ -351,11 +351,28 @@ class AccountUserFunctions {
         endif;
     }
 
-    /*
-     * --------------------------
-     * Functions To Be Modified By Sub-classes
-     * --------------------------
-     */
+    //============================================
+    //      Appointments
+    //============================================
+    public static function get_all_facilities(): array {
+
+        # Create An Array 
+        $facility_arr = array();
+
+        # Query For All The Facilities In The Database
+        $db = new DbQuery();
+        $facility_list = $db->get_all_documents_ordered(Database::MEDICAL_FACILITY, "facilityname");
+
+        # Loop & Add To Empty Array
+        foreach ($facility_list as $facility):
+            $facility_object = new Medical_Facility($facility['facilityname'], $facility['address'],
+                    $facility['contactnumber'], $facility['operatinghours'], $facility['facilityid']);
+            $facility_arr[] = $facility_object;
+        endforeach;
+
+        return $facility_arr;
+    }
+
 }
 
 ?>

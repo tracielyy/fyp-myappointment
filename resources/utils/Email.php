@@ -12,7 +12,11 @@ use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
 // -- Import Other Util Classes -- //
-require_once "Time.php";
+require_once '../resources/config.php';
+require_once UTILS_PATH . '/Time.php';
+require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
+
+
 
 class Email extends PHPMailer {
 
@@ -63,7 +67,7 @@ class Email extends PHPMailer {
     public static function template_passwordreset(string $to, string $token): void {
 
         // -- Recipient
-        $to_name = Account_User::retrieve_user_fullname($to);
+        $to_name = AccountUserFunctions::retrieve_user_fullname($to);
 
         // -- Email Subject
         $subject = "FYP-21-S2-24: Password Reset";
@@ -104,7 +108,7 @@ class Email extends PHPMailer {
     public static function template_passwordchanged(string $to) {
 
         // -- Recipient
-        $to_name = Account_User::retrieve_user_fullname($to);
+        $to_name = AccountUserFunctions::retrieve_user_fullname($to);
 
         // -- Email Subject
         $subject = "FYP-21-S2-24: Password has been changed";

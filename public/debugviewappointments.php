@@ -113,7 +113,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                             <div id="upcoming" class="tab-pane fade in active">
                                 <?php
                                 if ($upcoming_arr == null):
-                                    echo "<br/>No Upcoming Appointments";
+                                    echo '<br><p class="text-center text-muted display-6">No upcoming appointments </p>';
                                 else:
                                     ?>
                                     <!-- Nav tabs -->
@@ -152,7 +152,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                                                     </div> <!-- CARD BODY -->
                                                 </div> <!-- CARD -->
                                             </div> <!-- COLUMN CARD -->
-                                        <?php endforeach ?>
+                                        <?php endforeach; ?>
                                     </div> <!-- TAB FOR UPCOMING -->
                                 </div>
                             <?php

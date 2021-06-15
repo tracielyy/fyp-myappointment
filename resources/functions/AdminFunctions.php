@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @author yanying (Tracy)
+ * @author yanying (Tracie)
  */
 # -- Load Config File -- #
 require_once '../resources/config.php';
@@ -12,6 +12,14 @@ require_once ENUMS_PATH . '/User_Type.php';
 require_once UTILS_PATH . '/DbQuery.php';
 
 class AdminFunctions {
+
+    //============================================
+    //      Appointment_Slots
+    //============================================
+    // -- Generate Fresh Appointment Slots -- //
+    public static function generate_fresh_appointmentslots() {
+        
+    }
 
     //============================================
     //      Medical Personnel
