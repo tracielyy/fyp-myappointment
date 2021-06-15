@@ -10,6 +10,7 @@ require_once ENUMS_PATH . '/User_Type.php';
 require_once FUNCTIONS_PATH . '/PatientFunctions.php';
 require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?>
+<?php $pageName = "viewappointment"; ?>
 
 <head>
     <meta charset="UTF-8">
@@ -35,21 +36,37 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
 <?php
 include COMPONENTS_PATH . '/bootstrap.php';
-include COMPONENTS_PATH . '/navbar.php';
+
 ?>
 </head>
 <?php
 // -- Check If User Is Signed In (When Redirect or Load The Page) -- //
 if ($_SERVER['REQUEST_METHOD'] == "GET"):
-
     if (isset($_SESSION["user"])):
         $user = unserialize($_SESSION["user"]);
         $user_type = $user->get_usertype();
+        include COMPONENTS_PATH . '/navbar-loggedin.php';
+
+         // -- When User Click On The Buttons -- //
+         if ($_SERVER['REQUEST_METHOD'] == "POST"):
+
+            if (isset($_POST['cancel'])):
+
+                $appointmentid = $_POST['cancel'];
+
+                # Pop Up To Ask For Double Confirm Before Cancelling #
+                PatientFunctions::cancel_appointment($user_email, $appointmentid);
+
+            elseif (isset($_POST['reschedule'])):
+            # Ask For Reschedule Date & Time (Could Be Some Pop-Up) -- Return Rescheduled Array #
+            endif;
+
+        endif;
 ?>
 <div class="row bg-light py-4">
     <div class="row bg-light">
         <div class="col-xs-3 col-md-2 px-5 mx-md-1 mx-lg-0">
-            <img src="https://via.placeholder.com/100" class="rounded float-start" alt="...">
+            <img src="https://via.placeholder.com/100" class="rounded shadow float-start" alt="...">
         </div> <!-- col -->
 
         <div class="col-xs-8 col-md-6">
@@ -80,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
     <div class="row mt-3">
         <div class="d-grid gap-2 col-6 mx-auto">
             <button type="button" class="btn btn-info btn-lg pb-2">
-                <p class="h4"> Create New Appointment </p>
+                <p class="h4 text-light mt-1"> Create New Appointment </p>
             </button>
         </div>
     </div>
@@ -114,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
                             foreach ($upcoming_arr as $record):
                             ?>
                 <div class="col">
-                    <div class="card" style="border-radius: 10px;">
+                    <div class="card shadow" style="border-radius: 10px;">
                         <div class="card-header">
                             <?php echo $record->get_appointmenttype(); // Return String ?>
                         </div> <!-- CARD HEADER -->
@@ -126,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
                                 <br>
                                 <br>Date: <?php echo $record->get_scheduledon()->get_date(); // Returns Date ?>
                                 <br>Time: <?php echo $record->get_scheduledon()->get_time(); // Returns Time ?>
-                                <br>Location:<?php echo $record->get_facility()->get_facilityname(); // Returns Date ?>
+                                <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date ?>
 
                                 <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                 <br>Address: <?php echo $record->get_facility()->get_address(); ?>
@@ -137,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
                                     <button type="button" class="btn btn-danger col-12" data-bs-toggle="modal" data-bs-target="#cancelappt">Cancel</button>
                                 </div> <!-- BUTTON CANCEL COLUMN -->
                                 <div class="col">
-                                    <button type="button" class="btn btn-info col-12">Reschedule</button>
+                                    <button type="button" class="btn btn-info col-12 text-light">Reschedule</button>
                                 </div> <!-- BUTTON RESCEHDULE COLUMN -->
                                 <!-- Modal -->
                                 <div class="modal fade" id="cancelappt" tabindex="-1" aria-labelledby="cancelappointment" aria-hidden="true">
@@ -155,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-danger">Cancel</button>
+                                                <button type="submit" class="btn btn-danger" name="cancel" value="<?php echo $record->get_appointmentid(); ?>">Cancel</button>
                                             </div>
                                             </div>
                                         </div>
@@ -169,8 +186,6 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
         </div><!-- TAB-MISSED-CONTENT -->
         <?php endif; ?>
        
-
-
         <div class="tab-pane fade" id="nav-missed" role="tabpanel" aria-labelledby="nav-missed-tab">
             <?php    
                         if ($missed_arr == null):
@@ -187,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
                             foreach ($missed_arr as $record):
                             ?>
                 <div class="col">
-                    <div class="card" style="border-radius: 10px;">
+                    <div class="card shadow" style="border-radius: 10px;">
                         <div class="card-header">
                             <?php echo $record->get_appointmenttype(); // Return String ?>
                         </div> <!-- CARD HEADER -->
@@ -199,7 +214,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
                                 <br>
                                 <br>Date: <?php echo $record->get_scheduledon()->get_date(); // Returns Date ?>
                                 <br>Time: <?php echo $record->get_scheduledon()->get_time(); // Returns Time ?>
-                                <br>Location:<?php echo $record->get_facility()->get_facilityname(); // Returns Date ?>
+                                <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date ?>
 
                                 <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                 <br>Address: <?php echo $record->get_facility()->get_address(); ?>
@@ -228,7 +243,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-danger">Cancel</button>
+                                                <button type="submit" class="btn btn-danger" name="cancel" value="<?php echo $record->get_appointmentid(); ?>">Cancel</button>
                                             </div>
                                             </div>
                                         </div>
@@ -246,9 +261,9 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
 
 <?php 
             else: 
-                header("Location:debugIndex.php");
+                header("Location:login.php");
             endif;
-        //else: header("Location:login.php");
+        else: header("Location:login.php");
         endif;
     endif;
 ?>
@@ -267,7 +282,15 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js"
     integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous">
 </script>
-
+<script type="text/javascript">
+    $(document).ready(function () {
+        var url = window.location;
+        $('ul.nav a[href="'+ url +'"]').parent().addClass('active');
+        $('ul.nav a').filter(function() {
+             return this.href == url;
+        }).parent().addClass('active');
+    });
+</script> 
 </body>
 
 </html>
