@@ -135,7 +135,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                             $login_status = AccountUserFunctions::login($auth_user->get_email(), session_id(), $_SESSION['token'], $ipaddress); # Error
                             $auth_user = AccountUserFunctions::load_user_data($loginArr); // Reload After Login Session Update
                             $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
-                            //header("Location:debugreceive.php"); // Redirect Upon Success Authenticate
+                            header("Location:homepage.php"); // Redirect Upon Success Authenticate
                             echo nl2br(PHP_EOL . "Success" . PHP_EOL);
                             echo $auth_user . "<br/>";
                             echo (int) $login_status;
@@ -219,7 +219,6 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
             <!-- ("Register Now") & ("Forgot your password?") [Hyperlink(s)] -->
 
         </div>
-
 </body>
 
 </html>
