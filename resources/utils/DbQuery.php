@@ -28,10 +28,10 @@ class DbQuery {
     }
 
     // -- Get Unique Firestore Document In Specific Collection -- //
-    public function get_document(string $collection, string $id): ?array {
+    public function get_document(string $doc_path, string $id): ?array {
 
         # Document Reference
-        $doc_ref = $this->db->collection($collection)->document($id);
+        $doc_ref = $this->db->collection($doc_path)->document($id);
         $snapshot = $doc_ref->snapshot();
         if ($snapshot->exists()) :
             return $snapshot->data();
@@ -83,6 +83,20 @@ class DbQuery {
         return $doc_arr;
     }
 
+    // -- Update The Values Given The Path & Document ID -- //
+    public function update_document_by_path(string $doc_path, string $doc_id, array $changed_arr): bool {
+
+        # Collection Reference
+        $query = $this->db->collection($doc_path);
+
+        # Get The Document
+        $doc_ref = $query->document($doc_id);
+
+        # Updating The Map Values
+        $this->update_values($doc_ref, $changed_arr);
+
+        return True;
+    }
 
     // -- For Document Inner Maps -- //
     private function nested_condition(Query $query, array $conditionArr, string $key): Query {
@@ -194,7 +208,19 @@ class DbQuery {
         return False;
     }
 
-    public function update_array_add(string $doc_path, string $doc_id, array $changedArr): bool {
+    public function update_array_add(string $doc_path, string $doc_id, array $addArr): bool {
+
+        # Select "True" For Adding Of Array Elements
+        return $this->update_array($doc_path, $doc_id, $addArr, True);
+    }
+
+    public function update_array_remove(string $doc_path, string $doc_id, array $removeArr): bool {
+
+        # Select "False" For Removal Of Array Elements
+        return $this->update_array($doc_path, $doc_id, $removeArr, False);
+    }
+
+    private function update_array(string $doc_path, string $doc_id, array $changedArr, bool $add): bool {
 
         # Get The Document Reference
         $doc_ref = $this->db->collection($doc_path)->document($doc_id);
@@ -202,9 +228,20 @@ class DbQuery {
         # Modify The Document Via `DocumentReference`
         foreach ($changedArr as $field => $v) :
             foreach ($v as $val):
-                $doc_ref->update([
-                    ['path' => $field, 'value' => FieldValue::arrayUnion([$val])]
-                ]);
+
+                # Add To Array
+                if ($add):
+                    $doc_ref->update([
+                        ['path' => $field, 'value' => FieldValue::arrayUnion([$val])]
+                    ]);
+
+                # Remove From Array
+                else:
+                    $doc_ref->update([
+                        ['path' => $field, 'value' => FieldValue::arrayRemove([$val])]
+                    ]);
+
+                endif;
             endforeach;
         endforeach;
         return True;
@@ -259,7 +296,6 @@ class DbQuery {
         $sub_col_ref = $doc_ref->collection($subcollection); // -- Sub Collection Reference
         return $sub_col_ref;
     }
-
 
     private function get_sub_document(string $collection, string $subcollection, array $conditionArr, array $subconditionArr) {
 
