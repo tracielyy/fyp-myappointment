@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * @author yanying (Tracie)
+ */
+/* Load Config File */
+require_once '../resources/config.php';
+require_once UTILS_PATH . '/StringUtils.php';
+
 class ArrayCreation {
     /*
      * --------------------------
@@ -7,7 +14,11 @@ class ArrayCreation {
      * --------------------------
      */
 
-    public static function account_creation_array(string $usertype, string $vtoken): array {
+    public static function account_creation_array(string $usertype): array {
+
+        // -- Generate Verification Token (Security) 
+        $vtoken_length = 25; 
+        $vtoken = StringUtils::generate_token($vtoken_length);
 
         # -- Create New Time Object -- #
         $time = new Time();
@@ -87,7 +98,7 @@ class ArrayCreation {
     }
 
     public static function used_passwordreset_array(): array {
-        
+
         # -- Create New Time Object -- #
         $time = new Time();
 

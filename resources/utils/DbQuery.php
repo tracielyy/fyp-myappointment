@@ -157,7 +157,7 @@ class DbQuery {
     }
 
     // -- Insert Data: return success status  (Adding New Document To Collection) -- //
-    public function insert_data(string $doc_path, array $data_info, bool $auto_id, ?string $id): bool {
+    public function insert_data(string $doc_path, array $data_info, bool $auto_id, ?string $id = null): bool {
 
         # Collection Reference
         $collection_ref = $this->db->collection($doc_path);
