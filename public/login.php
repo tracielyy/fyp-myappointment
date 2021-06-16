@@ -24,7 +24,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
     <?php include COMPONENTS_PATH . '/bootstrap.php'; ?>
 
     <style>
-    <?php include './css/loginRegister.css';
+    <?php include_once './css/loginRegister.css';
     ?>
     </style>
 </head>
@@ -163,8 +163,8 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
         <!-- HTML Page Design -->
         <div>
-            <!-- Navigation -->
-            <?php include COMPONENTS_PATH . '/navbar.php' ?>
+            <!-- Navigation (include_once -> prevent "headers already sent" error) -->
+            <?php include_once COMPONENTS_PATH . '/navbar.php' ?>
 
             <!-- Login Card -->
             <div class="center row m-4">

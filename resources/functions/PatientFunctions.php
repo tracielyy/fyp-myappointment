@@ -64,39 +64,6 @@ class PatientFunctions {
         return $appointment_slots;
     }
 
-//    public static function get_apptslots_by_interval(string $facilityid, string $appointmenttype, int $days = 1): array {
-//
-//        # Create Empty Appointment Slots Array
-//        $appointment_slots = array();
-//
-//
-//        $doc_path = Database::MEDICAL_FACILITY . "/" . $facilityid . "/" . $appointmenttype . "/";
-//
-//        $current_date = Time::get_current_date();
-//        $start_date = Time::get_enddate($current_date, 1);
-//        $end_date = Time::get_enddate($start_date, $days);
-//        $date_arr = Time::get_date_from_range($start_date, $end_date);
-//
-//        # Loop Through Several Dates (Add Slots From Different Dates)
-//        $db = new DbQuery();
-//        foreach ($date_arr as $date):
-//
-//            # - Filtering Of Full Slots NOT IMPLEMENTED - #
-//
-//            $path = $doc_path . $date . "/Slots";
-//            $slot_list = $db->get_documents_by_path($path, false);
-//            
-//            # Loop & Add Slots For Each `Date` Loop
-//            foreach ($slot_list as $slots):
-//                $appointment_time = new Time ($date, $slots['time']);
-//                $slot_obj = new Appointment_Slot($slots['slotid'], $appointment_time, $slots['patients'], $slots['doctors']);
-//                $appointment_slots[] = $slot_obj;
-//            endforeach;
-//
-//        endforeach;
-//
-//        return $appointment_slots;
-//    }
     // -- Create Appointment -- //
     public static function book_appointment(string $email, array $booking_info): bool {
 
@@ -300,16 +267,46 @@ class PatientFunctions {
         # Conditions (For Outer Collection)
         $condition['credentials'] = array('email' => $email);
 
-        # Sub-Conditions (For Inner Collection)
-        $subcondition = array('appointmentid' => $appointmentid);
+        # Get User Document ID
+        $db = new DbQuery();
+        $user_doc_id = $db->get_document_id(Database::ACCOUNT_USER, $condition);
 
         # SET Appointment Status To Cancelled After Patient Cancel Appointment
         $changed_info['appointmentstatus'] = Appointment_Status::CANCELLED;
 
-        # Update The Modified Information In The Database
-        $db = new DbQuery();
-        return $db->modify_nested_collection(Database::ACCOUNT_USER, Database::APPOINTMENT_RECORD,
-                        $condition, $subcondition, $changed_info);
+        # Update The Patient's Appointment Record
+        $user_appt_path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
+        $user_appt_update = $db->update_document_by_path($user_appt_path, $appointmentid, $changed_info);
+
+
+        if ($user_appt_update):
+            # Get Appointment Record In Array
+            $appt_record = $db->get_document($user_appt_path, $appointmentid);
+
+            # Update The Appointment Slot
+            $appt_slot_update = self::remove_patient_from_slot($db, $user_doc_id, $appt_record);
+
+            return ($user_appt_update && $appt_slot_update);
+        endif;
+        return false;
+    }
+
+    // -- Update The Appointment Slot  (Remove The Patient From The Array)
+    private static function remove_patient_from_slot(DbQuery $db, $user_doc_id, array $appt_record): bool {
+
+        # Appointment Schedule
+        $scheduledon = $appt_record['scheduledon'];
+
+        # Patient Document ID In Array (To Be Removed)
+        $user_id_arr['patients'] = array($user_doc_id);
+
+        # Get Appointment Slot's ID
+        $slot_path = Database::MEDICAL_FACILITY . "/" . $appt_record['facilityid'] . "/" . $appt_record['appointmenttype'] . "/" . $scheduledon['date'] . "/" . Database::SLOTS;
+        $slot_condition = array('time' => $scheduledon['time']);
+        $slot_doc_id = $db->get_document_id($slot_path, $slot_condition);
+
+
+        return $db->update_array_remove($slot_path, $slot_doc_id, $user_id_arr);
     }
 
 }
