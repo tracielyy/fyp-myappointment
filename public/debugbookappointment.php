@@ -95,10 +95,10 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                         endif;
 
                         # -- Appointment Type
-                        if (!empty($appoinmentArr['appointmenttype'])):
+                        if (!empty($appointmentArr['appointmenttype'])):
                             $validArr['appointmenttype'] = True;
                         endif;
-                        $validArr['appointmenttype'] = True;
+
                         # -- Date
                         if (!empty($appointmentArr['date'])):
                             $appointmentArr['date'] = Time::date_format_default($appointmentArr['date']);
@@ -116,12 +116,19 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
                         // Can Only Book Appointment When Required Fields Are Filled
                         if (!in_array(FALSE, $validArr)) :
+                            
                             # -- Booking Of Appointment -- #
                             $slot_info_arr = explode("~", $appointmentArr['slotid']);
                             $appointmentArr['slotid'] = $slot_info_arr[1];
                             $appointmentArr['time'] = $slot_info_arr[2];
-                            PatientFunctions::create_appointment_record($user_email, $appointmentArr);
-                            echo "Booking Success";
+                            $booking_status = PatientFunctions::book_appointment($user_email, $appointmentArr);
+                            
+                            # -- Make Use Of The Following Message To Show Patient Their Booking Status -- #
+                            if ($booking_status):
+                                echo "Booking Success";
+                            else:
+                                echo "You Have Already Book The Slot Previously";
+                            endif;
                         else:
                             echo "Booking Fail";
                         endif;
@@ -233,7 +240,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                             <input type= "date" id= "<?php echo $appointmentArr['facilityid'] . "," . $appointmentArr['appointmenttype']; ?>" name= "date"  value="<?php echo $appt_date; ?>" min="<?php echo $next_day; ?>" max="<?php echo $max_date; ?>"  
                                    onchange="dateChange(this, this.value)"><br/>
                                    <?php
-                                   # -- Check & Loop All The Available Slots -- #
+                                   # -- Check & Loop All The Available Slots (Only Show Not Full Slots) -- #
                                    if (empty($slots)):
                                        echo "No Slots Available<br/>";
                                    else:
