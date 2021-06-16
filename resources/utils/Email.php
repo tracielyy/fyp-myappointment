@@ -8,8 +8,8 @@
 
 // -- Import PHPMailer Class -- //
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
+
+require '../vendor/autoload.php';
 
 // -- Import Other Util Classes -- //
 require_once '../resources/config.php';

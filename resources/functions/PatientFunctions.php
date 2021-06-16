@@ -37,25 +37,28 @@ class PatientFunctions {
     //============================================
     //      Appointments
     //============================================
-    public static function get_apptslots(string $facilityid, string $appointmenttype, string $date): array {
+    public static function get_apptslots(string $facilityid, string $appointmenttype, string $date, int $max_patients = 20): array {
 
         # Create Empty Appointment Slots Array
         $appointment_slots = array();
 
+        # Query For The Appointment Slots
         $doc_path = Database::MEDICAL_FACILITY . "/" . $facilityid . "/" . $appointmenttype . "/";
-
         $db = new DbQuery();
-
-        # - Filtering Of Full Slots NOT IMPLEMENTED - #
-
         $path = $doc_path . $date . "/Slots";
         $slot_list = $db->get_documents_by_path($path, false);
 
-        # Loop & Add Slots For Each `Date` Loop
+        # Loop & Add Slots
         foreach ($slot_list as $slots):
-            $appointment_time = new Time($date, $slots['time']);
-            $slot_obj = new Appointment_Slot($slots['slotid'], $appointment_time, $slots['patients'], $slots['doctors']);
-            $appointment_slots[] = $slot_obj;
+
+            # - Filtering Of Full Slots (Firestore Not Capable OF Array Count) - #
+            if (count($slots['patients']) < $max_patients):
+
+                $appointment_time = new Time($date, $slots['time']);
+                $slot_obj = new Appointment_Slot($slots['slotid'], $appointment_time, $slots['patients'], $slots['doctors']);
+
+                $appointment_slots[] = $slot_obj;
+            endif;
         endforeach;
 
         return $appointment_slots;
@@ -95,9 +98,41 @@ class PatientFunctions {
 //        return $appointment_slots;
 //    }
     // -- Create Appointment -- //
-    public static function create_appointment_record(string $email, array $appointment_info): bool {
+    public static function book_appointment(string $email, array $booking_info): bool {
 
         $condition['credentials'] = array('email' => $email);
+        $db = new DbQuery();
+        $user_doc_id = $db->get_document_id(Database::ACCOUNT_USER, $condition);
+
+        # Validate Appointment
+        if (self::validate_appt_booking($user_doc_id, $booking_info)):
+
+            # Create User Appointment Record
+            $user_appt_update = self::create_appointment_record($db, $user_doc_id, $booking_info);
+
+            # If User Appointment Record Created Successfully
+            if ($user_appt_update):
+
+                # Update To Add Patient's ID To Appointment's patient array
+                $appt_slot_update = self::add_patient_to_slot($db, $user_doc_id, $booking_info);
+                return ($user_appt_update && $appt_slot_update);
+            else:
+                return false;
+            endif;
+
+        endif;
+        return false;
+    }
+
+    private static function create_appointment_record(DbQuery $db, string $user_doc_id, array $booking_info): bool {
+
+        # SET Appointment Booking Information
+        $appointment_info['appointmenttype'] = $booking_info['appointmenttype'];
+        $appointment_info['facilityid'] = $booking_info['facilityid'];
+        $appointment_info['scheduledon'] = array(
+            'date' => $booking_info['date'],
+            'time' => $booking_info['time']
+        );
 
         # SET Appointment Creation Time
         $createdon = new Time();
@@ -110,45 +145,79 @@ class PatientFunctions {
         $appointment_info['appointmentstatus'] = Appointment_Status::UPCOMING;
 
         # Get Appointment ID
-        $id = self::generate_appointment_id($condition);
+        $id = self::generate_appointment_id($user_doc_id);
         $appointment_info['appointmentid'] = $id;
 
         # Add The AppointmentRecord To The Database
+        $appt_doc_path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
+        return $db->insert_data($appt_doc_path, $appointment_info, false, $id);
+    }
+
+    private static function add_patient_to_slot(DbQuery $db, string $user_doc_id, array $booking_info): bool {
+
+        # Update The Appointment Slot (Not Done)
+        $user_id_arr['patients'] = array($user_doc_id);
+        $slots_doc_path = Database::MEDICAL_FACILITY . "/" . $booking_info['facilityid'] . "/" .
+                $booking_info['appointmenttype'] . "/" . $booking_info['date'] . "/" . Database::SLOTS;
+        return $db->update_array_add($slots_doc_path, $booking_info['slotid'], $user_id_arr);
+    }
+
+    // -- Validate Appointment Booking -- //
+    private static function validate_appt_booking(string $user_doc_id, array $booking_info): bool {
+
+        # Declaring The Conditions
+        $conditions = array(
+            'appointmentstatus' => Appointment_Status::UPCOMING,
+            'appointmenttype' => $booking_info['appointmenttype'],
+            'facilityid' => $booking_info['facilityid'],
+            'scheduledon' => array(
+                'date' => $booking_info['date'],
+                'time' => $booking_info['time']
+            )
+        );
+
+        # Search For Same Appointment
         $db = new DbQuery();
-        return $db->insert_data(Database::APPOINTMENT_RECORD, $appointment_info, false, $id);
+        $path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
+        $same_appt = $db->query_exact_match($path, $conditions);
+        return $validate_status = ($same_appt == null) ? true : false;
     }
 
     // -- User-Defined ID -- //
-    private static function generate_appointment_id(array $conditionArr) {
+    private static function generate_appointment_id(string $user_doc_id) {
 
         # To OrderBy The Appointment ID
         $orderBy = array('appointmentid');
 
         # Find The Last ID & Increment
         $db = new DbQuery();
-        $last_id_appointment = $db->get_sub_document_ordered(Database::ACCOUNT_USER, Database::APPOINTMENT_RECORD, $conditionArr, $orderBy, false);
+        $doc_path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
+        $last_id_appointment = $db->get_documentid_ordered($doc_path, $orderBy, false);
 
+        echo "The last id:" . $last_id_appointment;
         # If There Is Any Present ID In Database
-        if ($last_id_appointment !== null) :
+        $current_year = Time::get_current_year();
+        if ($last_id_appointment != null) :
 
-            $last_id = explode($last_id_appointment, "-");
+            $last_id = explode("-", $last_id_appointment);
             $last_id_date = $last_id[1];
 
             # Compare Year
-            $current_year = Time::get_current_year();
             if ($last_id_date == $current_year):
 
                 # Increase The Number
                 $new_id = ++$last_id[2];
+                echo "Same Year";
                 return $last_id[0] . "-" . $last_id[1] . "-" . $new_id;
             else:
-                return $last_id[0] . "-" . $current_year . "-000";
+                echo "A New Year";
+                return $last_id[0] . "-" . $current_year . "-1000";
 
             endif;
 
         # No ID Present In Database
         else:
-            return "appt-" . $current_year . "-000";
+            return "appt-" . $current_year . "-1000";
         endif;
     }
 

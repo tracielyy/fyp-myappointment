@@ -48,12 +48,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
     </head>
     <body>
         <?php
-// -- Debug Testing (HARDCODE) -- //
-//        $slots = PatientFunctions::get_appointmentslots('mf001', Appointment_Type::SPECIALIST_CONSULTATION, 15);
-//        foreach ($slots as $slot):
-//            echo nl2br($slot->get_slot_description() . PHP_EOL);
-//        endforeach;
-// -- Check If User Is Signed In (When Redirect or Load The Page) -- //
+        // -- Check If User Is Signed In (When Redirect or Load The Page) -- //
         if (isset($_SESSION["user"])):
 
             // -- Get Signed In User Information
@@ -71,13 +66,15 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                 $appointmentArr = array(
                     'facilityid' => '',
                     'appointmenttype' => '',
-                    'slot' => ''
+                    'date' => '',
+                    'slotid' => ''
                 );
                 $validArr = array();
 
 
                 // -- When Submit Appointment
                 if ($_SERVER["REQUEST_METHOD"] == "POST") :
+
                     /* Load Data to Array */
                     foreach ($_POST as $key => $value):
                         if (isset($appointmentArr[$key])):
@@ -85,12 +82,56 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                             $validArr[$key] = False; // Set All Field Validation Check As False
                         endif;
                     endforeach;
-                    // Possible Validation of Email Before Firestore Query
-                    /* ------------ Start Validation ------------ */
-                    /* ------------ End Validation ------------ */
 
-                    // Can Only Book Appointment When Required Fields Are Filled
-                    if (!in_array(FALSE, $validArr)) :
+                    if (isset($_POST['bookappointment'])):
+
+
+                        // Possible Validation of Email Before Firestore Query
+                        /* ------------ Start Validation ------------ */
+
+                        # -- Facility ID
+                        if (!empty($appointmentArr['facilityid'])):
+                            $validArr['facilityid'] = True;
+                        endif;
+
+                        # -- Appointment Type
+                        if (!empty($appointmentArr['appointmenttype'])):
+                            $validArr['appointmenttype'] = True;
+                        endif;
+
+                        # -- Date
+                        if (!empty($appointmentArr['date'])):
+                            $appointmentArr['date'] = Time::date_format_default($appointmentArr['date']);
+                            $validArr['date'] = True;
+                        endif;
+
+                        # -- Slot ID
+                        if (!empty($appointmentArr['slotid'])):
+                            $validArr['slotid'] = True;
+                        endif;
+
+                        /* ------------ End Validation ------------ */
+                        echo var_dump($validArr);
+
+
+                        // Can Only Book Appointment When Required Fields Are Filled
+                        if (!in_array(FALSE, $validArr)) :
+                            
+                            # -- Booking Of Appointment -- #
+                            $slot_info_arr = explode("~", $appointmentArr['slotid']);
+                            $appointmentArr['slotid'] = $slot_info_arr[1];
+                            $appointmentArr['time'] = $slot_info_arr[2];
+                            $booking_status = PatientFunctions::book_appointment($user_email, $appointmentArr);
+                            
+                            # -- Make Use Of The Following Message To Show Patient Their Booking Status -- #
+                            if ($booking_status):
+                                echo "Booking Success";
+                            else:
+                                echo "You Have Already Book The Slot Previously";
+                            endif;
+                        else:
+                            echo "Booking Fail";
+                        endif;
 
                     endif;
                 endif;
@@ -168,15 +209,12 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                     ?>
 
                     <!-- Display & Select The Given Time Slot -->
-                    <!-- Each Slot -->
                     <?php
                     # -- Setting The Appointment Type -- #
                     if (isset($_POST['set_appointmenttype']) || isset($_POST['date'])):
 
                         if (isset($appointmentArr['appointmenttype']) && isset($appointmentArr['facilityid'])):
-                            if (isset($_POST['appointmenttype'])):
-                                $appointmentArr['appointmenttype'] = htmlspecialchars($_POST['appointmenttype']);
-                            endif;
+
 
                             #-- Get The Next Day -- #
                             $cal_default = Time::CALENDAR_FORMAT_DEFAULT;
@@ -202,16 +240,16 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                             <input type= "date" id= "<?php echo $appointmentArr['facilityid'] . "," . $appointmentArr['appointmenttype']; ?>" name= "date"  value="<?php echo $appt_date; ?>" min="<?php echo $next_day; ?>" max="<?php echo $max_date; ?>"  
                                    onchange="dateChange(this, this.value)"><br/>
                                    <?php
-                                   # -- Check & Loop All The Available Slots -- #
+                                   # -- Check & Loop All The Available Slots (Only Show Not Full Slots) -- #
                                    if (empty($slots)):
                                        echo "No Slots Available<br/>";
                                    else:
                                        foreach ($slots as $slot):
-                                           $sid = $slot->get_appointmentschedule()->get_date() . "~" . $slot->get_slotid();
+                                           $sid = $slot->get_appointmentschedule()->get_date() . "~" . $slot->get_slotid() . "~" . $slot->get_appointmentschedule()->get_time();
                                            ?>
-                                    <input type = "radio" id = "<?php echo $sid; ?>" name = "slot" value = "<?php echo $sid; ?>" 
+                                    <input type = "radio" id = "<?php echo $sid; ?>" name = "slotid" value = "<?php echo $sid; ?>" 
                                     <?php
-                                    if ($appointmentArr['slot'] == $sid):
+                                    if ($appointmentArr['slotid'] == $sid):
                                         echo "checked";
                                     endif;
                                     ?>/>

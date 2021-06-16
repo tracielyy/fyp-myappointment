@@ -11,6 +11,7 @@ use Google\Cloud\Firestore\DocumentReference;
 use Google\Cloud\Firestore\CollectionReference;
 use Google\Cloud\Firestore\Query;
 use Google\Cloud\Firestore\DocumentSnapshot;
+use Google\Cloud\Firestore\FieldValue;
 
 require '../vendor/autoload.php';
 
@@ -46,15 +47,16 @@ class DbQuery {
             if (is_array($value)):
 
                 # Inner Loop For Maps
-                $query = $this->nested_condition($query, $condition, $key)->limit(1);
+                $query = $this->nested_condition($query, $condition, $key);
             else:
 
                 # If It Is Not A Map
                 $condition_path = $key;
-                $query = $query->where($condition_path, "=", $value)->limit(1);
+                $query = $query->where($condition_path, "=", $value);
             endif;
         endforeach;
-        return $query;
+
+        return $query->limit(1);
     }
 
     public function get_documents_by_path(string $doc_path, bool $filter, ?array $condition = null): array {
@@ -81,8 +83,9 @@ class DbQuery {
         return $doc_arr;
     }
 
+
     // -- For Document Inner Maps -- //
-    private function nested_condition(CollectionReference $query, array $conditionArr, string $key): Query {
+    private function nested_condition(Query $query, array $conditionArr, string $key): Query {
         foreach ($conditionArr[$key] as $condition => $condition_value) :
 
             # Get The Path To The Map Fields
@@ -109,11 +112,24 @@ class DbQuery {
         endforeach;
     }
 
+    public function get_document_id(string $doc_path, array $conditionArr): ?string {
+        # Collection Reference
+        $collection_ref = $this->db->collection($doc_path);
+
+        # Get Document 
+        $doc_ref = $this->document_query($collection_ref, $conditionArr);
+
+        if ($doc_ref != null):
+            return $doc_ref->id();
+        endif;
+        return null;
+    }
+
     // -- Get Firestore Document Wihout Knowing Document ID -- //
-    public function query_exact_match(string $collection, array $conditionArr): ?array {
+    public function query_exact_match(string $path, array $conditionArr): ?array {
 
         # Collection Reference
-        $collection_ref = $this->db->collection($collection);
+        $collection_ref = $this->db->collection($path);
 
         # Get Document Data From DocumentSnapshot
         $doc_ref = $this->document_query($collection_ref, $conditionArr);
@@ -127,10 +143,10 @@ class DbQuery {
     }
 
     // -- Insert Data: return success status  (Adding New Document To Collection) -- //
-    public function insert_data(string $collection, array $data_info, bool $auto_id, ?string $id): bool {
+    public function insert_data(string $doc_path, array $data_info, bool $auto_id, ?string $id): bool {
 
         # Collection Reference
-        $collection_ref = $this->db->collection($collection);
+        $collection_ref = $this->db->collection($doc_path);
 
         # Opt for Auto-Generated ID
         if ($auto_id):
@@ -176,6 +192,22 @@ class DbQuery {
             return True;
         endif;
         return False;
+    }
+
+    public function update_array_add(string $doc_path, string $doc_id, array $changedArr): bool {
+
+        # Get The Document Reference
+        $doc_ref = $this->db->collection($doc_path)->document($doc_id);
+
+        # Modify The Document Via `DocumentReference`
+        foreach ($changedArr as $field => $v) :
+            foreach ($v as $val):
+                $doc_ref->update([
+                    ['path' => $field, 'value' => FieldValue::arrayUnion([$val])]
+                ]);
+            endforeach;
+        endforeach;
+        return True;
     }
 
     private function update_values(DocumentReference $doc_ref, array $changedArr): void {
@@ -228,9 +260,6 @@ class DbQuery {
         return $sub_col_ref;
     }
 
-    private function sub_document_query() {
-        
-    }
 
     private function get_sub_document(string $collection, string $subcollection, array $conditionArr, array $subconditionArr) {
 
@@ -312,17 +341,35 @@ class DbQuery {
 
     // -- Order By (Array Of Fields To Order) --//
     private function get_ordered_by(Query $query, array $orderedBy, bool $asc): Query {
+        echo nl2br(PHP_EOL . "OrderBy:" . var_dump($orderedBy));
 
         foreach ($orderedBy as $orderBy => $o) :
-            foreach ($orderedBy[$orderBy] as $order => $ovalue) :
-                if ($asc):
-                    $query = $query->orderBy($orderBy . "." . $ovalue);
-                else:
-                    $query = $query->orderBy($orderBy . "." . $ovalue, 'DESC');
-                endif;
-            endforeach;
+            if (is_array($orderedBy[$orderBy])):
+                echo "An Array";
+                $query = $this->nested_order_by($query, $orderedBy, $orderBy, $asc);
+            else:
+                echo nl2br(PHP_EOL . "This is o:" . $o . PHP_EOL);
+                $query = $this->asc_desc($query, $o, $asc);
+            endif;
         endforeach;
 
+        return $query;
+    }
+
+    private function asc_desc(Query $query, string $orderBy, bool $asc): Query {
+        if ($asc):
+            $query = $query->orderBy($orderBy);
+        else:
+            $query = $query->orderBy($orderBy, 'DESC');
+        endif;
+        return $query;
+    }
+
+    private function nested_order_by(Query $query, array $orderedBy, string $orderBy, bool $asc): Query {
+        foreach ($orderedBy[$orderBy] as $order => $ovalue) :
+            $by = $orderBy . "." . $ovalue;
+            $query = $this->asc_desc($query, $by, $asc);
+        endforeach;
         return $query;
     }
 
@@ -402,10 +449,10 @@ class DbQuery {
     }
 
     // -- Get ONLY ONE Document -- //
-    public function get_document_ordered(string $collection, string $orderBy, bool $asc) {
+    public function get_document_ordered(string $path, string $orderBy, bool $asc) {
 
         # Collection Reference 
-        $collection_ref = $this->db->collection($collection);
+        $collection_ref = $this->db->collection($path);
 
         # DocumentSnapshots Of All The Documents
         if ($asc):
@@ -425,21 +472,17 @@ class DbQuery {
     }
 
     // -- Get Nested Collection Document Ordered -- //
-    public function get_sub_document_ordered(string $collection, string $subcollection, array $conditionArr, array $orderBy, bool $asc) {
+    public function get_documentid_ordered(string $path, array $orderBy, bool $asc) {
 
-        # Query To Get The First Layer Document
-        $collection_ref = $this->db->collection($collection);
-        $doc_id = $this->document_query($collection_ref, $conditionArr)->id();
-
-        # Get Sub Document Via Sub Collection
-        $doc_ref = $collection_ref->document($doc_id);
-        $sub_col_ref = $doc_ref->collection($subcollection);
-        $sub_snapshot = $this->get_ordered_by($sub_col_ref, $orderBy, $asc)->limit(1);
+        # Get Nested Sub Document
+        $sub_col_ref = $this->db->collection($path);
+        $query = $this->get_ordered_by($sub_col_ref, $orderBy, $asc)->limit(1);
+        $sub_snapshot = $query->documents();
 
         # Return If There Is Any Document In DocumentSnapShot
         foreach ($sub_snapshot as $sub_doc):
-            if ($sub_doc->exist()):
-                return $sub_doc->data();
+            if ($sub_doc->exists()):
+                return $sub_doc->id();
             endif;
         endforeach;
     }
