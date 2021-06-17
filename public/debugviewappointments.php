@@ -31,7 +31,26 @@
     </head>
 
     <title>View Appointments</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+        function upcoming_cancel_appt(appt_info) {
+            var info = appt_info.split("~");
+            var appt_id = info[0];
+            var appt_type = info[1];
+            var appt_date = info[2];
+            var appt_time = info[3];
+            
+            // -- Testing
+            console.log(appt_id);
 
+            // jQuery Calls To Set The Modal Information 
+            $("#upcoming_cancel_appt_type").html(appt_type);
+            $("#upcoming_cancel_appt_date").html(appt_date);
+            $("#upcoming_cancel_appt_time").html(appt_time);
+            $("#upcoming_cancel_btn").val(appt_id);
+        }
+
+    </script>
 
 
     <?php
@@ -56,9 +75,10 @@ if (isset($_SESSION["user"])):
 
             # Delimit & Get Information
             $appointmentid = $_POST['cancel'];
+            echo $appointmentid;
 
-            # Cancel The Appointment
-            PatientFunctions::cancel_appointment($user_email, $appointmentid);
+        # -- Cancel The Appointment : Function is working (COMMENT IT FOR  OTHER TESTING PURPOSE) -- #
+        //PatientFunctions::cancel_appointment($user_email, $appointmentid);
 
         elseif (isset($_POST['reschedule'])):
         # Ask For Reschedule Date & Time (Could Be Some Pop-Up) -- Return Rescheduled Array #
@@ -88,7 +108,7 @@ if (isset($_SESSION["user"])):
     </div>
     <?php
     if (User_Type::check_user_type(User_Type::PATIENT, $user_type)):
-        $email['credentials']['email'] = $user->get_email();
+        $email['credentials']['email'] = $user_email;
 
         // -- Upcoming Appointments -- //
         $upcoming_arr = PatientFunctions::get_upcoming_appointments($email);
@@ -115,7 +135,7 @@ if (isset($_SESSION["user"])):
                             role="tab" aria-controls="nav-missed" aria-selected="false">Missed</button>
                 </div>
             </nav>
-            <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <form id= "apptform" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
                 <div class="mt-4">
                     <div class="tab-content" id="nav-tabContent">
                         <div class="tab-pane fade show active" id="nav-upcoming" role="tabpanel" aria-labelledby="nav-upcoming-tab">
@@ -137,48 +157,56 @@ if (isset($_SESSION["user"])):
                                     <div class="col">
                                         <div class="card shadow" style="border-radius: 10px;">
                                             <div class="card-header">
-                                                <?php echo $record->get_appointmenttype(); // Return String ?>
+                                                <?php echo $record->get_appointmenttype(); // Return String  ?>
                                             </div> <!-- CARD HEADER -->
                                             <div class="card-body">
                                                 Appointment ID:
-                                                <?php echo $record->get_appointmentid(); // Return Appointment ID ?>
+                                                <?php echo $record->get_appointmentid(); // Return Appointment ID  ?>
                                                 <br>Appointment Status:
-                                                <?php echo $record->get_appointmentstatus(); // Return Appointment status ?>
+                                                <?php echo $record->get_appointmentstatus(); // Return Appointment status  ?>
                                                 <br>
-                                                <br>Date: <?php echo $record->get_scheduledon()->get_date(); // Returns Date                        ?>
-                                                <br>Time: <?php echo $record->get_scheduledon()->get_time(); // Returns Time                        ?>
-                                                <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                        ?>
+                                                <br>Date: <?php echo $record->get_scheduledon()->get_date(); // Returns Date                                                        ?>
+                                                <br>Time: <?php echo Time::to_12hours($record->get_scheduledon()->get_time(), false); // Returns Time                                                        ?>
+                                                <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                        ?>
 
                                                 <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                                 <br>Address: <?php echo $record->get_facility()->get_address(); ?>
                                                 <br>Contact Number:
                                                 <?php echo $record->get_facility()->get_contactnumber(); ?>
                                                 <div class="row m-2 text-center">
+                                                    <?php
+                                                    // -- Bunch Of Appointment Info To Be Passed To Button Function -- //
+                                                    $appt_info = $record->get_appointmentid() . "~" . $record->get_appointmenttype() .
+                                                            "~" . $record->get_scheduledon()->get_date() . "~" . $record->get_scheduledon()->get_time();
+                                                    ?>
                                                     <div class="col">
-                                                        <button type="button" class="btn btn-danger col-12" data-bs-toggle="modal" data-bs-target="#cancelappt">Cancel</button>
+                                                        <button value="<?php echo $appt_info; ?>" type="button" class="btn btn-danger col-12" data-bs-toggle="modal" data-bs-target="#cancelappt"
+                                                                onclick="upcoming_cancel_appt(this.value)">Cancel</button>
                                                     </div> <!-- BUTTON CANCEL COLUMN -->
                                                     <div class="col">
                                                         <button type="button" class="btn btn-info col-12 text-light">Reschedule</button>
                                                     </div> <!-- BUTTON RESCEHDULE COLUMN -->
                                                     <!-- Modal -->
-                                                    <div class="modal fade" id="cancelappt" tabindex="-1" aria-labelledby="cancelappointment" aria-hidden="true">
+                                                    <div class="modal hide fade" id="cancelappt" tabindex="-1" aria-labelledby="cancelappointment" aria-hidden="true">
                                                         <div class="modal-dialog modal-dialog-centered">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
                                                                     <h5 class="modal-title" id="cancelappointment">Cancellation Confirmation</h5>
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                 </div>
-                                                                <div class="modal-body">
-                                                                    You are about to cancel your appointment of <br> <?php echo $record->get_appointmenttype(); // Return String                        ?> on
-                                                                    <br>Date: <?php echo $record->get_scheduledon()->get_date(); // Returns Date                        ?>
-                                                                    <br>Time: <?php echo $record->get_scheduledon()->get_time(); // Returns Time                        ?>
+
+                                                                <div class="modal-body" id="upcoming_cancel_modal_body">
+                                                                    You are about to cancel your appointment of <br><span id="upcoming_cancel_appt_type"></span> on
+                                                                    <br>Date: <span id="upcoming_cancel_appt_date"></span>
+                                                                    <br>Time: <span id="upcoming_cancel_appt_time"></span>
                                                                     <br> <br> <b> Warning: Action cannot be revoked </b>
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                    <?php $appt_id = $record->get_appointmentid(); ?>
+
                                                                     <button type = "button" class = "btn btn-secondary" data-bs-dismiss = "modal">Close</button>
-                                                                    <button type = "submit" class = "btn btn-danger" name = "cancel" value = "<?php echo $appt_id; ?>">Cancel</button>
+                                                                    <button id="upcoming_cancel_btn" type = "submit" class = "btn btn-danger"  name="cancel" >Cancel</button>
                                                                 </div>
+
                                                             </div>
                                                         </div>
                                                     </div> <!--MODAL END-->
@@ -211,60 +239,40 @@ if (isset($_SESSION["user"])):
                                 <div class="col">
                                     <div class="card shadow" style="border-radius: 10px;">
                                         <div class="card-header">
-                                            <?php echo $record->get_appointmenttype(); // Return String     ?>
+                                            <?php echo $record->get_appointmenttype(); // Return String          ?>
                                         </div> <!-- CARD HEADER -->
                                         <div class="card-body">
                                             Appointment ID:
-                                            <?php echo $record->get_appointmentid(); // Return Appointment ID    ?>
+                                            <?php echo $record->get_appointmentid(); // Return Appointment ID         ?>
                                             <br>Appointment Status:
-                                            <?php echo $record->get_appointmentstatus(); // Return Appointment status     ?>
+                                            <?php echo $record->get_appointmentstatus(); // Return Appointment status          ?>
                                             <br>
-                                            <br>Date: <?php echo $record->get_scheduledon()->get_date(); // Returns Date                        ?>
-                                            <br>Time: <?php echo $record->get_scheduledon()->get_time(); // Returns Time                        ?>
-                                            <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                        ?>
+                                            <br>Date: <?php echo $record->get_scheduledon()->get_date(); // Returns Date                                                        ?>
+                                            <br>Time: <?php echo Time::to_12hours($record->get_scheduledon()->get_time(), false); // Returns Time                                                        ?>
+                                            <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                        ?>
 
                                             <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                             <br>Address: <?php echo $record->get_facility()->get_address(); ?>
                                             <br>Contact Number:
                                             <?php echo $record->get_facility()->get_contactnumber(); ?>
                                             <div class="row m-2 text-center">
+                                                <?php
+                                                // -- Bunch Of Appointment Info To Be Passed To Button Function -- //
+                                                $appt_info = $record->get_appointmentid() . "~" . $record->get_appointmenttype() .
+                                                        "~" . $record->get_scheduledon()->get_date() . "~" . $record->get_scheduledon()->get_time();
+                                                ?>
                                                 <div class="col">
-                                                    <button type="button" class="btn btn-danger col-12" data-bs-toggle="modal" data-bs-target="#cancelappt">Cancel</button>
-                                                </div> <!-- BUTTON CANCEL COLUMN -->
-                                                <div class="col">
-                                                    <button type="button" class="btn btn-info col-12">Reschedule</button>
+                                                    <button type="button" class="btn btn-info col-12 text-light">Reschedule</button>
                                                 </div> <!-- BUTTON RESCEHDULE COLUMN -->
-                                                <!-- Modal -->
-                                                <div class="modal fade" id="cancelappt" tabindex="-1" aria-labelledby="cancelappointment" aria-hidden="true">
-                                                    <div class="modal-dialog modal-dialog-centered">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title" id="cancelappointment">Cancellation Confirmation</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                You are about to cancel your appointment of <br> <?php echo $record->get_appointmenttype(); // Return String                        ?> on
-                                                                <br>Date: <?php echo $record->get_scheduledon()->get_date(); // Returns Date                        ?>
-                                                                <br>Time: <?php echo $record->get_scheduledon()->get_time(); // Returns Time                        ?>
-                                                                <br> <br> <b> Warning: Action cannot be revoked </b>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                                <button type="submit" class="btn btn-danger" name="cancel" value="<?php echo $record->get_appointmentid(); ?>">Cancel</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div> <!-- MODAL END -->
                                             </div> <!-- BUTTON ROW-->
                                         </div> <!-- CARD BODY -->
                                     </div> <!-- CARD -->
                                 </div> <!-- COLUMN CARD -->
                             <?php endforeach; ?>
                         </div>
-                    </div><!-- TAB-MISSED-CONTENT -->
+                    </div> <!--MT-4 -->
                 </form> <!-- Form For "Cancel" & "Reschedule" -->
             <?php endif; ?>
-        </div> <!--MT-4 -->
         </div> <!-- CONTAINER -->
 
         <?php

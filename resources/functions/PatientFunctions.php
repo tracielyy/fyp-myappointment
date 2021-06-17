@@ -37,6 +37,29 @@ class PatientFunctions {
     //============================================
     //      Appointments
     //============================================
+    private static function appt_record_init(array $appt_record): Appointment_Record {
+        $facility = AccountUserFunctions::get_facility_by_id($appt_record['facilityid']);
+        $scheduledon = new Time($appt_record['scheduledon']['date'], $appt_record['scheduledon']['time']);
+        $createdon = new Time($appt_record['createdon']['date'], $appt_record['createdon']['time']);
+        $record_object = new Appointment_Record($createdon, $scheduledon, $appt_record['appointmentid'], $appt_record['appointmenttype'],
+                $facility, $appt_record['appointmentstatus']);
+        return $record_object;
+    }
+
+    public static function get_appointment_by_id(string $user_email, string $appointmentid): array {
+        $condition['credentials'] = array('email' => $user_email);
+        $db = new DbQuery();
+        $user_doc_id = $db->get_document_id(Database::ACCOUNT_USER, $condition);
+
+        # Query For The Particular Appointment Slot
+        $doc_path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
+        $appt_record = $db->get_document($doc_path, $appointmentid);
+
+        $appt_record_obj = self::appt_record_init($appt_record);
+
+        return $appt_record_obj;
+    }
+
     public static function get_apptslots(string $facilityid, string $appointmenttype, string $date, int $max_patients = 20): array {
 
         # Create Empty Appointment Slots Array
@@ -201,11 +224,7 @@ class PatientFunctions {
 
         # Create Appointment Record Object List
         foreach ($record_list as $record) :
-            $facility = AccountUserFunctions::get_facility_by_id($record['facilityid']);
-            $scheduledon = new Time($record['scheduledon']['date'], $record['scheduledon']['time']);
-            $createdon = new Time($record['createdon']['date'], $record['createdon']['time']);
-            $record_object = new Appointment_Record($createdon, $scheduledon, $record['appointmentid'], $record['appointmenttype'],
-                    $facility, $record['appointmentstatus']);
+            $record_object = self::appt_record_init($record);
             $appointment_arr[] = $record_object;
         endforeach;
         return $appointment_arr;
