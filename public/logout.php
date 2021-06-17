@@ -14,9 +14,9 @@ if (isset($_SESSION['user'])) {
     $_SESSION = array();
     session_destroy();
     
-    echo "Successfully Logout";
+    //echo "Successfully Logout";
 }
 // -- Insert Redirecting Location Below --
-//header("Location:debugIndex.php");
+header("Location:homepage.php");
 ?>
 

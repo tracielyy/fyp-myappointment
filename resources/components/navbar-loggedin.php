@@ -32,7 +32,7 @@ body {
                         href="./homepage.php">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Create an Appointment</a>
+                    <a class="nav-link <?php if ($pageName == 'createappointment') {echo 'active';} ?>" href="./createappointment.php">Create an Appointment</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link <?php if ($pageName == 'viewappointment') {echo 'active';} ?>"

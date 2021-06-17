@@ -1,0 +1,40 @@
+body{
+    margin: 0;
+}
+/* navigation bar section */
+.container-fluid{
+    padding: 0;
+}
+.navbar-brand{
+    padding: 0;
+}
+.navigation-buttons {
+    margin-right: 10px;
+    margin-bottom: 2%;
+}
+/* find clinic section */
+#find-clinic{
+    padding: 8% 15%;
+    background-color: lightgray;
+}
+.find-clinic-title{
+    margin: 30px auto;
+}
+.container{
+    margin: 0;
+    padding: 7% 15%;
+    background-color: bisque;
+}
+.clinicChoice{
+    display: inline-block;
+    margin: 20px;
+}
+/* promotional message section */
+#health-snippets{
+    margin: 30px;
+}
+.health-img{
+    width: 100px;
+    height: 100px;
+}
+/* footer section */

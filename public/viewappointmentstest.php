@@ -248,6 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"):
                                             </div>
                                         </div>
                                     </div> <!-- MODAL END -->
+                                </div>
                             </div> <!-- BUTTON ROW-->
                         </div> <!-- CARD BODY -->
                     </div> <!-- CARD -->
