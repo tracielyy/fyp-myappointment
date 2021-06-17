@@ -68,7 +68,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
             /* ------------ End Validation ------------ */
 
             // -- Make Sure It Is A Valid Patient/Medical Personnel (Can Admin Reset Password???)
-            $user_exist = Account_User::check_user_exist($resetArr['email']);
+            $user_exist = AccountUserFunctions::check_user_exist($resetArr['email']);
 
             // -- Invoke Email Send To User To Reset Password
             if ($user_exist) {
