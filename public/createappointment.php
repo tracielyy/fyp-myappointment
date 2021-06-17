@@ -236,7 +236,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                         <div class="card-body p-4">
 
                             <div class="form-group row">
-                                <input type="date" class="form-control">
+                                <input type="date" class="form-control" value="">
                             </div>
 
                             <div class="list-group mt-3">
