@@ -29,7 +29,6 @@ include COMPONENTS_PATH . '/bootstrap.php';
 
 <body>
     <?php
-include COMPONENTS_PATH . '/bootstrap.php';
 
 if (isset($_SESSION["user"])):
   $user = unserialize($_SESSION["user"]);
@@ -65,8 +64,8 @@ endif;
                                         as aches, pains, lethargy, and indigestion take a toll on your happiness and
                                         stress levels. One way to improve your ability to cope with stress and feel
                                         better is</p>
-                                    <p class="card-text"><small class="text-muted">Click here to read more...</small>
-                                    </p>
+                                    <a href="./HealthPromotionDemo.php" class="stretched-link"><small class="text-muted">Click here to read more...</small>
+                                    </a>
                                 </div>
                             </div>
                         </div>
