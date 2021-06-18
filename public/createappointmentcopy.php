@@ -193,7 +193,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
             $user = unserialize($_SESSION["user"]);
             $user_email = $user->get_email();
             $user_type = $user->get_usertype();
-            include COMPONENTS_PATH . '/navbar-loggedin.php'
+            include COMPONENTS_PATH . '/navbar-loggedin.php';
 
             // -- Check User Type (PATIENT ONLY) --//
             if (User_Type::check_user_type(User_Type::PATIENT, $user_type)):
