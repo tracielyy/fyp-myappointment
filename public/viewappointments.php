@@ -78,7 +78,7 @@ if (isset($_SESSION["user"])):
             echo $appointmentid;
 
         # -- Cancel The Appointment : Function is working (COMMENT IT FOR  OTHER TESTING PURPOSE) -- #
-        //PatientFunctions::cancel_appointment($user_email, $appointmentid);
+        PatientFunctions::cancel_appointment($user_email, $appointmentid);
 
         elseif (isset($_POST['reschedule'])):
         # Ask For Reschedule Date & Time (Could Be Some Pop-Up) -- Return Rescheduled Array #
