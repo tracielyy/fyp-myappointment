@@ -43,7 +43,7 @@ endif;
     <section id="Find-Clinic">
         <h2 class="find-clinic-title display-5"><b>Your one stop solution <br> for your medical appointment.</b></h2>
         <h3 class="find-clinic-title display-6" style="margin-top: 0px;">Book an appointment now.</h3>
-        <button href="./createappointment.php" class="btn btn-secondary" type="button"> Create an appointment </button>
+        <a href="./createappointment.php" class="btn btn-secondary" type="button"> Create an appointment </a>
     </section>
     <section id="health-snippets">
         <div class="row">
@@ -53,7 +53,7 @@ endif;
                     <div class="card  mb-3 h-30" style="max-width: 540px;">
                         <div class="row g-0">
                             <div class="col-md-4">
-                                <img src="https://via.placeholder.com/175" alt="...">
+                                <img src="https://via.placeholder.com/175" class="img-fluid" alt="...">
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body ms-2">
@@ -77,7 +77,7 @@ endif;
                     <div class="card mb-3 h-30 " style="max-width: 540px;">
                         <div class="row g-0">
                             <div class="col-md-4">
-                                <img src="https://via.placeholder.com/175" alt="...">
+                                <img src="https://via.placeholder.com/175" class="img-fluid" alt="...">
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body ms-2">
@@ -99,7 +99,7 @@ endif;
                     <div class="card mb-3 h-30 " style="max-width: 540px;">
                         <div class="row g-0">
                             <div class="col-md-4">
-                                <img src="https://via.placeholder.com/175" alt="...">
+                                <img src="https://via.placeholder.com/175" class="img-fluid" alt="...">
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body ms-2">
@@ -121,7 +121,7 @@ endif;
                     <div class="card mb-3 h-30 " style="max-width: 540px;">
                         <div class="row g-0">
                             <div class="col-md-4">
-                                <img src="https://via.placeholder.com/175" alt="...">
+                                <img src="https://via.placeholder.com/175" class="img-fluid" alt="...">
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body ms-2">
@@ -145,7 +145,7 @@ endif;
                     <div class="card mb-3 h-30 " style="max-width: 540px;">
                         <div class="row g-0">
                             <div class="col-md-4">
-                                <img src="https://via.placeholder.com/175" alt="...">
+                                <img src="https://via.placeholder.com/175" class="img-fluid" alt="...">
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body ms-2">
@@ -166,7 +166,7 @@ endif;
                     <div class="card mb-3 h-30 " style="max-width: 540px;">
                         <div class="row g-0">
                             <div class="col-md-4">
-                                <img src="https://via.placeholder.com/175" alt="...">
+                                <img src="https://via.placeholder.com/175" class="img-fluid" alt="...">
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body ms-2">
