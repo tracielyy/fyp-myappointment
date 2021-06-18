@@ -16,6 +16,10 @@ body{
 #find-clinic{
     padding: 8% 15%;
     background-color: lightgray;
+    background-image: url(placeholderphoto.png);
+    background-position: 0rem -25rem; 
+    background-size: 1920px;
+    background-repeat: no-repeat;
 }
 .find-clinic-title{
     margin: 30px auto;
@@ -36,5 +40,21 @@ body{
 .health-img{
     width: 100px;
     height: 100px;
+}
+
+.line-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;  
+    overflow: hidden;
+  }
+
+  .opt-icon {
+    margin:50px
+}
+
+.rounded1
+{
+    border-radius: 100px;
 }
 /* footer section */
