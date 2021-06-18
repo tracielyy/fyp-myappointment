@@ -16,6 +16,6 @@ if (isset($_SESSION['user'])) {
     
     echo "Successfully Logout";
 }
-//header("Location:debugIndex.php");
+//header("Location:Index.php");
 ?>
 
