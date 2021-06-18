@@ -19,7 +19,7 @@ body {
 
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-primary py-3 shadow" style="border-radius:0px;">
     <div class="container-fluid">
-        <a class="navbar-brand" href="./homepage.php">FYP-21-S2-24</a>
+        <a class="navbar-brand" href="./index.php">FYP-21-S2-24</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAppt"
             aria-controls="navbarAppt" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -29,14 +29,14 @@ body {
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link <?php if ($pageName == 'homepage') {echo 'active';} ?>" aria-current="page"
-                        href="./homepage.php">Home</a>
+                        href="./index.php">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link <?php if ($pageName == 'createappointment') {echo 'active';} ?>" href="./createappointment.php">Create an Appointment</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link <?php if ($pageName == 'viewappointment') {echo 'active';} ?>"
-                        href="./viewappointmentstest.php">View Appointment</a> <!-- HREF NEED TO BE CHANGED -->
+                        href="./viewappointments.php">View Appointment</a> <!-- HREF NEED TO BE CHANGED -->
                 </li>
             </ul>
                 <div style="display: inline-block;">
@@ -49,7 +49,7 @@ body {
                         </a>
                         <ul class="dropdown-menu dropdown-menu-secondary dropdown-menu-end" aria-labelledby="navbarDarkDropdownMenuLink">
                             <li><a class="dropdown-item" href="#">Profile</a></li>
-                            <li><a class="dropdown-item" href="#">View Appointments</a></li>
+                            <li><a class="dropdown-item" href="./viewappointments.php">View Appointments</a></li>
                             <li><a class="dropdown-item" href="./logout.php">Log out</a></li>
                         </ul>
                     </li>
