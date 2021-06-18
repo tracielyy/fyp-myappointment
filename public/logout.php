@@ -13,10 +13,10 @@ if (isset($_SESSION['user'])) {
     AccountUserFunctions::session_logout($current_user->get_email());
     $_SESSION = array();
     session_destroy();
-
-    echo "Successfully Logout";
-    // -- Insert Redirecting Location Below --
-    header("Location:Index.php");
+    
+    //echo "Successfully Logout";
 }
+// -- Insert Redirecting Location Below --
+header("Location:homepage.php");
 ?>
 
