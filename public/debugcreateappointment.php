@@ -315,7 +315,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                                     <input type="date" class="form-control"
                                            id="<?php echo "mf001" . "," . "Doctor Consultation"; ?>"
                                            name="date" value="<?php echo $appt_date; ?>" min="<?php echo $next_day; ?>"
-                                           max="<?php echo $max_date; ?>" onchange="dateChange(this, this.value)">
+                                           max="<?php echo $max_date; ?>" >
                                 </div>
 
                                 <!-- List Of Available Appointments (HARDCODE) -->
@@ -592,7 +592,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                                             set_appointmenttype: appointmenttype
                                         },
                                         success: function () {
-                                            $("#apptform").submit();
+//                                            $("#apptform").submit();
                                             console.log("Load Step 1 & 2");
 
                                         },
