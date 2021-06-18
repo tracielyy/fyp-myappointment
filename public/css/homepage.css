@@ -1,13 +1,6 @@
-body{
-    margin: 0;
-}
+
 /* navigation bar section */
-.container-fluid{
-    padding: 0;
-}
-.navbar-brand{
-    padding: 0;
-}
+
 .navigation-buttons {
     margin-right: 10px;
     margin-bottom: 2%;
@@ -25,7 +18,6 @@ body{
     margin: 30px auto;
 }
 .container{
-    margin: 0;
     padding: 7% 15%;
     background-color: bisque;
 }
@@ -49,7 +41,7 @@ body{
     overflow: hidden;
   }
 
-  .opt-icon {
+.opt-icon {
     margin:50px
 }
 
