@@ -236,19 +236,19 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
                             <div class="card-body p-4">
 
                                 <div class="form-group row">
-                                    <input type="date" class="form-control" value="2021-06-17">
+                                    <input type="date" class="form-control" value="2021-06-20">
                                 </div>
 
                                 <div class="list-group mt-3">
                                     <button type="button" class="list-group-item list-group-item-action timebtn"
                                             aria-current="true">
-                                        17 June 2021 (Thu), 08:00 AM <span class="badge bg-danger rounded-pill ms-2">almost
+                                        20 June 2021 (Thu), 08:00 AM <span class="badge bg-danger rounded-pill ms-2">almost
                                             full</span>
                                     </button>
-                                    <button type="button" class="list-group-item list-group-item-action timebtn">17 June
+                                    <button type="button" class="list-group-item list-group-item-action timebtn">20 June
                                         2021 (Thu), 08:30 AM <span class="badge bg-warning rounded-pill ms-2">half
                                             full</span></button>
-                                    <button type="button" class="list-group-item list-group-item-action timebtn">17 June
+                                    <button type="button" class="list-group-item list-group-item-action timebtn">20 June
                                         2021 (Thu), 09:30 AM <span class="badge bg-success rounded-pill ms-2">mostly
                                             vacant</span></button>
                                 </div>
