@@ -75,7 +75,7 @@ if (isset($_SESSION["user"])):
 
             # Delimit & Get Information
             $appointmentid = $_POST['cancel'];
-            echo $appointmentid;
+            #echo $appointmentid;
 
         # -- Cancel The Appointment : Function is working (COMMENT IT FOR  OTHER TESTING PURPOSE) -- #
         PatientFunctions::cancel_appointment($user_email, $appointmentid);
