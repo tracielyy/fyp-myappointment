@@ -10,10 +10,14 @@ require_once ENUMS_PATH . '/User_Type.php';
 require_once ENUMS_PATH . '/Appointment_Type.php';
 require_once FUNCTIONS_PATH . '/PatientFunctions.php';
 require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
-$pageName = 'createappointment'
+$pageName = 'createappointment';
+
+$user = unserialize($_SESSION["user"]);
+include COMPONENTS_PATH . '/navbar-loggedin.php';
+if ($_SERVER['REQUEST_METHOD'] == "POST"):
+    header("Location:viewappointments.php");
+endif;
 ?>
-
-
 
 <html>
 
@@ -133,10 +137,7 @@ $pageName = 'createappointment'
         </script>
 
         <!-- Navigation -->
-        <?php
-        $user = unserialize($_SESSION["user"]);
-        include COMPONENTS_PATH . '/navbar-loggedin.php'
-        ?>
+
 
 
         <!-- PHP Codes -->
