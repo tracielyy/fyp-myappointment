@@ -14,7 +14,7 @@ body{padding-top:70px;}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-primary py-3 shadow" style="border-radius:0px;" >
     <div class="container-fluid">
-      <a class="navbar-brand" href="./index.php">FYP-21-S2-24</a>
+      <a class="navbar-brand" href="./">FYP-21-S2-24</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAppt" aria-controls="navbarAppt" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -22,7 +22,7 @@ body{padding-top:70px;}
       <div class="collapse navbar-collapse" id="navbarAppt">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link <?php if ($pageName == 'homepage') {echo 'active';} ?>" aria-current="page" href="./index.php">Home</a>
+            <a class="nav-link <?php if ($pageName == 'homepage') {echo 'active';} ?>" aria-current="page" href="./">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="./login.php">Create an Appointment</a>
