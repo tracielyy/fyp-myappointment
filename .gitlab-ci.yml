@@ -1,0 +1,37 @@
+# Select image from https://hub.docker.com/_/php
+image: ruby:2.6
+
+# Select what we should cache
+cache:
+  paths:
+  - vendor/
+
+before_script:
+  - apt-get update -yqq
+  - apt-get upgrade -yqq
+  - apt-get install sudo -y
+  - apt-get install zlib1g-dev
+
+  # Install dependencies
+  - bash ci/docker_install.sh > /dev/null
+    
+  # Install composer
+  - curl -sS https://getcomposer.org/installer | php
+
+  # Get Info
+  - php --ini 
+  
+  # Install gRPC for Google Cloud Firestore
+  - sudo pecl install grpc
+  
+  # Install all project dependencies
+  - echo "extension=grpc.so" > /usr/local/etc/php && echo "extension=grpc.so" > /usr/local/etc/php/conf.d/docker-php-ext-sodium.ini && php composer.phar update
+    
+
+# -- Not Done --
+test:app:
+  image: php:7.3
+  script:
+    - echo 'ok'
+     #- vendor/bin/phpunit --configuration phpunit_myapp.xml
+
