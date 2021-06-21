@@ -1,38 +1,42 @@
 <?php
 
 /*
- * @author yanying (Tracy)
+ * @author yanying (Tracie)
  */
+/* Load Config File */
+require_once '../resources/config.php';
+require_once  'Normal_User.php';
+require_once ENUMS_PATH . '/Appointment_Status.php';
+require_once ENTITIES_PATH . '/Medical_Facility.php';
+require_once UTILS_PATH . '/Time.php';
 
-/*
- *  Medical Personnel (e.g. Doctor, Practioner)
- */
-
-class Medical_Personnel extends Account_User {
+// -- Medical Personnel (e.g. Doctor, Practioner)
+class Medical_Personnel extends Normal_User {
 
     // Properties
     # Name  Of The Medical Facility (e.g. NUH) -- Multiple Places (e.g. mf001, mf002)
     private array $facilityids;
 
-    # Types (e.g. Doctor, Nurse)
-    private string $roletype;
+    # "General" or "Cardiology" etc
+    private string $specialisation;
 
     # License Number
     private string $licensenumber;
 
     // -- Constructor -- //
-    public function __construct(Session $session, string $firstname, string $lastname, string $gender, string $dob,
-            string $contactnumber, string $address, string $usertype, Time $createdon,
-            array $practionerinfo, string $email, ?string $password = NULL) {
+    public function __construct(Session $session, string $usertype, Time $createdon, string $firstname, string $lastname,
+            string $gender, string $dob, string $contactnumber, string $address,
+            array $facilityids, string $roletype, string $licensenumber,
+            string $email, string $password = NULL) {
 
         # -- Parent Constructor -- #
         parent::__construct($session, $firstname, $lastname, $gender, $dob, $contactnumber, $address,
                 $usertype, $createdon, $email, $password);
 
         # -- Medical_Personnel's Properties Assignment -- #
-        $this->facilityids = $practionerinfo['facilityids'];
-        $this->roletype = $practionerinfo['roletype'];
-        $this->licensenumber = $practionerinfo['licensenumber'];
+        $this->facilityids = $facilityids;
+        $this->roletype = $roletype;
+        $this->licensenumber = $licensenumber;
     }
 
     // -- Getters

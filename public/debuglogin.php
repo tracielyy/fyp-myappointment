@@ -13,9 +13,11 @@ session_start();
 /* Load Config File */
 require_once '../resources/config.php';
 require_once ENTITIES_PATH . '/Account_User.php';
+require_once ENTITIES_PATH . '/Time.php';
+
 require_once UTILS_PATH . '/Email.php';
 require_once UTILS_PATH . '/Regex.php';
-require_once UTILS_PATH . '/Time.php';
+
 require_once UTILS_PATH . '/StringUtils.php';
 require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?>

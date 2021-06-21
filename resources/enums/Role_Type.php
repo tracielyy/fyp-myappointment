@@ -4,6 +4,8 @@
  * @author yanying (Tracy)
  */
 
+// REMOVE THIS
+
 abstract class Role_Type {
 
     const DOCTOR = "Doctor";

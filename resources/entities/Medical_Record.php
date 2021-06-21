@@ -1,25 +1,31 @@
 <?php
-/* NOT SURE IF NEED TO COMBINE WITH `Appointment_Record`. */
+
+/*
+ * @author yanying (Tracie)
+ */
+/* Load Config File */
+require_once '../resources/config.php';
+require_once 'Medical_Facility.php';
+require_once './Medical_Personnel.php';
+
 class Medical_Record {
 
     // Properties
     # Medical Facility
-    private string $facility_id;
+    private Medical_Facility $facility;
 
     # Medical Diagnosis (Some Descriptions)
-    private string $diagnosis_description;
-    
-    # Prescription
-    private array $prescription;  // Multiple Medications. (Possible `Prescription` Class)
+    private string $diagnosisdescription;
+
+    # Prescription -- Multiple Medications. (Possible `Prescription` Class)
+    private array $prescription;
 
     # Attending Medical Personnel
-    private string $personnel_licenseno;
+    private Medical_Personnel $attendingpersonnel;
 
     # Date
-    private string $date;
+    private Time $createdon;
 
-    // Constant
-    protected const MEDICAL_RECORD = "Medical_Record";
 
     // Constructor
     function __construct() {
@@ -32,11 +38,11 @@ class Medical_Record {
     //      Methods Accessing Firestore Database 
     //============================================
 
-    /* 
-    * Logic As Per Discussed:
-    * Nurse can create medical record (e.g. Triage and some initial diagnosis)
-    * Doctor needs to validate, edit and further validate before it can be saved.
-    */
+    /*
+     * Logic As Per Discussed:
+     * Nurse can create medical record (e.g. Triage and some initial diagnosis)
+     * Doctor needs to validate, edit and further validate before it can be saved.
+     */
 
     // -- Create Medical Record -- //
     public static function create_medical_record(array $medical_record_info) {
@@ -45,9 +51,7 @@ class Medical_Record {
 
     // -- Edit Medical Record -- //
     public static function edit_medical_record() {
-
+        
     }
-
-
 
 }

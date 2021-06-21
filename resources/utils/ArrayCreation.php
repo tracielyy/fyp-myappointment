@@ -103,11 +103,6 @@ class ArrayCreation {
         $time = new Time();
 
         $passwordreset_arr["passwordreset"] = array(
-//            "passwordtoken" => "",
-//            "requestedon" => array(
-//                "date" => "",
-//                "time" => ""
-//            ),
             "tokenused" => true,
             "usedon" => array(
                 "date" => $time->get_current_date(),

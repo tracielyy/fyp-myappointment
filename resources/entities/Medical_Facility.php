@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @author yanying (Tracie)
  */
@@ -131,7 +132,6 @@ class Medical_Facility {
     }
 
     // DATABASE CONSTANT
-    
-
 }
+
 ?>

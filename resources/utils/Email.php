@@ -13,7 +13,7 @@ require '../vendor/autoload.php';
 
 // -- Import Other Util Classes -- //
 require_once '../resources/config.php';
-require_once UTILS_PATH . '/Time.php';
+require_once ENTITIES_PATH . '/Time.php';
 require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
 

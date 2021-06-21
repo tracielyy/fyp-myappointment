@@ -5,9 +5,9 @@
  */
 /* Load Config File */
 require_once '../resources/config.php';
+require_once 'Time.php';
 require_once UTILS_PATH . '/DbQuery.php';
 require_once UTILS_PATH . '/Database.php';
-require_once UTILS_PATH . '/Time.php';
 require_once UTILS_PATH . '/ArrayCreation.php';
 require_once UTILS_PATH . '/StringUtils.php';
 require_once ENUMS_PATH . '/Appointment_Status.php';

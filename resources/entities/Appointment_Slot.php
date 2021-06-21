@@ -7,27 +7,32 @@
 require_once '../resources/config.php';
 require_once 'Appointment_Record.php';
 require_once 'Account_User.php';
+require_once  'Session.php';
+require_once  'Time.php';
 require_once ENUMS_PATH . '/User_Type.php';
 require_once UTILS_PATH . '/DbQuery.php';
 require_once UTILS_PATH . '/Database.php';
-require_once UTILS_PATH . '/Time.php';
+
 require_once UTILS_PATH . '/ArrayCreation.php';
-require_once UTILS_PATH . '/Session.php';
+
 
 class Appointment_Slot {
 
     // -- Properties
     private string $slotid;
     private Time $appointmentschedule;
-    private array $patientlist;
-    private array $doctorlist;
+    // Specialist: ONLY 1 Patient, Check Up & Dr Consult: max 10
+    private array $patientlist; 
+    private ?bool $available;
+
 
     // -- Constructor
-    public function __construct(string $slotid, Time $appointmentschedule, array $patientlist, array $doctorlist) {
+    public function __construct(string $slotid, Time $appointmentschedule, array $patientlist, bool $available = NULL) {
         $this->slotid = $slotid;
         $this->appointmentschedule = $appointmentschedule;
         $this->patientlist = $patientlist;
-        $this->doctorlist = $doctorlist;
+        $this->available = $available;
+
     }
 
     // -- Getters

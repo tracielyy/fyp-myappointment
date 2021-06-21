@@ -1,12 +1,13 @@
 <?php
 
 /*
- * @author yanying (Tracy)
+ * @author yanying (Tracie)
  */
 
 abstract class User_Type {
 
-    const ADMIN = "Admin";
+    const SUPER_ADMIN = "Super_Admin";
+    const FACIILITY_ADMIN = "Facility_Admin";
     const MEDICAL_PERSONNEL = "Medical_Personnel";
     const PATIENT = "Patient";
 

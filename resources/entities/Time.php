@@ -127,7 +127,7 @@ class Time {
     }
 
     // -- Get End Date Given Start & Interval -- //
-    public static function get_enddate(string $start, int $interval, string $format = self::DATE_FORMAT_DEFAULT) {
+    public static function get_enddate(string $start, int $interval, string $format = self::DATE_FORMAT_DEFAULT): string {
         $enddate = (string) date($format, strtotime($start . ' + ' . (string) $interval . ' days'));
         return $enddate;
     }
