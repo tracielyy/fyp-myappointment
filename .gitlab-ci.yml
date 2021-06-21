@@ -1,5 +1,5 @@
 # Select image from https://hub.docker.com/_/php
-image: php:7.3
+image: ruby:2.6
 
 # Select what we should cache
 cache:
@@ -7,8 +7,8 @@ cache:
   - vendor/
 
 before_script:
-  - apt-get update -y
-  - apt-get upgrade -y
+  - apt-get update -yqq
+  - apt-get upgrade -yqq
   - apt-get install sudo -y
   - apt-get install zlib1g-dev
 
@@ -18,7 +18,10 @@ before_script:
   # Install composer
   - curl -sS https://getcomposer.org/installer | php
 
+  # Get Info
   - php --ini 
+  
+  # Install gRPC for Google Cloud Firestore
   - sudo pecl install grpc
   
   # Install all project dependencies
@@ -27,7 +30,8 @@ before_script:
 
 # -- Not Done --
 test:app:
-    script:
-      - echo 'ok'
-        #- vendor/bin/phpunit --configuration phpunit_myapp.xml
+  image: php:7.3
+  script:
+    - echo 'ok'
+     #- vendor/bin/phpunit --configuration phpunit_myapp.xml
 

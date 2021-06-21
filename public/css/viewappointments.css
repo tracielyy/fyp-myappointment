@@ -1,0 +1,10 @@
+.rounded1
+{
+    border-radius: 15px;
+}
+
+.cd-admin-create-modal-btn {
+    min-width: 10vw;
+   margin: 0 1vw;
+   font-size : 1.5vw;
+  }
