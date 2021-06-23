@@ -12,6 +12,11 @@ require_once '../resources/config.php';
 require_once UTIL_MOD . '/StringUtils.php';
 
 class ArrayCreation {
+
+    private function __construct() {
+        // -- Prevent Instantiation
+    }
+
     /*
      * --------------------------
      * Default Array Creations
@@ -42,7 +47,7 @@ class ArrayCreation {
                 'verified' => false,
                 'vtoken' => $vtoken
             );
-           $user_data_arr['accountdetails']= array_merge($user_data_arr['accountdetails'], $verified_arr);
+            $user_data_arr['accountdetails'] = array_merge($user_data_arr['accountdetails'], $verified_arr);
         endif;
 
         # -- Merge All The Arrays -- #

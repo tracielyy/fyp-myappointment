@@ -142,7 +142,7 @@ class DbQuery {
     }
 
     // -- Get Firestore Document Wihout Knowing Document ID -- //
-    public function query_exact_match(string $path, array $conditionArr): ?array {
+    public function select_exact_match(string $path, array $conditionArr): ?array {
 
         # Collection Reference
         $collection_ref = $this->db->collection($path);
@@ -188,7 +188,7 @@ class DbQuery {
     }
 
     // -- Modify Map Fields (EMAIL) -- //
-    public function modify_field(string $collection, array $conditionArr, array $mapArr): bool {
+    public function update_field(string $collection, array $conditionArr, array $mapArr): bool {
 
         # Collection Reference
         $collection_ref = $this->db->collection($collection);

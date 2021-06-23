@@ -116,49 +116,7 @@ class Appointment_Record {
         return $appt_record_obj;
     }
 
-    // -- Retrieve Of Appointment Records Of Certain Type -- //
-    private static function get_patient_appointment(array $email, array $appointmentstatus): array {
 
-        # Array Of Appointments
-        $appointment_arr = array();
-
-        # Query For Upcoming Appointment Records
-        $db = new DbQuery();
-        $record_list = $db->get_nested_collection(Database::ACCOUNT_USER, Database::APPOINTMENT_RECORD,
-                $email, $appointmentstatus);
-
-        # Create Appointment Record Object List
-        foreach ($record_list as $record) :
-
-            $appointment_arr[] = self::initialise_appointment_record($record);
-
-        endforeach;
-        return $appointment_arr;
-    }
-
-    // -- GET UPCOMING APPOINTMENT RECORDS
-    public static function get_upcoming_appointments(array $email): array {
-
-        # Set Default Appointment Status
-        $appointmentstatus['appointmentstatus'] = Appointment_Status::UPCOMING;
-
-        # Retrieving List Of Upcoming Appointments
-        $upcoming_arr = self::get_patient_appointment($email, $appointmentstatus);
-
-        return $upcoming_arr;
-    }
-
-    // -- GET MISSED APPOINTMENT RECORDS  [last 14 days]
-    public static function get_missed_appointments(array $email): array {
-
-        # Set Default Appointment Status
-        $appointmentstatus['appointmentstatus'] = Appointment_Status::MISSED;
-
-        # Retrieving List Of Missed Appointments
-        $missed_arr = self::get_patient_appointment($email, $appointmentstatus);
-
-        return $missed_arr;
-    }
 
     // -- Set Appointment Reminder -- //
 }

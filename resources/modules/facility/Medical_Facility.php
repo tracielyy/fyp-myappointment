@@ -124,7 +124,7 @@ class Medical_Facility {
 
         # Query For Facility
         $db = new DbQuery();
-        $facility = $db->query_exact_match(Database::MEDICAL_FACILITY, $arr);
+        $facility = $db->select_exact_match(Database::MEDICAL_FACILITY, $arr);
         if ($facility != NULL):
             return self::initialise_medical_facility($facility);
         endif;
