@@ -21,6 +21,6 @@ if (isset($_SESSION['user'])) {
     //echo "Successfully Logout";
 }
 // -- Insert Redirecting Location Below --
-header("Location:index.php");
+header("Location:./");
 ?>
 
