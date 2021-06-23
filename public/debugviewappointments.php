@@ -1,25 +1,21 @@
-<!DOCTYPE html>
+<?php
+session_start();
+require_once '../resources/config.php';
+require_once USER_MOD . '/Account_User.php';
+require_once USER_MOD . '/Patient.php';
+require_once APPT_MOD . '/Appointment_Record.php';
+require_once ENUMS_PATH . '/User_Type.php';
+
+$pageName = "viewappointment";
+?><!DOCTYPE html>
 <html lang="en">
-
-    <?php
-    session_start();
-    require_once '../resources/config.php';
-    require_once ENTITIES_PATH . '/Account_User.php';
-    require_once ENTITIES_PATH . '/Appointment_Record.php';
-    require_once ENUMS_PATH . '/User_Type.php';
-    require_once FUNCTIONS_PATH . '/PatientFunctions.php';
-    require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
-    ?>
-    <?php $pageName = "viewappointment"; ?>
-
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <style>
-<?php include './css/viewappointments.css';
-?>
+<?php include './css/viewappointments.css'; ?>
         </style>
 
         <!--
@@ -54,7 +50,7 @@
 
 
     <?php
-    include COMPONENTS_PATH . '/bootstrap.php';
+    include TEMPLATES_PATH . '/bootstrap.php';
     ?>
 </head>
 <?php
@@ -65,7 +61,7 @@ if (isset($_SESSION["user"])):
     $user = unserialize($_SESSION["user"]);
     $user_email = $user->get_email();
     $user_type = $user->get_usertype();
-    include_once COMPONENTS_PATH . '/navbar-loggedin.php';
+    include_once TEMPLATES_PATH . '/navbar-loggedin.php';
 
     // -- When User Click On The Buttons -- //
     if ($_SERVER['REQUEST_METHOD'] == "POST"):
@@ -111,9 +107,9 @@ if (isset($_SESSION["user"])):
         $email['credentials']['email'] = $user_email;
 
         // -- Upcoming Appointments -- //
-        $upcoming_arr = PatientFunctions::get_upcoming_appointments($email);
+        $upcoming_arr = Appointment_Record::get_upcoming_appointments($email);
         // -- Missed Appointments -- //
-        $missed_arr = PatientFunctions::get_missed_appointments($email);
+        $missed_arr = Appointment_Record::get_missed_appointments($email);
         ?>
 
         <div class="container">
@@ -165,9 +161,10 @@ if (isset($_SESSION["user"])):
                                                 <br>Appointment Status:
                                                 <?php echo $record->get_appointmentstatus(); // Return Appointment status  ?>
                                                 <br>
-                                                <br>Date: <?php echo Time::date_format_change($record->get_scheduledon()->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                         ?>
-                                                <br>Time: <?php echo Time::to_12hours($record->get_scheduledon()->get_time(), false); // Returns Time                                                         ?>
-                                                <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                         ?>
+                                                <?php $appt_schedule = $record->get_appointmentslot()->get_appointmentschedule();?>
+                                                <br>Date: <?php echo Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                   ?>
+                                                <br>Time: <?php echo Time::to_12hours($appt_schedule->get_time(), false); // Returns Time                                                                   ?>
+                                                <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                   ?>
 
                                                 <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                                 <br>Address: <?php echo $record->get_facility()->get_address(); ?>
@@ -177,8 +174,8 @@ if (isset($_SESSION["user"])):
                                                     <?php
                                                     // -- Bunch Of Appointment Info To Be Passed To Button Function -- //
                                                     $appt_info = $record->get_appointmentid() . "~" . $record->get_appointmenttype() .
-                                                            "~" . Time::date_format_change($record->get_scheduledon()->get_date(), Time::DATE_FORMAT_APPOINTMENT) .
-                                                            "~" . Time::to_12hours($record->get_scheduledon()->get_time(), false);
+                                                            "~" . Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT) .
+                                                            "~" . Time::to_12hours($appt_schedule->get_time(), false);
                                                     ?>
                                                     <div class="col">
                                                         <button value="<?php echo $appt_info; ?>" type="button" class="btn btn-danger col-12" data-bs-toggle="modal" data-bs-target="#cancelappt"
@@ -248,9 +245,10 @@ if (isset($_SESSION["user"])):
                                             <br>Appointment Status:
                                             <?php echo $record->get_appointmentstatus(); // Return Appointment status          ?>
                                             <br>
-                                            <br>Date: <?php echo Time::date_format_change($record->get_scheduledon()->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                         ?>
-                                            <br>Time: <?php echo Time::to_12hours($record->get_scheduledon()->get_time(), false); // Returns Time                                                         ?>
-                                            <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                         ?>
+                                            <?php $appt_schedule = $record->get_appointmentslot()->get_appointmentschedule();?>
+                                            <br>Date: <?php echo Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                   ?>
+                                            <br>Time: <?php echo Time::to_12hours($appt_schedule->get_time(), false); // Returns Time                                                                   ?>
+                                            <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                   ?>
 
                                             <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                             <br>Address: <?php echo $record->get_facility()->get_address(); ?>
@@ -259,9 +257,10 @@ if (isset($_SESSION["user"])):
                                             <div class="row m-2 text-center">
                                                 <?php
                                                 // -- Bunch Of Appointment Info To Be Passed To Button Function -- //
+                                                
                                                 $appt_info = $record->get_appointmentid() . "~" . $record->get_appointmenttype() .
-                                                        "~" . Time::date_format_change($record->get_scheduledon()->get_date(), Time::DATE_FORMAT_APPOINTMENT) .
-                                                        "~" . Time::to_12hours($record->get_scheduledon()->get_time(), false);
+                                                        "~" . Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT) .
+                                                        "~" . Time::to_12hours($appt_schedule->get_time(), false);
                                                 ?>
                                                 <div class="col">
                                                     <button type="button" class="btn btn-info col-12 text-light">Reschedule</button>

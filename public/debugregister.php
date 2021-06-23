@@ -3,12 +3,11 @@
 session_start();
 /* Load Config File */
 require_once '../resources/config.php';
-require_once ENTITIES_PATH . '/Account_User.php';
-require_once ENTITIES_PATH . '/Patient.php';
-require_once UTILS_PATH . '/Regex.php';
-require_once UTILS_PATH . '/Time.php';
-require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
-require_once FUNCTIONS_PATH . '/PatientFunctions.php';
+require_once USER_MOD . '/Account_User.php';
+require_once USER_MOD . '/Patient.php';
+require_once UTIL_MOD . '/Regex.php';
+require_once USERACC_MOD . '/AccountCreation.php';
+//require_once FUNCTIONS_PATH . '/PatientFunctions.php';
 ?>
 <html lang="en">
 
@@ -23,7 +22,7 @@ require_once FUNCTIONS_PATH . '/PatientFunctions.php';
 <?php include './css/loginRegister.css';
 ?>
         </style>
-        <?php require COMPONENTS_PATH . '/bootstrap.php' ?>
+        <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
 
         <title>Register</title>
 
@@ -190,7 +189,7 @@ require_once FUNCTIONS_PATH . '/PatientFunctions.php';
             // If Valid User Information (After Validation)
             if (!in_array(False, $validArr)) {
                 // > Check If User Already Exist (Email & Contact Number)
-                $exist = AccountUserFunctions::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
+                $exist = AccountCreation::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
                 if (!$exist) {
 
                     # Change The Date Back To Database Default
@@ -212,7 +211,7 @@ require_once FUNCTIONS_PATH . '/PatientFunctions.php';
 
                     // > Salt Generation (?)
                     // > Need To Encrypt The Password Then Store In Database
-                    PatientFunctions::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
+                    AccountCreation::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
                     // Reset Information
                     $registerArr = array(
                         'firstname' => '',
@@ -239,7 +238,7 @@ require_once FUNCTIONS_PATH . '/PatientFunctions.php';
 
         <body>
             <!-- Navigation -->
-            <?php require COMPONENTS_PATH . '/navbar.php' ?>
+            <?php require TEMPLATES_PATH . '/navbar.php' ?>
 
             <!-- Registration -->
             <div class="row m-4">
@@ -279,7 +278,7 @@ require_once FUNCTIONS_PATH . '/PatientFunctions.php';
                                         <div class="row">
                                             <div class="col">
                                                 <!-- Date Of Birth -->
-                                                <input id="dob" class="form-control" type="date" name="dob" 
+                                                <input id="dob" class="form-control" type="date" name="dob"
                                                        value="<?php echo htmlspecialchars($registerArr['dob']); ?>" /><br />
                                             </div>
                                             <div class="col py-2">

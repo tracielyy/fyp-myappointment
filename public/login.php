@@ -3,12 +3,12 @@
 session_start();
 /* Load Config File */
 require_once '../resources/config.php';
-require_once ENTITIES_PATH . '/Account_User.php';
-require_once UTILS_PATH . '/Email.php';
-require_once UTILS_PATH . '/Regex.php';
-require_once UTILS_PATH . '/Time.php';
-require_once UTILS_PATH . '/StringUtils.php';
-require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
+require_once USER_MOD . '/Account_User.php';
+require_once EMAIL_MOD . '/Email.php';
+require_once UTIL_MOD . '/Regex.php';
+require_once TIME_MOD . '/Time.php';
+require_once UTIL_MOD . '/StringUtils.php';
+//require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?>
 
 <html>
@@ -21,7 +21,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Styling -->
-    <?php include COMPONENTS_PATH . '/bootstrap.php'; ?>
+    <?php include TEMPLATES_PATH . '/bootstrap.php'; ?>
 
     <style>
     <?php include_once './css/loginRegister.css';
@@ -164,7 +164,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
         <!-- HTML Page Design -->
         <div>
             <!-- Navigation (include_once -> prevent "headers already sent" error) -->
-            <?php include_once COMPONENTS_PATH . '/navbar.php' ?>
+            <?php include_once TEMPLATES_PATH . '/navbar.php' ?>
 
             <!-- Login Card -->
             <div class="center row m-4">

@@ -2,11 +2,11 @@
 <?php
 /* Load Config File */
 require_once '../resources/config.php';
-require_once ENTITIES_PATH . '/Account_User.php';
-require_once UTILS_PATH . '/Email.php';
-require_once UTILS_PATH . '/Regex.php';
-require_once UTILS_PATH . '/StringUtils.php';
-require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
+require_once USER_MOD . '/Account_User.php';
+require_once EMAIL_MOD . '/Email.php';
+require_once UTIL_MOD . '/Regex.php';
+require_once UTIL_MOD . '/StringUtils.php';
+//require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,7 +19,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
     <!-- Title -->
     <title>FYP-21-S2-24: Password Reset</title>
     <!-- Styling -->
-    <?php require COMPONENTS_PATH . '/bootstrap.php' ?>
+    <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
 
     <style>
     <?php include './css/loginRegister.css';
@@ -97,7 +97,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
     <div>
         <!-- Navigation -->
-        <?php include COMPONENTS_PATH . '/navbar.php' ?>
+        <?php include TEMPLATES_PATH . '/navbar.php' ?>
 
         <!-- Login Card -->
         <div class="center row m-4">

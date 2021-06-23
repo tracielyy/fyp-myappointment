@@ -3,11 +3,11 @@
 session_start();
 /* Load Config File */
 require_once '../resources/config.php';
-require_once ENTITIES_PATH . '/Account_User.php';
-require_once ENTITIES_PATH . '/Patient.php';
-require_once UTILS_PATH . '/Regex.php';
-require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
-require_once FUNCTIONS_PATH . '/PatientFunctions.php';
+require_once USER_MOD . '/Account_User.php';
+require_once USER_MOD . '/Patient.php';
+require_once UTIL_MOD . '/Regex.php';
+//require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
+//require_once FUNCTIONS_PATH . '/PatientFunctions.php';
 ?>
 <html lang="en">
 
@@ -22,7 +22,7 @@ require_once FUNCTIONS_PATH . '/PatientFunctions.php';
     <?php include './css/loginRegister.css';
     ?>
     </style>
-    <?php require COMPONENTS_PATH . '/bootstrap.php' ?>
+    <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
 
     <title>Register</title>
 
@@ -234,7 +234,7 @@ require_once FUNCTIONS_PATH . '/PatientFunctions.php';
 
 <body>
     <!-- Navigation -->
-    <?php require COMPONENTS_PATH . '/navbar.php' ?>
+    <?php require TEMPLATES_PATH . '/navbar.php' ?>
 
     <!-- Registration -->
     <div class="row m-4">

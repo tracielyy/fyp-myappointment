@@ -2,15 +2,15 @@
 <?php
 session_start();
 require_once '../resources/config.php';
-require_once ENTITIES_PATH . '/Account_User.php';
-require_once ENTITIES_PATH . '/Appointment_Record.php';
+require_once USER_MOD . '/Account_User.php';
+require_once USER_MOD . '/Patient.php';
+require_once APPT_MOD . '/Appointment_Record.php';
 require_once ENUMS_PATH . '/User_Type.php';
-require_once FUNCTIONS_PATH . '/PatientFunctions.php';
-require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
-include COMPONENTS_PATH . '/bootstrap.php';
+//require_once FUNCTIONS_PATH . '/PatientFunctions.php';
+//require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
-
+include TEMPLATES_PATH . '/bootstrap.php';
 ?>
 <?php $pageName = "homepage"; ?>
 
@@ -32,9 +32,9 @@ include COMPONENTS_PATH . '/bootstrap.php';
 
 if (isset($_SESSION["user"])):
   $user = unserialize($_SESSION["user"]);
-  include COMPONENTS_PATH . '/navbar-loggedin.php';
+  include TEMPLATES_PATH . '/navbar-loggedin.php';
 else:
-  include COMPONENTS_PATH . '/navbar.php';
+  include TEMPLATES_PATH . '/navbar.php';
 endif;
 
 ?>
