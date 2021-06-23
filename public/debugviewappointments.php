@@ -4,6 +4,7 @@ require_once '../resources/config.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Patient.php';
 require_once APPT_MOD . '/Appointment_Record.php';
+require_once APPT_MOD . '/DisplayAppointment.php';
 require_once ENUMS_PATH . '/User_Type.php';
 
 $pageName = "viewappointment";
@@ -13,7 +14,7 @@ $pageName = "viewappointment";
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+        <script src="https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
         <style>
 <?php include './css/viewappointments.css'; ?>
         </style>
@@ -97,7 +98,7 @@ if (isset($_SESSION["user"])):
             <div class="col-md-2">
                 <!-- col -->
                 <div class="row py-1 col-lg-12 mx-auto">
-                    <button type="button" class="btn btn-secondary float-end">Edit Profile</button>
+                    <a href="./debugeditprofile.php" type="button" class="btn btn-secondary float-end">Edit Profile</a>
                 </div> <!-- col -->
             </div> <!-- col -->
         </div>
@@ -107,9 +108,9 @@ if (isset($_SESSION["user"])):
         $email['credentials']['email'] = $user_email;
 
         // -- Upcoming Appointments -- //
-        $upcoming_arr = Appointment_Record::get_upcoming_appointments($email);
+        $upcoming_arr = DisplayAppointment::get_upcoming_appointments($email);
         // -- Missed Appointments -- //
-        $missed_arr = Appointment_Record::get_missed_appointments($email);
+        $missed_arr = DisplayAppointment::get_missed_appointments($email);
         ?>
 
         <div class="container">
@@ -156,15 +157,17 @@ if (isset($_SESSION["user"])):
                                                 <?php echo $record->get_appointmenttype(); // Return String  ?>
                                             </div> <!-- CARD HEADER -->
                                             <div class="card-body">
+                                                <button href="#" class="btn btn-outline-secondary" style="float: right;" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to calendar"><i
+                                                        class="fas fa-calendar-alt"></i></a></button><br>
                                                 Appointment ID:
                                                 <?php echo $record->get_appointmentid(); // Return Appointment ID  ?>
                                                 <br>Appointment Status:
                                                 <?php echo $record->get_appointmentstatus(); // Return Appointment status  ?>
                                                 <br>
-                                                <?php $appt_schedule = $record->get_appointmentslot()->get_appointmentschedule();?>
-                                                <br>Date: <?php echo Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                   ?>
-                                                <br>Time: <?php echo Time::to_12hours($appt_schedule->get_time(), false); // Returns Time                                                                   ?>
-                                                <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                   ?>
+                                                <?php $appt_schedule = $record->get_appointmentslot()->get_appointmentschedule(); ?>
+                                                <br>Date: <?php echo Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                       ?>
+                                                <br>Time: <?php echo Time::to_12hours($appt_schedule->get_time(), false); // Returns Time                                                                       ?>
+                                                <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                       ?>
 
                                                 <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                                 <br>Address: <?php echo $record->get_facility()->get_address(); ?>
@@ -245,10 +248,10 @@ if (isset($_SESSION["user"])):
                                             <br>Appointment Status:
                                             <?php echo $record->get_appointmentstatus(); // Return Appointment status          ?>
                                             <br>
-                                            <?php $appt_schedule = $record->get_appointmentslot()->get_appointmentschedule();?>
-                                            <br>Date: <?php echo Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                   ?>
-                                            <br>Time: <?php echo Time::to_12hours($appt_schedule->get_time(), false); // Returns Time                                                                   ?>
-                                            <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                   ?>
+                                            <?php $appt_schedule = $record->get_appointmentslot()->get_appointmentschedule(); ?>
+                                            <br>Date: <?php echo Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                       ?>
+                                            <br>Time: <?php echo Time::to_12hours($appt_schedule->get_time(), false); // Returns Time                                                                       ?>
+                                            <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                       ?>
 
                                             <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                             <br>Address: <?php echo $record->get_facility()->get_address(); ?>
@@ -257,7 +260,7 @@ if (isset($_SESSION["user"])):
                                             <div class="row m-2 text-center">
                                                 <?php
                                                 // -- Bunch Of Appointment Info To Be Passed To Button Function -- //
-                                                
+
                                                 $appt_info = $record->get_appointmentid() . "~" . $record->get_appointmenttype() .
                                                         "~" . Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT) .
                                                         "~" . Time::to_12hours($appt_schedule->get_time(), false);
@@ -283,8 +286,12 @@ if (isset($_SESSION["user"])):
 else: header("Location:login.php");
 endif;
 ?>
-
-
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+            }
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous">
@@ -299,14 +306,14 @@ endif;
         integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous">
 </script>
 <script type="text/javascript">
-    $(document).ready(function () {
-        var url = window.location;
-        $('ul.nav a[href="' + url + '"]').parent().addClass('active');
-        $('ul.nav a').filter(function () {
-            return this.href == url;
-        }).parent().addClass('active');
-    });
-</script> 
+            $(document).ready(function () {
+                var url = window.location;
+                $('ul.nav a[href="' + url + '"]').parent().addClass('active');
+                $('ul.nav a').filter(function () {
+                    return this.href == url;
+                }).parent().addClass('active');
+            });
+</script>
 </body>
 
 </html>

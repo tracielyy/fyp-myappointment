@@ -3,13 +3,12 @@
 session_start();
 /* Load Config File */
 require_once '../resources/config.php';
-require_once UTILS_PATH . '/Time.php';
-require_once ENTITIES_PATH . '/Account_User.php';
-require_once ENTITIES_PATH . '/Appointment_Record.php';
+require_once TIME_MOD . '/Time.php';
+require_once USER_MOD . '/Account_User.php';
+require_once USER_MOD . '/Patient.php';
+require_once APPT_MOD . '/Appointment_Record.php';
 require_once ENUMS_PATH . '/User_Type.php';
 require_once ENUMS_PATH . '/Appointment_Type.php';
-require_once FUNCTIONS_PATH . '/PatientFunctions.php';
-require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?>
 
 <html>
@@ -22,7 +21,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <!-- Styling -->
-        <?php include COMPONENTS_PATH . '/bootstrap.php'; ?>
+        <?php include TEMPLATES_PATH . '/bootstrap.php'; ?>
         <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'>
         <style>
             .li-search {
@@ -151,7 +150,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
         <!-- Navigation -->
         <?php
         $user = unserialize($_SESSION["user"]);
-        include COMPONENTS_PATH . '/navbar-loggedin.php';
+        include TEMPLATES_PATH . '/navbar-loggedin.php';
         // -- Used to store correct data
         $appointmentArr = array(
             'facilityid' => '',

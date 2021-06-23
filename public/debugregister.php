@@ -6,7 +6,7 @@ require_once '../resources/config.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Patient.php';
 require_once UTIL_MOD . '/Regex.php';
-require_once USERACC_MOD . '/AccountCreation.php';
+require_once USERACC_MOD . '/CreateAccount.php';
 //require_once FUNCTIONS_PATH . '/PatientFunctions.php';
 ?>
 <html lang="en">
@@ -189,7 +189,7 @@ require_once USERACC_MOD . '/AccountCreation.php';
             // If Valid User Information (After Validation)
             if (!in_array(False, $validArr)) {
                 // > Check If User Already Exist (Email & Contact Number)
-                $exist = AccountCreation::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
+                $exist = CreateAccount::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
                 if (!$exist) {
 
                     # Change The Date Back To Database Default
@@ -211,7 +211,7 @@ require_once USERACC_MOD . '/AccountCreation.php';
 
                     // > Salt Generation (?)
                     // > Need To Encrypt The Password Then Store In Database
-                    AccountCreation::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
+                    CreateAccount::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
                     // Reset Information
                     $registerArr = array(
                         'firstname' => '',
