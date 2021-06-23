@@ -33,7 +33,7 @@ class Authentication {
 
         # Update Session Field After Success Authentication
         $db = new DbQuery();
-        $login = $db->modify_field(Database::ACCOUNT_USER, $emailArr, $session_arr);
+        $login = $db->update_field(Database::ACCOUNT_USER, $emailArr, $session_arr);
         return $login; # -- Return Bool (Success or Failure) -- #
     }
 
@@ -59,7 +59,7 @@ class Authentication {
 
         # Retrieve User From Given Credentials
         $db = new DbQuery();
-        $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $credentials);
+        $user_data = $db->select_exact_match(Database::ACCOUNT_USER, $credentials);
 
         # Store Any User Data In `Account_User` Object
         if ($user_data != NULL):
@@ -109,7 +109,7 @@ class Authentication {
 
         # Query For User Using Given Credentials
         $db = new DbQuery();
-        $user_data = $db->query_exact_match(Database::ACCOUNT_USER, $credentials);
+        $user_data = $db->select_exact_match(Database::ACCOUNT_USER, $credentials);
 
         # Check If There Are Any User Returned From The Query
         if ($user_data != NULL):
@@ -132,7 +132,7 @@ class Authentication {
 
         # Update Session Array
         $db = new DbQuery();
-        $db->modify_field(Database::ACCOUNT_USER, $emailArr, $session_arr);
+        $db->update_field(Database::ACCOUNT_USER, $emailArr, $session_arr);
     }
 
 }

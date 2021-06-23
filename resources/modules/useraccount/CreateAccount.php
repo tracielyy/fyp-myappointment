@@ -13,7 +13,7 @@ require_once DB_MOD . '/Database.php';
 require_once ENUMS_PATH . '/User_Type.php';
 require_once UTIL_MOD . '/ArrayCreation.php';
 
-class AccountCreation {
+class CreateAccount {
 
    
     
@@ -56,5 +56,14 @@ class AccountCreation {
         $db = new DbQuery();
         $db->insert_data(Database::ACCOUNT_USER, $userDataArr, true);
     }
+    
+    // -- CREATE MEDICAL PERSONNEL ACCOUNT
+    
+    
 
+    // -- CREATE FACILITY ADMIN ACCOUNT
+    
+    
+    
+    
 }
