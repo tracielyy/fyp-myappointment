@@ -23,7 +23,7 @@ class RetrieveAccount {
     // -- Load User Data (Retrieve & Return User Data) -- //
     public static function retrieve_account_data(array $credentialArr): ?Account_User {
 
-        # Credentials
+        # Credentials   
         $credentials = array(
             "credentials" => $credentialArr
         );
@@ -59,8 +59,12 @@ class RetrieveAccount {
             // -- MEDICAL_PERSONNEL -- // 
             case User_Type::MEDICAL_PERSONNEL:
                 break;
+
+            // -- FACILITY_ADMIN -- //
             case User_Type::FACIILITY_ADMIN:
                 break;
+
+            // -- SUPER_ADMIN -- //
             case User_Type::SUPER_ADMIN:
                 break;
 

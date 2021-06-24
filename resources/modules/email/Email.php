@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  Email Class: For System Generated Mail Messages
+ *  Email Class: FOR SYSTEM GENERATED MAIL MESSAGES
  *      - Mail Message Functions Can Be Customised
  * 
  */
@@ -20,7 +20,7 @@ class Email extends PHPMailer {
     private const SYSMAIL = "fyp.21.s2.24@gmail.com";
     private const APP_PASSWORD = "rzylfksaoemejptd";
 
-    // -- Construct -- //
+    // -- CONSTRUCTOR -- //
     public function __construct($exceptions = null) {
         parent::__construct($exceptions);
         $this->isSMTP();
