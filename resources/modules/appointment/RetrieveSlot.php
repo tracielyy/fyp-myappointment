@@ -35,7 +35,7 @@ class RetrieveSlot {
                 $doc_path = Database::ACCOUNT_USER . "/" . $id_data[2] . "/" . Database::APPOINTMENT_SLOTS . "/" . $id_data[1] . "/"
                         . Database::SLOTS;
                 $slot_data = $db->get_documentdata_by_id($doc_path, $id);
-                return Appointment_Slot::initialise_appt_slot($slot_data, $id_data[2]);
+                return Appointment_Slot::initialise_appt_slot($slot_data, $id_data[1]);
 
         endswitch;
     }
