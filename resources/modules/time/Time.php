@@ -9,7 +9,7 @@ date_default_timezone_set('Asia/Singapore');
 
 class Time {
     /*
-     * Basic Time Template Class
+     *      # BASIC TIME TEMPLATE CLASS #
      */
 
     // -- Default Properties -- //
