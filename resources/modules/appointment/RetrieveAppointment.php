@@ -19,7 +19,7 @@ class RetrieveAppointment {
     }
 
     // -- Retrieve Of Appointment Records Of Certain Type -- //
-    private static function get_patient_appointment(array $email, ?array $appointmentstatus = NULL): array {
+    private static function retrieve_patient_appointment(array $email, ?array $appointmentstatus = NULL): array {
 
         # Array Of Appointments
         $appointment_arr = array();
@@ -46,26 +46,49 @@ class RetrieveAppointment {
         return $appointment_arr;
     }
 
+    // -- GET ALL APPOINTMENT RECORDS
+    public static function retrieve_all_appointments(array $email): array {
+        return self::retrieve_patient_appointment($email);
+    }
+
+    // -- FILTER APPOINTMENTS TO APPOINTMENT STATUS -- //
+    public static function sort_appointment_by_status(array $appt_arr): array {
+
+        # Create Empty Container
+        $arr ['upcoming'] = array();
+        $arr['missed'] = array();
+        foreach ($appt_arr as $appt):
+
+            # FILTER
+            if ($appt->get_appointmentstatus() == Appointment_Status::UPCOMING):
+                $arr['upcoming'][] = $appt;
+            elseif ($appt->get_appointmentstatus() == Appointment_Status::MISSED):
+                $arr['cancelled'][] = $appt;
+            endif;
+        endforeach;
+        return $arr;
+    }
+
     // -- GET UPCOMING APPOINTMENT RECORDS
-    public static function get_upcoming_appointments(array $email): array {
+    public static function retrieve_upcoming_appointments(array $email): array {
 
         # Set Default Appointment Status
         $appointmentstatus['appointmentstatus'] = Appointment_Status::UPCOMING;
 
         # Retrieving List Of Upcoming Appointments
-        $upcoming_arr = self::get_patient_appointment($email, $appointmentstatus);
+        $upcoming_arr = self::retrieve_patient_appointment($email, $appointmentstatus);
 
         return $upcoming_arr;
     }
 
     // -- GET MISSED APPOINTMENT RECORDS  [last 14 days]
-    public static function get_missed_appointments(array $email): array {
+    public static function retrieve_missed_appointments(array $email): array {
 
         # Set Default Appointment Status
         $appointmentstatus['appointmentstatus'] = Appointment_Status::MISSED;
 
         # Retrieving List Of Missed Appointments
-        $missed_arr = self::get_patient_appointment($email, $appointmentstatus);
+        $missed_arr = self::retrieve_patient_appointment($email, $appointmentstatus);
 
         return $missed_arr;
     }

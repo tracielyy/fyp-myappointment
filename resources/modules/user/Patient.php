@@ -13,17 +13,18 @@ require_once TIME_MOD . '/Time.php';
 
 require_once AUTH_MOD . '/Session.php';
 require_once USER_MOD . '/Normal_User.php';
+require_once APPT_MOD . '/RetrieveAppointment.php';
 
 class Patient extends Normal_User {
 
-// Properties
+    // Properties
 
     private string $patientid;
     private bool $verified; // Newly added -- To Make Sure Patient Is Verified Before Making Booking
     private array $appointmentrecords;
     private array $medicalrecords;
 
-// Constructor
+    // Constructor
     public function __construct(Session $session, string $usertype, Time $createdon, string $firstname, string $lastname,
             string $gender, string $dob, string $contactnumber, string $address,
             string $patientid, array $appointmentrecords, array $medicalrecords, bool $verified,
@@ -32,14 +33,14 @@ class Patient extends Normal_User {
         parent::__construct($session, $usertype, $createdon, $firstname, $lastname, $gender,
                 $dob, $contactnumber, $address, $email, $password);
 
-// -- Patient Information -- //
+        // -- Patient Information -- //
         $this->patientid = $patientid;
         $this->verified = $verified;
         $this->appointmentrecords = $appointmentrecords;
         $this->medicalrecords = $medicalrecords;
     }
 
-// -- Getters
+    // -- Getters
     public function get_patientid(): string {
         return $this->patientid;
     }
@@ -56,12 +57,16 @@ class Patient extends Normal_User {
         return $this->medicalrecords;
     }
 
-// -- Setters
+    // -- Setters
     public function set_verified(bool $verified): void {
         $this->verified = $verified;
     }
+    
+    public function set_appointmentrecords(array $appointmentrecords): void{
+        $this->appointmentrecords = $appointmentrecords;
+    }
 
-// Use For Debugging/ Logging Purpose
+    // Use For Debugging/ Logging Purpose
     public function __toString() {
         return parent::__toString();
     }
@@ -82,8 +87,11 @@ class Patient extends Normal_User {
 
         # Get Patient ID
         $patientid = "";
+        
+        # Credentials
+        $email['credentials']['email'] = $patient_info['credentials']['email'];
 
-        $appointmentrecords = array();
+        $appointmentrecords = RetrieveAppointment::retrieve_all_appointments($email);
         $medicalrecords = array();
 
         # Patient Object
@@ -93,8 +101,6 @@ class Patient extends Normal_User {
 
         return $patient;
     }
-
-
 
     // Functions
     # - Book Appointment

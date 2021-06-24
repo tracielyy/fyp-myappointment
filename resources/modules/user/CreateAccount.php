@@ -21,25 +21,7 @@ class CreateAccount {
         // -- Prevent Instantiation Of This Class
     }
 
-    //  -- Check If The User Exist In The Database  -- //
-    public static function check_user_exist(string $email): bool {
-
-        # Email Array
-        $emailArr ["credentials"] = array(
-            'email' => $email
-        );
-
-        # Query For User With The Given Email
-        $db = new DbQuery();
-        $emails_found = $db->query_exact_match(Database::ACCOUNT_USER, $emailArr);
-
-        # Check If There Are Any Value Returned
-        if (($emails_found !== NULL)):
-            return True;  // There is existing user
-        endif;
-
-        return False;
-    }
+ 
 
     // -- CREATE PATIENT ACCOUNT
     public static function create_patient(array $userDataArr): void {

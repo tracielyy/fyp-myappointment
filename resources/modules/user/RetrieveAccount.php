@@ -20,6 +20,51 @@ require_once UTIL_MOD . '/ArrayCreation.php';
 
 class RetrieveAccount {
 
+    //  -- CHECK IF USER EXIST IN THE DATABASE
+    public static function check_user_exist(string $email): bool {
+
+        # Email Array
+        $emailArr ["credentials"] = array(
+            'email' => $email
+        );
+
+        # Query For User With The Given Email
+        $db = new DbQuery();
+        $emails_found = $db->select_exact_match(Database::ACCOUNT_USER, $emailArr);
+
+        # Check If There Are Any Value Returned
+        if (($emails_found !== NULL)):
+            return True;  // There is existing user
+        endif;
+
+        return False;
+    }
+
+    // --  RETRIEVE FULL NAME OF ACCOUNT USER
+    public static function retrieve_user_fullname(string $email): ?string {
+
+        # Assign Email To Array
+        $emailArr ["credentials"] = array(
+            'email' => $email
+        );
+
+        # Retrieve `Account_User` Object
+        $db = new DbQuery();
+        $user_data = $db->select_exact_match(Database::ACCOUNT_USER, $emailArr);
+
+        # Filter & Return Full Name
+        if ($user_data !== NULL):
+            
+            # -- CHECK THE USER TYPE
+            $name_arr = $user_data['profile']['name'];
+            $full_name = $name_arr['firstname'] . " " . $name_arr['lastname'];
+            return $full_name;
+
+        endif;
+
+        return null;
+    }
+
     // -- Load User Data (Retrieve & Return User Data) -- //
     public static function retrieve_account_data(array $credentialArr): ?Account_User {
 

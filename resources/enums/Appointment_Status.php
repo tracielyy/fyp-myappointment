@@ -4,7 +4,6 @@
  * @author yanying (Tracy)
  */
 
-
 abstract class Appointment_Status {
 
     // -- Status Visible To Patient -- //
