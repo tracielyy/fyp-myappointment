@@ -17,9 +17,21 @@ class CreateAppointment {
         // -- Prevent Instantiation
     }
 
-    // -- CREATE AN APPOINTMENT
+    // -- BOOK AN APPOINTMENT
+    public static function book_appointment() {
+        
+    }
+
     // -- CREATE APPOINTMENT RECORD
+    public static function create_appointment_record() {
+        
+    }
+
     // -- UPDATE APPOINTMENT SLOT
+    public static function update_appt_slot() {
+        
+    }
+
 }
 
 ?>
