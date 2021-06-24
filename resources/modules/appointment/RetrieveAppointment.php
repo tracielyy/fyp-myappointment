@@ -8,14 +8,18 @@
 require_once '../resources/config.php';
 require_once APPT_MOD . '/Appointment_Record.php';
 
-class DisplayAppointment {
+/*
+ *       # VIEW APPOINTMENT #
+ */
+
+class RetrieveAppointment {
 
     private function __construct() {
         // -- Prevent Instantiation
     }
 
     // -- Retrieve Of Appointment Records Of Certain Type -- //
-    private static function get_patient_appointment(array $email, array $appointmentstatus): array {
+    private static function get_patient_appointment(array $email, ?array $appointmentstatus = NULL): array {
 
         # Array Of Appointments
         $appointment_arr = array();
@@ -25,7 +29,13 @@ class DisplayAppointment {
 
         $doc_id = $db->get_document_id(Database::ACCOUNT_USER, $email);
         $doc_path = Database::ACCOUNT_USER . "/" . $doc_id . "/" . Database::APPOINTMENT_RECORD;
-        $record_list = $db->get_documents_by_path($doc_path, True, $appointmentstatus);
+
+        # Check If Need To Filter By Appointment Status
+        if ($appointmentstatus == NULL):
+            $record_list = $db->get_documents_by_path($doc_path, False);
+        else:
+            $record_list = $db->get_documents_by_path($doc_path, True, $appointmentstatus);
+        endif;
 
         # Create Appointment Record Object List
         foreach ($record_list as $record) :

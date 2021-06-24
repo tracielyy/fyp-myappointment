@@ -4,8 +4,6 @@
  * @author yanying (Tracie)
  */
 
-
-
 /* Load Config File */
 require_once '../resources/config.php';
 
@@ -58,7 +56,7 @@ class Medical_Personnel extends Normal_User {
                 PHP_EOL . 'Facility IDs: ');
 
         # -- Counter Variables -- #
-        $count = count($facilityids);
+        $count = count($this->facilityids);
         $counter = 0;
 
         # -- Loop & Display Each Facility IDs -- #
@@ -74,6 +72,24 @@ class Medical_Personnel extends Normal_User {
             }
         }
         return $str;
+    }
+
+    public static function initialise_medical_personnel(array $personnel_info): Medical_Personnel {
+        
+        # Session Object
+        $session_obj = Session::intialise_session($personnel_info['session']);
+
+        # Time Object
+        $createdon = Time::initialise_time($personnel_info['accountdetails']['createdon']);
+
+        # Medical Personnel Object
+        $personnel = new Medical_Personnel($session_obj, $personnel_info['accountdetails']['usertype'], 
+                $createdon, $personnel_info['profile']['name']['firstname'], $personnel_info['profile']['name']['lastname'], 
+                $personnel_info['profile']['gender'], $personnel_info['profile']['dob'],$personnel_info['profile']['contactnumber'], 
+                $personnel_info['profile']['address'], $personnel_info['practitionerinfo']['facilityids'], $personnel_info['practitionerinfo']['specialisation'],
+                $personnel_info['practitionerinfo']['licensenumber'], $personnel_info['credentials']['email']);
+        
+        return $personnel;
     }
 
     //============================================

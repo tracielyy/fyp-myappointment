@@ -13,7 +13,10 @@ require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
 
 require_once APPT_MOD . '/Appointment_Slot.php';
+require_once APPT_MOD . '/RetrieveSlot.php';
 require_once FACILITY_MOD . '/Medical_Facility.php';
+require_once FACILITY_MOD . '/RetrieveFacility.php';
+
 
 class Appointment_Record {
 
@@ -105,10 +108,10 @@ class Appointment_Record {
         $createdon = new Time($appt_record['createdon']['date'], $appt_record['createdon']['time']);
 
         # Appointment Slot
-        $appt_slot = Appointment_Slot::retrieve_appt_slot_by_id($appt_record['slotid'], $appt_record['appointmenttype']);
+        $appt_slot = RetrieveSlot::retrieve_appt_slot_by_id($appt_record['slotid'], $appt_record['appointmenttype']);
 
         # Medical Facility
-        $facility = Medical_Facility::retrieve_facility_by_id($appt_record['facilityid']);
+        $facility = RetrieveFacility::retrieve_facility_by_id($appt_record['facilityid']);
         $appt_record_obj = new Appointment_Record($createdon, $appt_record['appointmentid'], $appt_record['appointmenttype'],
                 $appt_slot, $facility, $appt_record['appointmentstatus']);
 
@@ -117,8 +120,6 @@ class Appointment_Record {
     }
 
 
-
-    // -- Set Appointment Reminder -- //
 }
 
 ?>

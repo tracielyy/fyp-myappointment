@@ -7,18 +7,19 @@
 /* Load Config File */
 require_once '../resources/config.php';
 
-class CreateAppointment{
-    
+/*
+ *       # BOOK APPOINTMENT #
+ */
+
+class CreateAppointment {
+
     private function __construct() {
-       // -- Prevent Instantiation
+        // -- Prevent Instantiation
     }
-    
+
     // -- CREATE AN APPOINTMENT
-    
     // -- CREATE APPOINTMENT RECORD
-    
     // -- UPDATE APPOINTMENT SLOT
-    
-    
 }
+
 ?>

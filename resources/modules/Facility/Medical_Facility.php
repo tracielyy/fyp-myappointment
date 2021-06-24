@@ -116,37 +116,7 @@ class Medical_Facility {
         return $facility_object;
     }
 
-    // -- When A Certain Facility Is Requested To Be Displayed  (NOT DOCUMENT ID) -- //
-    public static function retrieve_facility_by_id(string $facilityid): ?Medical_Facility {
 
-        # Create Facility Array
-        $arr['facilityid'] = $facilityid;
-
-        # Query For Facility
-        $db = new DbQuery();
-        $facility = $db->select_exact_match(Database::MEDICAL_FACILITY, $arr);
-        if ($facility != NULL):
-            return self::initialise_medical_facility($facility);
-        endif;
-    }
-
-    // Retrieval Of All Facilities
-    public static function retrieve_all_facilities(): array {
-
-        # Create An Array 
-        $facility_arr = array();
-
-        # Query For All The Facilities In The Database
-        $db = new DbQuery();
-        $facility_list = $db->get_all_documents_ordered(Database::MEDICAL_FACILITY, "facilityname");
-
-        # Loop & Add To Empty Array
-        foreach ($facility_list as $facility):
-            $facility_arr[] = self::initialise_medical_facility($facility);
-        endforeach;
-
-        return $facility_arr;
-    }
 
 }
 

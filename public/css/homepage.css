@@ -9,7 +9,7 @@
 #find-clinic{
     padding: 8% 15%;
     background-color: lightgray;
-    background-image: url(placeholderphoto.png);
+    background-image: url(../img/placeholderphoto.png);
     background-position: 0rem -25rem; 
     background-size: 1920px;
     background-repeat: no-repeat;

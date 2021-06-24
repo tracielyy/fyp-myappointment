@@ -1,43 +1,39 @@
 <html lang="en">
-<?php
-session_start();
-require_once '../resources/config.php';
-require_once USER_MOD . '/Account_User.php';
-require_once USER_MOD . '/Patient.php';
-require_once APPT_MOD . '/Appointment_Record.php';
-require_once ENUMS_PATH . '/User_Type.php';
+    <?php
+    session_start();
+    require_once '../resources/config.php';
+    require_once USER_MOD . '/Account_User.php';
+    require_once USER_MOD . '/Patient.php';
+    require_once APPT_MOD . '/Appointment_Record.php';
+    require_once ENUMS_PATH . '/User_Type.php';
 
 //require_once FUNCTIONS_PATH . '/PatientFunctions.php';
 //require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
-include TEMPLATES_PATH . '/bootstrap.php';
-?>
-<?php $pageName = "homepage"; ?>
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
-    <!-- BOOTSTRAP CDN -->
-    <style>
-    <?php include './css/homepage.css';
+    include TEMPLATES_PATH . '/bootstrap.php';
     ?>
-    </style>
+    <?php $pageName = "homepage"; ?>
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
+        <!-- BOOTSTRAP CDN -->
+        <link rel="stylesheet" href="./css/homepage.css">
+
     <title>MyAppointment HomePage</title>
 </head>
 
 <body>
     <?php
-
-if (isset($_SESSION["user"])):
-  $user = unserialize($_SESSION["user"]);
-  include TEMPLATES_PATH . '/navbar-loggedin.php';
-else:
-  include TEMPLATES_PATH . '/navbar.php';
-endif;
-
-?>
+    if (isset($_SESSION["user"])):
+        $user = unserialize($_SESSION["user"]);
+        include TEMPLATES_PATH . '/navbar-loggedin.php';
+    else:
+        include TEMPLATES_PATH . '/navbar.php';
+    endif;
+    ?>
     <!-- <img src="https://png.pngtree.com/template/20190316/ourmid/pngtree-medical-health-logo-image_79595.jpg"
                                 class="health-img" alt="..."> -->
     <section id="Find-Clinic">

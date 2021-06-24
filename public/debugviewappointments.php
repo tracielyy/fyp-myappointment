@@ -4,7 +4,7 @@ require_once '../resources/config.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Patient.php';
 require_once APPT_MOD . '/Appointment_Record.php';
-require_once APPT_MOD . '/DisplayAppointment.php';
+require_once APPT_MOD . '/RetrieveAppointment.php';
 require_once ENUMS_PATH . '/User_Type.php';
 
 $pageName = "viewappointment";
@@ -108,9 +108,9 @@ if (isset($_SESSION["user"])):
         $email['credentials']['email'] = $user_email;
 
         // -- Upcoming Appointments -- //
-        $upcoming_arr = DisplayAppointment::get_upcoming_appointments($email);
+        $upcoming_arr = RetrieveAppointment::get_upcoming_appointments($email);
         // -- Missed Appointments -- //
-        $missed_arr = DisplayAppointment::get_missed_appointments($email);
+        $missed_arr = RetrieveAppointment::get_missed_appointments($email);
         ?>
 
         <div class="container">

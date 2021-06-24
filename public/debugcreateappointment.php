@@ -92,12 +92,6 @@ require_once ENUMS_PATH . '/Appointment_Type.php';
 
             }
         </style>
-    </head>
-
-    <body>
-
-        <!-- One "tab" for each step in the form: -->
-
         <script>
             function dateChange(input, date) {
 
@@ -142,10 +136,14 @@ require_once ENUMS_PATH . '/Appointment_Type.php';
 
             }
 
-
-
-
         </script>
+    </head>
+
+    <body>
+
+        <!-- One "tab" for each step in the form: -->
+
+
 
         <!-- Navigation -->
         <?php

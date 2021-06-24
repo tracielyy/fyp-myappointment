@@ -18,7 +18,6 @@ define("APPT_MOD", realpath(dirname(__FILE__) . '/modules/appointment'));
 define("TIME_MOD", realpath(dirname(__FILE__) . '/modules/time'));
 define("SECURE_MOD", realpath(dirname(__FILE__) . '/modules/security'));
 define("MEDICALDOC_MOD", realpath(dirname(__FILE__) . '/modules/medicaldocument'));
-define("USERACC_MOD", realpath(dirname(__FILE__) . '/modules/useraccount'));
 
 ?>
 

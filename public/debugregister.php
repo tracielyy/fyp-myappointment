@@ -6,7 +6,7 @@ require_once '../resources/config.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Patient.php';
 require_once UTIL_MOD . '/Regex.php';
-require_once USERACC_MOD . '/CreateAccount.php';
+require_once USER_MOD . '/CreateAccount.php';
 //require_once FUNCTIONS_PATH . '/PatientFunctions.php';
 ?>
 <html lang="en">
