@@ -49,18 +49,26 @@ class Authentication {
         return ($db_session->get_token() == $token && $db_session->get_sessionid() == $sessionid);
     }
 
-
     // -- Authenticate & Return The User Data If Authenticated Successfully -- //
-    public static function authenticate_user(array $credentialArr): bool {
+    public static function authenticate_user(array $credentialArr, string $usertype): bool {
 
         # Credentials
         $credentials = array(
             "credentials" => $credentialArr
         );
 
-        # Query For User Using Given Credentials
+        # User Type
+        $account_type ['accountdetails'] = array(
+            "usertype" => $usertype
+        );
+
+        # Condition Container
+        $condition_arr = array_merge($credentials, $account_type);
+//        echo var_dump($condition_arr);
+
+        # Query For User Using Given Credentials & Condition
         $db = new DbQuery();
-        $user_data = $db->select_exact_match(Database::ACCOUNT_USER, $credentials);
+        $user_data = $db->select_exact_match(Database::ACCOUNT_USER, $condition_arr);
 
         # Check If There Are Any User Returned From The Query
         if ($user_data != NULL):

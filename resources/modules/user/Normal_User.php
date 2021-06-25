@@ -14,8 +14,6 @@ require_once TIME_MOD . '/Time.php';
 
 require_once USER_MOD . '/Account_User.php';
 
-
-
 class Normal_User extends Account_User {
 
     private string $firstname;
@@ -107,6 +105,33 @@ class Normal_User extends Account_User {
                 PHP_EOL . 'Gender: ' . $this->gender . PHP_EOL . 'DOB: ' . $this->dob .
                 PHP_EOL . 'Address: ' . $this->address . PHP_EOL . 'Contact Number: ' . $this->contactnumber);
         return $str;
+    }
+
+    //============================================
+    //      Methods Accessing Firestore Database 
+    //============================================
+    // -- RETRIEVE FULL NAME FROM DATABASE
+    public static function retrieve_user_fullname(string $email): ?string {
+
+        # Assign Email To Array
+        $emailArr ["credentials"] = array(
+            'email' => $email
+        );
+
+        # Retrieve `Account_User` Object
+        $db = new DbQuery();
+        $user_data = $db->select_exact_match(Database::ACCOUNT_USER, $emailArr);
+
+        # Filter & Return Full Name
+        if ($user_data !== NULL):
+
+            $name_arr = $user_data['profile']['name'];
+            $full_name = $name_arr['firstname'] . " " . $name_arr['lastname'];
+            return $full_name;
+
+        endif;
+
+        return null;
     }
 
 }

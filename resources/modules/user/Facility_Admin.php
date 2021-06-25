@@ -35,6 +35,14 @@ class Facility_Admin extends Admin {
         return $str;
     }
 
+    //============================================
+    //      Methods Accessing Firestore Database 
+    //============================================
+    // -- CREATE FACILITY ADMIN ACCOUNT
+    public static function create_facility_admin(array $facility_admin_data): bool {
+        
+    }
+
 }
 
 ?>

@@ -75,7 +75,7 @@ class Medical_Personnel extends Normal_User {
     }
 
     public static function initialise_medical_personnel(array $personnel_info): Medical_Personnel {
-        
+
         # Session Object
         $session_obj = Session::intialise_session($personnel_info['session']);
 
@@ -83,12 +83,12 @@ class Medical_Personnel extends Normal_User {
         $createdon = Time::initialise_time($personnel_info['accountdetails']['createdon']);
 
         # Medical Personnel Object
-        $personnel = new Medical_Personnel($session_obj, $personnel_info['accountdetails']['usertype'], 
-                $createdon, $personnel_info['profile']['name']['firstname'], $personnel_info['profile']['name']['lastname'], 
-                $personnel_info['profile']['gender'], $personnel_info['profile']['dob'],$personnel_info['profile']['contactnumber'], 
+        $personnel = new Medical_Personnel($session_obj, $personnel_info['accountdetails']['usertype'],
+                $createdon, $personnel_info['profile']['name']['firstname'], $personnel_info['profile']['name']['lastname'],
+                $personnel_info['profile']['gender'], $personnel_info['profile']['dob'], $personnel_info['profile']['contactnumber'],
                 $personnel_info['profile']['address'], $personnel_info['practitionerinfo']['facilityids'], $personnel_info['practitionerinfo']['specialisation'],
                 $personnel_info['practitionerinfo']['licensenumber'], $personnel_info['credentials']['email']);
-        
+
         return $personnel;
     }
 
@@ -98,6 +98,47 @@ class Medical_Personnel extends Normal_User {
     // -- Get Medical Personnel (Individual) -- //
     public static function get_medical_personnel() {
         
+    }
+
+    // -- CREATE MEDICAL PERSONNEL ACCOUNT
+    public static function create_medical_personnel(array $medical_personnel_data): bool {
+
+        # Create Default Fields
+        # Load Info To Data Container
+        # Add Medical Personnel Data To Database
+    }
+
+    // -- RETRIEVE ALL MEDICAL PERSONNEL
+    public static function display_all_practitioner(string $admin_email): array {
+
+        # -- Email Array -- #
+        $email['credentials'] = array(
+            'email' => $admin_email
+        );
+
+        # -- Create Patient Object Array -- #
+        $practitioner_arr = array();
+
+        # -- Double Check If User Is Admin -- #
+        if (self::check_admin($email)) :
+
+            # -- Conditions -- #
+            $condition['accountdetails'] = array('usertype' => User_Type::MEDICAL_PERSONNEL);
+
+            # -- Ordered By -- #
+            $orderedBy['profile.name'] = array('firstname', 'lastname');
+
+            # -- Get All The Patient Ordered In Ascending -- #
+            $db = new DbQuery();
+            $practitioner_list = $db->get_filtered_documents_ordered(Database::ACCOUNT_USER, $condition, $orderedBy, true);
+
+            # -- Loop & Placed Patient Object To Array -- #
+            foreach ($practitioner_list as $practitioner):
+                $practitioner_arr[] = self::intialise_medical_personnel($practitioner);
+            endforeach;
+        endif;
+
+        return $practitioner_arr;
     }
 
 }

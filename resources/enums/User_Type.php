@@ -10,6 +10,7 @@ abstract class User_Type {
     const FACIILITY_ADMIN = "Facility_Admin";
     const MEDICAL_PERSONNEL = "Medical_Personnel";
     const PATIENT = "Patient";
+    const GUEST = "Guest";
 
     // -- Check If The User Is Of Certain User Type -- //
     public static function check_user_type(string $allowed_usertype, string $given_usertype): bool {

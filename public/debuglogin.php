@@ -6,7 +6,7 @@ require_once EMAIL_MOD . '/Email.php';
 require_once UTIL_MOD . '/StringUtils.php';
 require_once UTIL_MOD . '/Regex.php';
 require_once AUTH_MOD . '/Authentication.php';
-require_once USER_MOD . '/RetrieveAccount.php';
+require_once USER_MOD . '/Account_User.php';
 
 //require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?><!DOCTYPE html>
@@ -77,7 +77,7 @@ require_once USER_MOD . '/RetrieveAccount.php';
             if (!in_array(FALSE, $validArr)) {
 
                 # -- Start Authenticating User (boolean)
-                $auth = Authentication::authenticate_user($loginArr);
+                $auth = Authentication::authenticate_user($loginArr, User_Type::PATIENT);
 
                 # -- Check If There Is Any "token" generated ---
                 if (!isset($_SESSION['token'])) {
@@ -91,8 +91,8 @@ require_once USER_MOD . '/RetrieveAccount.php';
                 if ($auth) {
 
                     # -- Check If There Are Any Other Login Session (Terminate Other Session?)
-                    $auth_user = RetrieveAccount::retrieve_account_data($loginArr);
-                    $session_logon_allowed = Authentication::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
+                    $auth_patient = Patient::retrieve_patient($loginArr);
+                    $session_logon_allowed = Authentication::check_session($auth_patient->get_session(), session_id(), $_SESSION['token']);
 
                     # -- Get IP Address ---
                     // whether ip is from share internet
@@ -109,12 +109,12 @@ require_once USER_MOD . '/RetrieveAccount.php';
                     }
 
                     if ($session_logon_allowed) {
-                        $login_status = Authentication::login($auth_user->get_email(), session_id(), $_SESSION['token'], $ipaddress); # Error
-                        $auth_user = RetrieveAccount::retrieve_account_data($loginArr); // Reload After Login Session Update
-                        $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
+                        $login_status = Authentication::login($auth_patient->get_email(), session_id(), $_SESSION['token'], $ipaddress); # Error
+                        $auth_patient = Patient::retrieve_patient($loginArr); // Reload After Login Session Update
+                        $_SESSION['user'] = serialize($auth_patient); // Store User Data In Session
                         header("Location:./"); // Redirect Upon Success Authenticate
                         echo nl2br(PHP_EOL . "Success" . PHP_EOL);
-                        echo $auth_user . "<br/>";
+                        echo $auth_patient . "<br/>";
                         echo (int) $login_status;
 
                         # -- Clear Fields

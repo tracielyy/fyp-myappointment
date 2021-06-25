@@ -3,8 +3,6 @@
 /* Load Config File */
 require_once '../resources/config.php';
 require_once USER_MOD . '/Account_User.php';
-require_once USER_MOD . '/RetrieveAccount.php';
-require_once USER_MOD . '/UpdateAccount.php';
 require_once EMAIL_MOD . '/EmailTemplate.php';
 require_once UTIL_MOD . '/Regex.php';
 require_once UTIL_MOD . '/StringUtils.php';
@@ -66,7 +64,7 @@ require_once UTIL_MOD . '/StringUtils.php';
             /* ------------ End Validation ------------ */
 
             // -- Make Sure It Is A Valid Patient/Medical Personnel (Can Admin Reset Password???)
-            $user_exist = RetrieveAccount::check_user_exist($resetArr['email']);
+            $user_exist = Account_User::check_user_exist($resetArr['email']);
 
             // -- Invoke Email Send To User To Reset Password
             if ($user_exist) {
@@ -82,7 +80,7 @@ require_once UTIL_MOD . '/StringUtils.php';
 
                 $msg = "Successfully sent";
                 // -- Updating The Token To The Database
-                UpdateAccount::request_password_reset($to, $token);
+                Account_User::request_password_reset($to, $token);
 
                 $resetArr = array(
                     'email' => '',

@@ -33,6 +33,23 @@ class Super_Admin extends Admin {
         return $str;
     }
 
+    //============================================
+    //      Methods Accessing Firestore Database 
+    //============================================
+    // -- CHECK IF USER IS SUPER ADMIN
+    public static function check_super_admin(array $email): bool {
+
+        # -- Retrieve User Information Array -- #
+        $db = new DbQuery();
+        $admin_user = $db->select_exact_match(Database::ACCOUNT_USER, $email);
+
+        # -- Check If It Match The `Admin` User_Type -- #
+        if ($admin_user['accountdetails']['usertype'] == User_Type::SUPER_ADMIN) :
+            return true;
+        endif;
+        return false;
+    }
+
 }
 
 ?>

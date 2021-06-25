@@ -220,7 +220,7 @@ require_once ENUMS_PATH . '/Appointment_Type.php';
 
                                     <div id="mf003"
                                          class="col-auto me-sm-2 mx-1 card-block py-0 text-center radio radio-facilityid">
-                                        <div class="opt-icon"><img src="cgh.png" class="img-fluid" width="100"
+                                        <div class="opt-icon"><img src="./img/cgh.png" class="img-fluid" width="100"
                                                                    height="100">
                                         </div>
                                         <p><b>Changi General Hospital</b></p>
@@ -228,14 +228,14 @@ require_once ENUMS_PATH . '/Appointment_Type.php';
 
                                     <div id="mf001"
                                          class="col-auto me-sm-2 mx-1 card-block py-0 text-center radio radio-facilityid">
-                                        <div class="opt-icon"><img src="nuh.png" class="img-fluid" width="100"
+                                        <div class="opt-icon"><img src="./img/nuh.png" class="img-fluid" width="100"
                                                                    height="100"></div>
                                         <p><b>National University Hospital</b></p>
                                     </div>
 
                                     <div id="mf002"
                                          class="col-auto me-sm-2 mx-1 card-block py-0 text-center radio radio-facilityid">
-                                        <div class="opt-icon"><img src="tts.png" class="img-fluid" width="75"
+                                        <div class="opt-icon"><img src="./img/tts.png" class="img-fluid" width="75"
                                                                    height="50">
                                         </div>
                                         <p><b>Tan Tock Seng Hospital</b></p>

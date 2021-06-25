@@ -13,6 +13,8 @@ require_once '../resources/config.php';
 
 require_once TIME_MOD . '/Time.php';
 require_once FACILITY_MOD . '/Operating_Hours.php';
+require_once DB_MOD . '/DbQuery.php';
+require_once DB_MOD . '/Database.php';
 
 class Medical_Facility {
 
@@ -115,8 +117,97 @@ class Medical_Facility {
                 $facility['contactnumber'], $operatinghour, $facility['facilityid']);
         return $facility_object;
     }
+    
+    // ####################     Database Functions      ################### //
 
+    // -- GENERATE FACILITY ID
+    public static function generated_facility_id(): string {
 
+        # Order By Facility ID
+        $orderBy = array('facilityid');
+
+        # Find The Last ID & Increment
+        $db = new DbQuery();
+        $doc_path = Database::MEDICAL_FACILITY;
+        $last_id_facility = $db->get_documentid_ordered($doc_path, $orderBy, false);
+
+        # If There Is Any Present ID In Database
+        if ($last_id_facility != null) :
+
+            return ++$last_id_facility;
+
+        # No ID Present In Database
+        else:
+            return "mf1001";
+        endif;
+    }
+
+    // -- CREATE NEW MEDICAL FACILTY
+    public static function create_medical_facility(array $facility_info): bool {
+
+        # Check If There Is Existing Record Of The Facility
+        if (!RetrieveFacility::check_facility_exist($facility_info)):
+
+            # Generate User Defined Facility ID
+            $facility_id = self::generated_facility_id();
+
+            $doc_path = Database::MEDICAL_FACILITY;
+            $db = new DbQuery();
+            return $db->insert_data($doc_path, $facility_info, False, $facility_id);
+        endif;
+        return False;
+    }
+
+    // -- RETRIEVE FACILITY BY ID
+    public static function retrieve_facility_by_id(string $facilityid): ?Medical_Facility {
+
+        # Create Facility Array
+        $arr['facilityid'] = $facilityid;
+
+        # Query For Facility
+        $db = new DbQuery();
+        $facility = $db->select_exact_match(Database::MEDICAL_FACILITY, $arr);
+        if ($facility != NULL):
+            return self::initialise_medical_facility($facility);
+        endif;
+    }
+
+    // -- RETRIEVE ALL FACILITIES
+    public static function retrieve_all_facilities(): array {
+
+        # Create An Array 
+        $facility_arr = array();
+
+        # Query For All The Facilities In The Database
+        $db = new DbQuery();
+        $facility_list = $db->get_all_documents_ordered(Database::MEDICAL_FACILITY, "facilityname");
+
+        # Loop & Add To Empty Array
+        foreach ($facility_list as $facility):
+            $facility_arr[] = self::initialise_medical_facility($facility);
+        endforeach;
+
+        return $facility_arr;
+    }
+
+    // -- CHECK IF THE FACILITY EXIST
+    public static function check_facility_exist(array $facility_info): bool {
+
+        # Create Checking Array (Store Conditions To Check)
+        $checking_arr = array(
+            'facilityname' => $facility_info['facilityname'],
+            'contactnumber' => $facility_info['contactnumber']
+        );
+
+        # -- Check Name & Contact Number
+        $path = Database::MEDICAL_FACILITY;
+        $db = new DbQuery();
+        $found_facility = $db->select_exact_match($path, $checking_arr);
+        if ($found_facility):
+            return True;
+        endif;
+        return False;
+    }
 
 }
 

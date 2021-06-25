@@ -7,8 +7,6 @@
     require_once APPT_MOD . '/Appointment_Record.php';
     require_once ENUMS_PATH . '/User_Type.php';
 
-//require_once FUNCTIONS_PATH . '/PatientFunctions.php';
-//require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
     include TEMPLATES_PATH . '/bootstrap.php';
     ?>

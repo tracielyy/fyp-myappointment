@@ -11,7 +11,7 @@ require_once '../resources/config.php';
  *       # VIEW BILL HISTORY #
  */
 
-class DisplayBill {
+class Bill {
     
 }
 ?>

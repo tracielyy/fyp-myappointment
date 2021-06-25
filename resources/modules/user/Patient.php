@@ -13,7 +13,7 @@ require_once TIME_MOD . '/Time.php';
 
 require_once AUTH_MOD . '/Session.php';
 require_once USER_MOD . '/Normal_User.php';
-require_once APPT_MOD . '/RetrieveAppointment.php';
+require_once APPT_MOD . '/Appointment_Record.php';
 
 class Patient extends Normal_User {
 
@@ -61,8 +61,8 @@ class Patient extends Normal_User {
     public function set_verified(bool $verified): void {
         $this->verified = $verified;
     }
-    
-    public function set_appointmentrecords(array $appointmentrecords): void{
+
+    public function set_appointmentrecords(array $appointmentrecords): void {
         $this->appointmentrecords = $appointmentrecords;
     }
 
@@ -87,11 +87,11 @@ class Patient extends Normal_User {
 
         # Get Patient ID
         $patientid = "";
-        
-        # Credentials
-        $email['credentials']['email'] = $patient_info['credentials']['email'];
 
-        $appointmentrecords = RetrieveAppointment::retrieve_all_appointments($email);
+        # Credentials
+        $email['credentials'] = array("email" => $patient_info['credentials']['email']);
+
+        $appointmentrecords = Appointment_Record::retrieve_patient_all_appointments($email);
         $medicalrecords = array();
 
         # Patient Object
@@ -102,18 +102,66 @@ class Patient extends Normal_User {
         return $patient;
     }
 
-    // Functions
-    # - Book Appointment
-    # - View Appointment
-    # - Cancel Appointment
-    # - Update Profile Details
-    # - Password Reset
-    # - Password Change
-    # - View Bill History
-    # - View Health Educational Materials
-    # - View Health Tips
-    # - Calendar Invites (Add To Calendar)
-    # - View FAQs
+    //============================================
+    //      Methods Accessing Firestore Database 
+    //============================================
+    // -- CREATE PATIENT ACCOUNT
+    public static function create_patient(array $patient_info): bool {
+
+        # Declaration Of Basic Information To Include To Account_User
+        $account_user_arr = ArrayCreation::account_creation_array(User_Type::PATIENT);
+
+        # Load Basic Account User Fields & Values To Array
+        foreach ($account_user_arr as $field => $value) :
+            $patient_info[$field] = $value;
+        endforeach;
+
+        # Add Patient Data To Database
+        $db = new DbQuery();
+        return $db->insert_data(Database::ACCOUNT_USER, $patient_info, true);
+    }
+
+    // -- RETRIEVE PATIENT DATA
+    public static function retrieve_patient(array $login_arr): Patient {
+
+        $patient_data = Account_User::retrieve_account_data($login_arr);
+        return self::initialise_patient($patient_data);
+    }
+
+    // -- RETRIEVE ALL PATIENTS (put patient in container)
+    public static function retrieve_all_patients(string $admin_email): array {
+
+        # -- Email Array -- #
+        $email['credentials'] = array(
+            'email' => $admin_email
+        );
+
+        # -- Create Patient Object Array -- #
+        $patient_arr = array();
+
+        # -- Double Check If User Is Admin -- #
+        if (self::check_admin($email)) :
+
+            # -- Conditions -- #
+            $condition['accountdetails'] = array('usertype' => User_Type::PATIENT);
+
+            # -- Ordered By -- #
+            $orderedBy['profile.name'] = array('firstname', 'lastname');
+
+            # -- Get All The Patient Ordered In Ascending -- #
+            $db = new DbQuery();
+            $patient_list = $db->get_filtered_documents_ordered(Database::ACCOUNT_USER, $condition, $orderedBy, true);
+
+            # -- Loop & Placed Patient Object To Array -- #
+            foreach ($patient_list as $patient):
+                $patient_arr[] = self::initialise_patient($patient);
+            endforeach;
+
+        endif;
+
+        return $patient_arr;
+    }
+
 }
 
 ?>
