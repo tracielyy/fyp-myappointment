@@ -2,6 +2,7 @@
 /*
  * @author yanying (Tracie)
  */
+
 abstract class Appointment_Type {
 
     const SPECIALIST_CONSULTATION = "Specialist Consultation";

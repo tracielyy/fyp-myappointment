@@ -3,13 +3,12 @@
 session_start();
 /* Load Config File */
 require_once '../resources/config.php';
-require_once UTILS_PATH . '/Time.php';
-require_once ENTITIES_PATH . '/Account_User.php';
-require_once ENTITIES_PATH . '/Appointment_Record.php';
+require_once TIME_MOD . '/Time.php';
+require_once USER_MOD . '/Account_User.php';
+require_once USER_MOD . '/Patient.php';
+require_once APPT_MOD . '/Appointment_Record.php';
 require_once ENUMS_PATH . '/User_Type.php';
 require_once ENUMS_PATH . '/Appointment_Type.php';
-require_once FUNCTIONS_PATH . '/PatientFunctions.php';
-require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?>
 
 <html>
@@ -22,7 +21,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <!-- Styling -->
-        <?php include COMPONENTS_PATH . '/bootstrap.php'; ?>
+        <?php include TEMPLATES_PATH . '/bootstrap.php'; ?>
         <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'>
         <style>
             .li-search {
@@ -93,12 +92,6 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
             }
         </style>
-    </head>
-
-    <body>
-
-        <!-- One "tab" for each step in the form: -->
-
         <script>
             function dateChange(input, date) {
 
@@ -143,15 +136,19 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
             }
 
-
-
-
         </script>
+    </head>
+
+    <body>
+
+        <!-- One "tab" for each step in the form: -->
+
+
 
         <!-- Navigation -->
         <?php
         $user = unserialize($_SESSION["user"]);
-        include COMPONENTS_PATH . '/navbar-loggedin.php';
+        include TEMPLATES_PATH . '/navbar-loggedin.php';
         // -- Used to store correct data
         $appointmentArr = array(
             'facilityid' => '',
@@ -223,7 +220,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
                                     <div id="mf003"
                                          class="col-auto me-sm-2 mx-1 card-block py-0 text-center radio radio-facilityid">
-                                        <div class="opt-icon"><img src="cgh.png" class="img-fluid" width="100"
+                                        <div class="opt-icon"><img src="./img/cgh.png" class="img-fluid" width="100"
                                                                    height="100">
                                         </div>
                                         <p><b>Changi General Hospital</b></p>
@@ -231,14 +228,14 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
                                     <div id="mf001"
                                          class="col-auto me-sm-2 mx-1 card-block py-0 text-center radio radio-facilityid">
-                                        <div class="opt-icon"><img src="nuh.png" class="img-fluid" width="100"
+                                        <div class="opt-icon"><img src="./img/nuh.png" class="img-fluid" width="100"
                                                                    height="100"></div>
                                         <p><b>National University Hospital</b></p>
                                     </div>
 
                                     <div id="mf002"
                                          class="col-auto me-sm-2 mx-1 card-block py-0 text-center radio radio-facilityid">
-                                        <div class="opt-icon"><img src="tts.png" class="img-fluid" width="75"
+                                        <div class="opt-icon"><img src="./img/tts.png" class="img-fluid" width="75"
                                                                    height="50">
                                         </div>
                                         <p><b>Tan Tock Seng Hospital</b></p>

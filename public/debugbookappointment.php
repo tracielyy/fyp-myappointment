@@ -6,9 +6,9 @@
 session_start();
 /* Load Config File */
 require_once '../resources/config.php';
-require_once UTILS_PATH . '/Time.php';
-require_once ENTITIES_PATH . '/Account_User.php';
-require_once ENTITIES_PATH . '/Appointment_Record.php';
+require_once TIME_MOD . '/Time.php';
+require_once USER_MOD . '/Account_User.php';
+require_once APPT_MOD . '/Appointment_Record.php';
 require_once ENUMS_PATH . '/User_Type.php';
 require_once ENUMS_PATH . '/Appointment_Type.php';
 require_once FUNCTIONS_PATH . '/PatientFunctions.php';

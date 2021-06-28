@@ -1,26 +1,28 @@
-<!--
-   Developed By FYP-21-S2-24
--->
-<!-- This File Is Solely Used For Debugging -->
+<!-- When User Is Directed To Email Reset -->
 <?php
 /* Load Config File */
 require_once '../resources/config.php';
-require_once UTILS_PATH . '/Regex.php';
-require_once UTILS_PATH . '/Email.php';
-require_once ENTITIES_PATH . '/Account_User.php';
-require_once ENTITIES_PATH . '/Appointment_Record.php';
-require_once ENUMS_PATH . '/User_Type.php';
-require_once FUNCTIONS_PATH . '/PatientFunctions.php';
-require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
+require_once USER_MOD . '/Account_User.php';
+require_once EMAIL_MOD . '/EmailTemplate.php';
+require_once UTIL_MOD . '/Regex.php';
+require_once UTIL_MOD . '/StringUtils.php';
 ?>
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
     <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
         <!-- Title -->
         <title>FYP-21-S2-24: Password Reset</title>
         <!-- Styling -->
-        <?php require COMPONENTS_PATH . '/bootstrap.php' ?>
+        <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
+        <link rel='stylesheet' href='./css/loginRegister.css'>
 
     </head>
+
     <body>
         <!-- PHP Script -->
         <?php
@@ -62,7 +64,7 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
             /* ------------ End Validation ------------ */
 
             // -- Make Sure It Is A Valid Patient/Medical Personnel (Can Admin Reset Password???)
-            $user_exist = AccountUserFunctions::check_user_exist($resetArr['email']);
+            $user_exist = Account_User::check_user_exist($resetArr['email']);
 
             // -- Invoke Email Send To User To Reset Password
             if ($user_exist) {
@@ -74,11 +76,15 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 
                 // -- Send Emaill With Token To User 
                 $to = $resetArr['email'];
-                Email::template_passwordreset($to, $token);
+                EmailTemplate::template_passwordreset($to, $token);
 
                 $msg = "Successfully sent";
                 // -- Updating The Token To The Database
-                AccountUserFunctions::request_password_reset($to, $token);
+                Account_User::request_password_reset($to, $token);
+
+                $resetArr = array(
+                    'email' => '',
+                );
             } else {
                 $msg = "This email does not exist";
             }
@@ -86,12 +92,53 @@ require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
         ?>
         <!-- Display Message Info -->
         <div><?php echo $msg; ?></div>
-        <!-- Reset Form (Ask For Email To Reset) -->
-        <form method="post"  action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-            <p>Enter Email Address To Reset Password</p>
-            <input type="email" name="email" required placeholder="Email"  value="<?php echo $resetArr['email']; ?>"/>
-            <button type="submit" name="resetpassword" value="reset">Reset</button>
-        </form>
+
+        <!-- HTML FRONT END CODE -->
+
+        <div>
+            <!-- Navigation -->
+            <?php include TEMPLATES_PATH . '/navbar.php' ?>
+
+            <!-- Login Card -->
+            <div class="center row m-4">
+                <div class="container col-md-10 col-lg-6 col-xl-4 col-xxl-4">
+                    <div class="my-5 col-sm-12">
+                        <div class="shadow card p-2 rounded1">
+                            <div class="card-body m-1">
+                                <h1 class="card-title pt-2 pb-3">Password Recovery</h1>
+                                <div class="px-1">
+                                    <p class="text-muted"> Enter email address to reset password </p>
+                                    <!-- Form -->
+                                    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                                        <div class="row pb-2">
+                                            <div class="col-4 d-none d-lg-block">  
+                                                <p class="pt-2"> Email: </p>
+                                            </div>
+                                            <div class="col-lg-8 col-xs-12">
+                                                <!-- EMAIL -->
+                                                <input type="email" class="form-control" name="email" required
+                                                       placeholder="Email" value="<?php echo $resetArr['email']; ?>" />
+                                            </div>
+                                        </div>
+                                        <div class="row pt-2">
+                                            <div class="d-grid gap-2 d-lg-block">
+                                                <!-- Login Submission -->
+                                                <button class="btn btn-primary" style="float: right"
+                                                        type="submit"  name="resetpassword" value="reset" >Reset</button><br />
+                                            </div>
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
     </body>
+
 </html>
