@@ -24,6 +24,7 @@ data = {
 #doctor_slots.document('slot-1002').set(data)
 d = datetime.datetime.now()
 
+#Medical Personnel Profile
 doctor = {
     'accountdetails' : {
         'createdon' : {
