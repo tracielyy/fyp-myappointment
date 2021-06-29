@@ -109,7 +109,7 @@ class Medical_Personnel extends Normal_User {
     }
 
     // -- RETRIEVE ALL MEDICAL PERSONNEL
-    public static function display_all_practitioner(string $admin_email): array {
+    public static function retrieve_all_practitioner(string $admin_email): array {
 
         # -- Email Array -- #
         $email['credentials'] = array(
@@ -140,6 +140,9 @@ class Medical_Personnel extends Normal_User {
 
         return $practitioner_arr;
     }
+    
+
+    
 
 }
 

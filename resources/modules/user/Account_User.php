@@ -87,7 +87,7 @@ class Account_User {
 
         # Retrieve User From Given Credentials
         $db = new DbQuery();
-        $user_data = $db->select_exact_match(Database::ACCOUNT_USER, $credentials);
+        $user_data = $db->fetch_one_document(Database::ACCOUNT_USER, $credentials);
 
         # Store Any User Data In `Account_User` Object
         if ($user_data != NULL):
@@ -110,7 +110,7 @@ class Account_User {
 
         # Query For User With The Given Email
         $db = new DbQuery();
-        $user = $db->select_exact_match(Database::ACCOUNT_USER, $emailArr);
+        $user = $db->fetch_one_document(Database::ACCOUNT_USER, $emailArr);
 
         # Check If There Are Any Value Returned
         if (($user !== NULL)):
@@ -130,7 +130,7 @@ class Account_User {
 
         # Query For User With The Given Email
         $db = new DbQuery();
-        $user = $db->select_exact_match(Database::ACCOUNT_USER, $emailArr);
+        $user = $db->fetch_one_document(Database::ACCOUNT_USER, $emailArr);
 
         # Check If There Are Any Value Returned
         if (($user !== NULL)):
@@ -173,7 +173,7 @@ class Account_User {
 
         # Update User Profile
         $db = new DbQuery();
-        $changed = $db->modify_field(Database::ACCOUNT_USER, $credentials, $profile_arr);
+        $changed = $db->update_field(Database::ACCOUNT_USER, $credentials, $profile_arr);
 
         # Return Boolean (Success or Failure)
         return $changed;
@@ -209,18 +209,18 @@ class Account_User {
 
             # Retrieving `passwordreset` Map Fields
             $db = new DbQuery();
-            $mapData = $db->get_map_field(Database::ACCOUNT_USER, $email_arr, self::PASSWORD_RESET);
+            $mapData = $db->fetch_one_document(Database::ACCOUNT_USER, $email_arr);
 
             # Validate The Database's Requested Dates
-            if (self::verify_requested_date($mapData['requestedon']['date'], $mapData['requestedon']['time'])):
+            if (self::verify_requested_date($mapData['passwordreset']['requestedon']['date'], $mapData['password']['requestedon']['time'])):
 
                 # Set The Dates
                 $currentDate = new Time();
-                $requestedon = new Time($mapData['requestedon']['date'], $mapData['requestedon']['time']);
+                $requestedon = new Time($mapData['passwordreset']['requestedon']['date'], $mapData['passwordreset']['requestedon']['time']);
 
                 # Get token duration (Since Request)
                 $duration = (int) Time::datetime_second_diff($currentDate, $requestedon);
-                $originaltoken = $mapData["passwordtoken"];
+                $originaltoken = $mapData['passwordreset']["passwordtoken"];
 
                 echo $requestedon->get_current_date();
 

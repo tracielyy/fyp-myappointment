@@ -120,7 +120,7 @@ class Normal_User extends Account_User {
 
         # Retrieve `Account_User` Object
         $db = new DbQuery();
-        $user_data = $db->select_exact_match(Database::ACCOUNT_USER, $emailArr);
+        $user_data = $db->fetch_one_document(Database::ACCOUNT_USER, $emailArr);
 
         # Filter & Return Full Name
         if ($user_data !== NULL):

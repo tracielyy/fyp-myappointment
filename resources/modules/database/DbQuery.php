@@ -29,8 +29,26 @@ class DbQuery {
         ]);
     }
 
+    public function get_db(): FirestoreClient {
+        return $this->db;
+    }
+
+    // -- DELETE COLLECTION (Removing Data Inside The Collection)
+    public function data_delete_collection(string $collection_path, int $batch_size): void {
+
+        $collectionReference = $this->db->collection($collection_path);
+        $documents = $collectionReference->limit($batch_size)->documents();
+        while (!$documents->isEmpty()) {
+            foreach ($documents as $document) {
+                printf('Deleting document %s' . PHP_EOL, $document->id());
+                $document->reference()->delete();
+            }
+            $documents = $collectionReference->limit($batch_size)->documents();
+        }
+    }
+
     // -- Get Unique Firestore Document In Specific Collection -- //
-    public function get_documentdata_by_id(string $doc_path, string $id): ?array {
+    public function fetch_document_by_id(string $doc_path, string $id): ?array {
 
         # Document Reference
         $doc_ref = $this->db->collection($doc_path)->document($id);
@@ -114,7 +132,7 @@ class DbQuery {
     // -- Get DocumentSnapshot -- //
     private function document_query(CollectionReference $query, array $conditionArr)/* [nullable]: DocumentSnapshot */ {
 
-        $snapshot = $this->with_condition($query, $conditionArr)->documents();
+        $snapshot = $this->with_condition($query, $conditionArr)->limit(1)->documents();
 
         # Iterate Through An Array Of Documents
         foreach ($snapshot as $document) :
@@ -126,6 +144,42 @@ class DbQuery {
             return null;
 
         endforeach;
+    }
+
+    private function all_documents_query(CollectionReference $query, array $conditionArr): array {
+
+        # Document Container
+        $doc_container = array();
+        $snapshot = $this->with_condition($query, $conditionArr)->documents();
+
+        # Iterate Through An Array Of Documents
+        foreach ($snapshot as $document) :
+
+            if ($document->exists()) :
+
+                # Add Document To Container
+                $doc_container[] = $document;
+
+            endif;
+
+        endforeach;
+        return $doc_container; # -- Returning The Whole Document Container
+    }
+
+    // -- GET ALL DOCUMENT ID & STORE THEM IN THE CONTAINER
+    public function retrieve_doc_id_arr(Query $query): array {
+        
+        # Create Empty Arr Container
+        $doc_id_arr = array();
+
+        # Loop & Add ID To Container
+        foreach ($query->documents() as $doc):
+            if ($doc->exists()):
+                $doc_id_arr[] = $doc->id();
+            endif;
+        endforeach;
+        
+        return $doc_id_arr;
     }
 
     public function get_document_id(string $doc_path, array $conditionArr): ?string {
@@ -142,7 +196,7 @@ class DbQuery {
     }
 
     // -- Get Firestore Document Wihout Knowing Document ID -- //
-    public function select_exact_match(string $path, array $conditionArr): ?array {
+    public function fetch_one_document(string $path, array $conditionArr): ?array {
 
         # Collection Reference
         $collection_ref = $this->db->collection($path);
@@ -282,15 +336,6 @@ class DbQuery {
         endforeach;
     }
 
-    public function get_map_field(string $collection, array $conditionArr, string $mapField): array {
-
-        # Return The Whole Document Data
-        $mapData = $this->query_exact_match($collection, $conditionArr);
-
-        # Filter & Return Specified Map Field Datas
-        return $mapData[$mapField];
-    }
-
     private function get_sub_collection_ref(string $collection, string $subcollection, string $doc_id) {
 
         # Using Document ID To Get Nested Collection (Sub-Collection)
@@ -300,93 +345,66 @@ class DbQuery {
     }
 
     private function get_sub_document(string $collection, string $subcollection, array $conditionArr, array $subconditionArr) {
+        $sub_doc_arr = array();
 
         # Collection Reference
         $collection_ref = $this->db->collection($collection);
 
         # Get DocumentSnapShot (An Array Of Documents)
-        $doc_snapshot = $this->document_query($collection_ref, $conditionArr);
+        $doc_snapshot_container = $this->all_documents_query($collection_ref, $conditionArr);
 
         # Get Document ID
-        if ($doc_snapshot->exists()) :
-            $doc_id = $doc_snapshot->id();
-        endif;
+        foreach ($doc_snapshot_container as $doc_snapshot):
+            if ($doc_snapshot->exists()) :
+                $doc_id = $doc_snapshot->id();
+            endif;
+            # Using Document ID To Get Nested Collection (Sub-Collection)
+            $sub_query = $this->get_sub_collection_ref($collection, $subcollection, $doc_id);
 
-        # Using Document ID To Get Nested Collection (Sub-Collection)
-        $sub_query = $this->get_sub_collection_ref($collection, $subcollection, $doc_id);
+            # Sub-Collection (Get Document With Relevant Condition In Sub Collection)
+            foreach ($subconditionArr as $subcondition => $value) :
+                $sub_query = $sub_query->where($subcondition, "=", $value);
+            endforeach;
+            $sub_snapshot = $sub_query->documents();
+            $sub_doc_arr[] = $sub_snapshot;
 
-        # Sub-Collection (Get Document With Relevant Condition In Sub Collection)
-        foreach ($subconditionArr as $subcondition => $value) :
-            $sub_query = $sub_query->where($subcondition, "=", $value);
         endforeach;
-        $sub_snapshot = $sub_query->documents();
 
-        # Return The DocumentSnapShot From The Sub Collection
-        return $sub_snapshot;
+        # Return The DocumentSnapShot Arr
+        return $sub_doc_arr;
     }
 
-    // -- Get Nested Collection's Documents (With Conditions) - //
-    public function get_nested_collection(string $collection, string $subcollection, array $conditionArr, array $subconditionArr): array {
+    // -- Get All Sub Document Of Certain Root Documents (With Conditions) - //
+    public function retrieve_all_sub_documents(string $collection, string $subcollection, array $conditionArr, array $subconditionArr): array {
 
         # -- Get DocumentSnapShot Of Sub Collection
-        $sub_snapshot = $this->get_sub_document($collection, $subcollection, $conditionArr, $subconditionArr);
+        $sub_snapshot_arr = $this->get_sub_document($collection, $subcollection, $conditionArr, $subconditionArr);
 
         # Create An Array To Store The Document Data
         $doc_arr = array();
 
         # Retrieve & Store The Document's Data To Array
-        foreach ($sub_snapshot as $doc) :
-            if ($doc->exists()) :
-                $doc_arr[] = $doc->data(); //  -- Storing Each Document Data In Array
-            endif;
+        foreach ($sub_snapshot_arr as $sub_snapshot) :
+            foreach ($sub_snapshot as $doc):
+                if ($doc->exists()) :
+                    $doc_arr[] = $doc->data(); //  -- Storing Each Document Data In Array
+                endif;
+            endforeach;
         endforeach;
 
         return $doc_arr;  // -- Return Array Of Document Datas
     }
 
-    // -- Update Nested Collection's Document -- //
-    public function modify_nested_collection(string $collection, string $subcollection, array $conditionArr, array $subconditionArr, array $changedArr): bool {
-
-        # Get Collection Rerefence
-        $collection_ref = $this->db->collection($collection);
-
-        # Get DocumentSnapShot
-        $sub_snapshot = $this->get_sub_document($collection, $subcollection, $conditionArr, $subconditionArr);
-
-        # Get DocumentID
-        $doc_id = $this->document_query($collection_ref, $conditionArr)->id();
-
-        # Iterate Through An Array Of Documents
-        foreach ($sub_snapshot as $sub_doc) :
-
-            if ($sub_doc->exists()) :
-
-                # Getting The Document Reference
-                $sub_doc_id = $sub_doc->id();
-                $sub_col_ref = $this->get_sub_collection_ref($collection, $subcollection, $doc_id);
-                $doc_ref = $sub_col_ref->document($sub_doc_id);
-
-                # Update The Values Of The Retrieved DocumentReference
-                $this->update_values($doc_ref, $changedArr);
-                return true;
-
-            endif;
-
-        endforeach;
-
-        return false;
-    }
-
     // -- Order By (Array Of Fields To Order) --//
     private function get_ordered_by(Query $query, array $orderedBy, bool $asc): Query {
-        echo nl2br(PHP_EOL . "OrderBy:" . var_dump($orderedBy));
+
 
         foreach ($orderedBy as $orderBy => $o) :
             if (is_array($orderedBy[$orderBy])):
-                echo "An Array";
+
                 $query = $this->nested_order_by($query, $orderedBy, $orderBy, $asc);
             else:
-                echo nl2br(PHP_EOL . "This is o:" . $o . PHP_EOL);
+
                 $query = $this->asc_desc($query, $o, $asc);
             endif;
         endforeach;

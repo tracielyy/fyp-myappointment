@@ -13,6 +13,7 @@ require_once TIME_MOD . '/Time.php';
 
 require_once AUTH_MOD . '/Session.php';
 require_once USER_MOD . '/Normal_User.php';
+require_once USER_MOD . '/Super_Admin.php';
 require_once APPT_MOD . '/Appointment_Record.php';
 
 class Patient extends Normal_User {
@@ -140,7 +141,7 @@ class Patient extends Normal_User {
         $patient_arr = array();
 
         # -- Double Check If User Is Admin -- #
-        if (self::check_admin($email)) :
+        if (Super_Admin::check_super_admin($email)) :
 
             # -- Conditions -- #
             $condition['accountdetails'] = array('usertype' => User_Type::PATIENT);
@@ -160,6 +161,21 @@ class Patient extends Normal_User {
         endif;
 
         return $patient_arr;
+    }
+
+    // -- RETRIEVE PATIENT BY DOCUMENT ID (document id)
+    public static function retrieve_patient_by_id(string $patient_id): ?Patient {
+        $doc_path = Database::ACCOUNT_USER;
+
+        # Getting Patient Information
+        $db = new DbQuery();
+        $patient_data = $db->fetch_document_by_id($doc_path, $patient_id);
+
+        # If There Is Patient Data Returned
+        if ($patient_data !== NULL):
+            return self::initialise_patient($patient_data);
+        endif;
+        return NULL;
     }
 
 }

@@ -64,11 +64,10 @@ class Authentication {
 
         # Condition Container
         $condition_arr = array_merge($credentials, $account_type);
-//        echo var_dump($condition_arr);
 
         # Query For User Using Given Credentials & Condition
         $db = new DbQuery();
-        $user_data = $db->select_exact_match(Database::ACCOUNT_USER, $condition_arr);
+        $user_data = $db->fetch_one_document(Database::ACCOUNT_USER, $condition_arr);
 
         # Check If There Are Any User Returned From The Query
         if ($user_data != NULL):

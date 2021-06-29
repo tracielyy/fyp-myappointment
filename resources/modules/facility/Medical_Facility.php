@@ -166,7 +166,7 @@ class Medical_Facility {
 
         # Query For Facility
         $db = new DbQuery();
-        $facility = $db->select_exact_match(Database::MEDICAL_FACILITY, $arr);
+        $facility = $db->fetch_one_document(Database::MEDICAL_FACILITY, $arr);
         if ($facility != NULL):
             return self::initialise_medical_facility($facility);
         endif;
@@ -202,7 +202,7 @@ class Medical_Facility {
         # -- Check Name & Contact Number
         $path = Database::MEDICAL_FACILITY;
         $db = new DbQuery();
-        $found_facility = $db->select_exact_match($path, $checking_arr);
+        $found_facility = $db->fetch_one_document($path, $checking_arr);
         if ($found_facility):
             return True;
         endif;
