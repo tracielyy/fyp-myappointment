@@ -25,16 +25,12 @@ class Appointment_Slot {
     // -- Properties
     private string $slotid;
     private Time $appointmentschedule;
-    // Specialist: ONLY 1 Patient, Check Up & Dr Consult: max 10
-    private array $patientlist;
-    private ?bool $available;
 
+    // Specialist: ONLY 1 Patient, Check Up & Dr Consult: max 10
     // -- Constructor
-    public function __construct(string $slotid, Time $appointmentschedule, array $patientlist, bool $available = NULL) {
+    public function __construct(string $slotid, Time $appointmentschedule) {
         $this->slotid = $slotid;
         $this->appointmentschedule = $appointmentschedule;
-        $this->patientlist = $patientlist;
-        $this->available = $available;
     }
 
     // -- Getters
@@ -42,8 +38,7 @@ class Appointment_Slot {
         return $this->slotid;
     }
 
-    # -- Print For Individual Appointment Slots
-
+    // -- Print For Individual Appointment Slots
     public function get_slot_description(): string {
         $date = Time::date_format_change($this->appointmentschedule->get_date(), Time::DATE_FORMAT_APPOINTMENT);
         $time = Time::to_12hours($this->appointmentschedule->get_time(), false);
@@ -55,30 +50,14 @@ class Appointment_Slot {
         return $this->appointmentschedule;
     }
 
-    public function get_patientlist(): array {
-        return $this->patientlist;
-    }
-
-    public function get_doctorlist(): array {
-        return $this->doctorlist;
-    }
-
     // -- Settters
     public function set_slotid(string $slotid): void {
         $this->slotid = $slotid;
     }
 
-    public function set_appointmentschedule(Time $appointmentschedule): void {
-        $this->appointmentschedule = $appointmentschedule;
-    }
-
-    public function set_patientlist(array $patientlist): void {
-        $this->patientlist = $patientlist;
-    }
-
-    public function set_doctorlist(array $doctorlist): void {
-        $this->doctorlist = $doctorlist;
-    }
+    // ---------- ABSTRACT METHODS 
+//    public abstract function insert_patient_to_slot(string $slotid, string $patient_doc_id);
+//    public abstract function remove_patient_from_slot(string $slotid, string $patient_doc_id);
 
     // -- Use For Debugging/ Logging Purpose -- //
     public function __toString(): string {
@@ -111,7 +90,7 @@ class Appointment_Slot {
 
     // ####################     Database Functions      ################### //
     // -- RETRIEVE APPOINTMENT SLOT (via slot id & appointment type)
-    public static function retrieve_appt_slot_by_id(string $id, string $appt_type): Appointment_Slot {
+    public static function retrieve_apptslot_by_id(string $id, string $appt_type): Appointment_Slot {
 
         # Split The ID
         $id_data = explode("~", $id);
@@ -129,7 +108,7 @@ class Appointment_Slot {
             case Appointment_Type::SPECIALIST_CONSULTATION:
                 $doc_path = Database::ACCOUNT_USER . "/" . $id_data[2] . "/" . Database::APPOINTMENT_SLOTS . "/" . $id_data[1] . "/"
                         . Database::SLOTS;
-                $slot_data = $db->get_documentdata_by_id($doc_path, $id);
+                $slot_data = $db->fetch_document_by_id($doc_path, $id);
                 return Appointment_Slot::initialise_appt_slot($slot_data, $id_data[1]);
 
         endswitch;
@@ -162,6 +141,8 @@ class Appointment_Slot {
 
         return $appointment_slots;
     }
+
+
 
 }
 

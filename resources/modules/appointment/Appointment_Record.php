@@ -104,7 +104,7 @@ class Appointment_Record {
         $createdon = new Time($appt_record['createdon']['date'], $appt_record['createdon']['time']);
 
         # Appointment Slot
-        $appt_slot = Appointment_Slot::retrieve_appt_slot_by_id($appt_record['slotid'], $appt_record['appointmenttype']);
+        $appt_slot = Appointment_Slot::retrieve_apptslot_by_id($appt_record['slotid'], $appt_record['appointmenttype']);
 
         # Medical Facility
         $facility = Medical_Facility::retrieve_facility_by_id($appt_record['facilityid']);
