@@ -155,8 +155,8 @@ $checkup_slot = array(
 
 
 //-- SPECIALIST
-//$eg_medical_personnel = "Medical_Personnel-iBnhkCP6HAhM0MvxeI4O";
-$eg_medical_personnel = "MedicalPersonnel002";
+$eg_medical_personnel = "Medical_Personnel-iBnhkCP6HAhM0MvxeI4O";
+//$eg_medical_personnel = "MedicalPersonnel002";
 $path = Database::ACCOUNT_USER . "/" . $eg_medical_personnel . "/" . Database::APPOINTMENT_SLOTS;
 foreach ($dates_arr as $date):
     $count = 0;
@@ -189,7 +189,7 @@ foreach ($dates_arr as $date):
             "available" => True,
             "slotid" => $slotid,
             "time" => $time,
-            "patientlist" => "",
+            "patient" => "",
         );
         $batch->set($slot_ref, $data_info);
         echo ++$count . "  ";
