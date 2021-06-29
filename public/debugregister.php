@@ -5,6 +5,7 @@ require_once '../resources/config.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Patient.php';
 require_once UTIL_MOD . '/Regex.php';
+require_once UTIL_MOD . '/StringUtils.php';
 
 
 // Used to store correct data
@@ -123,6 +124,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Store Some Error Message
         $err_email = "Invalid";
     } else {
+        $registerArr['email'] = StringUtils::clean_input($registerArr['email']);
         $validArr['email'] = True; // Pass Validation
     }
 
