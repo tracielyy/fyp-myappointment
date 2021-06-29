@@ -6,9 +6,9 @@
 
 abstract class User_Type {
 
-    const SUPER_ADMIN = "Super_Admin";
-    const FACIILITY_ADMIN = "Facility_Admin";
-    const MEDICAL_PERSONNEL = "Medical_Personnel";
+    const SUPER_ADMIN = "Super Admin";
+    const FACIILITY_ADMIN = "Facility Admin";
+    const MEDICAL_PERSONNEL = "Medical Personnel";
     const PATIENT = "Patient";
     const GUEST = "Guest";
 
