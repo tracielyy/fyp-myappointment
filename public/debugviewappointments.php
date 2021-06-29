@@ -4,7 +4,6 @@ require_once '../resources/config.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Patient.php';
 require_once APPT_MOD . '/Appointment_Record.php';
-require_once APPT_MOD . '/RetrieveAppointment.php';
 require_once ENUMS_PATH . '/User_Type.php';
 require_once TIME_MOD . '/CalendarICS.php';
 require_once TIME_MOD . '/Time.php';
@@ -22,9 +21,9 @@ if (isset($_SESSION["user"])):
     $email['credentials']['email'] = $user_email;
 
 
-    // -- PERIODICALLY UPDATE APPOINTMENT RECORD -- //
+    // -- UPDATE APPOINTMENT RECORD IN PATIENT OBJECT -- //
     # Get Appt Record
-    $updated_appt_records = RetrieveAppointment::retrieve_all_appointments($email);
+    $updated_appt_records = Appointment_Record::retrieve_patient_all_appointments($email);
 
     # Update Appt Record
     $user->set_appointmentrecords($updated_appt_records);
@@ -76,7 +75,7 @@ if (isset($_SESSION["user"])):
 //        $missed_arr = RetrieveAppointment::get_missed_appointments($email);
         # -- TESTING
         $appt_container = $user->get_appointmentrecords();
-        $appt_sorted_container = RetrieveAppointment::sort_appointment_by_status($appt_container);
+        $appt_sorted_container = Appointment_Record::sort_appointment_by_status($appt_container);
         $upcoming_arr = $appt_sorted_container['upcoming'];
         $missed_arr = $appt_sorted_container['missed'];
         ?><!DOCTYPE html>
