@@ -52,7 +52,7 @@ class Special_Slot extends Appointment_Slot {
     //      Methods Accessing Firestore Database 
     //============================================
     // -- ADD PATIENT TO SPECIAL SLOT (SEPCIALIST)
-    public function insert_patient_to_slot(string $slotid, string $patient_doc_id): bool {
+    public static function insert_patient_to_slot(string $slotid, string $patient_doc_id): bool {
 
         # Split The Slot ID <e.g 1001>~<date>~<doctor-doc-id>
         $slotid_data = explode("~", $slotid);
@@ -68,31 +68,58 @@ class Special_Slot extends Appointment_Slot {
     }
 
     // -- REMOVE PATIENT FROM SPECIAL SLOT (SPECIALIST)
-    public function remove_patient_from_slot(string $slotid) {
+    public static function remove_patient_from_slot(string $slotid) {
         # Split The Slot ID <e.g 1001>~<date>~<doctor-doc-id>
         $slotid_data = explode("~", $slotid);
 
         # Slot Path 
-        $sloth_path = Database::ACCOUNT_USER . "/" . $slotid_data[2] . "." . Database::APPOINTMENT_SLOTS . "/" . $slotid_data[1] . "/" . Database::SLOTS;
+        $slot_path = Database::ACCOUNT_USER . "/" . $slotid_data[2] . "." . Database::APPOINTMENT_SLOTS . "/" . $slotid_data[1] . "/" . Database::SLOTS;
         $db = new DbQuery();
-        $db->get_db()->collection($sloth_path)
+        $db->get_db()->collection($slot_path)
                 ->document($slotid)->update([
             ['path' => 'patient', 'value' => ""]
         ]);
         return True;
     }
 
+    // -- RETRIEVE ONLY BOOKED SLOTS
+    public static function retrieve_booked_slots_by_date(string $doctor_doc_id, string $date): array {
+
+        # Slot Container
+        $slots_arr = array();
+
+        # Path
+        $path = Database:: ACCOUNT_USER . "/" . $doctor_doc_id . "/" . Database::APPOINTMENT_SLOTS . "/" . $date .
+                "/" . Database::SLOTS;
+
+        $db = new DbQuery();
+        $doc_snapshot = $db->get_db()->collection($path)
+                ->where("available", "=", True)
+                ->where("patient", "!=", "")
+                ->documents();
+
+        # Loop & Add Slot To Array
+        foreach ($doc_snapshot as $doc):
+            if ($doc->exists()):
+                $slot_data = $doc->data();
+                $date = explode("~", $slot_data['slotid'])[1];
+                $schedule = new Time($date, $slot_data['time']);
+                $slots_arr[] = new Special_Slot($slot_data['slotid'], $schedule, $slot_data['patient'], $slot_data['available']);
+            endif;
+        endforeach;
+        return $slots_arr;
+    }
+
     // -- RETRIEVE APPOINTMENT SLOT (via slot id & appointment type)
     public static function retrieve_apptslot_by_id(string $id): Appointment_Slot {
 
-        # Split The ID
+        # Split The ID <e.g 1001>~<date>~<doctor-doc-id>
         $id_data = explode("~", $id);
 
         $db = new DbQuery();
 
         # Slot id <e.g 1001>~<date>~<doctor-doc-id>
-        $doc_path = Database::ACCOUNT_USER . "/" . $id_data[2] . "/" . Database::APPOINTMENT_SLOTS . "/" . $id_data[1] . "/"
-                . Database::SLOTS;
+        $doc_path = Database::ACCOUNT_USER . "/" . $id_data[2] . "/" . Database::APPOINTMENT_SLOTS . "/" . $id_data[1] . "/" . Database::SLOTS;
         $slot_data = $db->fetch_document_by_id($doc_path, $id);
         return Special_Slot::initialise_appt_slot($slot_data, $id_data[1]);
     }

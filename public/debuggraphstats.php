@@ -15,8 +15,11 @@ require_once APPT_MOD . '/Special_Slot.php';
 
 # -- Find The Patient Count (HARDCODE)
 $patient_per_day = Normal_Slot::patient_count_per_date("mf001", "15-07-2021");
-$patient_per_day += Special_Slot::patient_count_per_date("mf001","15-07-2021");
+$patient_per_day += Special_Slot::patient_count_per_date("mf001", "15-07-2021");
 
+
+# -- Get Slots
+$slot_arr = Special_Slot::retrieve_booked_slots_by_date("Medical_Personnel-iBnhkCP6HAhM0MvxeI4O", "15-07-2021");
 ?><!DOCTYPE html>
 <html lang="en">
     <head>
@@ -27,6 +30,8 @@ $patient_per_day += Special_Slot::patient_count_per_date("mf001","15-07-2021");
         <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
     </head>
     <body>
-       &nbsp;<?php echo $patient_per_day;?>
+        &nbsp;<?php echo $patient_per_day; ?>
+                &nbsp;<?php echo var_dump($slot_arr); ?>
+
     </body>
 </html>
