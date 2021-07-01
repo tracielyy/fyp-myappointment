@@ -186,7 +186,7 @@ class Patient extends Normal_User {
         $user_doc_id = $db->get_document_id(Database::ACCOUNT_USER, $condition);
 
         # Validate Appointment
-        if (self::validate_appt_booking($user_doc_id, $booking_info)):
+        if (Appointment_Record::validate_appt_booking($user_doc_id, $booking_info)):
 
             # Create User Appointment Record
             $user_appt_update = Appointment_Record::create_appointment_record($user_doc_id, $booking_info);

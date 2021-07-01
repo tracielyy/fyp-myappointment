@@ -123,31 +123,24 @@ class Appointment_Record {
 
         $db = new DbQuery();
 
-        # SET Appointment Booking Information
-        $appointment_info['appointmenttype'] = $booking_info['appointmenttype'];
-        $appointment_info['facilityid'] = $booking_info['facilityid'];
-        $appointment_info['scheduledon'] = array(
-            'date' => $booking_info['date'],
-            'time' => $booking_info['time']
-        );
-
         # SET Appointment Creation Time
         $createdon = new Time();
-        $appointment_info['createdon'] = array(
-            'date' => $createdon->get_date(),
-            'time' => $createdon->get_time()
-        );
-
-        # SET Default Appointment Status
-        $appointment_info['appointmentstatus'] = Appointment_Status::UPCOMING;
 
         # Get Appointment ID
         $id = self::generate_appointment_id($user_doc_id);
-        $appointment_info['appointmentid'] = $id;
 
         # Add The AppointmentRecord To The Database
         $appt_doc_path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
-        return $db->insert_data($appt_doc_path, $appointment_info, false, $id);
+        $db->get_db()->collection($appt_doc_path)->document($id)
+                ->set([
+                    'appointmentid' => $id,
+                    'appointmenttype' => $booking_info['appointmenttype'],
+                    'appointmentstatus' => Appointment_Status::UPCOMING,
+                    'facilityid' => $booking_info['facilityid'],
+                    'createdon' => ['date' => $createdon->get_date(), 'time' => $createdon->get_time()],
+                    'slotid' => $booking_info['slotid']
+        ]);
+        return True;
     }
 
     // -- Validate Appointment Booking  (Check If Patient Have Same Appointment) -- //
