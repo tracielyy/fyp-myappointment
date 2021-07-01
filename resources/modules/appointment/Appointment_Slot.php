@@ -89,30 +89,6 @@ class Appointment_Slot {
     }
 
     // ####################     Database Functions      ################### //
-    // -- RETRIEVE APPOINTMENT SLOT (via slot id & appointment type)
-    public static function retrieve_apptslot_by_id(string $id, string $appt_type): Appointment_Slot {
-
-        # Split The ID
-        $id_data = explode("~", $id);
-
-        $db = new DbQuery();
-
-        # Slot id <e.g 1001>~<date>~<doctor-doc-id>
-        switch ($appt_type):
-            case Appointment_Type::CHECK_UP:
-            case Appointment_Type::DOCTOR_CONSULTATION:
-                # -- TBC -- #
-                break;
-
-            # -- (SPECIALIST CONSULTATION W DOC DOCUMENT ID)
-            case Appointment_Type::SPECIALIST_CONSULTATION:
-                $doc_path = Database::ACCOUNT_USER . "/" . $id_data[2] . "/" . Database::APPOINTMENT_SLOTS . "/" . $id_data[1] . "/"
-                        . Database::SLOTS;
-                $slot_data = $db->fetch_document_by_id($doc_path, $id);
-                return Appointment_Slot::initialise_appt_slot($slot_data, $id_data[1]);
-
-        endswitch;
-    }
 
     // -- RETRIEVE APPOINTMENT SLOTS BY GIVEN DATE
     public static function retrieve_apptslots_by_date(string $facilityid, string $appointmenttype, string $date, int $max_patients = 20): array {
