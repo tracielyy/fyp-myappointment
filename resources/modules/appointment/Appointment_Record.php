@@ -12,6 +12,8 @@ require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
 
 require_once APPT_MOD . '/Appointment_Slot.php';
+require_once APPT_MOD . '/Special_Slot.php';
+require_once APPT_MOD . '/Normal_Slot.php';
 require_once FACILITY_MOD . '/Medical_Facility.php';
 
 class Appointment_Record {
@@ -104,7 +106,7 @@ class Appointment_Record {
         $createdon = new Time($appt_record['createdon']['date'], $appt_record['createdon']['time']);
 
         # Appointment Slot
-        $appt_slot = Appointment_Slot::retrieve_apptslot_by_id($appt_record['slotid'], $appt_record['appointmenttype']);
+        $appt_slot = self::retrieve_slot($appt_record['slotid'], $appt_record['appointmenttype'], $appt_record['facilityid']);
 
         # Medical Facility
         $facility = Medical_Facility::retrieve_facility_by_id($appt_record['facilityid']);
@@ -116,35 +118,10 @@ class Appointment_Record {
     }
 
     // ####################     Database Functions      ################### //
-    // -- BOOK AN APPOINTMENT
-    public static function book_appointment(string $email, array $booking_info): bool {
-
-        $condition['credentials'] = array('email' => $email);
-        $db = new DbQuery();
-        $user_doc_id = $db->get_document_id(Database::ACCOUNT_USER, $condition);
-
-        # Validate Appointment
-        if (self::validate_appt_booking($user_doc_id, $booking_info)):
-
-            # Create User Appointment Record
-            $user_appt_update = self::create_appointment_record($db, $user_doc_id, $booking_info);
-
-            # If User Appointment Record Created Successfully
-            if ($user_appt_update):
-
-                # Update To Add Patient's ID To Appointment's patient array
-                $appt_slot_update = self::add_patient_to_slot($db, $user_doc_id, $booking_info);
-                return ($user_appt_update && $appt_slot_update);
-            else:
-                return false;
-            endif;
-
-        endif;
-        return false;
-    }
-
     // -- CREATE APPOINTMENT RECORD
-    private static function create_appointment_record(DbQuery $db, string $user_doc_id, array $booking_info): bool {
+    public static function create_appointment_record(string $user_doc_id, array $booking_info): bool {
+
+        $db = new DbQuery();
 
         # SET Appointment Booking Information
         $appointment_info['appointmenttype'] = $booking_info['appointmenttype'];
@@ -173,18 +150,8 @@ class Appointment_Record {
         return $db->insert_data($appt_doc_path, $appointment_info, false, $id);
     }
 
-    // -- UPDATE APPOINTMENT SLOT
-    private static function add_patient_to_slot(DbQuery $db, string $user_doc_id, array $booking_info): bool {
-
-        # Update The Appointment Slot (Not Done)
-        $user_id_arr['patients'] = array($user_doc_id);
-        $slots_doc_path = Database::MEDICAL_FACILITY . "/" . $booking_info['facilityid'] . "/" .
-                $booking_info['appointmenttype'] . "/" . $booking_info['date'] . "/" . Database::SLOTS;
-        return $db->update_array_add($slots_doc_path, $booking_info['slotid'], $user_id_arr);
-    }
-
-    // -- Validate Appointment Booking -- //
-    private static function validate_appt_booking(string $user_doc_id, array $booking_info): bool {
+    // -- Validate Appointment Booking  (Check If Patient Have Same Appointment) -- //
+    public static function validate_appt_booking(string $user_doc_id, array $booking_info): bool {
 
         # Declaring The Conditions
         $conditions = array(
@@ -200,7 +167,7 @@ class Appointment_Record {
         # Search For Same Appointment
         $db = new DbQuery();
         $path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
-        $same_appt = $db->select_exact_match($path, $conditions);
+        $same_appt = $db->fetch_one_document($path, $conditions);
         return $validate_status = ($same_appt == null) ? true : false;
     }
 
@@ -287,7 +254,7 @@ class Appointment_Record {
             if ($appt->get_appointmentstatus() == Appointment_Status::UPCOMING):
                 $arr['upcoming'][] = $appt;
             elseif ($appt->get_appointmentstatus() == Appointment_Status::MISSED):
-                $arr['cancelled'][] = $appt;
+                $arr['missed'][] = $appt;
             endif;
         endforeach;
         return $arr;
@@ -368,22 +335,23 @@ class Appointment_Record {
         return false;
     }
 
-    // -- REMOVE PATIENT FROM SLOT WHEN CANCELLING APPOINTMENT
-    private static function remove_patient_from_slot(DbQuery $db, $user_doc_id, array $appt_record): bool {
+    // -- RETRIEVE APPOINTMENT SLOTS BY ID 
+    public static function retrieve_slot(string $slotid, string $appointmenttype, string $facilityid): Appointment_Slot {
 
-        # Appointment Schedule
-        $scheduledon = $appt_record['scheduledon'];
+        # Slots Container
+        $slots_arr = array();
 
-        # Patient Document ID In Array (To Be Removed)
-        $user_id_arr['patients'] = array($user_doc_id);
+        switch ($appointmenttype):
+            case Appointment_Type::CHECK_UP:
+            case Appointment_Type::DOCTOR_CONSULTATION:
+                $slots_arr = Normal_Slot::retrieve_apptslot_by_id($slotid, $appointmenttype, $facilityid);
+                break;
+            case Appointment_Type::SPECIALIST_CONSULTATION:
+                $slots_arr = Special_Slot::retrieve_apptslot_by_id($slotid);
+                break;
+        endswitch;
 
-        # Get Appointment Slot's ID
-        $slot_path = Database::MEDICAL_FACILITY . "/" . $appt_record['facilityid'] . "/" . $appt_record['appointmenttype'] . "/" . $scheduledon['date'] . "/" . Database::SLOTS;
-        $slot_condition = array('time' => $scheduledon['time']);
-        $slot_doc_id = $db->get_document_id($slot_path, $slot_condition);
-
-
-        return $db->update_array_remove($slot_path, $slot_doc_id, $user_id_arr);
+        return $slots_arr;
     }
 
     // -- RETRIEVE APPOINTMENT BY APPOINTMENT ID
