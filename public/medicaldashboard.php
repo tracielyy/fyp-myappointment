@@ -5,12 +5,15 @@
 
     <?php
     // session_start();
-    require_once '../resources/config.php';
-    // require_once ENTITIES_PATH . '/Account_User.php';
-    // require_once ENTITIES_PATH . '/Appointment_Record.php';
+    // session_start();
+     require_once '../resources/config.php';
+    // require_once USER_MOD . '/Account_User.php';
+    // require_once USER_MOD . '/Patient.php';
+    // require_once APPT_MOD . '/Appointment_Record.php';
+    // require_once APPT_MOD . '/RetrieveAppointment.php';
     // require_once ENUMS_PATH . '/User_Type.php';
-    // require_once FUNCTIONS_PATH . '/PatientFunctions.php';
-    // require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
+    // require_once TIME_MOD . '/CalendarICS.php';
+    // require_once TIME_MOD . '/Time.php';
     ?>
 
     <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
@@ -19,9 +22,10 @@
     <?php include './css/medicaldashboard.css';
     ?>
     </style>
+    
     <?php
-    include COMPONENTS_PATH . '/bootstrap.php';
-    include_once COMPONENTS_PATH . '/navbar.php';
+    include TEMPLATES_PATH . '/bootstrap.php';
+    include_once TEMPLATES_PATH . '/navbar.php';
     ?>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -31,7 +35,7 @@
     <script src="https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
 </head>
 
-<body>
+<body onload="startTime()">
 
     <?php
 
@@ -69,41 +73,42 @@
         </div>
     </div>
 
-    <div class="container-fluid mt-5">
+    <div class="container-fluid mt-3">
         <div class="tab">
-            <button class="tablinks top" onclick="openCity(event, 'Dashboard')" id="defaultOpen"><i
-                    class="far fa-window-maximize tab-icon"></i>Dashboard</button>
+            <button class="tablinks top" onclick="openCity(event, 'Dashboard')"
+                    id="defaultOpen"><i class="far fa-window-maximize tab-icon"></i>Dashboard </button>
             <button class="tablinks" onclick="openCity(event, 'Appointments')"><i
-                    class="far fa-calendar-alt tab-icon"></i>Appointments</button>
+                        class="far fa-calendar-alt tab-icon"></i>Appointments</a> </a>
             <button class="tablinks" onclick="openCity(event, 'Data')"><i
-                    class="fas fa-chart-bar tab-icon"></i>Data</button>
+                        class="fas fa-chart-bar tab-icon"></i>Data</a> </a>
             <button class="tablinks" onclick="openCity(event, 'Settings')"><i
-                    class="fas fa-cog tab-icon"></i>Settings</button>
+                        class="far fa-clock tab-icon"></i>Shift Settings</a> </a>
         </div>
 
         <div id="Dashboard" class="tabcontent shadow rounded">
             <div class="container chart-container mt-5">
-                <h3 class="text-center">Dashboard</h3>
+                <h3 class="text-center mb-4">Dashboard</h3>
                 <div class="row">
+                
+                <div class="border mb-3 shadow-sm" style="border-radius: 15px">
+                <div id="time" class="display-6 text-center mb-1"></div>
+                </div>
 
                     <div class="col">
-                        <div class="myChartDiv">
-                            <canvas id="chart2" height="200px"></canvas>
+                        <div class="p-4 shadow" style="border-radius: 25px">
+                            <canvas id="chart2" height="250px"></canvas>
                         </div>
                     </div>
                     <div class="col">
-                        <div class="myChartDiv">
-                            <canvas id="chart3" height="200px"></canvas>
+                        <div class="p-4 shadow" style="border-radius: 25px">
+                            <canvas id="chart3" height="250px"></canvas>
                         </div>
                     </div>
 
                 </div>
-                <div class="row">
+                <div class="row mt-5">
                     <div class="col">
-
-                    </div>
-                    <div class="col">
-
+                        <div id="wrapper2"></div>
                     </div>
                 </div>
             </div>
@@ -129,7 +134,7 @@
 
         <div id="Settings" class="tabcontent shadow rounded">
             <div class="container mt-5">
-                <h3 class="text-center">Settings</h3>
+                <h3 class="text-center">Shift</h3>
                 <p>Shows to set the timing of work</p>
             </div>
         </div>
@@ -143,6 +148,24 @@
 //endif;?>
 </body>
 
+<script>
+function startTime() {
+  const today = new Date();
+  let h = today.getHours();
+  let m = today.getMinutes();
+  let s = today.getSeconds();
+  m = checkTime(m);
+  s = checkTime(s);
+  document.getElementById('time').innerHTML =  h + ":" + m + ":" + s;
+  setTimeout(startTime, 1000);
+}
+
+function checkTime(i) {
+  if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+  return i;
+}
+</script>
+
 <!-- CHART JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js"
     integrity="sha512-VCHVc5miKoln972iJPvkQrUYYq7XpxXzvqNfiul1H4aZDwGBGC0lq373KNleaB2LpnC2a/iNfE5zoRYmB4TRDQ=="
@@ -154,7 +177,7 @@ var myChart = new Chart(ctx, {
     data: {
         labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
         datasets: [{
-            label: '# of Votes',
+            label: 'Number of ',
             data: [12, 19, 3, 5, 2, 3],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
@@ -212,7 +235,7 @@ var myChart1 = new Chart(ctx2, {
         }]
     },
     options: {
-        maintainAspectRatio : false,
+        maintainAspectRatio: false,
         scales: {
             y: {
                 beginAtZero: true
@@ -249,17 +272,15 @@ var myChart2 = new Chart(ctx3, {
         }]
     },
     options: {
-        maintainAspectRatio : false,
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
+        maintainAspectRatio: false
+
     }
 });
 </script>
 
 <!-- END OF CHARTJS -->
+
+<!-- GRIDJS -->
 
 <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
 
@@ -284,9 +305,38 @@ new gridjs.Grid({
 
     pagination: {
         enabled: true,
-        limit: 6,
+        limit: 3,
         summary: false
     }
+}).render(document.getElementById("wrapper2"));
+</script>
+<script>
+new gridjs.Grid({
+    columns: ["Name", "Email", "Date", "Time"],
+    data: [
+        ["John", "john@example.com", "24-June-2021", "14:00"],
+        ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
+        ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
+        ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
+        ["Afshin", "afshin@mail.com", "24-June-2021", "14:00"],
+        ["John", "john@example.com", "24-June-2021", "14:00"],
+        ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
+        ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
+        ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
+        ["John", "john@example.com", "24-June-2021", "14:00"],
+        ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
+        ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
+        ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"]
+    ],
+
+    pagination: {
+        enabled: true,
+        limit: 6,
+        summary: false
+    },
+
+    sort: true,
+    search: true,
 }).render(document.getElementById("wrapper"));
 </script>
 
