@@ -78,6 +78,7 @@ if (isset($_SESSION["user"])):
         $appt_sorted_container = Appointment_Record::sort_appointment_by_status($appt_container);
         $upcoming_arr = $appt_sorted_container['upcoming'];
         $missed_arr = $appt_sorted_container['missed'];
+
         ?><!DOCTYPE html>
         <html lang="en">
             <head>
