@@ -344,7 +344,7 @@ class Appointment_Record {
         switch ($appointmenttype):
             case Appointment_Type::CHECK_UP:
             case Appointment_Type::DOCTOR_CONSULTATION:
-                $slots_arr = Normal_Slot::retrieve_apptslot_by_id($slotid, $appointmenttype, $facilityid);
+                $slots_arr = Normal_Slot::retrieve_apptslot_by_id($slotid, $facilityid);
                 break;
             case Appointment_Type::SPECIALIST_CONSULTATION:
                 $slots_arr = Special_Slot::retrieve_apptslot_by_id($slotid);

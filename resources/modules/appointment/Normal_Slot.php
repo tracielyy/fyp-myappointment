@@ -52,8 +52,18 @@ class Normal_Slot extends Appointment_Slot {
 
     // ####################     Database Functions      ################### //
     // -- ADD PATIENT TO NORMAL SLOT (DR CONSULT, CHECKUP)
-    public function insert_patient_to_slot(string $slotid, string $patient_doc_id) {
-        # Slot id <e.g 1001>~<date>~<e.g. drconsult, checkup>
+    public function insert_patient_to_slot(string $slotid,  string $patient_doc_id) {
+
+        # Split The Slot ID <e.g 1001>~<date>~<appointmenttype>
+        $slotid_data = explode("~", $slotid);
+
+        # Slot Path 
+        $sloth_path = Database::MEDICAL_FACILITY . "/" . $slotid[2] . "/" . $slotid[1] . "/" . $slotid_data[1] . "/" . Database::SLOTS;
+        $db = new DbQuery();
+        $db->get_db()->collection($sloth_path)
+                ->document($slotid)->update([
+            ['path' => 'patient', 'value' => $patient_doc_id]
+        ]);
     }
 
     // -- REMOVE PATIENT FROM SLOT WHEN CANCELLING APPOINTMENT
@@ -76,7 +86,7 @@ class Normal_Slot extends Appointment_Slot {
     }
 
     // -- RETRIEVE APPOINTMENT SLOT (via slot id & appointment type)
-    public static function retrieve_apptslot_by_id(string $slotid, string $appt_type, string $facilityid): Appointment_Slot {
+    public static function retrieve_apptslot_by_id(string $slotid, string $facilityid): Appointment_Slot {
 
         # Split The ID
         $id_data = explode("~", $slotid);
@@ -84,7 +94,7 @@ class Normal_Slot extends Appointment_Slot {
         $db = new DbQuery();
 
         # Slot id <e.g 1001>~<date>~<appointmenttype>
-        $doc_path = Database::MEDICAL_FACILITY . "/" . $facilityid . "/" . $appt_type . "/" . $id_data[1] . "/"
+        $doc_path = Database::MEDICAL_FACILITY . "/" . $facilityid . "/" . $id_data[2] . "/" . $id_data[1] . "/"
                 . Database::SLOTS;
         $slot_data = $db->fetch_document_by_id($doc_path, $slotid);
         return Normal_Slot::initialise_appt_slot($slot_data, $id_data[1]);

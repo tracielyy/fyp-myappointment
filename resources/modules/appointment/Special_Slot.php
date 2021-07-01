@@ -52,13 +52,34 @@ class Special_Slot extends Appointment_Slot {
     //      Methods Accessing Firestore Database 
     //============================================
     // -- ADD PATIENT TO SPECIAL SLOT (SEPCIALIST)
-    public function insert_patient_to_slot(string $slotid, string $patient_doc_id) {
-        
+    public function insert_patient_to_slot(string $slotid, string $patient_doc_id): bool {
+
+        # Split The Slot ID <e.g 1001>~<date>~<doctor-doc-id>
+        $slotid_data = explode("~", $slotid);
+
+        # Slot Path 
+        $sloth_path = Database::ACCOUNT_USER . "/" . $slotid_data[2] . "/" . Database::APPOINTMENT_SLOTS . "/" . $slotid_data[1] . "/" . Database::SLOTS;
+        $db = new DbQuery();
+        $db->get_db()->collection($sloth_path)
+                ->document($slotid)->update([
+            ['path' => 'patient', 'value' => $patient_doc_id]
+        ]);
+        return True;
     }
 
     // -- REMOVE PATIENT FROM SPECIAL SLOT (SPECIALIST)
-    public function remove_patient_from_slot(string $slotid, string $patient_doc_id) {
-        
+    public function remove_patient_from_slot(string $slotid) {
+        # Split The Slot ID <e.g 1001>~<date>~<doctor-doc-id>
+        $slotid_data = explode("~", $slotid);
+
+        # Slot Path 
+        $sloth_path = Database::ACCOUNT_USER . "/" . $slotid_data[2] . "." . Database::APPOINTMENT_SLOTS . "/" . $slotid_data[1] . "/" . Database::SLOTS;
+        $db = new DbQuery();
+        $db->get_db()->collection($sloth_path)
+                ->document($slotid)->update([
+            ['path' => 'patient', 'value' => ""]
+        ]);
+        return True;
     }
 
     // -- RETRIEVE APPOINTMENT SLOT (via slot id & appointment type)
