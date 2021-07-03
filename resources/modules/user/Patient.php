@@ -178,33 +178,7 @@ class Patient extends Normal_User {
         return NULL;
     }
 
-    // -- BOOK AN APPOINTMENT
-    public static function book_appointment(string $email, array $booking_info): bool {
 
-        $condition['credentials'] = array('email' => $email);
-        $db = new DbQuery();
-        $user_doc_id = $db->get_document_id(Database::ACCOUNT_USER, $condition);
-
-        # Validate Appointment
-        if (Appointment_Record::validate_appt_booking($user_doc_id, $booking_info)):
-
-            # Create User Appointment Record
-            $user_appt_update = Appointment_Record::create_appointment_record($user_doc_id, $booking_info);
-
-            # If User Appointment Record Created Successfully
-            if ($user_appt_update):
-
-                # Update To Add Patient's ID To Appointment's patient array
-                $appt_slot_update = self::add_to_slot($user_doc_id, $booking_info);
-
-                return ($user_appt_update && $appt_slot_update);
-            else:
-                return false;
-            endif;
-
-        endif;
-        return false;
-    }
 
     // -- add patient to normal or special slots
     private static function add_to_slot(string$user_doc_id, array $booking_info ) {

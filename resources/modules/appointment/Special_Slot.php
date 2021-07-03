@@ -9,6 +9,7 @@
 /* Load Config File */
 require_once '../resources/config.php';
 require_once APPT_MOD . '/Appointment_Record.php';
+//require_once APPT_MOD . '/Appointment_Slot.php';
 require_once USER_MOD . '/Account_User.php';
 require_once AUTH_MOD . '/Session.php';
 require_once TIME_MOD . '/Time.php';
@@ -18,6 +19,7 @@ require_once UTIL_MOD . '/ArrayCreation.php';
 require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
 require_once ENUMS_PATH . '/Appointment_Type.php';
+
 
 class Special_Slot extends Appointment_Slot {
 
@@ -86,7 +88,7 @@ class Special_Slot extends Appointment_Slot {
     }
 
     // -- RETRIEVE APPOINTMENT SLOTS BY DATE
-    public static function retrieve_free_slots_by_date(string $doctor_email, string $date): array {
+    public static function retrieve_free_slots_by_date(string $facilityid, string $doctor_email, string $date): array {
 
         $db = new DbQuery();
 
@@ -102,6 +104,7 @@ class Special_Slot extends Appointment_Slot {
 
         # Getting Array Of Document SnapShot
         $slot_snapshot_arr = $db->get_db()->collection($slot_path)
+                ->where("facilityid","=", $facilityid)
                 ->where("available", "=", True)
                 ->where("patient", "=", "")
                 ->documents();

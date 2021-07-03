@@ -57,17 +57,17 @@ class Normal_Slot extends Appointment_Slot {
 
     // ####################     Database Functions      ################### //
     // -- ADD PATIENT TO NORMAL SLOT (DR CONSULT, CHECKUP)
-    public static function insert_patient_to_slot(string $slotid, string $patient_doc_id) {
+    public static function insert_patient_to_slot(string $slotid, string $patient_doc_id, string $facilityid) {
 
         # Split The Slot ID <e.g 1001>~<date>~<appointmenttype>
         $slotid_data = explode("~", $slotid);
 
         # Slot Path 
-        $slot_path = Database::MEDICAL_FACILITY . "/" . $slotid_data[2] . "/" . $slotid_data[1] . "/" . Database::SLOTS;
+        $slot_path = Database::MEDICAL_FACILITY . "/" . $facilityid . "/" . $slotid_data[2] . "/" . $slotid_data[1] . "/" . Database::SLOTS;
         $db = new DbQuery();
         $db->get_db()->collection($slot_path)
                 ->document($slotid)->update([
-            ['path' => 'patientlist', 'value' => FieldValue::arrayUnion($patient_doc_id)]
+            ['path' => 'patientlist', 'value' => FieldValue::arrayUnion([$patient_doc_id])]
         ]);
     }
 
