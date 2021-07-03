@@ -117,6 +117,14 @@ class Special_Slot extends Appointment_Slot {
             endif;
         endforeach;
 
+//        # Sorting The Array In Accordance To The Slot Id
+//        array_multisort(array_column($slots_arr, 'slotid'), $slots_arr);
+//
+//        # Loop & Store As Normal Slot Object
+//        foreach ($slots_arr as $slot):
+//            $slot_list[] = self::initialise_normal_slot($slot);
+//        endforeach;
+
         # -- Return Array Of Appointment Slots
         return $slots_arr;
     }

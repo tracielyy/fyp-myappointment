@@ -77,6 +77,13 @@ class Account_User {
     //============================================
     //      Methods Accessing Firestore Database 
     //============================================
+    // -- GET USER DOCUMENT ID
+    public static function retrieve_user_doc_id(string $user_email): string {
+        $db = new DbQuery();
+        $email['credentials'] = array('email' => $user_email);
+        return $db->get_document_id(Database::ACCOUNT_USER, $email);
+    }
+
     // -- RETRIEVE ACCOUNT USER DATA
     public static function retrieve_account_data(array $credentialArr): ?array {
 
