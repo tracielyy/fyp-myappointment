@@ -36,6 +36,7 @@ function book_appointment(string $patient_email, array $booking_info): bool {
     return false;
 }
 
+// -- Call Appropriate Method For Different Appointment Type
 function add_to_slot(string $patient_doc_id, array $booking_info): void {
     switch ($booking_info['appointmenttype']):
         case Appointment_Type::CHECK_UP:
