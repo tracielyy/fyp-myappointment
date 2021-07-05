@@ -1,14 +1,13 @@
 import schedule
 import time
-import pytz
-import datetime
-
-timezone = pytz.timezone('Asia/Singapore')
-zone = timezone.localize(datetime.datetime.now())
+from pytz import timezone
+from datetime import datetime
 
 def job():
-    print("Time now: " + str(zone))
-    
+    datenow = datetime.now()
+    datetime_tz = timezone('Asia/Singapore').localize(datenow)
+    print("Time now: " + str(datetime_tz))
+
 schedule.every(10).minutes.do(job)
 schedule.every().day.at("00:00").do(job)
 
