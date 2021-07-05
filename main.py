@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 
 def job():
-    print("Time now: " + datetime.now())
+    print("Time now: " + str(datetime.now()))
 
 schedule.every(10).minutes.do(job)
 schedule.every().day.at("00:00").do(job)
