@@ -10,6 +10,8 @@ require_once DB_MOD . '/Database.php';
 require_once APPT_MOD . '/Normal_Slot.php';
 require_once APPT_MOD . '/Special_Slot.php';
 
+# ---------------------------------------------  BUSINESS LOGIC START --------------------------------------------- #
+
 // -- BOOK AN APPOINTMENT  (Put This Function In The Create Appointment Page)
 function book_appointment(string $patient_email, array $booking_info): bool {
 
@@ -21,12 +23,10 @@ function book_appointment(string $patient_email, array $booking_info): bool {
         echo "Validate";
 
         # Create User Appointment Record
-        # If User Appointment Record Created Successfully
         Appointment_Record::create_appointment_record($patient_doc_id, $booking_info);
         echo "Appointment Record  Created";
 
         # Update To Add Patient's ID To Appointment's patient array
-        # Do A Switch For Appointment Type Routing To Normal Slot or Special Slot
         add_to_slot($patient_doc_id, $booking_info);
         echo "yes";
 
@@ -76,6 +76,7 @@ function remove_from_slot(string $patient_doc_id, Appointment_Record $appt_recor
             break;
     endswitch;
 }
+# ---------------------------------------------  BUSINESS LOGIC END --------------------------------------------- #
 
 # -- Find The Patient Count (HARDCODE)
 //$patient_per_day = Normal_Slot::patient_count_per_date("mf001", "15-07-2021");
@@ -123,7 +124,9 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
 //        endif;
 
         echo nl2br(PHP_EOL . "Testing Cancel Appointment -- HARDCODE --" . PHP_EOL);
-        cancel_appointment("yanying25@outlook.com", "appt-2021-1003");
+//        cancel_appointment("yanying25@outlook.com", "appt-2021-1003");
+
+        echo nl2br(PHP_EOL . "Testing Reschedule Appointment -- HARDCODE --" . PHP_EOL);
         ?>
 
     </body>
