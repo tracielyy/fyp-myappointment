@@ -16,12 +16,13 @@ def job():
     print("Time now: " + str(datetime_tz))
 
 def add_data(x):
+    print("Time now: " + str(datetime_tz))
     db.collection('Account_User').document('MedicalPersonnel0' + str(x)).set(doctor)
+    print("Data Added")
 
 for i in range(10,15,1):
     i = 10
     schedule.every(30).minutes.do(add_data,i)
-print("Data Added")
 
 schedule.every(10).minutes.do(job)
 schedule.every().day.at("00:00").do(job)

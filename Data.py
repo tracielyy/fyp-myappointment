@@ -65,5 +65,6 @@ doctor = {
         'token' : 'xe,yE0DtLEwoWH1'}
 }
 
-for x in range (1,5):
-    db.collection('Account_User').document('MedicalPersonnel00' + str(x)).set(doctor)
+
+# for x in range (1,5):
+#     db.collection('Account_User').document('MedicalPersonnel00' + str(x)).set(doctor)
