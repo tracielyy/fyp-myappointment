@@ -78,7 +78,7 @@ class Special_Slot extends Appointment_Slot {
         $slotid_data = explode("~", $slotid);
 
         # Slot Path 
-        $slot_path = Database::ACCOUNT_USER . "/" . $slotid_data[2] . "." . Database::APPOINTMENT_SLOTS . "/" . $slotid_data[1] . "/" . Database::SLOTS;
+        $slot_path = Database::ACCOUNT_USER . "/" . $slotid_data[2] . "/" . Database::APPOINTMENT_SLOTS . "/" . $slotid_data[1] . "/" . Database::SLOTS;
         $db = new DbQuery();
         $db->get_db()->collection($slot_path)
                 ->document($slotid)->update([

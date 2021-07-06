@@ -131,15 +131,18 @@ class Appointment_Record {
 
         # Add The AppointmentRecord As Sub Collection Nested In Patient Database
         $appt_doc_path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
-        $db->get_db()->collection($appt_doc_path)->document($id)
-                ->set([
-                    'appointmentid' => $id,
-                    'appointmenttype' => $booking_info['appointmenttype'],
-                    'appointmentstatus' => Appointment_Status::UPCOMING,
-                    'facilityid' => $booking_info['facilityid'],
-                    'createdon' => ['date' => $createdon->get_date(), 'time' => $createdon->get_time()],
-                    'slotid' => $booking_info['slotid']
+        $batch = $db->get_db()->batch();
+
+        $batch->set($db->get_db()->collection($appt_doc_path)->document($id), [
+            'appointmentid' => $id,
+            'appointmenttype' => $booking_info['appointmenttype'],
+            'appointmentstatus' => Appointment_Status::UPCOMING,
+            'facilityid' => $booking_info['facilityid'],
+            'createdon' => ['date' => $createdon->get_date(), 'time' => $createdon->get_time()],
+            'slotid' => $booking_info['slotid']
         ]);
+
+        $batch->commit();
     }
 
     // -- Validate Appointment Booking  (Check If Patient Have Same Appointment) -- //
@@ -150,15 +153,23 @@ class Appointment_Record {
         $db = new DbQuery();
         $path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
         $snapshot = $db->get_db()->collection($path)
+                        ->where("appointmentstatus", "=", Appointment_Status::UPCOMING)
                         ->where("appointmenttype", "=", $booking_info['appointmenttype'])->documents();
 
+       echo nl2br(PHP_EOL . "Get Called" . PHP_EOL);
+        
         # Loop & Check If There Is Any Match
         foreach ($snapshot as $doc):
             if ($doc->exists()):
                 $comparison_date = explode("~", $doc->data()['slotid'])[1];
+
+                echo "Comparison Date: " . $comparison_date . "<br/>";
+                echo "Booking Date: " . $booking_date . "<br/>";
+                # Check If Have Same Appointment Type In The Same Day
                 if ($comparison_date == $booking_date):
                     return False;
                 endif;
+
             endif;
 
         endforeach;
@@ -299,39 +310,31 @@ class Appointment_Record {
                         $condition, $subcondition, $changed_info);
     }
 
-    // -- CANCEL APPOINTMENT
-    public static function cancel_appointment(string $email, string $appointmentid): bool {
+    // -- REMOVE APPOINTMENT RECORD
+    public static function remove_appointment_record(string $patient_doc_id, string $appointmentid): Appointment_Record {
 
         $db = new DbQuery();
-
-        # Conditions (For Outer Collection)
-        $condition['credentials'] = array('email' => $email);
-
-        # Get User Document ID
-        $patient_doc_id = $db->get_document_id(Database::ACCOUNT_USER, $condition);
 
         # Update The Patient's Appointment Record (DELETE APPOINTMENT RECORD)
         $user_appt_path = Database::ACCOUNT_USER . "/" . $patient_doc_id . "/" . Database::APPOINTMENT_RECORD;
 
         # Get Appt Details (slotid)
-        $appt = $db->get_db()->collection($user_appt_path)->document($patient_doc_id);
+        $appt = $db->get_db()->collection($user_appt_path)->document($appointmentid);
 
         if ($appt->snapshot()->exists()):
 
             # Retrieving The Data Before Deletion
             $appt_details = $appt->snapshot()->data();
 
+            echo var_dump($appt_details);
+            # Appointment Record Object
+            $appt_obj = self::initialise_appointment_record($appt_details);
+
             # Delete The Appointment Record
             $appt->delete();
 
-            # Update The Appointment Slot
-            self::remove_patient_from_slot($appt_details['slotid'], $appt_details['appointmenttype'], $patient_doc_id);
-
+            return $appt_obj;
         endif;
-
-
-
-        return True;
     }
 
     // -- REMOVE PATIENT FROM SLOT
@@ -340,6 +343,7 @@ class Appointment_Record {
         switch ($appointmenttype):
             case Appointment_Type::CHECK_UP:
             case Appointment_Type::DOCTOR_CONSULTATION:
+                Normal_Slot::remove_patient_from_slot($slotid, $patient_doc_id);
                 break;
             case Appointment_Type::SPECIALIST_CONSULTATION:
                 Special_Slot::remove_patient_from_slot($slotid);
