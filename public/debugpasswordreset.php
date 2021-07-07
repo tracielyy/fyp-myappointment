@@ -8,6 +8,7 @@
  */
 /* Load Config File */
 require_once '../resources/config.php';
+require '../vendor/autoload.php';
 
 // -- Import Project Classes -- //
 require_once ENTITIES_PATH . '/Account_User.php';
