@@ -5,7 +5,7 @@
  */
 
 /* Load Config File */
-require_once '../resources/config.php';
+//require_once '../resources/config.php';
 require_once EMAIL_MOD . '/Email.php';
 require_once ENUMS_PATH . '/User_Type.php';
 require_once USER_MOD . '/Account_User.php';

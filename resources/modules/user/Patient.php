@@ -7,7 +7,7 @@
 
 
 /* Load Config File */
-require_once '../resources/config.php';
+//require_once '../resources/config.php';
 
 require_once TIME_MOD . '/Time.php';
 
@@ -122,6 +122,17 @@ class Patient extends Normal_User {
         return $db->insert_document(Database::ACCOUNT_USER, $patient_info, true);
     }
 
+    // -- REMOVE PATIENT ACCOUNT
+    public static function remove_patient(string $email): bool {
+
+        # Make Sure Person To Be Removed Is Patient
+        $usertype = Account_User::retrieve_user_type($email);
+        if ($usertype == User_Type::PATIENT):
+            $patient_doc_id = Account_User::retrieve_user_doc_id($email);
+            
+        endif;
+    }
+
     // -- RETRIEVE PATIENT DATA
     public static function retrieve_patient(array $login_arr): Patient {
 
@@ -176,21 +187,6 @@ class Patient extends Normal_User {
             return self::initialise_patient($patient_data);
         endif;
         return NULL;
-    }
-
-
-
-    // -- add patient to normal or special slots
-    private static function add_to_slot(string$user_doc_id, array $booking_info ) {
-        switch ($booking_info['appointmenttype']):
-            case Appointment_Type::CHECK_UP:
-            case Appointment_Type::DOCTOR_CONSULTATION:
-                $appt_slot_update = Normal_Slot::add_patient_to_slot($user_doc_id, $booking_info);
-            case Appointment_Type::SPECIALIST_CONSULTATION:
-                $appt_slot_update = Special_Slot::add_patient_to_slot($user_doc_id, $booking_info);
-        endswitch;
-
-        return $appt_slot_update;
     }
 
 }

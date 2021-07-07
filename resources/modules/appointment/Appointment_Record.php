@@ -4,7 +4,7 @@
  * @author yanying (Tracie)
  */
 /* Load Config File */
-require_once '../resources/config.php';
+//require_once '../resources/config.php';
 require_once TIME_MOD . '/Time.php';
 require_once ENUMS_PATH . '/Appointment_Status.php';
 
@@ -156,8 +156,8 @@ class Appointment_Record {
                         ->where("appointmentstatus", "=", Appointment_Status::UPCOMING)
                         ->where("appointmenttype", "=", $booking_info['appointmenttype'])->documents();
 
-       echo nl2br(PHP_EOL . "Get Called" . PHP_EOL);
-        
+        echo nl2br(PHP_EOL . "Get Called" . PHP_EOL);
+
         # Loop & Check If There Is Any Match
         foreach ($snapshot as $doc):
             if ($doc->exists()):
@@ -351,7 +351,7 @@ class Appointment_Record {
         endswitch;
     }
 
-// -- RETRIEVE APPOINTMENT SLOTS BY ID 
+    // -- RETRIEVE APPOINTMENT SLOTS BY ID 
     public static function retrieve_slot(string $slotid, string $appointmenttype, string $facilityid): Appointment_Slot {
 
         # Slots Container
@@ -370,7 +370,7 @@ class Appointment_Record {
         return $slots_arr;
     }
 
-// -- RETRIEVE APPOINTMENT BY APPOINTMENT ID
+    // -- RETRIEVE APPOINTMENT BY APPOINTMENT ID
     public static function retrieve_appointment_by_id(string $user_email, string $appointmentid): array {
         $condition['credentials'] = array('email' => $user_email);
         $db = new DbQuery();

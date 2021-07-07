@@ -7,7 +7,7 @@
 
 
 
-require_once '../resources/config.php';
+//require_once '../resources/config.php';
 
 require_once AUTH_MOD . '/Session.php';
 require_once TIME_MOD . '/Time.php';
@@ -78,10 +78,16 @@ class Account_User {
     //      Methods Accessing Firestore Database 
     //============================================
     // -- GET USER DOCUMENT ID
-    public static function retrieve_user_doc_id(string $user_email): string {
+    public static function retrieve_user_doc_id(string $user_email, ?string $user_password = NULL): string {
         $db = new DbQuery();
-        $email['credentials'] = array('email' => $user_email);
-        return $db->get_document_id(Database::ACCOUNT_USER, $email);
+
+        if ($user_password == null):
+            $credentials['credentials'] = array('email' => $user_email);
+        else:
+            $credentials['credentials'] = array('email' => $user_email, 'password' => $user_password);
+        endif;
+
+        return $db->get_document_id(Database::ACCOUNT_USER, $credentials);
     }
 
     // -- RETRIEVE ACCOUNT USER DATA
@@ -150,37 +156,45 @@ class Account_User {
     // -- CHANGE EMAIL
     public static function change_email(string $cur_email, string $new_email, string $password): bool {
 
-        # Credential Array (The Condition To Fulfil
-        $credentials['credentials'] = array(
-            'email' => $cur_email,
-            'password' => $password
-        );
-
-        # Changed Array
-        $update_arr['credentials'] = array(
-            'email' => $new_email
-        );
-
         # Update User Email        
         $db = new DbQuery();
-        $changed = $db->update_field(Database::ACCOUNT_USER, $credentials, $update_arr);
+        $user_doc_id = self::retrieve_user_doc_id($cur_email, $password);
+
+        # If Valid User
+        if ($user_doc_id !== NULL):
+
+            # Updating Email To New Email
+            $db->get_db()->collection(Database::ACCOUNT_USER)->document($user_doc_id)->update([
+                ['path' => 'credentials.email', 'value' => $new_email]
+            ]);
+            return True;
+        endif;
 
         # Return Boolean (Success or Failure)
-        return $changed;
+        return False;
     }
 
     // -- UPDATE  BASIC PROFILE (name, address, contact etc)
     public static function update_general_profile(array $profile_arr, string $email, string $password) {
 
-        # Credential Array
-        $credentials['credentials'] = array(
-            'email' => $email,
-            'password' => $password
+        # Limiting Field Array
+        $profile_limit = array(
+            "profile.contactnumber" => "",
+            "profile.address" => ""
         );
 
-        # Update User Profile
+        # Update User Email        
         $db = new DbQuery();
-        $changed = $db->update_field(Database::ACCOUNT_USER, $credentials, $profile_arr);
+        $user_doc_id = self::retrieve_user_doc_id($email, $password);
+
+        # If Valid User
+        if ($user_doc_id !== NULL):
+            $db->get_db()->collection(Database::ACCOUNT_USER)->document($user_doc_id)->update([
+                ['path' => 'profile.contactnumber', 'value' => $profile_arr['profile.contactnumber']],
+                ['path' => 'profile.address', 'value' => $profile_arr['profile.address']]
+            ]);
+
+        endif;
 
         # Return Boolean (Success or Failure)
         return $changed;
@@ -305,9 +319,21 @@ class Account_User {
         $user_data = self::retrieve_account_data($credentials_arr);
         if ($user_data !== null):
 
+            # Get User Document ID
+            $user_doc_id = self::retrieve_user_doc_id($credentials_arr['email']);
+
             # Modify The Patient Profile Based On The Given Array
             $db = new DbQuery();
-            return $db->update_field(Database::ACCOUNT_USER, $credentials_arr, $profile_changed_arr);
+            $user_path = Database::ACCOUNT_USER;
+
+            $db->get_db()->collection($user_path)
+                    ->document($user_doc_id)->update([
+                ['path' => 'profile.name.firstname', 'value' => $profile_changed_arr["firstname"]],
+                ['path' => 'profile.name.lastname', 'value' => $profile_changed_arr['lastname']]
+            ]);
+
+            return True;
+
         endif;
         return false;
     }

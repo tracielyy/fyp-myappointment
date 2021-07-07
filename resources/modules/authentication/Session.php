@@ -5,7 +5,7 @@
  */
 
 /* Load Config File */
-require_once '../resources/config.php';
+//require_once '../resources/config.php';
 require_once TIME_MOD . '/Time.php';
 require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';

@@ -4,7 +4,6 @@
  * @author nanta
  */
 
-namespace Module\Security;
 
 class Security {
     

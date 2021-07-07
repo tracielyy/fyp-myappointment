@@ -4,7 +4,7 @@
  * @author yanying (Tracie)
  */
 # -- Load Config File -- #
-require_once '../resources/config.php';
+//require_once '../resources/config.php';
 require_once USER_MOD . '/Admin.php';
 require_once USER_MOD . '/Account_User.php';
 require_once ENUMS_PATH . '/User_Type.php';

@@ -7,6 +7,7 @@ require_once UTIL_MOD . '/StringUtils.php';
 require_once UTIL_MOD . '/Regex.php';
 require_once AUTH_MOD . '/Authentication.php';
 require_once USER_MOD . '/Account_User.php';
+require '../vendor/autoload.php';
 
 //require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?><!DOCTYPE html>

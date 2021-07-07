@@ -7,7 +7,7 @@
 
 
 /* Load Config File */
-require_once '../resources/config.php';
+//require_once '../resources/config.php';
 
 class Operating_Hours {
 

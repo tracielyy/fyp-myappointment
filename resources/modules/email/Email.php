@@ -9,10 +9,10 @@
 // -- Import PHPMailer Class -- //
 use PHPMailer\PHPMailer\PHPMailer;
 
-require '../vendor/autoload.php';
+//require '../vendor/autoload.php';
 
 // -- Import Other Util Classes -- //
-require_once '../resources/config.php';
+//require_once '../resources/config.php';
 
 class Email extends PHPMailer {
 

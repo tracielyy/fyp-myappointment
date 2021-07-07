@@ -5,7 +5,7 @@
  */
 
 /* Load Config File */
-require_once '../resources/config.php';
+//require_once '../resources/config.php';
 
 require_once USER_MOD . '/Normal_User.php';
 require_once TIME_MOD . '/Time.php';
