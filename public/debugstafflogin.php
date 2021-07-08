@@ -13,25 +13,27 @@ require_once USER_MOD . '/Facility_admin.php';
 require_once USER_MOD . '/Medical_Personnel.php';
 
 //require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
-?><!DOCTYPE html>
+?>
+<!DOCTYPE html>
 
 <html>
 
-    <head>
-        <!-- Title -->
-        <title>FYP-21-S2-24</title>
+<head>
+    <!-- Title -->
+    <title>FYP-21-S2-24</title>
 
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- Styling -->
-        <?php include TEMPLATES_PATH . '/bootstrap.php'; ?>
-        <link rel="stylesheet" href="./css/loginRegister.css">
+    <!-- Styling -->
+    <?php include TEMPLATES_PATH . '/bootstrap.php'; ?>
+    <link rel="stylesheet" href="./css/loginRegister.css">
 
 
-    </head>
-    <body>
-        <?php
+</head>
+
+<body>
+    <?php
 
         function retrieve_user(array $login_arr): Account_User {
             $credentials = array('email' => $login_arr['email'], 'password' => $login_arr['password']);
@@ -42,6 +44,7 @@ require_once USER_MOD . '/Medical_Personnel.php';
 //                            $auth_staff = Facility_Admin::retrieve_facility_admin($credentials);
                 case User_Type::MEDICAL_PERSONNEL:
 //                            $auth_staff = Medical_Personnel::retrieve_medical_personnel($credentials);
+                    return Medical_Personnel::retrieve_medical_personnel($credentials);
             endswitch;
         }
 
@@ -164,92 +167,98 @@ require_once USER_MOD . '/Medical_Personnel.php';
             }
         }
         ?>
-        <!-- Msg -->
-        <div>
-            <?php echo $msg; ?>
-        </div>
+    <!-- Msg -->
+    <div>
+        <?php echo $msg; ?>
+    </div>
 
-        <!-- HTML Page Design -->
-        <div>
-            <!-- Navigation (include_once -> prevent "headers already sent" error) -->
-            <?php include_once TEMPLATES_PATH . '/navbar.php' ?>
+    <!-- HTML Page Design -->
+    <div>
+        <!-- Navigation (include_once -> prevent "headers already sent" error) -->
+        <?php include_once TEMPLATES_PATH . '/navbar.php' ?>
 
-            <!-- Login Card -->
-            <div class="center row m-4">
-                <div class="container col-md-10 col-lg-6 col-xl-4 col-xxl-4">
-                    <div class="my-5 col-sm-12">
-                        <div class="shadow card p-2 rounded1">
-                            <div class="card-body m-1">
-                                <h1 class="card-title pt-2 pb-3">Login</h1>
-                                <div class="px-1">
-                                    <!-- Form -->
-                                    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-                                        <!-- DROPDOWN LIST: USER TYPE -->
-
-                                        <select id="usertype" name="usertype">
-                                            <option hidden selected value =" " >Select User Type: </option> 
-                                            <!-- Super Admin -->
-                                            <option value="<?php echo User_Type::SUPER_ADMIN; ?>" <?php
+        <!-- Login Card -->
+        <div class="center row m-4">
+            <div class="container col-md-10 col-lg-6 col-xl-4 col-xxl-4">
+                <div class="my-5 col-sm-12">
+                    <div class="shadow card p-2 rounded1">
+                        <div class="card-body m-1">
+                            <h1 class="card-title pt-2 pb-3">Login</h1>
+                            <div class="px-1">
+                                <!-- Form -->
+                                <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                                    <!-- DROPDOWN LIST: USER TYPE -->
+                                    <div class="row pb-2">
+                                    <div class="col">
+                                    
+                                    </div>
+                                    <div class="col">
+                                    <select class="form-select" aria-label="Default select example" id="usertype" name="usertype">
+                                    <option hidden selected value=" ">Select User Type</option>
+                                        <!-- Super Admin -->
+                                        <option value="<?php echo User_Type::SUPER_ADMIN; ?>" <?php
                                             if ($loginArr['usertype'] == User_Type::SUPER_ADMIN) {
                                                 echo ' selected="selected"';
                                             }
                                             ?>><?php echo User_Type::SUPER_ADMIN; ?></option>
-                                            <!-- Facility Admin -->
-                                            <option value="<?php echo User_Type::FACIILITY_ADMIN; ?>" <?php
+                                        <!-- Facility Admin -->
+                                        <option value="<?php echo User_Type::FACIILITY_ADMIN; ?>" <?php
                                             if ($loginArr['usertype'] == User_Type::FACIILITY_ADMIN) {
                                                 echo ' selected="selected"';
                                             }
                                             ?>><?php echo User_Type::FACIILITY_ADMIN; ?></option>
-                                            <option value="<?php echo User_Type::MEDICAL_PERSONNEL; ?>" <?php
+                                        <option value="<?php echo User_Type::MEDICAL_PERSONNEL; ?>" <?php
                                             if ($loginArr['usertype'] == User_Type::MEDICAL_PERSONNEL) {
                                                 echo ' selected="selected"';
                                             }
                                             ?>><?php echo User_Type::MEDICAL_PERSONNEL; ?></option>
-                                        </select>
+                                    </select>
+                                    </div>
+                                    </div>
 
-                                        <div class="row pb-2">
-                                            <div class="col d-none d-lg-block">
-                                                Email:
-                                            </div>
-                                            <div class="col">
-                                                <!-- EMAIL -->
-                                                <input type="email" class="form-control" name="email" required
-                                                       placeholder="Email" value="<?php echo $loginArr['email']; ?>" />
-                                            </div>
-                                        </div>
-                                        <div class="row pb-2">
-                                            <div class="col d-none d-lg-block">Password: </div>
-                                            <div class="col">
-                                                <!-- PASSWORD -->
-                                                <input type="password" class="form-control" name="password"
-                                                       placeholder="Password"
-                                                       value="<?php echo $loginArr['password']; ?>" />
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <a href="email-reset.php" style="float: right">Forgot password?</a>
-                                        </div>
-                                        <div class="row pt-2">
-                                            <div class="d-grid gap-2 d-lg-block">
-                                                <!-- Login Submission -->
-                                                <button class="btn btn-primary" style="float: right"
-                                                        type="submit">Login</button><br />
-                                            </div>
-                                        </div>
 
-                                    </form>
-                                </div>
+                                    <div class="row pb-2">
+                                        <div class="col d-none d-lg-block">
+                                            Email:
+                                        </div>
+                                        <div class="col">
+                                            <!-- EMAIL -->
+                                            <input type="email" class="form-control" name="email" required
+                                                placeholder="Email" value="<?php echo $loginArr['email']; ?>" />
+                                        </div>
+                                    </div>
+                                    <div class="row pb-2">
+                                        <div class="col d-none d-lg-block">Password: </div>
+                                        <div class="col">
+                                            <!-- PASSWORD -->
+                                            <input type="password" class="form-control" name="password"
+                                                placeholder="Password" value="<?php echo $loginArr['password']; ?>" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <a href="email-reset.php" style="float: right">Forgot password?</a>
+                                    </div>
+                                    <div class="row pt-2">
+                                        <div class="d-grid gap-2 d-lg-block">
+                                            <!-- Login Submission -->
+                                            <button class="btn btn-primary" style="float: right"
+                                                type="submit">Login</button><br />
+                                        </div>
+                                    </div>
+
+                                </form>
                             </div>
-                            <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                         </div>
+                        <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                     </div>
                 </div>
             </div>
-
-            <!-- After the "Login" button -->
-            <!-- ("Register Now") & ("Forgot your password?") [Hyperlink(s)] -->
-
         </div>
-    </body>
+
+        <!-- After the "Login" button -->
+        <!-- ("Register Now") & ("Forgot your password?") [Hyperlink(s)] -->
+
+    </div>
+</body>
 
 </html>
