@@ -43,7 +43,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
 <script>
-
+import { css } from '@emotion/css';
 
 const grid = new gridjs.Grid({
     columns: ["Title", "Description", "Author", "Posted on"],
@@ -72,28 +72,7 @@ const grid = new gridjs.Grid({
         enabled: true,
         limit: 9,
         summary: false
-    },
-    style: {
-    table: {
-      border: '3px solid #ccc'
-    },
-    tr: hover td
-    {
-      'background-color': 'rgba(0, 0, 0, 0.1)';
-    },
-    th: {
-      'text-align: 'center;
-      &:hover {
-        'background-color': '#999';
-        color: #fff;
-    },
-    td: {
-      color: #999;
-      &:hover {
-        color: #000;
-      }
     }
-  }
     
 })
 
