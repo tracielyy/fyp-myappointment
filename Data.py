@@ -44,7 +44,7 @@ doctor = {
         },
         'tokenused' : False
     },
-    'practionerinfo' : {
+    'practitionerinfo' : {
         'facilityid' : ['mf001'],
         'licensenumber' : 'doc-002',
         'specialisation' : 'Neurology'
