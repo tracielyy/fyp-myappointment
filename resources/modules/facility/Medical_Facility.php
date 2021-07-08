@@ -66,17 +66,8 @@ class Medical_Facility {
         return $this->is24hour;
     }
 
-    public function get_operatinghours(): array {
+    public function get_operatinghours(): Operating_Hours {
         return $this->operatinghours;
-    }
-
-    public function display_operatinghours(): string {
-        if ($this->operatinghours['is24hours'] == false) {
-            return Time::to_12hours($this->operatinghours['opening'], false) .
-                    ' - ' . Time::to_12hours($this->operatinghours['closing'], false);
-        } else {
-            return '24 Hours';
-        }
     }
 
     // -- Setters -- //
@@ -103,7 +94,7 @@ class Medical_Facility {
     //  -- Use For Debugging/ Logging Purpose -- //
     public function __toString(): string {
         $str = nl2br(PHP_EOL . 'Facility ID: ' . $this->facilityid . PHP_EOL . 'Facility Name: ' . $this->facilityname . PHP_EOL . 'Address: ' . $this->address .
-                PHP_EOL . 'Contact Number: ' . $this->contactnumber . PHP_EOL . $this->display_operatinghours());
+                PHP_EOL . 'Contact Number: ' . $this->contactnumber);
         return $str;
     }
 
@@ -112,14 +103,12 @@ class Medical_Facility {
 
         # Operating Hour
         $operatinghour = Operating_Hours::initialise_operating_hours($facility['operatinghours']);
-
         $facility_object = new Medical_Facility($facility['facilityname'], $facility['address'],
                 $facility['contactnumber'], $operatinghour, $facility['facilityid']);
         return $facility_object;
     }
-    
-    // ####################     Database Functions      ################### //
 
+    // ####################     Database Functions      ################### //
     // -- GENERATE FACILITY ID
     public static function generated_facility_id(): string {
 

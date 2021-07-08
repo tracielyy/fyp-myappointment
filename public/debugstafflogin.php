@@ -41,9 +41,8 @@ require_once USER_MOD . '/Medical_Personnel.php';
                 case User_Type::SUPER_ADMIN:
                     return Super_Admin::retrieve_super_admin($credentials);
                 case User_Type::FACIILITY_ADMIN:
-//                            $auth_staff = Facility_Admin::retrieve_facility_admin($credentials);
+                    return Facility_Admin::retrieve_facility_admin($credentials);
                 case User_Type::MEDICAL_PERSONNEL:
-//                            $auth_staff = Medical_Personnel::retrieve_medical_personnel($credentials);
                     return Medical_Personnel::retrieve_medical_personnel($credentials);
             endswitch;
         }
@@ -64,6 +63,7 @@ require_once USER_MOD . '/Medical_Personnel.php';
         if ($_SERVER['REQUEST_METHOD'] == "GET") {
             if (isset($_SESSION["user"])) {
                 echo unserialize($_SESSION["user"]);
+
             }
         }
 
@@ -146,8 +146,9 @@ require_once USER_MOD . '/Medical_Personnel.php';
                         $_SESSION['user'] = serialize($auth_staff); // Store User Data In Session
 //                        header("Location:./"); // Redirect Upon Success Authenticate
                         echo nl2br(PHP_EOL . "Success" . PHP_EOL);
-                        echo $auth_staff . "<br/>";
+//                        echo $auth_staff . "<br/>";
                         echo (int) $login_status;
+//                        echo $auth_staff->get_facility();
 
                         # -- Clear Fields
                         $loginArr = array(

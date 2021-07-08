@@ -27,11 +27,10 @@ class Medical_Personnel extends Normal_User {
     public function __construct(Session $session, string $usertype, Time $createdon, string $firstname, string $lastname,
             string $gender, string $dob, string $contactnumber, string $address,
             array $facilityids, string $specialisation, string $licensenumber,
-            string $email, string $password = NULL) {
+            string $email, ?string $password = NULL) {
 
         # -- Parent Constructor -- #
-        parent::__construct($session, $firstname, $lastname, $gender, $dob, $contactnumber, $address,
-                $usertype, $createdon, $email, $password);
+        parent::__construct($session, $usertype, $createdon, $firstname, $lastname, $gender, $dob, $contactnumber, $address, $email, $password);
 
         # -- Medical_Personnel's Properties Assignment -- #
         $this->facilityids = $facilityids;
@@ -52,15 +51,14 @@ class Medical_Personnel extends Normal_User {
     // -- Use For Debugging/ Logging Purpose -- //
     public function __toString(): string {
         $str = parent::__toString();
-        $str .= nl2br('License Number: ' . $this->licensenumber . PHP_EOL . 'Role Type: ' . $this->roletype .
-                PHP_EOL . 'Facility IDs: ');
+        $str .= nl2br('License Number: ' . $this->licensenumber . PHP_EOL . 'Facility IDs: ');
 
         # -- Counter Variables -- #
         $count = count($this->facilityids);
         $counter = 0;
 
         # -- Loop & Display Each Facility IDs -- #
-        foreach ($facilityids as $facilityid) {
+        foreach ($this->facilityids as $facilityid) {
 
             # Increment
             $counter++;
@@ -140,9 +138,13 @@ class Medical_Personnel extends Normal_User {
 
         return $practitioner_arr;
     }
-    
 
-    
+    // -- RETRIEVE  MEDICAL PERSONNEL DATA
+    public static function retrieve_medical_personnel(array $login_arr): Medical_Personnel {
+
+        $medical_personnel_data = Account_User::retrieve_account_data($login_arr);
+        return self::initialise_medical_personnel($medical_personnel_data);
+    }
 
 }
 
