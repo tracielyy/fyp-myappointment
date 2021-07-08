@@ -33,7 +33,7 @@ class Super_Admin extends Admin {
         return $str;
     }
 
-    // -- Initialise Patient
+    // -- Initialise Super Admin
     public static function initialise_super_admin(array $super_admin_info): Super_Admin {
 
         # Session Object
@@ -66,7 +66,7 @@ class Super_Admin extends Admin {
         return false;
     }
 
-    // -- RETRIEVE PATIENT DATA
+    // -- RETRIEVE SUPER ADMIN DATA
     public static function retrieve_super_admin(array $login_arr): Super_Admin {
 
         $super_admin_data = Account_User::retrieve_account_data($login_arr);

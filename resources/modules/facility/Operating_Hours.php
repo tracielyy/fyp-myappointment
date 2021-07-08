@@ -17,9 +17,9 @@ class Operating_Hours {
     private bool $is24hours;
 
     // Constructor
-    public function __construct(string $opening, string $closing, bool $is24hours) {
-        $this->opening = $opening;
-        $this->closing = $closing;
+    public function __construct(string $openinghour, string $closinghour, bool $is24hours) {
+        $this->openinghour = $openinghour;
+        $this->closinghour = $closinghour;
         $this->is24hours = $is24hours;
     }
 
@@ -50,7 +50,7 @@ class Operating_Hours {
     }
 
     // Debugging: Logging
-    public function _toString(): string {
+    public function __toString(): string {
 
         // Not 24 hours
         if ($this->is24hours == false) {
@@ -61,6 +61,7 @@ class Operating_Hours {
     }
 
     public static function initialise_operating_hours(array $operatinghours): Operating_Hours {
+   
         $operatinghours_obj = new Operating_Hours($operatinghours['openinghour'], $operatinghours['closinghour'], $operatinghours['is24hours']);
         return $operatinghours_obj;
     }
