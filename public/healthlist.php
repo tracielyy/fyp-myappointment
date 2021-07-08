@@ -10,17 +10,18 @@
     // require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
     ?>
 
-    <?php
+<?php
     include TEMPLATES_PATH . '/bootstrap.php';
     include_once TEMPLATES_PATH . '/navbar.php';
     ?>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health and Information Tips</title>
-    <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
 
     <style>
     <?php include './css/healthlist.css';
@@ -28,52 +29,133 @@
     </style>
 
 </head>
+
 <body>
-<div class="container">
+    <div class="container">
 
-<h1 class="mb-3"> Health Information and Tips</h1>
-<div id="wrapper"></div>
-</div>
+        <h1 class="mb-3"> Health Information and Tips</h1>
+
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body rounded" style="background-color: #5BA33F;">
+                        <b class="text-white"><i class="fas fa-star me-1"></i></i>Featured</b>
+                    </div>
+                </div>
+
+                <div class="card mh-100">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-1 min-vw-1000">
+
+                                <i class="fas fa-user-md fa-3x opt-icon"></i>
+
+                            </div>
+                            <div class="col">
+                                <h5 class="card-title">Why You Should Take Care of Your Body and Health</h5>
+                                <p class="card-text line-clamp">Health problems, even minor ones, can interfere with
+                                    or even
+                                    overshadow other aspects of your life. Even relatively minor health issues such
+                                    as aches, pains, lethargy, and indigestion take a toll on your happiness and
+                                    stress levels. One way to improve your ability to cope with stress and feel
+                                    better is</p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
-    
 </body>
 
 
 <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
 <script>
-import { css } from '@emotion/css';
+import {
+    css
+} from '@emotion/css';
 
 const grid = new gridjs.Grid({
     columns: ["Title", "Description", "Author", "Posted on"],
     search: true,
     data: [
-        ["Why You Should Take Care of Your Body and Health", "Health problems, even minor ones, can interfere with or even ...", "Dr. John Mark", "1 year ago"],
-        ["Fast Remedies When Having Headache", "Even relatively minor health issues such as aches, pains, lethargy ...", "Dr. John Mark", "5 days ago"],
-        ["Reasons Why Sleep is the Most Important Part of the Day", "Sleep can have a serious impact on your overall health and well-being. Make a ...", "Dr. David Jones", "2 days ago"],
-        ["Your Posture is Affecting Your Health", "We've all heard the advice to eat right and exercise, but it can be difficult to fit in ...", "Dr. Sarah Eoin", "7 days ago"],
-        ["Eat This Everyday, and You Will Feel Better", "Indigestion take a toll on your happiness and stress ...", "Dr. John Mark", "1 year ago"],
-        ["What To do When You are Bloated", "Rather than eating right solely for the promise of...", "Dr. John Mark", "5 days ago"],
-        ["Why You Should Take Care of Your Body and Health", ">Health problems, even minor ones, can interfere with or even ...", "Dr. John Mark", "1 year ago"],
-        ["Fast Remedies When Having Headache", "Even relatively minor health issues such as aches, pains, lethargy ...", "Dr. John Mark", "5 days ago"],
-        ["Reasons Why Sleep is the Most Important Part of the Day", "Sleep can have a serious impact on your overall health and well-being. Make a ...", "Dr. David Jones", "2 days ago"],
-        ["Your Posture is Affecting Your Health", "We've all heard the advice to eat right and exercise, but it can be difficult to fit in ...", "Dr. Sarah Eoin", "7 days ago"],
-        ["Eat This Everyday, and You Will Feel Better", "Indigestion take a toll on your happiness and stress ...", "Dr. John Mark", "1 year ago"],
-        ["What To do When You are Bloated", "Rather than eating right solely for the promise of...", "Dr. John Mark", "5 days ago"],
-        ["Why You Should Take Care of Your Body and Health", ">Health problems, even minor ones, can interfere with or even ...", "Dr. John Mark", "1 year ago"],
-        ["Fast Remedies When Having Headache", "Even relatively minor health issues such as aches, pains, lethargy ...", "Dr. John Mark", "5 days ago"],
-        ["Reasons Why Sleep is the Most Important Part of the Day", "Sleep can have a serious impact on your overall health and well-being. Make a ...", "Dr. David Jones", "2 days ago"],
-        ["Your Posture is Affecting Your Health", "We've all heard the advice to eat right and exercise, but it can be difficult to fit in ...", "Dr. Sarah Eoin", "7 days ago"],
-        ["Eat This Everyday, and You Will Feel Better", "Indigestion take a toll on your happiness and stress ...", "Dr. John Mark", "1 year ago"],
-        ["What To do When You are Bloated", "Rather than eating right solely for the promise of...", "Dr. John Mark", "5 days ago"]
+        ["Why You Should Take Care of Your Body and Health",
+            "Health problems, even minor ones, can interfere with or even ...", "Dr. John Mark",
+            "1 year ago"
+        ],
+        ["Fast Remedies When Having Headache",
+            "Even relatively minor health issues such as aches, pains, lethargy ...", "Dr. John Mark",
+            "5 days ago"
+        ],
+        ["Reasons Why Sleep is the Most Important Part of the Day",
+            "Sleep can have a serious impact on your overall health and well-being. Make a ...",
+            "Dr. David Jones", "2 days ago"
+        ],
+        ["Your Posture is Affecting Your Health",
+            "We've all heard the advice to eat right and exercise, but it can be difficult to fit in ...",
+            "Dr. Sarah Eoin", "7 days ago"
+        ],
+        ["Eat This Everyday, and You Will Feel Better",
+            "Indigestion take a toll on your happiness and stress ...", "Dr. John Mark", "1 year ago"
+        ],
+        ["What To do When You are Bloated", "Rather than eating right solely for the promise of...",
+            "Dr. John Mark", "5 days ago"
+        ],
+        ["Why You Should Take Care of Your Body and Health",
+            ">Health problems, even minor ones, can interfere with or even ...", "Dr. John Mark",
+            "1 year ago"
+        ],
+        ["Fast Remedies When Having Headache",
+            "Even relatively minor health issues such as aches, pains, lethargy ...", "Dr. John Mark",
+            "5 days ago"
+        ],
+        ["Reasons Why Sleep is the Most Important Part of the Day",
+            "Sleep can have a serious impact on your overall health and well-being. Make a ...",
+            "Dr. David Jones", "2 days ago"
+        ],
+        ["Your Posture is Affecting Your Health",
+            "We've all heard the advice to eat right and exercise, but it can be difficult to fit in ...",
+            "Dr. Sarah Eoin", "7 days ago"
+        ],
+        ["Eat This Everyday, and You Will Feel Better",
+            "Indigestion take a toll on your happiness and stress ...", "Dr. John Mark", "1 year ago"
+        ],
+        ["What To do When You are Bloated", "Rather than eating right solely for the promise of...",
+            "Dr. John Mark", "5 days ago"
+        ],
+        ["Why You Should Take Care of Your Body and Health",
+            ">Health problems, even minor ones, can interfere with or even ...", "Dr. John Mark",
+            "1 year ago"
+        ],
+        ["Fast Remedies When Having Headache",
+            "Even relatively minor health issues such as aches, pains, lethargy ...", "Dr. John Mark",
+            "5 days ago"
+        ],
+        ["Reasons Why Sleep is the Most Important Part of the Day",
+            "Sleep can have a serious impact on your overall health and well-being. Make a ...",
+            "Dr. David Jones", "2 days ago"
+        ],
+        ["Your Posture is Affecting Your Health",
+            "We've all heard the advice to eat right and exercise, but it can be difficult to fit in ...",
+            "Dr. Sarah Eoin", "7 days ago"
+        ],
+        ["Eat This Everyday, and You Will Feel Better",
+            "Indigestion take a toll on your happiness and stress ...", "Dr. John Mark", "1 year ago"
+        ],
+        ["What To do When You are Bloated", "Rather than eating right solely for the promise of...",
+            "Dr. John Mark", "5 days ago"
+        ]
     ],
     pagination: {
         enabled: true,
         limit: 9,
         summary: false
     }
-    
+
 })
 
 grid.render(document.getElementById("wrapper"));
