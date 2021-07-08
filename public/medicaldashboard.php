@@ -3,29 +3,19 @@
 
 <head>
 
-    <?php
-    // session_start();
-    // session_start();
-     require_once '../resources/config.php';
-    // require_once USER_MOD . '/Account_User.php';
-    // require_once USER_MOD . '/Patient.php';
-    // require_once APPT_MOD . '/Appointment_Record.php';
-    // require_once APPT_MOD . '/RetrieveAppointment.php';
-    // require_once ENUMS_PATH . '/User_Type.php';
-    // require_once TIME_MOD . '/CalendarICS.php';
-    // require_once TIME_MOD . '/Time.php';
+<?php
+session_start();
+/* Load Config File */
+require_once '../resources/config.php';
+require '../vendor/autoload.php';
+require_once EMAIL_MOD . '/Email.php';
+require_once UTIL_MOD . '/StringUtils.php';
+require_once UTIL_MOD . '/Regex.php';
+require_once AUTH_MOD . '/Authentication.php';
+require_once USER_MOD . '/Account_User.php';
 
 
-    require_once TIME_MOD . '/Time.php';
-    require_once FACILITY_MOD . '/Operating_Hours.php';
-    require_once DB_MOD . '/DbQuery.php';
-    require_once DB_MOD . '/Database.php';
-
-    require_once APPT_MOD . '/Normal_Slot.php';
-    require_once APPT_MOD . '/Special_Slot.php';
-
-    require_once USER_MOD . '/Account_User.php';
-    require_once USER_MOD . '/Patient.php';
+//require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
     ?>
 
     <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />

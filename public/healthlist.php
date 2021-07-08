@@ -42,7 +42,6 @@
                         <b class="text-white"><i class="fas fa-star me-1"></i></i>Featured</b>
                     </div>
                 </div>
-
                 <div class="card mh-100">
                     <div class="card-body">
                         <div class="row">
@@ -53,17 +52,44 @@
                             </div>
                             <div class="col">
                                 <h5 class="card-title">Why You Should Take Care of Your Body and Health</h5>
-                                <p class="card-text line-clamp">Health problems, even minor ones, can interfere with
+                                <p class="card-text line-clamp" style="margin:2px">Health problems, even minor ones, can
+                                    interfere with
                                     or even
                                     overshadow other aspects of your life. Even relatively minor health issues such
                                     as aches, pains, lethargy, and indigestion take a toll on your happiness and
                                     stress levels. One way to improve your ability to cope with stress and feel
                                     better is</p>
+                                <label class="card-text text-muted" style="margin:0">Dr. Sylvester Stallone - Uploaded 5
+                                    months ago</label>
                             </div>
-
                         </div>
                     </div>
                 </div>
+                
+                <div class="card mh-100">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-1 min-vw-1000">
+
+                                <i class="fas fa-user-md fa-3x opt-icon"></i>
+
+                            </div>
+                            <div class="col">
+                                <h5 class="card-title">Why You Should Take Care of Your Body and Health</h5>
+                                <p class="card-text line-clamp" style="margin:2px">Health problems, even minor ones, can
+                                    interfere with
+                                    or even
+                                    overshadow other aspects of your life. Even relatively minor health issues such
+                                    as aches, pains, lethargy, and indigestion take a toll on your happiness and
+                                    stress levels. One way to improve your ability to cope with stress and feel
+                                    better is</p>
+                                <label class="card-text text-muted" style="margin:0">Dr. Sylvester Stallone - Uploaded 5
+                                    months ago</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
