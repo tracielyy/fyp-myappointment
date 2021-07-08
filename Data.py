@@ -10,8 +10,8 @@ db = firestore.client()
 doctor_slots = db.collection('Account_User').document('Medical_Personnel-iBnhkCP6HAhM0MvxeI4O').collection('Appointment_Slots').document('22-06-2021').collection('Slots')
 timing = doctor_slots.get()
 
-for slots in timing:
-    print('{} => {} '.format(slots.id, slots.to_dict()))
+# for slots in timing:
+#     print('{} => {} '.format(slots.id, slots.to_dict()))
 
 #adding first data
 data = {
@@ -29,7 +29,8 @@ doctor = {
     'accountdetails' : {
         'createdon' : {
             'date' : d.strftime("%d-%m-%Y"),
-            'time' : d.strftime("%X")}
+            'time' : d.strftime("%X")},
+        'usertype': 'Medical Personnel'
     },
     'credentials' : {
         'email' : '',
@@ -59,10 +60,10 @@ doctor = {
         }
     },
     'session' : {
-        'ipaddress' : '192.168.1.194',
+        'ipaddress' : '',
         'isloggedin' : False,
-        'sessionid' : 'kthlla5tf4gsf4rj04fdjibb0m',
-        'token' : 'xe,yE0DtLEwoWH1'}
+        'sessionid' : '',
+        'token' : ''}
 }
 
 
