@@ -11,6 +11,9 @@ require_once DB_MOD . '/Database.php';
 require_once APPT_MOD . '/Normal_Slot.php';
 require_once APPT_MOD . '/Special_Slot.php';
 
+require_once USER_MOD . '/Account_User.php';
+require_once USER_MOD . '/Patient.php';
+
 
 
 # -- Find The Patient Count (HARDCODE)
@@ -32,6 +35,23 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("Medical_Personnel-iBnhk
     <body>
         &nbsp;<?php echo $patient_per_day; ?>
                 &nbsp;<?php echo var_dump($slot_arr); ?>
+    <hr>
+                <?php 
+        $pnum = 0;
+        $p_perday = Special_Slot::patient_count_per_date("mf001", "15-07-2021");
+            foreach($slot_arr as $slot):
+            $patientid = $slot->get_patient();
+            $patient = Patient::retrieve_patient_by_id($patientid);
+            $str = "[\"" . $patient->get_firstname() . "\"," . $patient->get_email() . "\",\"" . $slot->get_appointmentschedule()->get_date() . "\",\"" . $slot->get_appointmentschedule()->get_time()."\"]" ; 
+            echo $str;
+            $pnum++;
+            if ($pnum == $p_perday) :
+                echo "";
+            else:
+                echo ",";
+            endif;
+            endforeach; 
+        ?>
 
     </body>
 </html>
