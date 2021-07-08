@@ -14,6 +14,18 @@
     // require_once ENUMS_PATH . '/User_Type.php';
     // require_once TIME_MOD . '/CalendarICS.php';
     // require_once TIME_MOD . '/Time.php';
+
+
+    require_once TIME_MOD . '/Time.php';
+    require_once FACILITY_MOD . '/Operating_Hours.php';
+    require_once DB_MOD . '/DbQuery.php';
+    require_once DB_MOD . '/Database.php';
+
+    require_once APPT_MOD . '/Normal_Slot.php';
+    require_once APPT_MOD . '/Special_Slot.php';
+
+    require_once USER_MOD . '/Account_User.php';
+    require_once USER_MOD . '/Patient.php';
     ?>
 
     <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
@@ -22,7 +34,7 @@
     <?php include './css/medicaldashboard.css';
     ?>
     </style>
-    
+
     <?php
     include TEMPLATES_PATH . '/bootstrap.php';
     include_once TEMPLATES_PATH . '/navbar.php';
@@ -47,8 +59,10 @@
     
         
 //         include COMPONENTS_PATH . '/navbar-loggedin.php';
+$patient_per_day = Normal_Slot::patient_count_per_date("mf001", "15-07-2021");
+$patient_per_day += Special_Slot::patient_count_per_date("mf001", "15-07-2021");
   
-  
+$slot_arr = Special_Slot::retrieve_booked_slots_by_date("Medical_Personnel-iBnhkCP6HAhM0MvxeI4O", "15-07-2021");
 
 ?>
 
@@ -75,24 +89,24 @@
 
     <div class="container-fluid mt-3">
         <div class="tab">
-            <button class="tablinks top" onclick="openCity(event, 'Dashboard')"
-                    id="defaultOpen"><i class="far fa-window-maximize tab-icon"></i>Dashboard </button>
+            <button class="tablinks top" onclick="openCity(event, 'Dashboard')" id="defaultOpen"><i
+                    class="far fa-window-maximize tab-icon"></i>Dashboard </button>
             <button class="tablinks" onclick="openCity(event, 'Appointments')"><i
-                        class="far fa-calendar-alt tab-icon"></i>Appointments</a> </a>
-            <button class="tablinks" onclick="openCity(event, 'Data')"><i
+                    class="far fa-calendar-alt tab-icon"></i>Appointments</a> </a>
+                <button class="tablinks" onclick="openCity(event, 'Data')"><i
                         class="fas fa-chart-bar tab-icon"></i>Data</a> </a>
-            <button class="tablinks" onclick="openCity(event, 'Settings')"><i
-                        class="far fa-clock tab-icon"></i>Shift Settings</a> </a>
+                    <button class="tablinks" onclick="openCity(event, 'Settings')"><i
+                            class="far fa-clock tab-icon"></i>Shift Settings</a> </a>
         </div>
 
         <div id="Dashboard" class="tabcontent shadow rounded">
             <div class="container chart-container mt-5">
                 <h3 class="text-center mb-4">Dashboard</h3>
                 <div class="row">
-                
-                <div class="border mb-3 shadow-sm" style="border-radius: 15px">
-                <div id="time" class="display-6 text-center mb-1"></div>
-                </div>
+
+                    <div class="border mb-3 shadow-sm" style="border-radius: 15px">
+                        <div id="time" class="display-6 text-center mb-1"></div>
+                    </div>
 
                     <div class="col">
                         <div class="p-4 shadow" style="border-radius: 25px">
@@ -150,19 +164,21 @@
 
 <script>
 function startTime() {
-  const today = new Date();
-  let h = today.getHours();
-  let m = today.getMinutes();
-  let s = today.getSeconds();
-  m = checkTime(m);
-  s = checkTime(s);
-  document.getElementById('time').innerHTML =  h + ":" + m + ":" + s;
-  setTimeout(startTime, 1000);
+    const today = new Date();
+    let h = today.getHours();
+    let m = today.getMinutes();
+    let s = today.getSeconds();
+    m = checkTime(m);
+    s = checkTime(s);
+    document.getElementById('time').innerHTML = h + ":" + m + ":" + s;
+    setTimeout(startTime, 1000);
 }
 
 function checkTime(i) {
-  if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
-  return i;
+    if (i < 10) {
+        i = "0" + i
+    }; // add zero in front of numbers < 10
+    return i;
 }
 </script>
 
@@ -282,26 +298,30 @@ var myChart2 = new Chart(ctx3, {
 
 <!-- GRIDJS -->
 
+
+
 <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
 
 <script>
 new gridjs.Grid({
     columns: ["Name", "Email", "Date", "Time"],
     data: [
-        ["John", "john@example.com", "24-June-2021", "14:00"],
-        ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
-        ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
-        ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
-        ["Afshin", "afshin@mail.com", "24-June-2021", "14:00"],
-        ["John", "john@example.com", "24-June-2021", "14:00"],
-        ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
-        ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
-        ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
-        ["John", "john@example.com", "24-June-2021", "14:00"],
-        ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
-        ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
-        ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"]
-    ],
+        <?php 
+          $pnum = 0;
+          $p_perday = Special_Slot::patient_count_per_date("mf001", "15-07-2021");
+              foreach($slot_arr as $slot):
+              $patientid = $slot->get_patient();
+              $patient = Patient::retrieve_patient_by_id($patientid);
+              $str = "[\"" . $patient->get_firstname() . "\",\"" . $patient->get_email() . "\",\"" . $slot->get_appointmentschedule()->get_date() . "\",\"" . $slot->get_appointmentschedule()->get_time()."\"]" ; 
+              echo $str;
+              $pnum++;
+              if ($pnum == $p_perday) :
+                  echo "";
+              else:
+                  echo ",";
+              endif;
+              endforeach; 
+        ?>],
 
     pagination: {
         enabled: true,
