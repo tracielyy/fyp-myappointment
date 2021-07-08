@@ -5,7 +5,6 @@ define("TEMPLATES_PATH", realpath(dirname(__FILE__) . '/templates'));
 define("ENTITIES_PATH", realpath(dirname(__FILE__) . '/entities'));
 
 define("ENUMS_PATH", realpath(dirname(__FILE__) . '/enums'));
-define("FUNCTIONS_PATH", realpath(dirname(__FILE__) . '/functions'));
 
 ############## -- CONFIGURATIONS FOR MODULES -- ################
 define("DB_MOD", realpath(dirname(__FILE__) . '/modules/database'));

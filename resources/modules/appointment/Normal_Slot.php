@@ -7,7 +7,7 @@
 
 
 /* Load Config File */
-require_once '../resources/config.php';
+//require_once '../resources/config.php';
 require_once APPT_MOD . '/Appointment_Record.php';
 require_once USER_MOD . '/Account_User.php';
 require_once AUTH_MOD . '/Session.php';
@@ -18,6 +18,8 @@ require_once UTIL_MOD . '/ArrayCreation.php';
 require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
 require_once ENUMS_PATH . '/Appointment_Type.php';
+
+use Google\Cloud\Firestore\FieldValue;
 
 class Normal_Slot extends Appointment_Slot {
 
@@ -42,47 +44,102 @@ class Normal_Slot extends Appointment_Slot {
 
     // -- Setters
     // -- Initialise Appointment_Slot
-    public static function initialise_appt_slot(array $appt_slot, string $date): Normal_Slot {
+    public static function initialise_normal_slot(array $slot_data): Normal_Slot {
+
+        # Extract Date From Slot Id <e.g 1001>~<date>~<appointmenttype>
+        $slot_date = explode("~", $slot_data['slotid'])[1];
 
         # Time
-        $appt_schedule = new Time($date, $appt_slot['time']);
-        $slot_obj = new Normal_Slot($appt_slot['slotid'], $appt_schedule, $appt_slot['patientlist'], $appt_slot['doctorlist']);
+        $appt_schedule = new Time($slot_date, $slot_data['time']);
+        $slot_obj = new Normal_Slot($slot_data['slotid'], $appt_schedule, $slot_data['patientlist'], $slot_data['doctorlist']);
         return $slot_obj;
     }
 
     // ####################     Database Functions      ################### //
     // -- ADD PATIENT TO NORMAL SLOT (DR CONSULT, CHECKUP)
-    public function insert_patient_to_slot(string $slotid,  string $patient_doc_id) {
+    public static function insert_patient_to_slot(string $slotid, string $patient_doc_id, string $facilityid): void {
 
         # Split The Slot ID <e.g 1001>~<date>~<appointmenttype>
         $slotid_data = explode("~", $slotid);
 
         # Slot Path 
-        $sloth_path = Database::MEDICAL_FACILITY . "/" . $slotid[2] . "/" . $slotid[1] . "/" . $slotid_data[1] . "/" . Database::SLOTS;
+        $slot_path = Database::MEDICAL_FACILITY . "/" . $facilityid . "/" . $slotid_data[2] . "/" . $slotid_data[1] . "/" . Database::SLOTS;
         $db = new DbQuery();
-        $db->get_db()->collection($sloth_path)
+        $db->get_db()->collection($slot_path)
                 ->document($slotid)->update([
-            ['path' => 'patient', 'value' => $patient_doc_id]
+            ['path' => 'patientlist', 'value' => FieldValue::arrayUnion([$patient_doc_id])]
         ]);
     }
 
     // -- REMOVE PATIENT FROM SLOT WHEN CANCELLING APPOINTMENT
-    public static function remove_patient_from_slot(string $user_doc_id, array $appt_record): bool {
+    public static function remove_patient_from_slot(string $slotid, string $facilityid, string $patient_doc_id): bool {
 
-        # Appointment Schedule
-        $scheduledon = $appt_record['scheduledon'];
+        # Split The Slot ID <e.g 1001>~<date>~<appointmenttype>
+        $slotid_data = explode("~", $slotid);
 
-        # Patient Document ID In Array (To Be Removed)
-        $user_id_arr['patients'] = array($user_doc_id);
-
-        # Get Appointment Slot's ID
+        # Slot Path 
+        $slot_path = Database::MEDICAL_FACILITY . "/" . $facilityid . "/" . $slotid_data[2] . "/" . $slotid_data[1] . "/" . Database::SLOTS;
         $db = new DbQuery();
-        $slot_path = Database::MEDICAL_FACILITY . "/" . $appt_record['facilityid'] . "/" . $appt_record['appointmenttype'] . "/" . $scheduledon['date'] . "/" . Database::SLOTS;
-        $slot_condition = array('time' => $scheduledon['time']);
-        $slot_doc_id = $db->get_document_id($slot_path, $slot_condition);
+        $db->get_db()->collection($slot_path)
+                ->document($slotid)->update([
+            ['path' => 'patientlist', 'value' => FieldValue::arrayRemove([$patient_doc_id])]
+        ]);
+        return True;
+    }
+
+    // -- RETRIEVE APPOINTMENT SLOTS BY DATE
+    public static function retrieve_free_slots_by_date(string $facilityid, string $appointmenttype, string $date): array {
+
+        # Create Empty Array (Store Appointment Slots)
+        $slots_arr = array();
+        $slot_list = array();
+
+        # Path To Retrieve The Appointment Slot
+        $slot_path = Database::MEDICAL_FACILITY . "/" . $facilityid . "/" . $appointmenttype . "/" . $date . "/" . Database::SLOTS;
+        $db = new DbQuery();
+
+        # Getting Array Of Document SnapShot (Get Slots With At Least ONE DOCTOR
+        $slot_snapshot_arr = $db->get_db()->collection($slot_path)
+                ->where("doctorlist", "!=", [])
+                ->documents();
+
+        # Loop & Check If Slot Is Free
+        foreach ($slot_snapshot_arr as $slot_snapshot):
+            if ($slot_snapshot->exists()):
+
+                # Extract Data From Snapshot
+                $slot_data = $slot_snapshot->data();
+
+                # More Filtering (Make Sure There Is Enough Doctor For Patients) --> 1:1
+                self::filter_free_slots($slots_arr, $slot_data);
+            endif;
+        endforeach;
 
 
-        return $db->update_array_remove($slot_path, $slot_doc_id, $user_id_arr);
+        # Sorting The Array In Accordance To The Slot Id
+        array_multisort(array_column($slots_arr, 'slotid'), $slots_arr);
+
+        # Loop & Store As Normal Slot Object
+        foreach ($slots_arr as $slot):
+            $slot_list[] = self::initialise_normal_slot($slot);
+        endforeach;
+
+        # -- Return Array Of Appointment Slots
+        return $slot_list;
+    }
+
+    // Filter & Make Sure Ratio Of Doctor To Patient Is 1:1
+    private static function filter_free_slots(array &$slots_arr, array $slot_data) {
+
+        # Get All The Counters For Comparison
+        $doctor_count = count($slot_data['doctorlist']);
+        $patient_count = count($slot_data['patientlist']);
+
+        # More Filtering (Make Sure There Is Enough Doctor For Patients) --> 1:1
+        if ($doctor_count > $patient_count):
+            # Add Normal Slot To Array
+            $slots_arr[] = ($slot_data);
+        endif;
     }
 
     // -- RETRIEVE APPOINTMENT SLOT (via slot id & appointment type)
@@ -150,21 +207,6 @@ class Normal_Slot extends Appointment_Slot {
         endforeach;
 
         return $patient_counter;
-    }
-
-    // -- UPDATE APPOINTMENT SLOT WITH PATIENT DOCUMENT ID
-    public static function add_patient_to_slot(string $user_doc_id, array $booking_info): bool {
-
-        # Path For Normal Appointment Slots (Dr Consult & Check Up)
-        $slots_doc_path = Database::MEDICAL_FACILITY . "/" . $booking_info['facilityid'] . "/" .
-                $booking_info['appointmenttype'] . "/" . $booking_info['date'] . "/" . Database::SLOTS;
-
-        # Update The Appointment Slot (Not Done)
-        $db = new DbQuery();
-        $db->get_db()->collection($slots_doc_path)->document($booking_info['slotid'])->update([
-            ['path' => 'patientlist', 'value' => FieldValue::arrayUnion([$user_doc_id])]
-        ]);
-        return true;
     }
 
 }

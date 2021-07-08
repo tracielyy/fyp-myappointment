@@ -180,6 +180,10 @@ require_once ENUMS_PATH . '/Appointment_Type.php';
                     echo "date called";
                     $selected_date = Time::date_format_default($_POST['date']);
                     $appt_date = Time::date_format_change($selected_date, $cal_default);
+                    
+                    # -- Call Different Functions For Different Appt Type
+                    
+                    
                     $slots = PatientFunctions::get_apptslots($appointmentArr['facilityid'], $appointmentArr['appointmenttype'], $selected_date);
                 else:
                     $selected_date = Time::date_format_default($next_day);

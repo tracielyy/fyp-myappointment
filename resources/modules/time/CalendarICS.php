@@ -5,7 +5,7 @@
  */
 
 /* Load Config File */
-require_once '../resources/config.php';
+//require_once '../resources/config.php';
 require_once APPT_MOD . '/Appointment_Record.php';
 require_once APPT_MOD . '/Appointment_Slot.php';
 

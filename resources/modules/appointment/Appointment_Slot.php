@@ -7,7 +7,7 @@
 
 
 /* Load Config File */
-require_once '../resources/config.php';
+//require_once '../resources/config.php';
 require_once APPT_MOD . '/Appointment_Record.php';
 require_once USER_MOD . '/Account_User.php';
 require_once AUTH_MOD . '/Session.php';
@@ -25,6 +25,7 @@ class Appointment_Slot {
     // -- Properties
     private string $slotid;
     private Time $appointmentschedule;
+    private string $facilityid;
 
     // Specialist: ONLY 1 Patient, Check Up & Dr Consult: max 10
     // -- Constructor
@@ -84,7 +85,7 @@ class Appointment_Slot {
 
         # Time
         $appt_schedule = new Time($date, $appt_slot['time']);
-        $slot_obj = new Appointment_Slot($appt_slot['slotid'], $appt_schedule, $appt_slot['patientlist'], $appt_slot['available']);
+        $slot_obj = new Appointment_Slot($appt_slot['slotid'], $appt_schedule);
         return $slot_obj;
     }
 

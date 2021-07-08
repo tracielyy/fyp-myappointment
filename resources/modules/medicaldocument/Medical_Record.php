@@ -4,14 +4,15 @@
  * @author yanying (Tracie)
  */
 
-namespace Module\MedicalDoc;
 
 /* Load Config File */
-require_once '../resources/config.php';
+//require_once '../resources/config.php';
 
-use Module\User\Medical_Personnel;
-use Module\Facility\Medical_Facility;
-use Module\Time\Time;
+require_once USER_MOD . '/Medical_Personnel.php';
+require_once FACILITY_MOD . '/Medical_Facility.php';
+require_once TIME_MOD . '/Time.php';
+
+
 
 class Medical_Record {
 

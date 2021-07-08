@@ -7,7 +7,7 @@
 
 
 
-require_once '../resources/config.php';
+//require_once '../resources/config.php';
 
 require_once AUTH_MOD . '/Session.php';
 require_once TIME_MOD . '/Time.php';

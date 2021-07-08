@@ -8,6 +8,7 @@ require_once ENUMS_PATH . '/User_Type.php';
 require_once TIME_MOD . '/CalendarICS.php';
 require_once TIME_MOD . '/Time.php';
 
+require '../vendor/autoload.php';
 
 $pageName = "viewappointment";
 

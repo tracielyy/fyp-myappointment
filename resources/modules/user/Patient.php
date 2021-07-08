@@ -7,7 +7,7 @@
 
 
 /* Load Config File */
-require_once '../resources/config.php';
+//require_once '../resources/config.php';
 
 require_once TIME_MOD . '/Time.php';
 
@@ -122,6 +122,17 @@ class Patient extends Normal_User {
         return $db->insert_document(Database::ACCOUNT_USER, $patient_info, true);
     }
 
+    // -- REMOVE PATIENT ACCOUNT
+    public static function remove_patient(string $email): bool {
+
+        # Make Sure Person To Be Removed Is Patient
+        $usertype = Account_User::retrieve_user_type($email);
+        if ($usertype == User_Type::PATIENT):
+            $patient_doc_id = Account_User::retrieve_user_doc_id($email);
+            
+        endif;
+    }
+
     // -- RETRIEVE PATIENT DATA
     public static function retrieve_patient(array $login_arr): Patient {
 
@@ -176,47 +187,6 @@ class Patient extends Normal_User {
             return self::initialise_patient($patient_data);
         endif;
         return NULL;
-    }
-
-    // -- BOOK AN APPOINTMENT
-    public static function book_appointment(string $email, array $booking_info): bool {
-
-        $condition['credentials'] = array('email' => $email);
-        $db = new DbQuery();
-        $user_doc_id = $db->get_document_id(Database::ACCOUNT_USER, $condition);
-
-        # Validate Appointment
-        if (Appointment_Record::validate_appt_booking($user_doc_id, $booking_info)):
-
-            # Create User Appointment Record
-            $user_appt_update = Appointment_Record::create_appointment_record($user_doc_id, $booking_info);
-
-            # If User Appointment Record Created Successfully
-            if ($user_appt_update):
-
-                # Update To Add Patient's ID To Appointment's patient array
-                $appt_slot_update = self::add_to_slot($user_doc_id, $booking_info);
-
-                return ($user_appt_update && $appt_slot_update);
-            else:
-                return false;
-            endif;
-
-        endif;
-        return false;
-    }
-
-    // -- add patient to normal or special slots
-    private static function add_to_slot(string$user_doc_id, array $booking_info ) {
-        switch ($booking_info['appointmenttype']):
-            case Appointment_Type::CHECK_UP:
-            case Appointment_Type::DOCTOR_CONSULTATION:
-                $appt_slot_update = Normal_Slot::add_patient_to_slot($user_doc_id, $booking_info);
-            case Appointment_Type::SPECIALIST_CONSULTATION:
-                $appt_slot_update = Special_Slot::add_patient_to_slot($user_doc_id, $booking_info);
-        endswitch;
-
-        return $appt_slot_update;
     }
 
 }
