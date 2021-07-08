@@ -78,7 +78,7 @@ class Account_User {
     //      Methods Accessing Firestore Database 
     //============================================
     // -- GET USER DOCUMENT ID
-    public static function retrieve_user_doc_id(string $user_email, ?string $user_password = NULL): string {
+    public static function retrieve_user_doc_id(string $user_email, ?string $user_password = NULL): ?string {
         $db = new DbQuery();
 
         if ($user_password == null):
