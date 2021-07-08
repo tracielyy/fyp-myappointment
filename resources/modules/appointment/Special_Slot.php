@@ -20,7 +20,6 @@ require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
 require_once ENUMS_PATH . '/Appointment_Type.php';
 
-
 class Special_Slot extends Appointment_Slot {
 
     private string $patient;
@@ -104,7 +103,7 @@ class Special_Slot extends Appointment_Slot {
 
         # Getting Array Of Document SnapShot
         $slot_snapshot_arr = $db->get_db()->collection($slot_path)
-                ->where("facilityid","=", $facilityid)
+                ->where("facilityid", "=", $facilityid)
                 ->where("available", "=", True)
                 ->where("patient", "=", "")
                 ->documents();
@@ -171,6 +170,7 @@ class Special_Slot extends Appointment_Slot {
 
         # Initialise Counter As Zero
         $patient_counter = 0;
+        $all_slot_list = array();
 
         # Specialist Consultation (Filter Doctors)
         $db = new DbQuery();
@@ -188,13 +188,15 @@ class Special_Slot extends Appointment_Slot {
             $all_slot_list[] = $db->get_all_documents($specialist_path);
         endforeach;
 
-        foreach ($all_slot_list as $slot_list):
-            foreach ($slot_list as $slot):
-                if ($slot['patient'] != ""):
-                    ++$patient_counter;
-                endif;
+        if (!empty($all_slot_list)):
+            foreach ($all_slot_list as $slot_list):
+                foreach ($slot_list as $slot):
+                    if ($slot['patient'] != ""):
+                        ++$patient_counter;
+                    endif;
+                endforeach;
             endforeach;
-        endforeach;
+        endif;
 
         return $patient_counter;
     }
