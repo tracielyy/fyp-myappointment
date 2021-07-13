@@ -194,23 +194,24 @@ echo "oniion:" . $selected_date;
                         var slot_arr = null;
                         try {
                             var slot_arr = JSON.parse(data);
-//                                console.log(slot_arr[0]);
+                            if (slot_arr.length === 0) {
+                                $('#display_slots').append("<div>No Slots Available</div>");
+                            } else {
+                                for (var i = 0; i < slot_arr.length; i++) {
+                                    var slot_description = slot_arr[i]['slotdescription'];
+                                    var sid = slot_arr[i]['appointmentschedule']['date'] + "~" + slot_arr[i]['slotid'] + "~" + slot_arr[i]['appointmentschedule']['time'];
+                                    var btn = `<button type="button" class="list-group-item list-group-item-action timebtn" id="${sid}" name="slotid" value="${sid}" 
+                aria-current="true">${slot_description}</button>`;
+                                    console.log(sid);
+                                    $('#display_slots').append(btn);
+                                }
+                            }
                         } catch (e) {
                             // forget about it :)
                             console.log("empty");
+                            $('#display_slots').append("<div>Invalid Input</div>");
                         }
-                        if (slot_arr.length === 0) {
-                            $('#display_slots').append("<div>No Slots Available</div>");
-                        } else {
-                            for (var i = 0; i < slot_arr.length; i++) {
-                                var slot_description = slot_arr[i]['slotdescription'];
-                                var sid = slot_arr[i]['appointmentschedule']['date'] + "~" + slot_arr[i]['slotid'] + "~" + slot_arr[i]['appointmentschedule']['time'];
-                                var btn = `<button type="button" class="list-group-item list-group-item-action timebtn" id="${sid}" name="slotid" value="${sid}" 
-                aria-current="true">${slot_description}</button>`;
-                                console.log(sid);
-                                $('#display_slots').append(btn);
-                            }
-                        }
+
                     },
                     error: function () {
                         console.log("Error Date Change");
@@ -262,7 +263,7 @@ echo "oniion:" . $selected_date;
             <input type="hidden" id="hide_facilityid"/>
             <input type="hidden" id="hide_appointmenttype"/>
             <input type="hidden" id="hide_date"/>
-            <!--<input type="hidden" id="hide_json_slots" name="hide_json_slots" value="<?php // echo htmlspecialchars($encode_slots, ENT_QUOTES);                ?>"/>-->
+            <!--<input type="hidden" id="hide_json_slots" name="hide_json_slots" value="<?php // echo htmlspecialchars($encode_slots, ENT_QUOTES);                  ?>"/>-->
             <?php
             /* Load Appointment Slots */
             if ($_SERVER["REQUEST_METHOD"] == "POST"):
@@ -697,23 +698,24 @@ echo "oniion:" . $selected_date;
                             var slot_arr = null;
                             try {
                                 var slot_arr = JSON.parse(data);
-//                                console.log(slot_arr[0]);
+                                if (slot_arr.length === 0) {
+                                    $('#display_slots').append("<div>No Slots Available</div>");
+                                } else {
+                                    for (var i = 0; i < slot_arr.length; i++) {
+                                        var slot_description = slot_arr[i]['slotdescription'];
+                                        var sid = slot_arr[i]['appointmentschedule']['date'] + "~" + slot_arr[i]['slotid'] + "~" + slot_arr[i]['appointmentschedule']['time'];
+                                        var btn = `<button type="button" class="list-group-item list-group-item-action timebtn" id="${sid}" name="slotid" value="${sid}" 
+                aria-current="true">${slot_description}</button>`;
+                                        console.log(sid);
+                                        $('#display_slots').append(btn);
+                                    }
+                                }
                             } catch (e) {
                                 // forget about it :)
                                 console.log("empty");
+                                $('#display_slots').append("<div>Invalid Input</div>");
                             }
-                            if (slot_arr.length === 0) {
-                                $('#display_slots').append("<div>No Slots Available</div>");
-                            } else {
-                                for (var i = 0; i < slot_arr.length; i++) {
-                                    var slot_description = slot_arr[i]['slotdescription'];
-                                    var sid = slot_arr[i]['appointmentschedule']['date'] + "~" + slot_arr[i]['slotid'] + "~" + slot_arr[i]['appointmentschedule']['time'];
-                                    var btn = `<button type="button" class="list-group-item list-group-item-action timebtn" id="${sid}" name="slotid" value="${sid}" 
-                aria-current="true">${slot_description}</button>`;
-                                    console.log(sid);
-                                    $('#display_slots').append(btn);
-                                }
-                            }
+
                         },
                         error: function () {
                             console.log("Error Date Change");
