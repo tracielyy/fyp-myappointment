@@ -62,6 +62,7 @@ class Normal_Slot extends Appointment_Slot {
         # Split The Slot ID <e.g 1001>~<date>~<appointmenttype>
         $slotid_data = explode("~", $slotid);
 
+        # Slot Path
         $slot_path = Database::MEDICAL_FACILITY . '/' . $facilityid . '/' . $slotid_data[2] . '/' . $slotid_data[1] . '/' . Database::SLOTS;
         $db = new DbQuery();
         $db->get_db()->collection($slot_path)
