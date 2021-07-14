@@ -260,26 +260,34 @@ echo "oniion:" . $selected_date;
 
         <!-- HIDDEN FIELDS For Appointment Form Submission -->
         <form id="hide_form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-            <input type="hidden" id="hide_facilityid"/>
-            <input type="hidden" id="hide_appointmenttype"/>
-            <input type="hidden" id="hide_date"/>
-            <!--<input type="hidden" id="hide_json_slots" name="hide_json_slots" value="<?php // echo htmlspecialchars($encode_slots, ENT_QUOTES);                  ?>"/>-->
+            <input type="hidden" name="hide_facilityid" id="hide_facilityid"/>
+            <input type="hidden" name="hide_appointmenttype" id="hide_appointmenttype"/>
+            <input type="hidden" name="hide_date" id="hide_date"/>
+            <input type="hidden" name="hide_specialist" id="hide_specialist"/>
+            <input type="hidden" name="hide_slotid" id="hide_slotid"/>
             <?php
+            $appt_info = array(
+                "facilityid" => "",
+                "appointmenttype" => "",
+                "date" => "",
+                "slotid" => ""
+            );
             /* Load Appointment Slots */
             if ($_SERVER["REQUEST_METHOD"] == "POST"):
-                if (isset($_POST['ajax'])):
-                    echo "date called";
-                    $cal_default = Time::CALENDAR_FORMAT_DEFAULT;
-                    $selected_date = Time::date_format_default($_POST['set_date']);
-                    $appt_date = Time::date_format_change($selected_date, $cal_default);
 
-                    # -- Call Different Functions For Different Appt Type
-                    echo $_POST['set_facilityid'];
+                // -- User Click On BOOK APPOINTMENT
+                if (isset($_POST['book_appt'])):
 
-                    $_SESSION['free_slots'] = retrieve_slots($_POST['set_facilityid'], $_POST['set_appointmenttype'], $selected_date);
-                else:
-                    $selected_date = Time::date_format_default($next_day);
-                    $appt_date = $next_day;
+                    // -- Loop Info To Array
+                    foreach ($_POST as $key => $value):
+                        if (isset($appt_info[$key])) {
+                            $appt_info[$key] = htmlspecialchars($value);
+                            $valid_arr[$key] = False; // Set All Field Validation Check As False
+                        }
+                    endforeach; # -- END LOOPING INFO TO ARRAY
+
+
+
                 endif;
 
             endif; # -- END POST REQUEST
@@ -298,8 +306,8 @@ echo "oniion:" . $selected_date;
                     <div class = "progress-bar" style = "font-weight:bold; font-size:15px;" role = "progressbar" aria-valuemin = "0"
                          aria-valuemax = "100">
                     </div>
-                </div>
-                <form id = "apptform" method = "post" action = "<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+                </div><!-- END OF PROGRESS BAR -->
+                <form id = "apptform" method = "post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
                     <div class = "card mt-3">
                         <!--STEP 1 -->
                         <div class = "step">
@@ -337,10 +345,6 @@ echo "oniion:" . $selected_date;
                                 </div>
                             </div>
 
-                            <!--<div class = "card-footer">
-                            <button type = "button" class = "action next btn btn-sm btn-outline-secondary float-end"
-                            onclick = "submitLoc()" disabled = "">Next</button>
-                            </div>-->
                         </div> <!--END OF STEP 1 -->
 
 
@@ -382,12 +386,6 @@ echo "oniion:" . $selected_date;
                                 </div>
                                 <div id = "filter-records" class = "mx-5"></div>
                             </div>
-                            <!--<div class = "card-footer">
-                            <button type = "button" class = "action back btn btn-sm btn-outline-warning"
-                            style = "display: none">Back</button>
-                            <button type = "button" class = "action next btn btn-sm btn-outline-secondary float-end"
-                            onclick = "submitAT()" disabled = "">Next</button>
-                            </div>-->
                         </div> <!--END OF STEP 2 -->
 
                         <!--STEP 3 -->
@@ -404,60 +402,24 @@ echo "oniion:" . $selected_date;
                                            max = "<?php echo $max_date; ?>" onchange = "dateChange(this.value)">
                                 </div>
 
-                                <!--List Of Available Appointments (HARDCODE) -->
-                                <div class = "list-group mt-3" id="display_slots">
-                                    <?php
-                                    # -- Check & Loop All The Available Slots (Only Show Not Full Slots) -- #
-                                    if (isset($_SESSION['free_slots'])):
-//                                        $slots = $_SESSION['free_slots'];
-
-                                    endif;
-                                    if (empty($slots)):
-                                        echo "No Slots Available<br/>";
-                                    else:
-                                        foreach ($slots as $slot):
-//                                            $slot = unserialize($slot);
-                                            $sid = $slot->get_appointmentschedule()->get_date() . "~" . $slot->get_slotid() . "~" . $slot->get_appointmentschedule()->get_time();
-                                            ?>
-                                            <button type="button" class="list-group-item list-group-item-action timebtn" id="<?php echo $sid; ?>" 
-                                                    name="slotid" value="<?php echo $sid; ?>"
-                                                    aria-current="true">
-                                                        <?php echo $slot->get_slot_description(); ?>
-                                            </button>
-                                            <?php
-                                        endforeach;
-                                    endif;
-                                    ?>
-                                    <!--                                    <button type="button" class="list-group-item list-group-item-action timebtn">17 June
-                                                                            2021 (Thu), 08:30 AM <span class="badge bg-warning rounded-pill ms-2">half
-                                                                                full</span></button>
-                                                                        <button type="button" class="list-group-item list-group-item-action timebtn">17 June
-                                                                            2021 (Thu), 09:30 AM <span class="badge bg-success rounded-pill ms-2">mostly
-                                                                                vacant</span></button>-->
-                                </div>
-
+                                <!--List Of Available Appointments (Slots Will Be Updated Via jQuery) -->
+                                <div class = "list-group mt-3" id="display_slots"></div>
                             </div>
-                            <!--                            <div class="card-footer">
-                                                            <button type="button" class="action back btn btn-sm btn-outline-warning"
-                                                                    style="display: none">Back</button>
-                                                            <button type="submit" name="bookappointment"
-                                                                    class="action submit btn btn-sm btn-outline-success float-end"
-                                                                    style="display: none">Book Now</button>
-                                                        </div>-->
                         </div><!-- END OF STEP 3 -->
 
 
                         <div class="card-footer">
                             <button type="button" class="action back btn btn-sm btn-outline-warning" style="display: none">Back</button>
                             <button onclick="set_appt_fields()" type="button" class="action next btn btn-sm btn-outline-secondary float-end" disabled="">Next</button>
-                            <button type="submit" class="action submit btn btn-sm btn-outline-success float-end" style="display: none">
+                            <button name="book_appt" type="submit" class="action submit btn btn-sm btn-outline-success float-end" style="display: none">
                                 Book Now
                             </button>
-                        </div>
+                        </div> <!-- END OF CARD FOOTER -->
                     </div><!-- END OF APPT CARD IN FORM -->
+
                 </form>
             </div>
-        </div>
+        </div><!-- END OF OUTER CONTAINER -->
         <br/><br/>
 
         <script>
