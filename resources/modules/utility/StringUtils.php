@@ -40,24 +40,7 @@ class StringUtils {
         return $token;
     }
 
-    public static function nested_array_encode($array) {
-        $str = "";
-        if (is_array($array)) {
-            $box = array();
-            foreach ($array as $v) {
-                if (is_array($v)) {
-                    $str .= self::nested_array_encode($v);
-                } else {
-                    $str = json_encode($array);
-                    break;
-                }
-            }
-            $box[]= $str;
-        }
-        return json_encode($box);
-    }
-
-    public static function object_to_array($obj) {
+    public static function object_to_array( $obj) {
         if (is_object($obj)) {
             $obj = (array) self::dismount($obj);
         }

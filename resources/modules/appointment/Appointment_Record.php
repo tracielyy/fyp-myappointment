@@ -119,7 +119,7 @@ class Appointment_Record {
 
     // ####################     Database Functions      ################### //
     // -- CREATE APPOINTMENT RECORD
-    public static function create_appointment_record(string $user_doc_id, array $booking_info): void {
+    public static function create_appointment_record(string $user_doc_id, array $booking_info): string {
 
         $db = new DbQuery();
 
@@ -143,6 +143,7 @@ class Appointment_Record {
         ]);
 
         $batch->commit();
+        return $id;
     }
 
     // -- Validate Appointment Booking  (Check If Patient Have Same Appointment) -- //
@@ -371,14 +372,15 @@ class Appointment_Record {
     }
 
     // -- RETRIEVE APPOINTMENT BY APPOINTMENT ID
-    public static function retrieve_appointment_by_id(string $user_email, string $appointmentid): array {
+    public static function retrieve_appointment_by_id(string $user_email, string $appointmentid): Appointment_Record {
         $condition['credentials'] = array('email' => $user_email);
         $db = new DbQuery();
         $user_doc_id = $db->get_document_id(Database::ACCOUNT_USER, $condition);
 
         # Query For The Particular Appointment Slot
         $doc_path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
-        $appt_record = $db->get_document($doc_path, $appointmentid);
+        
+        $appt_record = $db->fetch_document_by_id($doc_path, $appointmentid);
 
         $appt_record_obj = self::initialise_appointment_record($appt_record);
 

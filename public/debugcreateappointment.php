@@ -5,6 +5,7 @@ require_once '../resources/config.php';
 require '../vendor/autoload.php';
 
 require_once TIME_MOD . '/Time.php';
+require_once EMAIL_MOD . '/EmailTemplate.php';
 
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Patient.php';
@@ -20,6 +21,10 @@ require_once APPT_MOD . '/Normal_Slot.php';
 require_once APPT_MOD . '/Special_Slot.php';
 require_once APPT_MOD . '/Appointment_Record.php';
 
+if (isset($_SESSION['user'])):
+    $user = unserialize($_SESSION["user"]);
+endif;
+
 // -- DISPLAY AVAILABLE SLOTS ($doctor_email is optional -- Only when user select specialist)
 function retrieve_slots(string $facilityid, string $appointmenttype, string $date, ?string $doctor_email = NULL): array {
     switch ($appointmenttype):
@@ -34,28 +39,28 @@ function retrieve_slots(string $facilityid, string $appointmenttype, string $dat
 }
 
 // -- BOOK AN APPOINTMENT  (Put This Function In The Create Appointment Page)
-function book_appointment(string $patient_email, array $booking_info): bool {
+function book_appointment(string $patient_email, array $booking_info): ?string {
 
     $patient_doc_id = Account_User::retrieve_user_doc_id($patient_email);
 
-# Validate Appointment
+    # Validate Appointment
     $valid = Appointment_Record::validate_appt_booking($patient_doc_id, $booking_info);
     if ($valid):
         echo "Validate";
 
-# Create User Appointment Record
-        Appointment_Record::create_appointment_record($patient_doc_id, $booking_info);
+        # Create User Appointment Record
+        $appt_id = Appointment_Record::create_appointment_record($patient_doc_id, $booking_info);
         echo "Appointment Record  Created";
 
-# Update To Add Patient's ID To Appointment's patient array
+        # Update To Add Patient's ID To Appointment's patient array
         add_to_slot($patient_doc_id, $booking_info);
         echo "yes";
 
-        return True;
+        return $appt_id;
     else:
         echo "Similar Booking In The Same Day";
     endif;
-    return false;
+    return null;
 }
 
 // -- Call Appropriate Method For Different Appointment Type
@@ -82,7 +87,57 @@ $max_date = Time::get_enddate($next_day, $future_days, $cal_default);
 # -- Check For Some On Change Event -- #
 $selected_date = Time::date_format_default($next_day);
 $appt_date = $next_day;
-echo "oniion:" . $selected_date;
+
+
+
+$appt_info = array(
+    "facilityid" => "",
+    "appointmenttype" => "",
+    "date" => "",
+    "slotid" => "",
+);
+/* Load Appointment Slots */
+if ($_SERVER["REQUEST_METHOD"] == "POST"):
+
+    // -- User Click On BOOK APPOINTMENT
+    if (isset($_POST['book_appt'])):
+        echo "<script>console.log('book appt');</script>";
+        // -- Loop Info To Array
+        foreach ($_POST as $key => $value):
+            if (isset($appt_info[$key])):
+                $appt_info[$key] = htmlspecialchars($value);
+                $valid_arr[$key] = False; // Set All Field Validation Check As False
+                // -- Valid If It Is Not Empty
+                if (!empty($appt_info[$key])):
+                    $valid_arr[$key] = True;
+                endif;
+
+            endif;
+        endforeach; # -- END LOOPING INFO TO ARRAY
+
+
+        if (Appointment_Type::validate_appointment_type($appt_info['appointmenttype'])):
+            $valid_arr['appointmenttype'] = True;
+        else:
+            $valid_arr['appointmenttype'] = False;
+        endif; # -- END VALIDATE APPOINTMENT TYPE
+
+        $appt_info['date'] = Time::date_format_default($appt_info['date']);
+
+        if (!in_array(False, $valid_arr)) :
+            $appt_id = book_appointment($user->get_email(), $appt_info);
+            EmailTemplate::template_bookappointment($user->get_email(), $appt_id);
+            header("Location:./debugviewappointments.php");
+
+        else:
+            echo "<script>console.log('Appt Fail');</script>";
+        endif; # -- END VALIDATION
+
+
+
+    endif; # -- END BOOK APPOINTMENT TRIGGER
+
+endif; # -- END POST REQUEST
 ?><!DOCTYPE html>
 <html>
     <head>
@@ -166,6 +221,10 @@ echo "oniion:" . $selected_date;
             }
         </style>
         <script>
+            function set_slotid(slotid) {
+                $('#hide_slotid').val(slotid);
+                console.log(slotid);
+            }
             function dateChange(date) {
 
                 //                var ipt = input.split(",");
@@ -199,9 +258,12 @@ echo "oniion:" . $selected_date;
                             } else {
                                 for (var i = 0; i < slot_arr.length; i++) {
                                     var slot_description = slot_arr[i]['slotdescription'];
-                                    var sid = slot_arr[i]['appointmentschedule']['date'] + "~" + slot_arr[i]['slotid'] + "~" + slot_arr[i]['appointmentschedule']['time'];
-                                    var btn = `<button type="button" class="list-group-item list-group-item-action timebtn" id="${sid}" name="slotid" value="${sid}" 
+
+                                    var sid = slot_arr[i]['slotid'];
+                                    var btn = `<button onclick="set_slotid(this.id)"  type="button" class="list-group-item list-group-item-action timebtn" id="${sid}" name="slotid" value="${sid}" 
                 aria-current="true">${slot_description}</button>`;
+
+                                    $('#' + sid).attr('onclick', 'set_slotid()');
                                     console.log(sid);
                                     $('#display_slots').append(btn);
                                 }
@@ -230,6 +292,15 @@ echo "oniion:" . $selected_date;
 
             }
 
+
+
+            // BOOK APPOINTMENT ON CLICK TRIGGER
+            function book_appt() {
+
+                $('#hide_form').submit();
+            }
+
+            // -- AID TO LOAD INITIAL DEFAULT DATE (NEXT DAY)
             function load_date(date) {
                 $('#hide_date').val(date);
                 console.log("setting date: " + date);
@@ -238,7 +309,7 @@ echo "oniion:" . $selected_date;
         </script>
     </head>
 
-    <body onload="load_date('<?php echo $selected_date; ?>')">
+    <body onload="load_date('<?php echo $selected_date; ?>')" >
 
         <!-- One "tab" for each step in the form: -->
 
@@ -246,52 +317,18 @@ echo "oniion:" . $selected_date;
 
         <!-- Navigation -->
         <?php
-        $user = unserialize($_SESSION["user"]);
         include TEMPLATES_PATH . '/navbar-loggedin.php';
-// -- Used to store correct data
-        $appointmentArr = array(
-            'facilityid' => '',
-            'appointmenttype' => '',
-            'date' => '',
-            'slotid' => ''
-        );
         ?>
 
 
         <!-- HIDDEN FIELDS For Appointment Form Submission -->
         <form id="hide_form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-            <input type="hidden" name="hide_facilityid" id="hide_facilityid"/>
-            <input type="hidden" name="hide_appointmenttype" id="hide_appointmenttype"/>
-            <input type="hidden" name="hide_date" id="hide_date"/>
-            <input type="hidden" name="hide_specialist" id="hide_specialist"/>
-            <input type="hidden" name="hide_slotid" id="hide_slotid"/>
-            <?php
-            $appt_info = array(
-                "facilityid" => "",
-                "appointmenttype" => "",
-                "date" => "",
-                "slotid" => ""
-            );
-            /* Load Appointment Slots */
-            if ($_SERVER["REQUEST_METHOD"] == "POST"):
-
-                // -- User Click On BOOK APPOINTMENT
-                if (isset($_POST['book_appt'])):
-
-                    // -- Loop Info To Array
-                    foreach ($_POST as $key => $value):
-                        if (isset($appt_info[$key])) {
-                            $appt_info[$key] = htmlspecialchars($value);
-                            $valid_arr[$key] = False; // Set All Field Validation Check As False
-                        }
-                    endforeach; # -- END LOOPING INFO TO ARRAY
-
-
-
-                endif;
-
-            endif; # -- END POST REQUEST
-            ?>
+            <input type="hidden" name="book_appt" id="book_appt"/>
+            <input type="hidden" name="facilityid" id="hide_facilityid"/>
+            <input type="hidden" name="appointmenttype" id="hide_appointmenttype"/>
+            <input type="hidden" name="date" id="hide_date"/>
+            <input type="hidden" name="specialist" id="hide_specialist"/>
+            <input type="hidden" name="slotid" id="hide_slotid"/>
         </form>
         <!--HIDDEN FIELDS END-->
 
@@ -411,7 +448,7 @@ echo "oniion:" . $selected_date;
                         <div class="card-footer">
                             <button type="button" class="action back btn btn-sm btn-outline-warning" style="display: none">Back</button>
                             <button onclick="set_appt_fields()" type="button" class="action next btn btn-sm btn-outline-secondary float-end" disabled="">Next</button>
-                            <button name="book_appt" type="submit" class="action submit btn btn-sm btn-outline-success float-end" style="display: none">
+                            <button onclick="book_appt()"  type="button" class="action submit btn btn-sm btn-outline-success float-end" style="display: none">
                                 Book Now
                             </button>
                         </div> <!-- END OF CARD FOOTER -->
@@ -665,9 +702,10 @@ echo "oniion:" . $selected_date;
                                 } else {
                                     for (var i = 0; i < slot_arr.length; i++) {
                                         var slot_description = slot_arr[i]['slotdescription'];
-                                        var sid = slot_arr[i]['appointmentschedule']['date'] + "~" + slot_arr[i]['slotid'] + "~" + slot_arr[i]['appointmentschedule']['time'];
-                                        var btn = `<button type="button" class="list-group-item list-group-item-action timebtn" id="${sid}" name="slotid" value="${sid}" 
+                                        var sid = slot_arr[i]['slotid'];
+                                        var btn = `<button onclick="set_slotid(this.id)"  type="button" class="list-group-item list-group-item-action timebtn" id="${sid}" name="slotid" value="${sid}" 
                 aria-current="true">${slot_description}</button>`;
+
                                         console.log(sid);
                                         $('#display_slots').append(btn);
                                     }
