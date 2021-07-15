@@ -24,13 +24,13 @@ class Medical_Personnel extends Normal_User {
     private string $licensenumber;
 
     // -- Constructor -- //
-    public function __construct(Session $session, string $usertype, Time $createdon, string $firstname, string $lastname,
+    public function __construct(Session $session, string $usertype, Time $createdon, string $nric, string $firstname, string $lastname,
             string $gender, string $dob, string $contactnumber, string $address,
             array $facilityids, string $specialisation, string $licensenumber,
             string $email, ?string $password = NULL) {
 
         # -- Parent Constructor -- #
-        parent::__construct($session, $usertype, $createdon, $firstname, $lastname, $gender, $dob, $contactnumber, $address, $email, $password);
+        parent::__construct($session, $usertype, $createdon, $nric, $firstname, $lastname, $gender, $dob, $contactnumber, $address, $email, $password);
 
         # -- Medical_Personnel's Properties Assignment -- #
         $this->facilityids = $facilityids;
@@ -82,7 +82,7 @@ class Medical_Personnel extends Normal_User {
 
         # Medical Personnel Object
         $personnel = new Medical_Personnel($session_obj, $personnel_info['accountdetails']['usertype'],
-                $createdon, $personnel_info['profile']['name']['firstname'], $personnel_info['profile']['name']['lastname'],
+                $createdon, $personnel_info['profile']['nric'], $personnel_info['profile']['name']['firstname'], $personnel_info['profile']['name']['lastname'],
                 $personnel_info['profile']['gender'], $personnel_info['profile']['dob'], $personnel_info['profile']['contactnumber'],
                 $personnel_info['profile']['address'], $personnel_info['practitionerinfo']['facilityids'], $personnel_info['practitionerinfo']['specialisation'],
                 $personnel_info['practitionerinfo']['licensenumber'], $personnel_info['credentials']['email']);
@@ -94,7 +94,7 @@ class Medical_Personnel extends Normal_User {
     //      Methods Accessing Firestore Database 
     //============================================
     // -- CREATE MEDICAL PERSONNEL ACCOUNT
-    public static function create_medical_personnel(array $medical_personnel_data): bool {
+    public static function create_medical_personnel(array $medical_personnel_data) {
 
         # Create Default Fields
         $account_user_arr = ArrayCreation::account_creation_array(User_Type::MEDICAL_PERSONNEL);
@@ -106,9 +106,11 @@ class Medical_Personnel extends Normal_User {
 
         # Add Medical Personnel Data To Database
         $db = new DbQuery();
-        $added_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->add($medical_personnel_data);
-
-        return $added_ref ? True : False;
+        $db->get_db()->collection(Database::ACCOUNT_USER)
+                ->document($medical_personnel_data['profile']['nric'])
+                ->set($medical_personnel_data);
+//        $added_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->add($medical_personnel_data);
+//        return $added_ref ? True : False;
     }
 
     // -- RETRIEVE ALL MEDICAL PERSONNEL

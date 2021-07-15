@@ -22,13 +22,15 @@ class Normal_User extends Account_User {
     private string $dob; // Date of birth -- DDMMYYYY
     private string $contactnumber; // Unsure whether to use 'int' or 'string' -- Is Foreign Number Allowed?
     private string $address;
+    private string $nric; // -- Need To Validate
 
     // Constructor
-    public function __construct(Session $session, string $usertype, Time $createdon, string $firstname, string $lastname,
+    public function __construct(Session $session, string $usertype, Time $createdon, string $nric, string $firstname, string $lastname,
             string $gender, string $dob, string $contactnumber, string $address, string $email, string $password = NULL) {
 
         parent::__construct($session, $usertype, $createdon, $email, $password);
 
+        $this->nric = $nric;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
 
@@ -51,6 +53,10 @@ class Normal_User extends Account_User {
 
     public function get_lastname(): string {
         return $this->lastname;
+    }
+    
+    public function get_nric(): string {
+        return $this->nric;
     }
 
     public function get_fullname(): string {
