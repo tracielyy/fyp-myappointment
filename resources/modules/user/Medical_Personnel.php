@@ -93,17 +93,22 @@ class Medical_Personnel extends Normal_User {
     //============================================
     //      Methods Accessing Firestore Database 
     //============================================
-    // -- Get Medical Personnel (Individual) -- //
-    public static function get_medical_personnel() {
-        
-    }
-
     // -- CREATE MEDICAL PERSONNEL ACCOUNT
     public static function create_medical_personnel(array $medical_personnel_data): bool {
 
         # Create Default Fields
+        $account_user_arr = ArrayCreation::account_creation_array(User_Type::MEDICAL_PERSONNEL);
+
         # Load Info To Data Container
+        foreach ($account_user_arr as $field => $value) :
+            $medical_personnel_data[$field] = $value;
+        endforeach;
+
         # Add Medical Personnel Data To Database
+        $db = new DbQuery();
+        $added_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->add($medical_personnel_data);
+
+        return $added_ref ? True : False;
     }
 
     // -- RETRIEVE ALL MEDICAL PERSONNEL

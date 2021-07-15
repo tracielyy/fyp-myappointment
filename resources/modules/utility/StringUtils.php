@@ -4,8 +4,6 @@
  * @author yanying (Tracie)
  */
 
-
-
 class StringUtils {
 
     // -- String Cleaning -- //
@@ -40,6 +38,43 @@ class StringUtils {
         endfor;
 
         return $token;
+    }
+
+    public static function object_to_array( $obj) {
+        if (is_object($obj)) {
+            $obj = (array) self::dismount($obj);
+        }
+        if (is_array($obj)) {
+            $new = array();
+            foreach ($obj as $key => $val) {
+                $new[$key] = self::object_to_array($val);
+            }
+        } else {
+            $new = $obj;
+        }
+
+        return $new;
+    }
+
+    public static function dismount($object) {
+        $reflectionClass = new ReflectionClass(get_class($object));
+        $array = array();
+
+
+        foreach ($reflectionClass->getProperties() as $property) {
+            $property->setAccessible(true); // For Retrieval Of Private or Protected Properties
+            $array[$property->getName()] = $property->getValue($object);
+            $property->setAccessible(false);
+        }
+
+        if ($reflectionClass->getParentClass() != False) {
+            foreach ($reflectionClass->getParentClass()->getProperties() as $property) {
+                $property->setAccessible(true);
+                $array[$property->getName()] = $property->getValue($object);
+                $property->setAccessible(false);
+            }
+        }
+        return $array;
     }
 
 }

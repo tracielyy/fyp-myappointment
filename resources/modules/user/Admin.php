@@ -45,6 +45,29 @@ class Admin extends Account_User {
         return $str;
     }
 
+    // -- Access Database
+    public static function retrieve_admin_name(string $email): string {
+
+        # Assign Email To Array
+        $emailArr ["credentials"] = array(
+            'email' => $email
+        );
+
+        # Retrieve `Account_User` Object
+        $db = new DbQuery();
+        $user_data = $db->fetch_one_document(Database::ACCOUNT_USER, $emailArr);
+
+        # Filter & Return Full Name
+        if ($user_data !== NULL):
+
+            $adminname = $user_data['profile']['adminname'];
+            return $adminname;
+
+        endif;
+
+        return "";
+    }
+
 }
 
 ?>

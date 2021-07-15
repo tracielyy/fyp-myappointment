@@ -55,6 +55,20 @@ class Special_Slot extends Appointment_Slot {
     //============================================
     //      Methods Accessing Firestore Database 
     //============================================
+    // -- CHANGE SLOT AVAILABILITY (whether the doctor wants to work anot)
+    public static function set_availability(string $slotid, bool $availability): void {
+
+        # Split The Slot ID <e.g 1001>~<date>~<doctor-doc-id>
+        $slotid_data = explode("~", $slotid);
+
+        $sloth_path = Database::ACCOUNT_USER . "/" . $slotid_data[2] . "/" . Database::APPOINTMENT_SLOTS . "/" . $slotid_data[1] . "/" . Database::SLOTS;
+        $db = new DbQuery();
+        $db->get_db()->collection($sloth_path)
+                ->document($slotid)->update([
+            ['path' => 'available', 'value' => $availability]
+        ]);
+    }
+
     // -- ADD PATIENT TO SPECIAL SLOT (SEPCIALIST)
     public static function insert_patient_to_slot(string $slotid, string $patient_doc_id): bool {
 

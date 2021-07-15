@@ -25,7 +25,7 @@ class Appointment_Slot {
     // -- Properties
     private string $slotid;
     private Time $appointmentschedule;
-    private string $facilityid;
+//    private string $facilityid;
 
     // Specialist: ONLY 1 Patient, Check Up & Dr Consult: max 10
     // -- Constructor
