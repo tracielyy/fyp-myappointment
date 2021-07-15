@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <?php
 session_start();
-/* Load Config File */
 require_once '../resources/config.php';
-require_once USER_MOD . '/Account_User.php';
+require '../vendor/autoload.php';
 require_once EMAIL_MOD . '/Email.php';
-require_once UTIL_MOD . '/Regex.php';
-require_once TIME_MOD . '/Time.php';
 require_once UTIL_MOD . '/StringUtils.php';
+require_once UTIL_MOD . '/Regex.php';
+require_once AUTH_MOD . '/Authentication.php';
+require_once USER_MOD . '/Account_User.php';
+
+
 //require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?>
 
