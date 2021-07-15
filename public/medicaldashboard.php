@@ -51,8 +51,19 @@ require_once USER_MOD . '/Account_User.php';
 //         include COMPONENTS_PATH . '/navbar-loggedin.php';
 $patient_per_day = Normal_Slot::patient_count_per_date("mf001", "15-07-2021");
 $patient_per_day += Special_Slot::patient_count_per_date("mf001", "15-07-2021");
+
+$dateToday = date("d-m-Y",strtotime('15-07-2021')); //Date today NEED TO CHANGE ONLY FOR DEBUG
   
-$slot_arr = Special_Slot::retrieve_booked_slots_by_date("Medical_Personnel-iBnhkCP6HAhM0MvxeI4O", "15-07-2021");
+$slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com", $dateToday);
+$numofPatients = count($slot_arr);
+
+$date1 = date("d-m-Y",strtotime('+1 day', strtotime($dateToday)));
+$date2 = date("d-m-Y",strtotime('+2 day', strtotime($dateToday)));
+$date3 = date("d-m-Y",strtotime('+3 day', strtotime($dateToday)));
+$date4 = date("d-m-Y",strtotime('+4 day', strtotime($dateToday)));
+$date5 = date("d-m-Y",strtotime('+5 day', strtotime($dateToday)));
+//can use get_date_from_range -- make it to 7 days
+
 
 ?>
 
@@ -103,11 +114,11 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("Medical_Personnel-iBnhk
                             <canvas id="chart2" height="250px"></canvas>
                         </div>
                     </div>
-                    <div class="col">
+            <!--        <div class="col">
                         <div class="p-4 shadow" style="border-radius: 25px">
                             <canvas id="chart3" height="250px"></canvas>
                         </div>
-                    </div>
+                    </div> -->
 
                 </div>
                 <div class="row mt-5">
@@ -181,10 +192,10 @@ var ctx = document.getElementById('myChart').getContext('2d');
 var myChart = new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+        labels: ['<?php echo $dateToday?>', '<?php echo $date1?>', '<?php echo $date2?>', '<?php echo $date3?>', '<?php echo $date4?>', '<?php echo $date5?>'],
         datasets: [{
             label: 'Number of ',
-            data: [12, 19, 3, 5, 2, 3],
+            data: [<?php echo $numofPatients; ?>, 0,0, 0, 0, 0],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)',
@@ -215,12 +226,12 @@ var myChart = new Chart(ctx, {
 
 var ctx2 = document.getElementById("chart2").getContext("2d");
 var myChart1 = new Chart(ctx2, {
-    type: 'line',
+    type: 'bar',
     data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+        labels: ['<?php echo $dateToday?>', '<?php echo $date1?>', '<?php echo $date2?>', '<?php echo $date3?>', '<?php echo $date4?>', '<?php echo $date5?>'],
         datasets: [{
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
+            label: 'Number of Patients per date',
+            data: [<?php echo $numofPatients; ?>, 2, 3,4,5,5],
             backgroundColor: [
                 'rgba(255, 99, 132, 1)',
                 'rgba(54, 162, 235, 1)',
@@ -244,7 +255,13 @@ var myChart1 = new Chart(ctx2, {
         maintainAspectRatio: false,
         scales: {
             y: {
-                beginAtZero: true
+                beginAtZero: true,
+                max: 10,
+                min: 0,
+                ticks: {
+                stepSize: 1
+                }
+
             }
         }
     }
