@@ -39,7 +39,7 @@ function retrieve_slots(string $facilityid, string $appointmenttype, string $dat
 }
 
 // -- BOOK AN APPOINTMENT  (Put This Function In The Create Appointment Page)
-function book_appointment(string $patient_email, array $booking_info): ?string {
+function book_appointment(string $patient_email, array $booking_info): ?Appointment_Record {
 
     $patient_doc_id = Account_User::retrieve_user_doc_id($patient_email);
 
@@ -49,14 +49,14 @@ function book_appointment(string $patient_email, array $booking_info): ?string {
         echo "Validate";
 
         # Create User Appointment Record
-        $appt_id = Appointment_Record::create_appointment_record($patient_doc_id, $booking_info);
+        $appt_record = Appointment_Record::create_appointment_record($patient_doc_id, $booking_info);
         echo "Appointment Record  Created";
 
         # Update To Add Patient's ID To Appointment's patient array
         add_to_slot($patient_doc_id, $booking_info);
         echo "yes";
 
-        return $appt_id;
+        return $appt_record;
     else:
         echo "Similar Booking In The Same Day";
     endif;
@@ -75,6 +75,8 @@ function add_to_slot(string $patient_doc_id, array $booking_info): void {
             break;
     endswitch;
 }
+
+
 
 #-- Get The Next Day -- #
 $cal_default = Time::CALENDAR_FORMAT_DEFAULT;
@@ -125,8 +127,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"):
         $appt_info['date'] = Time::date_format_default($appt_info['date']);
 
         if (!in_array(False, $valid_arr)) :
-            $appt_id = book_appointment($user->get_email(), $appt_info);
-            EmailTemplate::template_bookappointment($user->get_email(), $appt_id);
+            $appt_record = book_appointment($user->get_email(), $appt_info);
+            EmailTemplate::template_bookappointment($user->get_email(), $appt_record);
             header("Location:./debugviewappointments.php");
 
         else:
