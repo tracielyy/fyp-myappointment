@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <?php
+
 session_start();
 /* Load Config File */
 require_once '../resources/config.php';
