@@ -6,6 +6,8 @@ require_once TIME_MOD . '/Time.php';
 require_once FACILITY_MOD . '/Operating_Hours.php';
 require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
+require_once DB_MOD . '/DbStorage.php';
+
 
 require_once APPT_MOD . '/Normal_Slot.php';
 require_once APPT_MOD . '/Special_Slot.php';
@@ -79,6 +81,11 @@ function remove_from_slot(string $patient_doc_id, Appointment_Record $appt_recor
     endswitch;
 }
 
+// -- RESCHEDULE APPOINTMENT
+function reschedule_appointment(string $patient_email, string $current_slotid, string $new_slotid) {
+    
+}
+
 // -- DISPLAY AVAILABLE SLOTS ($doctor_email is optional -- Only when user select specialist)
 function retrieve_slots(string $facilityid, string $appointmenttype, string $date, ?string $doctor_email = NULL): array {
     switch ($appointmenttype):
@@ -109,7 +116,7 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
         <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
     </head>
     <body>
-        <?php // echo $patient_per_day;       ?>
+        <?php // echo $patient_per_day;        ?>
         <?php // echo var_dump($slot_arr);         ?>
 
         <?php
@@ -144,22 +151,9 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
         echo nl2br(PHP_EOL . "Testing Reschedule Appointment -- HARDCODE --" . PHP_EOL);
         echo nl2br(PHP_EOL . "Testing Create Medical Personnel -- HARDCODE --" . PHP_EOL);
 
-        $mp_array = array(
-            "credentials" => array("email" => "lyy123@gmail.com", "password" => "Line@123"),
-            "practitionerinfo" => array("facilityids" => ["mf001"], "licensenumber" => "dcg2302", "specialisation" => "Dermatology"),
-            "profile" => array(
-                "address" => "Fatty Patty",
-                "contactnumber" => "85231123",
-                "dob" => "04-05-1989",
-                "gender" => "F",
-                "name" => array(
-                    "firstname" => "Gret",
-                    "lastname" => "Pizza"
-                )
-            )
-        );
 
-//        Medical_Personnel::create_medical_personnel($mp_array);
+
+
         echo nl2br(PHP_EOL . "Testing DISPLAY APPT SLOTS -- HARDCODE --" . PHP_EOL);
         # -- Display Specialist Slots
 //        $slot_appt_type = Appointment_Type::SPECIALIST_CONSULTATION;
@@ -167,15 +161,28 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
 //        $slot_date = "15-07-2021";
 //        $slot_doctor = "wynterz2525@gmail.com";
         # -- Display Doctor Consultation Slots
-        $slot_appt_type = Appointment_Type::CHECK_UP;
+        $slot_appt_type = Appointment_Type::DOCTOR_CONSULTATION;
         $slot_facilityid = "mf001";
         $slot_date = "15-07-2021";
         $slot_doctor = "wynterz2525@gmail.com";
 
-        $free_slots = retrieve_slots($slot_facilityid, $slot_appt_type, $slot_date);
-        foreach ($free_slots as $slot):
-            echo nl2br($slot->get_slotid() . PHP_EOL);
-        endforeach;
+//        $free_slots = retrieve_slots($slot_facilityid, $slot_appt_type, $slot_date);
+//        foreach ($free_slots as $slot):
+//            echo nl2br($slot->get_slotid() . PHP_EOL);
+//        endforeach;
+        echo nl2br(PHP_EOL . "Testing Show mf001 Specialisations -- HARDCODE --" . PHP_EOL);
+//        $mf001 = Medical_Facility::retrieve_facility_by_id("mf001");
+//        $s_arr = $mf001->get_specialisations();
+//        echo var_dump($s_arr);
+//        foreach ($s_arr as $specialisation):
+//            if ($specialisation != "General") {
+//                echo $specialisation . "<br/>";
+//            }
+//        endforeach;
+        echo nl2br(PHP_EOL . "Testing Show Image -- HARDCODE --" . PHP_EOL);
+        $db_storage = new DbStorage();
+        $file = $db_storage->retrieve_data_url("facility/facilityicon/mf001.png");
+        echo "<img src='{$file}' />";
         ?>
 
     </body>
