@@ -253,6 +253,7 @@ else:
                 }
                 function set_specialist_id(specialist_id) {
                     $('#hide_specialist').val(specialist_id);
+                    $(".next").show();
                     console.log(specialist_id);
                 }
                 function dateChange(date) {
@@ -260,6 +261,7 @@ else:
                     //                var ipt = input.split(",");
                     var facilityid = $('#hide_facilityid').val();
                     var appointmenttype = $('#hide_appointmenttype').val();
+                    var specialist = $('#hide_specialist').val();
 
                     // Set Date
                     $('#hide_date').val(date);
@@ -274,7 +276,8 @@ else:
                             set_location: 1,
                             set_facilityid: facilityid,
                             set_appointmenttype: appointmenttype,
-                            set_date: date
+                            set_date: date,
+                            set_specialist: specialist
                         },
                         success: function (data) {
     //                        $('#hide_form').submit();
@@ -660,8 +663,8 @@ else:
                                             $('#display_personnel').append(specialist_section);
 
                                             for (var i = 0; i < personnels.length; i++) {
-                                                var personnel_name = personnels[i]['profile']['name']['firstname'] + " " + personnels[i]['profile']['name']['lastname'];
-                                                var doc_id = personnels[i]['credentials']['email'];
+                                                var personnel_name = personnels[i]['firstname'] + " " + personnels[i]['lastname'];
+                                                var doc_id = personnels[i]['email'];
                                                 var doc_btn = `<button onclick="set_specialist_id(this.id)"  type="button" class="list-group-item list-group-item-action timebtn" id="${doc_id}" name="slotid" value="${doc_id}" 
                     aria-current="true">${personnel_name}</button>`; // Inner Layer (personnel) -- nanta to change
 
@@ -753,6 +756,7 @@ else:
                         var facilityid = $('#hide_facilityid').val();
                         var appointmenttype = $('#hide_appointmenttype').val();
                         var date = $('#hide_date').val();
+                        var specialist = $('#hide_specialist').val();
                         $('#display_slots').empty();
                         $.ajax({
                             type: "POST",
@@ -761,7 +765,8 @@ else:
                                 ajax: 1,
                                 set_facilityid: facilityid,
                                 set_appointmenttype: appointmenttype,
-                                set_date: date
+                                set_date: date,
+                                set_specialist: specialist
                             },
                             success: function (data) {
                                 //                                            $("#apptform").submit();
@@ -770,6 +775,7 @@ else:
                                 console.log("appointment type: " + appointmenttype);
                                 console.log("default date: " + date);
                                 var slot_arr = null;
+//                                console.log(JSON.stringify(data));
                                 try {
                                     var slot_arr = JSON.parse(data);
                                     if (slot_arr.length === 0) {

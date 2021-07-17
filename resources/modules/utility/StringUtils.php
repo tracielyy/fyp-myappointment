@@ -40,7 +40,7 @@ class StringUtils {
         return $token;
     }
 
-    public static function object_to_array( $obj) {
+    public static function object_to_array($obj) {
         if (is_object($obj)) {
             $obj = (array) self::dismount($obj);
         }
@@ -62,18 +62,29 @@ class StringUtils {
 
 
         foreach ($reflectionClass->getProperties() as $property) {
+//            echo $property->getType();
             $property->setAccessible(true); // For Retrieval Of Private or Protected Properties
             $array[$property->getName()] = $property->getValue($object);
             $property->setAccessible(false);
         }
 
-        if ($reflectionClass->getParentClass() != False) {
-            foreach ($reflectionClass->getParentClass()->getProperties() as $property) {
+//        if ($reflectionClass->getParentClass() != False) {
+//            foreach ($reflectionClass->getParentClass()->getProperties() as $property) {
+//                $property->setAccessible(true);
+//                $array[$property->getName()] = $property->getValue($object);
+//                $property->setAccessible(false);
+//            }
+//        }
+        while ($class = $reflectionClass->getParentClass()) {
+            foreach ($class->getProperties() as $property) {
                 $property->setAccessible(true);
                 $array[$property->getName()] = $property->getValue($object);
                 $property->setAccessible(false);
+                $reflectionClass = $class;
             }
         }
+
+
         return $array;
     }
 
