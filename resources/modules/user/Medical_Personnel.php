@@ -154,7 +154,7 @@ class Medical_Personnel extends Normal_User {
     }
 
     // -- RETRIEVE MEDICAL PERSONNEL THAT BELONGS TO THE GIVEN FACILITY
-    public static function retrieve_personnel_by_facility(string $facilityid): array {
+    public static function retrieve_personnel_by_facility(string $facilityid, bool $return_as_object = true): array {
 
         # Create Empty Array To Store Personnel
         $personnel_arr = array();
@@ -167,7 +167,11 @@ class Medical_Personnel extends Normal_User {
         foreach ($doc_arr as $doc) {
             if ($doc->exists()) {
                 $doc_data = $doc->data();
-                $personnel_arr[$doc_data['practitionerinfo']['specialisation']][] = self:: initialise_medical_personnel($doc_data);
+                if ($return_as_object):
+                    $personnel_arr[$doc_data['practitionerinfo']['specialisation']][] = self:: initialise_medical_personnel($doc_data);
+                else:
+                    $personnel_arr[$doc_data['practitionerinfo']['specialisation']][] = $doc_data;
+                endif;
             }
         }
 

@@ -61,6 +61,7 @@ else:
         "appointmenttype" => "",
         "date" => "",
         "slotid" => "",
+        "specialist" => ""
     );
     /* Load Appointment Slots */
     if ($_SERVER["REQUEST_METHOD"] == "POST"):
@@ -140,6 +141,12 @@ else:
             else:
                 $valid_arr['appointmenttype'] = False;
             endif; # -- END VALIDATE APPOINTMENT TYPE
+            // -- Remove The Array Key For Specialist If It Is Not Specialist
+            if ($appt_info['appointmenttype'] !== Appointment_Type::SPECIALIST_CONSULTATION):
+                unset($appt_info['specialist']);
+                unset($valid_arr['specialist']);
+            endif;
+
 
             $appt_info['date'] = Time::date_format_default($appt_info['date']);
 
@@ -350,7 +357,7 @@ else:
                 <input type="hidden" name="facilityid" id="hide_facilityid"/>
                 <input type="hidden" name="appointmenttype" id="hide_appointmenttype"/>
                 <input type="hidden" name="date" id="hide_date"/>
-                <input type="hidden" name="specialist" id="hide_specialist"/>
+                <input type="hidden" name="specialist" id="hide_specialist"/> <!-- Doctor's Email -->
                 <input type="hidden" name="slotid" id="hide_slotid"/>
             </form>
             <!--HIDDEN FIELDS END-->
@@ -608,6 +615,7 @@ else:
 
 
                     // APPOINTMENT TYPE
+                    $('#display_personnel').empty(); // -- Remove All The Sections
                     if ($("#cp").hasClass("selected") === true) {
                         $(".next").prop("disabled", false);
                         $(".searchfield").hide();
@@ -624,9 +632,9 @@ else:
                         $('#hide_appointmenttype').val("<?php echo Appointment_Type::SPECIALIST_CONSULTATION; ?>");
 
                         console.log($('#hide_facilityid').val());
-                        
+
                         // -- CALL TO LOAD THE SPECIALIST
-                        $('#display_personnel').empty(); // -- Remove All The Sections
+
                         $.ajax({
                             type: "POST",
                             url: "loadspecialist.php",
@@ -645,17 +653,18 @@ else:
                                         $('#display_personnel').append("<div>No Personnel</div>");
                                     } else {
                                         // -- Looping Each Specialisation Category (Alphabetical Order NOT IMPLEMENTED)
+                                        console.log("1");
                                         for (const specialisation in personnel_arr) {
                                             var personnels = personnel_arr[specialisation];
                                             var specialist_section = `<div id=${specialisation}>${specialisation}</div>`; // Outer Layer -- nanta to change
                                             $('#display_personnel').append(specialist_section);
 
                                             for (var i = 0; i < personnels.length; i++) {
-                                                var personnel_name = personnels[i]['firstname'] + " " + personnels[i]['lastname'];
-                                                var doc_id = personnels[i]['licensenumber'];
+                                                var personnel_name = personnels[i]['profile']['name']['firstname'] + " " + personnels[i]['profile']['name']['lastname'];
+                                                var doc_id = personnels[i]['credentials']['email'];
                                                 var doc_btn = `<button onclick="set_specialist_id(this.id)"  type="button" class="list-group-item list-group-item-action timebtn" id="${doc_id}" name="slotid" value="${doc_id}" 
                     aria-current="true">${personnel_name}</button>`; // Inner Layer (personnel) -- nanta to change
- 
+
                                                 console.log(doc_id);
                                                 $('#' + specialisation).append(doc_btn); // Append In Each Specialisation 
                                             }

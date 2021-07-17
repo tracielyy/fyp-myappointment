@@ -103,7 +103,7 @@ class Normal_Slot extends Appointment_Slot {
     }
 
     // -- RETRIEVE APPOINTMENT SLOTS BY DATE
-    public static function retrieve_free_slots_by_date(string $facilityid, string $appointmenttype, string $date): array {
+    public static function retrieve_free_slots_by_date(string $facilityid, string $appointmenttype, string $date, bool $return_as_object = true): array {
 
         # Create Empty Array (Store Appointment Slots)
         $slots_arr = array();
@@ -136,7 +136,11 @@ class Normal_Slot extends Appointment_Slot {
 
         # Loop & Store As Normal Slot Object
         foreach ($slots_arr as $slot):
-            $slot_list[] = self::initialise_normal_slot($slot);
+            if ($return_as_object):
+                $slot_list[] = self::initialise_normal_slot($slot);
+            else:
+                $slot_list[] = $slot;
+            endif;
         endforeach;
 
         # -- Return Array Of Appointment Slots

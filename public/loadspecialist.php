@@ -29,9 +29,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"):
     if (isset($_POST['load_specialist'])):
 
         if (isset($_POST['facilityid'])):
-            $personnel_by_specialisation_arr = Medical_Personnel::retrieve_personnel_by_facility($_POST['facilityid']);
-            $personnel_arr = StringUtils::object_to_array($personnel_by_specialisation_arr);
-            $encode_personnel = json_encode($personnel_arr);
+            $personnel_by_specialisation_arr = Medical_Personnel::retrieve_personnel_by_facility($_POST['facilityid'], false);
+
+//            $personnel_arr = StringUtils::object_to_array($personnel_by_specialisation_arr);
+            $encode_personnel = json_encode($personnel_by_specialisation_arr);
             echo $encode_personnel;
 
         endif; # -- END FACILITY ID
@@ -41,7 +42,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"):
 
 endif; # -- END POST REQUEST
 //// -- TEST
-//$personnel_by_specialisation_arr = Medical_Personnel::retrieve_personnel_by_facility("mf001");
-//$personnel_arr = StringUtils::object_to_array($personnel_by_specialisation_arr);
-//$encode_personnel = json_encode($personnel_arr);
+//$personnel_by_specialisation_arr = Medical_Personnel::retrieve_personnel_by_facility("mf001", false);
+//echo "<pre>";
+//var_dump($personnel_by_specialisation_arr);
+//echo "</pre>";
+////$personnel_arr = StringUtils::object_to_array($personnel_by_specialisation_arr);
+//$encode_personnel = json_encode($personnel_by_specialisation_arr);
 //echo $encode_personnel;
