@@ -24,10 +24,36 @@ class DbStorage {
         return $this->bucket->name();
     }
 
+    // -- COMPRESS THE IMAGES
+    private function compress_image(string $src_url, string $dest_url, int $quality /* 0 to 100 */) {
+        $info = getimagesize($src_url);
+        $info_mime = $info['mime'];
+        switch ($info_mime):
+            case 'image/jpeg':
+                $img = imagecreatefromjpeg($src_url);
+                break;
+            case 'image/gif':
+                $img = imagecreatefromgif($src_url);
+                break;
+            case 'image/png':
+                $img = imagecreatefrompng($src_url);
+                break;
+        endswitch;
+
+
+        imagejpeg($img, $src_url, $quality);
+    }
+
     // -- STORE DATA
-    public function store_data(string $folder, string $filename): void {
-        $this->bucket->upload(fopen($filename, 'r'), [
-            'name' => $folder . '/' . $filename,
+    public function store_data(string $filetype, int $size, string $filename_from, string $filename_to): void {
+        if (($filetype == "image/gif") || ($filetype == "image/jpeg") || ($filetype == "image/png") || ($filetype == "image/pjpeg")) {
+            // Compress If More Than or Equal To 1mb
+            if ($size >= 1000.00) {
+                $this->compress_image($filename_from, $filename_to, 50);
+            }
+        }
+        $this->bucket->upload(fopen($filename_from, 'r'), [
+            'name' => $filename_to,
             'predefinedAcl' => 'publicRead'
         ]);
     }

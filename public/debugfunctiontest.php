@@ -181,9 +181,50 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
 //        endforeach;
         echo nl2br(PHP_EOL . "Testing Show Image -- HARDCODE --" . PHP_EOL);
         $db_storage = new DbStorage();
-        $file = $db_storage->retrieve_data_url("facility/facilityicon/mf001.png");
-        echo "<img src='{$file}' />";
-        ?>
+        $file = $db_storage->retrieve_data_url("facility/facilityicon/test123.png");
+        echo "<img src='{$file}' width=100 height=100/>";
+        $file = $db_storage->retrieve_data_url("facility/facilityicon/sunset.png");
+        echo "<img src='{$file}' width=100 height=100/>";
 
+
+        echo nl2br(PHP_EOL . "Testing SAVE Image -- HARDCODE --" . PHP_EOL);
+        ?>
+        <form id="facility_form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
+            <input type="file" id="facility_icon" name="facility_icon" accept=".png"/>
+            <button type="submit" class="action back btn btn-sm btn-outline-primary">Submit</button>
+
+        </form>
+
+        <?php
+        if ($_SERVER["REQUEST_METHOD"] == "POST"):
+
+
+            if ($_FILES["facility_icon"]["error"] > 0) {
+                echo "Error: " . $_FILES["facility_icon"]["error"] . "<br />";
+            } else {
+                $file_name = $_FILES["facility_icon"]["name"];
+                $size = ($_FILES["facility_icon"]["size"] / 1024);
+                $type = $_FILES["facility_icon"]["type"];
+                $tmp_path = $_FILES["facility_icon"]["tmp_name"];
+
+                echo "Upload: " . $file_name . "<br />";
+                echo "Type: " . $type . "<br />";
+                echo "Size: " . $size . " Kb<br />";
+                echo "Stored in: " . $tmp_path;
+                echo "<img src='{$_FILES["facility_icon"]["tmp_name"]}' />";
+            }
+            // -- Save The Facility Icon
+            if (isset($_FILES['facility_icon'])):
+                echo "here";
+                $db_storage = new DbStorage();
+//                $test_path = "C:\Users\yanyi\OneDrive - University of Wollongong\UOW (SIM)\YEAR 3\Year 3 Quarter 3 - 4\CSIT321 - FYP\img\test";
+//                $db_storage->store_data($test_path, 'facility/facilityicon/' . 'test001.png');
+
+                $db_storage->store_data($type, (int) $size, $tmp_path, 'facility/facilityicon/' . $file_name);
+
+            endif;
+
+        endif;
+        ?>
     </body>
 </html>
