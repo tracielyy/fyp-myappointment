@@ -101,7 +101,7 @@ class Special_Slot extends Appointment_Slot {
     }
 
     // -- RETRIEVE APPOINTMENT SLOTS BY DATE
-    public static function retrieve_free_slots_by_date(string $facilityid, string $doctor_email, string $date): array {
+    public static function retrieve_free_slots_by_date(string $facilityid, string $doctor_email, string $date, bool $return_as_object = true): array {
 
         $db = new DbQuery();
 
@@ -128,7 +128,11 @@ class Special_Slot extends Appointment_Slot {
                 $slot_data = $slot_snapshot->data();
 
                 # Add Special Slot To Array (Already Sorted In Ascending Slotid Order
-                $slots_arr[] = self::initialise_special_slot($slot_data);
+                if ($return_as_object):
+                    $slots_arr[] = self::initialise_special_slot($slot_data);
+                else:
+                    $slots_arr[] = $slot_data;
+                endif;
 
             endif;
         endforeach;
@@ -213,6 +217,22 @@ class Special_Slot extends Appointment_Slot {
         endif;
 
         return $patient_counter;
+    }
+
+    public static function add_new_slots(string $doctor_email, array $date_range) {
+        # Get Doctor ID
+        $doctor_doc_id = Account_User::retrieve_user_doc_id($doctor_email);
+
+        # Insert Special Slots
+        $db = new DbQuery();
+        $slot_path = Database::ACCOUNT_USER . '/' . $doctor_doc_id . '/' . Database::APPOINTMENT_SLOTS;
+
+        foreach ($date_range as $date) {
+            $query = $db->get_db()->collection($slot_path)->document($date);
+            for ($i = 1001; $i <= 1015; $i++) {
+                
+            }
+        }
     }
 
 }
