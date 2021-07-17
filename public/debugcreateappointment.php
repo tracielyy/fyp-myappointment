@@ -22,76 +22,26 @@ require_once APPT_MOD . '/Normal_Slot.php';
 require_once APPT_MOD . '/Special_Slot.php';
 require_once APPT_MOD . '/Appointment_Record.php';
 
-// -- DISPLAY AVAILABLE SLOTS ($doctor_email is optional -- Only when user select specialist)
-function retrieve_slots(string $facilityid, string $appointmenttype, string $date, ?string $doctor_email = NULL): array {
-    switch ($appointmenttype):
-        case Appointment_Type::CHECK_UP:
-        case Appointment_Type::DOCTOR_CONSULTATION:
-            return Normal_Slot::retrieve_free_slots_by_date($facilityid, $appointmenttype, $date);
-        case Appointment_Type::SPECIALIST_CONSULTATION:
-            if ($doctor_email != NULL):
-                return Special_Slot::retrieve_free_slots_by_date($facilityid, $doctor_email, $date);
-        endif;
-    endswitch;
-}
-
-// -- BOOK AN APPOINTMENT  (Put This Function In The Create Appointment Page)
-function book_appointment(string $patient_email, array $booking_info): ?Appointment_Record {
-
-    $patient_doc_id = Account_User::retrieve_user_doc_id($patient_email);
-
-    # Validate Appointment
-    $valid = Appointment_Record::validate_appt_booking($patient_doc_id, $booking_info);
-    if ($valid):
-        echo "Validate";
-
-        # Create User Appointment Record
-        $appt_record = Appointment_Record::create_appointment_record($patient_doc_id, $booking_info);
-        echo "Appointment Record  Created";
-
-        # Update To Add Patient's ID To Appointment's patient array
-        add_to_slot($patient_doc_id, $booking_info);
-        echo "yes";
-
-        return $appt_record;
-    else:
-        echo "Similar Booking In The Same Day";
-    endif;
-    return null;
-}
-
-// -- Call Appropriate Method For Different Appointment Type
-function add_to_slot(string $patient_doc_id, array $booking_info): void {
-    switch ($booking_info['appointmenttype']):
-        case Appointment_Type::CHECK_UP:
-        case Appointment_Type::DOCTOR_CONSULTATION:
-            Normal_Slot::insert_patient_to_slot($booking_info['slotid'], $patient_doc_id, $booking_info['facilityid']);
-            break;
-        case Appointment_Type::SPECIALIST_CONSULTATION:
-            Special_Slot::insert_patient_to_slot($booking_info['slotid'], $patient_doc_id);
-            break;
-    endswitch;
-}
-
-function retrieve_facility_icon(array $facilities): array {
-    $icon_url_arr = array();
-    $db_storage = new DbStorage();
-    foreach ($facilities as $facility):
-        $img_path = "facility/facilityicon/" . $facility->get_facilityid() . ".png";
-        $icon_url_arr[$facility->get_facilityid()] = $db_storage->retrieve_data_url($img_path);
-//        echo $icon_url_arr[$facility->get_facilityid()];
-    endforeach;
-    return $icon_url_arr;
-}
 
 if (!isset($_SESSION['user'])):
     header("Location:./debuglogin.php"); # -- REDIRECT USER TO THE LOGIN PAGE
 else:
     $user = unserialize($_SESSION["user"]);
 
+    function retrieve_facility_icon(array $facilities): array {
+        $icon_url_arr = array();
+        $db_storage = new DbStorage();
+        foreach ($facilities as $facility):
+            $img_path = "facility/facilityicon/" . $facility->get_facilityid() . ".png";
+            $icon_url_arr[$facility->get_facilityid()] = $db_storage->retrieve_data_url($img_path);
+        endforeach;
+        return $icon_url_arr;
+    }
+
     // -- Retrieve All Facility Icons
     $facilities = Medical_Facility::retrieve_all_facilities();
     $facility_icons = retrieve_facility_icon($facilities);
+
 
 
     # -- Get The Next Day -- #
@@ -106,8 +56,6 @@ else:
     $selected_date = Time::date_format_default($next_day);
     $appt_date = $next_day;
 
-
-
     $appt_info = array(
         "facilityid" => "",
         "appointmenttype" => "",
@@ -119,6 +67,59 @@ else:
 
         // -- User Click On BOOK APPOINTMENT
         if (isset($_POST['book_appt'])):
+            /* ---------  FUNCTIONS FOR CREATING APPOINTMENT ---------  */
+
+            // -- DISPLAY AVAILABLE SLOTS ($doctor_email is optional -- Only when user select specialist)
+            function retrieve_slots(string $facilityid, string $appointmenttype, string $date, ?string $doctor_email = NULL): array {
+                switch ($appointmenttype):
+                    case Appointment_Type::CHECK_UP:
+                    case Appointment_Type::DOCTOR_CONSULTATION:
+                        return Normal_Slot::retrieve_free_slots_by_date($facilityid, $appointmenttype, $date);
+                    case Appointment_Type::SPECIALIST_CONSULTATION:
+                        if ($doctor_email != NULL):
+                            return Special_Slot::retrieve_free_slots_by_date($facilityid, $doctor_email, $date);
+                    endif;
+                endswitch;
+            }
+
+            // -- BOOK AN APPOINTMENT  (Put This Function In The Create Appointment Page)
+            function book_appointment(string $patient_email, array $booking_info): ?Appointment_Record {
+
+                $patient_doc_id = Account_User::retrieve_user_doc_id($patient_email);
+
+                # Validate Appointment
+                $valid = Appointment_Record::validate_appt_booking($patient_doc_id, $booking_info);
+                if ($valid):
+                    echo "Validate";
+
+                    # Create User Appointment Record
+                    $appt_record = Appointment_Record::create_appointment_record($patient_doc_id, $booking_info);
+                    echo "Appointment Record  Created";
+
+                    # Update To Add Patient's ID To Appointment's patient array
+                    add_to_slot($patient_doc_id, $booking_info);
+                    echo "yes";
+
+                    return $appt_record;
+                else:
+                    echo "Similar Booking In The Same Day";
+                endif;
+                return null;
+            }
+
+            // --Call Appropriate Method For Different Appointment Type
+            function add_to_slot(string $patient_doc_id, array $booking_info): void {
+                switch ($booking_info['appointmenttype']):
+                    case Appointment_Type::CHECK_UP:
+                    case Appointment_Type::DOCTOR_CONSULTATION:
+                        Normal_Slot::insert_patient_to_slot($booking_info['slotid'], $patient_doc_id, $booking_info['facilityid']);
+                        break;
+                    case Appointment_Type::SPECIALIST_CONSULTATION:
+                        Special_Slot::insert_patient_to_slot($booking_info['slotid'], $patient_doc_id);
+                        break;
+                endswitch;
+            }
+
             echo "<script>console.log('book appt');</script>";
             // -- Loop Info To Array
             foreach ($_POST as $key => $value):
@@ -239,9 +240,13 @@ else:
                 }
             </style>
             <script>
-                function set_slotid(slotid) {
-                    $('#hide_slotid').val(slotid);
-                    console.log(slotid);
+                function set_slotid(slot_id) {
+                    $('#hide_slotid').val(slot_id);
+                    console.log(slot_id);
+                }
+                function set_specialist_id(specialist_id) {
+                    $('#hide_specialist').val(specialist_id);
+                    console.log(specialist_id);
                 }
                 function dateChange(date) {
 
@@ -423,7 +428,8 @@ else:
                                         </div>
 
                                     </div>
-
+                                    <div id="display_personnel">
+                                    </div>
 
                                     <div class = "searchfield input-group px-5">
                                         <span class = "input-group-text" id = "basic-addon1"><i class = "fas fa-search text-white"
@@ -614,8 +620,58 @@ else:
                         $('#hide_appointmenttype').val("<?php echo Appointment_Type::DOCTOR_CONSULTATION; ?>");
                     } else if ($("#sc").hasClass("selected") === true) {
                         $(".next").prop("disabled", true);
-                        $(".searchfield").show();
+                        //$(".searchfield").show();
                         $('#hide_appointmenttype').val("<?php echo Appointment_Type::SPECIALIST_CONSULTATION; ?>");
+
+                        console.log($('#hide_facilityid').val());
+                        
+                        // -- CALL TO LOAD THE SPECIALIST
+                        $('#display_personnel').empty(); // -- Remove All The Sections
+                        $.ajax({
+                            type: "POST",
+                            url: "loadspecialist.php",
+                            data: {
+                                load_specialist: true,
+                                facilityid: $('#hide_facilityid').val()
+                            },
+                            success: function (data) {
+
+                                var personnel_arr = null;
+
+                                try {
+                                    var personnel_arr = JSON.parse(data);
+                                    console.log(Object.keys(personnel_arr).length);
+                                    if (Object.keys(personnel_arr).length === 0) {
+                                        $('#display_personnel').append("<div>No Personnel</div>");
+                                    } else {
+                                        // -- Looping Each Specialisation Category (Alphabetical Order NOT IMPLEMENTED)
+                                        for (const specialisation in personnel_arr) {
+                                            var personnels = personnel_arr[specialisation];
+                                            var specialist_section = `<div id=${specialisation}>${specialisation}</div>`; // Outer Layer -- nanta to change
+                                            $('#display_personnel').append(specialist_section);
+
+                                            for (var i = 0; i < personnels.length; i++) {
+                                                var personnel_name = personnels[i]['firstname'] + " " + personnels[i]['lastname'];
+                                                var doc_id = personnels[i]['licensenumber'];
+                                                var doc_btn = `<button onclick="set_specialist_id(this.id)"  type="button" class="list-group-item list-group-item-action timebtn" id="${doc_id}" name="slotid" value="${doc_id}" 
+                    aria-current="true">${personnel_name}</button>`; // Inner Layer (personnel) -- nanta to change
+ 
+                                                console.log(doc_id);
+                                                $('#' + specialisation).append(doc_btn); // Append In Each Specialisation 
+                                            }
+                                        }
+                                    }
+                                } catch (e) {
+                                    // forget about it :)
+                                    console.log("empty");
+                                    $('#display_slots').append("<div>Invalid Input</div>");
+                                }
+
+                            },
+                            error: function () {
+                                console.log("Error Date Change");
+                            }
+                        });
                     } else {
                         $(".searchfield").hide();
                     }

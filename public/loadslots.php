@@ -44,12 +44,9 @@ $next_day = Time::get_enddate(date($cal_default), 1, $cal_default);
 /* Load Appointment Slots */
 if ($_SERVER["REQUEST_METHOD"] == "POST"):
     if (isset($_POST['ajax'])):
-//        echo "date called";
 
         $selected_date = Time::date_format_default($_POST['set_date']);
         $appt_date = Time::date_format_change($selected_date, $cal_default);
-
-
         $raw_slots = retrieve_slots($_POST['set_facilityid'], $_POST['set_appointmenttype'], $selected_date);
 
         $slots_arr = StringUtils::object_to_array($raw_slots);
@@ -63,14 +60,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"):
             $slot_box[] = $slot;
         endforeach;
         $encode_slots = json_encode($slot_box);
-        echo $encode_slots;
+        echo $encode_slots; 
 
     else:
         $selected_date = Time::date_format_default($next_day);
         $appt_date = $next_day;
     endif;
 else:
-    echo "post not called";
+    //echo "post not called";
     $selected_date = Time::date_format_default($next_day);
     $appt_date = $next_day;
 endif; # -- END POST REQUEST
@@ -101,7 +98,7 @@ $slot_doctor = "wynterz2525@gmail.com";
 //endforeach;
 //$encode_slots = json_encode($slot_box);
 //echo $encode_slots;
-//
+
 //echo '</pre>';
 //
 //$test_arr = array("tracie", "qwynn");

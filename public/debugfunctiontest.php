@@ -181,8 +181,6 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
 //        endforeach;
         echo nl2br(PHP_EOL . "Testing Show Image -- HARDCODE --" . PHP_EOL);
         $db_storage = new DbStorage();
-        $file = $db_storage->retrieve_data_url("facility/facilityicon/test123.png");
-        echo "<img src='{$file}' width=100 height=100/>";
         $file = $db_storage->retrieve_data_url("facility/facilityicon/sunset.png");
         echo "<img src='{$file}' width=100 height=100/>";
 
@@ -190,6 +188,8 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
         echo nl2br(PHP_EOL . "Testing SAVE Image -- HARDCODE --" . PHP_EOL);
         ?>
         <form id="facility_form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
+            <input type="text" id="testname" name="testname" value="hey"/>
+
             <input type="file" id="facility_icon" name="facility_icon" accept=".png"/>
             <button type="submit" class="action back btn btn-sm btn-outline-primary">Submit</button>
 
@@ -198,33 +198,47 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
         <?php
         if ($_SERVER["REQUEST_METHOD"] == "POST"):
 
+            if (isset($_POST['testname'])):
+                echo $_POST['testname'];
+            endif;
 
-            if ($_FILES["facility_icon"]["error"] > 0) {
-                echo "Error: " . $_FILES["facility_icon"]["error"] . "<br />";
-            } else {
-                $file_name = $_FILES["facility_icon"]["name"];
-                $size = ($_FILES["facility_icon"]["size"] / 1024);
-                $type = $_FILES["facility_icon"]["type"];
-                $tmp_path = $_FILES["facility_icon"]["tmp_name"];
-
-                echo "Upload: " . $file_name . "<br />";
-                echo "Type: " . $type . "<br />";
-                echo "Size: " . $size . " Kb<br />";
-                echo "Stored in: " . $tmp_path;
-                echo "<img src='{$_FILES["facility_icon"]["tmp_name"]}' />";
-            }
             // -- Save The Facility Icon
             if (isset($_FILES['facility_icon'])):
+                if ($_FILES["facility_icon"]["error"] > 0) {
+                    echo "Error: " . $_FILES["facility_icon"]["error"] . "<br />";
+                } else {
+                    echo var_dump($_FILES["facility_icon"]);
+//                    $file_name = $_FILES["facility_icon"]["name"];
+//                    $size = ($_FILES["facility_icon"]["size"] / 1024); # In kb
+//                    $type = $_FILES["facility_icon"]["type"];
+//                    $tmp_path = $_FILES["facility_icon"]["tmp_name"];
+//
+//                    echo "Upload: " . $file_name . "<br />";
+//                    echo "Type: " . $type . "<br />";
+//                    echo "Size: " . $size . " Kb<br />";
+//                    echo "Stored in: " . $tmp_path;
+//                    echo "<img src='{$_FILES["facility_icon"]["tmp_name"]}' />";
+                }
                 echo "here";
                 $db_storage = new DbStorage();
 //                $test_path = "C:\Users\yanyi\OneDrive - University of Wollongong\UOW (SIM)\YEAR 3\Year 3 Quarter 3 - 4\CSIT321 - FYP\img\test";
 //                $db_storage->store_data($test_path, 'facility/facilityicon/' . 'test001.png');
-
-                $db_storage->store_data($type, (int) $size, $tmp_path, 'facility/facilityicon/' . $file_name);
+//                $db_storage->store_data($type, (int) $size, $tmp_path, 'facility/facilityicon/' . $file_name);
 
             endif;
 
         endif;
+        echo nl2br(PHP_EOL . "Testing Display Personnel By Facility -- HARDCODE --" . PHP_EOL);
+        $personnel_by_specialisation_arr = Medical_Personnel::retrieve_personnel_by_facility("mf001");
+        foreach ($personnel_by_specialisation_arr as $specialisation => $personnels):
+            echo "<br/><br/>" . $specialisation . "<br/>";
+            foreach ($personnels as $p):
+                echo $p->get_firstname() . ", ";
+            endforeach;
+        endforeach;
         ?>
+
+
+
     </body>
 </html>

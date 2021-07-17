@@ -153,6 +153,27 @@ class Medical_Personnel extends Normal_User {
         return self::initialise_medical_personnel($medical_personnel_data);
     }
 
+    // -- RETRIEVE MEDICAL PERSONNEL THAT BELONGS TO THE GIVEN FACILITY
+    public static function retrieve_personnel_by_facility(string $facilityid): array {
+
+        # Create Empty Array To Store Personnel
+        $personnel_arr = array();
+
+        $db = new DbQuery();
+        $doc_arr = $db->get_db()->collection(Database::ACCOUNT_USER)
+                ->where("accountdetails.usertype", "=", User_Type::MEDICAL_PERSONNEL)
+                ->where("practitionerinfo.facilityids", "array-contains", $facilityid)
+                ->documents();
+        foreach ($doc_arr as $doc) {
+            if ($doc->exists()) {
+                $doc_data = $doc->data();
+                $personnel_arr[$doc_data['practitionerinfo']['specialisation']][] = self:: initialise_medical_personnel($doc_data);
+            }
+        }
+
+        return $personnel_arr;
+    }
+
 }
 
 ?>
