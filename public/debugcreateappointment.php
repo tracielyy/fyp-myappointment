@@ -578,7 +578,7 @@ endif; # -- END POST REQUEST
                 // Add The Triggering "Radio" With "selected" class
                 $(this).addClass("selected");
 
-                //  FACILITY ID
+                //  FACILITY ID (NEED TO CHANGE TO BECOME MORE RESONPSIVE) ---------- IMPORTANT --------- USE JQUERY
                 if ($("#mf001").hasClass("selected") === true) {
                     $(".next").prop("disabled", false);
                     $('#hide_facilityid').val("mf001");
