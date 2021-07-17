@@ -33,130 +33,116 @@ require_once USER_MOD . '/Account_User.php';
 
 <body>
 
-    <!-- PHP Script -->
-    <?php
-        // Code here
-        ?>
-
-    <!-- HTML Page Design -->
-    <div>
-        <!-- Navigation -->
-        <!-- Debug Test For Users -->
-        <!-- Hint: Explode & Implode For Date Of Birth (DD-MM-YYYY) If there is other preferred string format (e.g. '/') -->
-        <?php
-        // Code here
-        ?>
-
         <!-- HTML Page Design -->
         <div>
             <!-- Navigation -->
             <!-- Debug Test For Users -->
             <!-- Hint: Explode & Implode For Date Of Birth (DD-MM-YYYY) If there is other preferred string format (e.g. '/') -->
             <?php
-            // Used to store correct data
-            $loginArr = array(
-                'email' => '',
-                'password' => '',
-            );
+             // Used to store correct data
+        $loginArr = array(
+            'email' => '',
+            'password' => '',
+        );
 
-            // -- Msg Variables
-            $msg = "";
+        // -- Msg Variables
+        $msg = "";
 
-            $validArr = array();
+        $validArr = array();
 
-            // -- When Redirect or Load The Page
-            if ($_SERVER['REQUEST_METHOD'] == "GET") {
-                if (isset($_SESSION["user"])) {
-                    echo unserialize($_SESSION["user"]);
+        // -- When Redirect or Load The Page
+        if ($_SERVER['REQUEST_METHOD'] == "GET") {
+            if (isset($_SESSION["user"])) {
+                echo unserialize($_SESSION["user"]);
+            }
+        }
+
+        // Upon clicking "Login" Button
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+            /* Load Data to Array */
+            foreach ($_POST as $key => $value) {
+                if (isset($loginArr[$key])) {
+                    $loginArr[$key] = htmlspecialchars($value);
+                    $validArr[$key] = False; // Set All Field Validation Check As False
                 }
             }
 
-            // Upon clicking "Login" Button
-            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            // Possible Validation of Email Before Firestore Query
+            /* ------------ Start Validation ------------ */
 
-                /* Load Data to Array */
-                foreach ($_POST as $key => $value) {
-                    if (isset($loginArr[$key])) {
-                        $loginArr[$key] = htmlspecialchars($value);
-                        $validArr[$key] = False; // Set All Field Validation Check As False
-                    }
+
+            // -- Email Validation
+            if (empty($loginArr['email'])) {
+                // Store Some Error Message
+            } else if (!Regex::validate_email($loginArr['email'])) {
+                // Store Some Error Message
+            } else {
+                $validArr['email'] = True; // Pass Validation
+            }
+
+            // Password
+            $validArr["password"] = True;
+
+            /* ------------ End Validation ------------ */
+            if (!in_array(FALSE, $validArr)) {
+
+                # -- Start Authenticating User (boolean)
+                $auth = Authentication::authenticate_user($loginArr, User_Type::PATIENT);
+
+                # -- Check If There Is Any "token" generated ---
+                if (!isset($_SESSION['token'])) {
+
+                    // Default Session Token Length
+                    $token_length = 15;
+                    $_SESSION['token'] = StringUtils::generate_token($token_length);
                 }
 
-                // Possible Validation of Email Before Firestore Query
-                /* ------------ Start Validation ------------ */
+                # -- User Authenticated ----
+                if ($auth) {
 
+                    # -- Check If There Are Any Other Login Session (Terminate Other Session?)
+                    $auth_patient = Patient::retrieve_patient($loginArr);
+                    $session_logon_allowed = Authentication::check_session($auth_patient->get_session(), session_id(), $_SESSION['token']);
 
-                // -- Email Validation
-                if (empty($loginArr['email'])) {
-                    // Store Some Error Message
-                } else if (!Regex::validate_email($loginArr['email'])) {
-                    // Store Some Error Message
-                } else {
-                    $validArr['email'] = True; // Pass Validation
-                }
-
-                // Password
-                $validArr["password"] = True;
-
-                /* ------------ End Validation ------------ */
-                if (!in_array(FALSE, $validArr)) {
-
-                    # -- Start Authenticating User (boolean)
-                    $auth = AccountUserFunctions::authenticate_user($loginArr);
-
-                    # -- Check If There Is Any "token" generated ---
-                    if (!isset($_SESSION['token'])) {
-
-                        // Default Session Token Length
-                        $token_length = 15;
-                        $_SESSION['token'] = StringUtils::generate_token($token_length);
+                    # -- Get IP Address ---
+                    // whether ip is from share internet
+                    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+                        $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+                    }
+                    //whether ip is from proxy
+                    elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                        $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+                    }
+                    //whether ip is from remote address
+                    else {
+                        $ipaddress = $_SERVER['REMOTE_ADDR'];
                     }
 
-                    # -- User Authenticated ----
-                    if ($auth) {
+                    if ($session_logon_allowed) {
+                        $login_status = Authentication::login($auth_patient->get_email(), session_id(), $_SESSION['token'], $ipaddress); # Error
+                        $auth_patient = Patient::retrieve_patient($loginArr); // Reload After Login Session Update
+                        $_SESSION['user'] = serialize($auth_patient); // Store User Data In Session
+                        header("Location:./"); // Redirect Upon Success Authenticate
+                        echo nl2br(PHP_EOL . "Success" . PHP_EOL);
+                        echo $auth_patient . "<br/>";
+                        echo (int) $login_status;
 
-                        # -- Check If There Are Any Other Login Session (Terminate Other Session?)
-                        $auth_user = AccountUserFunctions::load_user_data($loginArr);
-                        $session_logon_allowed = AccountUserFunctions::check_session($auth_user->get_session(), session_id(), $_SESSION['token']);
-
-                        # -- Get IP Address ---
-                        // whether ip is from share internet
-                        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-                            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
-                        }
-                        //whether ip is from proxy
-                        elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-                            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-                        }
-                        //whether ip is from remote address
-                        else {
-                            $ipaddress = $_SERVER['REMOTE_ADDR'];
-                        }
-
-                        if ($session_logon_allowed) {
-                            $login_status = AccountUserFunctions::login($auth_user->get_email(), session_id(), $_SESSION['token'], $ipaddress); # Error
-                            $auth_user = AccountUserFunctions::load_user_data($loginArr); // Reload After Login Session Update
-                            $_SESSION['user'] = serialize($auth_user); // Store User Data In Session
-                            header("Location:./"); // Redirect Upon Success Authenticate
-                            echo nl2br(PHP_EOL . "Success" . PHP_EOL);
-                            echo $auth_user . "<br/>";
-                            echo (int) $login_status;
-
-                            # -- Clear Fields
-                            $loginArr = array(
-                                'email' => '',
-                                'password' => '',
-                            );
-                        } else {
-                            $msg = "Account is logged in at another location";
-                        }
+                        # -- Clear Fields
+                        $loginArr = array(
+                            'email' => '',
+                            'password' => '',
+                        );
                     } else {
-                        $msg = "Invalid Credentials!";
+                        $msg = "Account is logged in at another location";
                     }
                 } else {
-                    // When Validation Fails
+                    $msg = "Invalid Credentials!";
                 }
+            } else {
+                // When Validation Fails
             }
+        }
             ?>
         <!-- Msg -->
         <div>
