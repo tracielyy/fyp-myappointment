@@ -33,16 +33,20 @@ class Medical_Facility {
 
     # Medical Facility Operating Hours
     private Operating_Hours $operatinghours;
+    
+    # Different Specialisation Categories
+    private array $specialisations;
 
     // -- Constructor -- //
     public function __construct(string $facilityname, string $address,
-            string $contactnumber, Operating_Hours $operatinghours, ?string $facilityid) {
+            string $contactnumber, Operating_Hours $operatinghours, ?string $facilityid, array $specialisations) {
 
         $this->facilityname = $facilityname;
         $this->address = $address;
         $this->contactnumber = $contactnumber;
         $this->operatinghours = $operatinghours;
         $this->facilityid = $facilityid;
+        $this->specialisations = $specialisations;
     }
 
     // -- Getters -- //
@@ -69,6 +73,10 @@ class Medical_Facility {
     public function get_operatinghours(): Operating_Hours {
         return $this->operatinghours;
     }
+    
+    public function get_specialisations(): array {
+        return $this->specialisations;
+    }
 
     // -- Setters -- //
     public function set_facilityid(string $facilityid): void {
@@ -90,6 +98,10 @@ class Medical_Facility {
     public function set_operatinghours(Operating_Hours $operatinghours): void {
         $this->operatinghour = $operatinghours;
     }
+    
+    public function set_specialisations(array $specialisation): void {
+        $this->specialisation = $specialisation;
+    }
 
     //  -- Use For Debugging/ Logging Purpose -- //
     public function __toString(): string {
@@ -104,7 +116,7 @@ class Medical_Facility {
         # Operating Hour
         $operatinghour = Operating_Hours::initialise_operating_hours($facility['operatinghours']);
         $facility_object = new Medical_Facility($facility['facilityname'], $facility['address'],
-                $facility['contactnumber'], $operatinghour, $facility['facilityid']);
+                $facility['contactnumber'], $operatinghour, $facility['facilityid'], $facility['specialisations']);
         return $facility_object;
     }
 
@@ -197,6 +209,8 @@ class Medical_Facility {
         endif;
         return False;
     }
+
+
 
 }
 

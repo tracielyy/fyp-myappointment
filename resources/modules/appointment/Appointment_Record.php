@@ -100,26 +100,29 @@ class Appointment_Record {
     }
 
     // -- Initialise Appointment_Records
-    public static function initialise_appointment_record(array $appt_record): Appointment_Record {
+    public static function initialise_appointment_record(array $appt_record): ?Appointment_Record {
+        try {
+            # Time (Createdon)
+            $createdon = new Time($appt_record['createdon']['date'], $appt_record['createdon']['time']);
 
-        # Time (Createdon)
-        $createdon = new Time($appt_record['createdon']['date'], $appt_record['createdon']['time']);
+            # Appointment Slot
+            $appt_slot = self::retrieve_slot($appt_record['slotid'], $appt_record['appointmenttype'], $appt_record['facilityid']);
 
-        # Appointment Slot
-        $appt_slot = self::retrieve_slot($appt_record['slotid'], $appt_record['appointmenttype'], $appt_record['facilityid']);
+            # Medical Facility
+            $facility = Medical_Facility::retrieve_facility_by_id($appt_record['facilityid']);
+            $appt_record_obj = new Appointment_Record($createdon, $appt_record['appointmentid'], $appt_record['appointmenttype'],
+                    $appt_slot, $facility, $appt_record['appointmentstatus']);
 
-        # Medical Facility
-        $facility = Medical_Facility::retrieve_facility_by_id($appt_record['facilityid']);
-        $appt_record_obj = new Appointment_Record($createdon, $appt_record['appointmentid'], $appt_record['appointmenttype'],
-                $appt_slot, $facility, $appt_record['appointmentstatus']);
-
-        # -- Return 
-        return $appt_record_obj;
+            # -- Return 
+            return $appt_record_obj;
+        } catch (Exception $e) {
+            return null;
+        }
     }
 
     // ####################     Database Functions      ################### //
     // -- CREATE APPOINTMENT RECORD
-    public static function create_appointment_record(string $user_doc_id, array $booking_info): string {
+    public static function create_appointment_record(string $user_doc_id, array $booking_info): ?Appointment_Record {
 
         $db = new DbQuery();
 
@@ -133,17 +136,20 @@ class Appointment_Record {
         $appt_doc_path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
         $batch = $db->get_db()->batch();
 
-        $batch->set($db->get_db()->collection($appt_doc_path)->document($id), [
+        $appt_record_arr = array(
             'appointmentid' => $id,
             'appointmenttype' => $booking_info['appointmenttype'],
             'appointmentstatus' => Appointment_Status::UPCOMING,
             'facilityid' => $booking_info['facilityid'],
             'createdon' => ['date' => $createdon->get_date(), 'time' => $createdon->get_time()],
             'slotid' => $booking_info['slotid']
-        ]);
+        );
 
+        $batch->set($db->get_db()->collection($appt_doc_path)->document($id), $appt_record_arr);
         $batch->commit();
-        return $id;
+
+
+        return self::initialise_appointment_record($appt_record_arr);
     }
 
     // -- Validate Appointment Booking  (Check If Patient Have Same Appointment) -- //
@@ -327,7 +333,6 @@ class Appointment_Record {
             # Retrieving The Data Before Deletion
             $appt_details = $appt->snapshot()->data();
 
-            echo var_dump($appt_details);
             # Appointment Record Object
             $appt_obj = self::initialise_appointment_record($appt_details);
 
@@ -379,7 +384,7 @@ class Appointment_Record {
 
         # Query For The Particular Appointment Slot
         $doc_path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
-        
+
         $appt_record = $db->fetch_document_by_id($doc_path, $appointmentid);
 
         $appt_record_obj = self::initialise_appointment_record($appt_record);

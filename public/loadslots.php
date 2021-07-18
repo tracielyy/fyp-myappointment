@@ -28,10 +28,10 @@ function retrieve_slots(string $facilityid, string $appointmenttype, string $dat
     switch ($appointmenttype):
         case Appointment_Type::CHECK_UP:
         case Appointment_Type::DOCTOR_CONSULTATION:
-            return Normal_Slot::retrieve_free_slots_by_date($facilityid, $appointmenttype, $date);
+            return Normal_Slot::retrieve_free_slots_by_date($facilityid, $appointmenttype, $date, true);
         case Appointment_Type::SPECIALIST_CONSULTATION:
             if ($doctor_email != NULL):
-                return Special_Slot::retrieve_free_slots_by_date($facilityid, $doctor_email, $date);
+                return Special_Slot::retrieve_free_slots_by_date($facilityid, $doctor_email, $date, true);
         endif;
     endswitch;
 }
@@ -44,13 +44,10 @@ $next_day = Time::get_enddate(date($cal_default), 1, $cal_default);
 /* Load Appointment Slots */
 if ($_SERVER["REQUEST_METHOD"] == "POST"):
     if (isset($_POST['ajax'])):
-//        echo "date called";
 
         $selected_date = Time::date_format_default($_POST['set_date']);
         $appt_date = Time::date_format_change($selected_date, $cal_default);
-
-
-        $raw_slots = retrieve_slots($_POST['set_facilityid'], $_POST['set_appointmenttype'], $selected_date);
+        $raw_slots = retrieve_slots($_POST['set_facilityid'], $_POST['set_appointmenttype'], $selected_date, $_POST['set_specialist']);
 
         $slots_arr = StringUtils::object_to_array($raw_slots);
         # Add additional Information
@@ -63,14 +60,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"):
             $slot_box[] = $slot;
         endforeach;
         $encode_slots = json_encode($slot_box);
-        echo $encode_slots;
+        echo $encode_slots; 
 
     else:
         $selected_date = Time::date_format_default($next_day);
         $appt_date = $next_day;
     endif;
 else:
-    echo "post not called";
+    //echo "post not called";
     $selected_date = Time::date_format_default($next_day);
     $appt_date = $next_day;
 endif; # -- END POST REQUEST
@@ -90,7 +87,7 @@ $slot_doctor = "wynterz2525@gmail.com";
 //echo '<pre>';
 ////    var_dump(json_encode($slots_arr));
 //        var_dump(json_encode($slots_arr));
-//
+//echo '</pre>';
 //$slot_box = array();
 //foreach ($slots_arr as $slot):
 //    $date = Time::date_format_change($slot['appointmentschedule']['date'], Time::DATE_FORMAT_APPOINTMENT);
@@ -101,7 +98,7 @@ $slot_doctor = "wynterz2525@gmail.com";
 //endforeach;
 //$encode_slots = json_encode($slot_box);
 //echo $encode_slots;
-//
+
 //echo '</pre>';
 //
 //$test_arr = array("tracie", "qwynn");

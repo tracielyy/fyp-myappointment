@@ -26,12 +26,12 @@ class Patient extends Normal_User {
     private array $medicalrecords;
 
     // Constructor
-    public function __construct(Session $session, string $usertype, Time $createdon, string $firstname, string $lastname,
+    public function __construct(Session $session, string $usertype, Time $createdon, string $nric, string $firstname, string $lastname,
             string $gender, string $dob, string $contactnumber, string $address,
             string $patientid, array $appointmentrecords, array $medicalrecords, bool $verified,
             string $email, string $password = NULL) {
 
-        parent::__construct($session, $usertype, $createdon, $firstname, $lastname, $gender,
+        parent::__construct($session, $usertype, $createdon, $nric, $firstname, $lastname, $gender,
                 $dob, $contactnumber, $address, $email, $password);
 
         // -- Patient Information -- //
@@ -96,7 +96,7 @@ class Patient extends Normal_User {
         $medicalrecords = array();
 
         # Patient Object
-        $patient = new Patient($session_obj, $patient_info['accountdetails']['usertype'], $time_obj, $patient_info['profile']['name']['firstname'], $patient_info['profile']['name']['lastname'],
+        $patient = new Patient($session_obj, $patient_info['accountdetails']['usertype'], $time_obj, $patient_info['profile']['nric'], $patient_info['profile']['name']['firstname'], $patient_info['profile']['name']['lastname'],
                 $patient_info['profile']['gender'], $patient_info['profile']['dob'], $patient_info['profile']['contactnumber'], $patient_info['profile']['address'],
                 $patientid, $appointmentrecords, $medicalrecords, $patient_info['accountdetails']['verification']['verified'], $patient_info['credentials']['email']);
 
@@ -107,7 +107,7 @@ class Patient extends Normal_User {
     //      Methods Accessing Firestore Database 
     //============================================
     // -- CREATE PATIENT ACCOUNT
-    public static function create_patient(array $patient_info): bool {
+    public static function create_patient(array $patient_info): void {
 
         # Declaration Of Basic Information To Include To Account_User
         $account_user_arr = ArrayCreation::account_creation_array(User_Type::PATIENT);
@@ -119,7 +119,9 @@ class Patient extends Normal_User {
 
         # Add Patient Data To Database
         $db = new DbQuery();
-        return $db->insert_document(Database::ACCOUNT_USER, $patient_info, true);
+        $db->get_db()->collection(Database::ACCOUNT_USER)
+                ->document($patient_info['profile']['nric'])
+                ->set($patient_info);
     }
 
     // -- REMOVE PATIENT ACCOUNT
@@ -129,7 +131,7 @@ class Patient extends Normal_User {
         $usertype = Account_User::retrieve_user_type($email);
         if ($usertype == User_Type::PATIENT):
             $patient_doc_id = Account_User::retrieve_user_doc_id($email);
-            
+
         endif;
     }
 

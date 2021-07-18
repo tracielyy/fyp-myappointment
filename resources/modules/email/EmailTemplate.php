@@ -10,6 +10,7 @@ require_once EMAIL_MOD . '/Email.php';
 require_once ENUMS_PATH . '/User_Type.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Normal_User.php';
+require_once APPT_MOD . '/Appointment_Record.php';
 
 class EmailTemplate {
 
@@ -125,7 +126,7 @@ class EmailTemplate {
     }
 
     // -- Sent When User Book An Appointment (Show Appointment Schedule) -- //
-    public static function template_bookappointment(string $to, string $appt_id) {
+    public static function template_bookappointment(string $to, Appointment_Record $appt_info) {
 
         // -- Email Subject
         $subject = "FYP-21-S2-24: New Appointment";
@@ -138,15 +139,42 @@ class EmailTemplate {
             $to_name = "";
         endif;
 
-        // -- Get Appointment Record
-        $appt_info = Appointment_Record::retrieve_appointment_by_id($to, $appt_id);
 
         // -- Miscellaneous
         $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
 
         // -- Message
         $message = "<span style='color:black;'>Hi {$to_name}, " . self::LINEBREAK;
-        $message .= "Your appointment booking at {$appt_info->get_facility()->get_facilityname()} has been confirmed!" . self::LINEBREAK;
+        $message .= "Your <b>{$appt_info->get_appointmenttype()}</b> appointment booking at {$appt_info->get_facility()->get_facilityname()} has been confirmed!" . self::LINEBREAK;
+        $message .= "<b>Appointment Details</b>" . self::LINEBREAK;
+        $message .= "Date: {$appt_info->get_appointmentslot()->get_slot_description()}" . self::LINEBREAK;
+        $message .= "Location: {$appt_info->get_facility()->get_address()} " . self::LINEBREAK;
+        $message .= "{$sign_off}</span>";
+
+        Email::sendEmail($to, $subject, $message);
+    }
+
+    // -- Sent When User Book An Appointment (Show Appointment Schedule) -- //
+    public static function template_cancelappointment(string $to, Appointment_Record $appt_info) {
+
+        // -- Email Subject
+        $subject = "FYP-21-S2-24: Cancelled Appointment";
+
+        // -- Check User Type &  Set Recipient
+        $recipient_usertype = Account_User::retrieve_user_type($to);
+        if ($recipient_usertype == User_Type::PATIENT || $recipient_usertype == User_Type::MEDICAL_PERSONNEL):
+            $to_name = Normal_User::retrieve_user_fullname($to);
+        else:
+            $to_name = "";
+        endif;
+
+
+        // -- Miscellaneous
+        $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
+
+        // -- Message
+        $message = "<span style='color:black;'>Hi {$to_name}, " . self::LINEBREAK;
+        $message .= "Your have CANCELLED your <b>{$appt_info->get_appointmenttype()}</b> appointment at {$appt_info->get_facility()->get_facilityname()}!" . self::LINEBREAK;
         $message .= "<b>Appointment Details</b>" . self::LINEBREAK;
         $message .= "Date: {$appt_info->get_appointmentslot()->get_slot_description()}" . self::LINEBREAK;
         $message .= "Location: {$appt_info->get_facility()->get_address()} " . self::LINEBREAK;
