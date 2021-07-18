@@ -6,8 +6,8 @@
   var defaults = {
     date: null,
     weekDayLength: 1,
-    prevButton: "Previous",
-    nextButton: "Next",
+    prevButton: "Previous Day",
+    nextButton: "Next Day",
     monthYearSeparator: " ",
     onClickDate: function (date) {},
     onChangeMonth: function (date) {},
