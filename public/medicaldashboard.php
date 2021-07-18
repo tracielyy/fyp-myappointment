@@ -90,13 +90,13 @@ $date5 = date("d-m-Y",strtotime('+5 day', strtotime($dateToday)));
 
     <div class="container-fluid mt-3">
         <div class="tab">
-            <button class="tablinks top" onclick="openCity(event, 'Dashboard')" id="defaultOpen"><i
+            <button class="tablinks top" onclick="openTab(event, 'Dashboard')" id="defaultOpen"><i
                     class="far fa-window-maximize tab-icon"></i>Dashboard </button>
-            <button class="tablinks" onclick="openCity(event, 'Appointments')"><i
+            <button class="tablinks" onclick="openTab(event, 'Appointments')"><i
                     class="far fa-calendar-alt tab-icon"></i>Appointments</a> </a>
-                <button class="tablinks" onclick="openCity(event, 'Data')"><i
+                <button class="tablinks" onclick="openTab(event, 'Data')"><i
                         class="fas fa-chart-bar tab-icon"></i>Data</a> </a>
-                    <button class="tablinks" onclick="openCity(event, 'Settings')"><i
+                    <button class="tablinks" onclick="openTab(event, 'Settings')"><i
                             class="far fa-clock tab-icon"></i>Shift Settings</a> </a>
         </div>
 
@@ -368,7 +368,7 @@ new gridjs.Grid({
 </script>
 
 <script>
-function openCity(evt, cityName) {
+function openTab(evt, tabName) {
     var i, tabcontent, tablinks;
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
@@ -378,7 +378,7 @@ function openCity(evt, cityName) {
     for (i = 0; i < tablinks.length; i++) {
         tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
-    document.getElementById(cityName).style.display = "block";
+    document.getElementById(tabName).style.display = "block";
     evt.currentTarget.className += " active";
 }
 
