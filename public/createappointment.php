@@ -161,20 +161,21 @@ endif; # -- END POST REQUEST
 
     var spinnerhtml = '<div id="spinner" class="d-flex justify-content-center pt-5"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div></div>';
 
-    var post = null;
+    var xhr = null;
     function set_slotid(slotid) {
         $('#hide_slotid').val(slotid);
         console.log(slotid);
     }
-
     function dateChange(date) {
-        if (post) {
-            post.abort();
-        }
+        if (xhr)
+        {
+            xhr.abort();
+            console.log("ajax aborted");
+        };
+
         //                var ipt = input.split(",");
         var facilityid = $('#hide_facilityid').val();
         var appointmenttype = $('#hide_appointmenttype').val();
-
         // Set Date
         $('#hide_date').val(date);
         $('#display_slots').empty();
@@ -182,7 +183,7 @@ endif; # -- END POST REQUEST
         $('#spinner_display').append(spinnerhtml);
 
         console.log("js triggered");
-     post =   $.ajax({
+        xhr =  $.ajax({
             type: "POST",
             url: "loadslots.php",
             data: {
@@ -213,7 +214,7 @@ endif; # -- END POST REQUEST
                 aria-current="true">${slot_description}</button>`;
 
                             $('#' + sid).attr('onclick', 'set_slotid()');
-                            console.log(sid);
+                            //console.log(sid);
                             $('#spinner').remove();
                             $('#display_slots').append(btn);
                             post = null;
@@ -452,6 +453,8 @@ endif; # -- END POST REQUEST
     var defaultConfig = {
         weekDayLength: 1,
         date: dateTomorrow,
+        prevButton: "Last Month",
+        nextButton: "Next Month",
         onClickDate: selectDate,
         showYearDropdown: true,
         showTodayButton: false,
@@ -471,6 +474,7 @@ endif; # -- END POST REQUEST
     </script>
 
     <script>
+        
     /*--------------------------------------
      |  ONLY FOR SHOWCASE, WILL BE DELETED |
       --------------------------------------  */
@@ -594,7 +598,7 @@ endif; # -- END POST REQUEST
         $(".next").prop("disabled", false);
     });
 
-    // CALLING RADIO GROUP
+    //when clicking the facilities
     $(".radio-group .radio-facilityid").on("click", function() {
         // Remove Any Previous Inputs
         $(".selected .fa").removeClass("fa-check");
@@ -602,7 +606,6 @@ endif; # -- END POST REQUEST
 
         // Add The Triggering "Radio" With "selected" class
         $(this).addClass("selected");
-
 
         if ($(this).hasClass("selected") === true) {
             $(".next").prop("disabled", false);
@@ -612,7 +615,10 @@ endif; # -- END POST REQUEST
 
     });
 
+    //when clicking the appointment type
+    $(".searchfield").hide();
     $(".radio-group .radio-appointmenttype").on("click", function() {
+        
         // Remove Any Previous Inputs
         $(".selected .fa").removeClass("fa-check");
         $(".radio").removeClass("selected");
@@ -640,13 +646,6 @@ endif; # -- END POST REQUEST
             $(".searchfield").hide();
         }
 
-    });
-
-    //calendar pick
-    $(".weeks-wrapper .week .day").on("change", function() {
-        // Remove Any Previous Inputs
-        //$('#hide_date').val($(this).attr("id"));
-        console.log("clicked a date");
     });
 
     /*
