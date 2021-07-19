@@ -6,15 +6,17 @@
 
 <!-- The navigation is added at server level  (PHP File Need To Contain PHP Code) -->
 <!-- Will Need To Add Logic To Make Sure User Is Logged In Before Displaying Logout Button. -->
-<style>
-body {
-    padding-top: 80px;
-}
-</style>
 
 <link href="/docs/5.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+<style>
+body {
+    padding-top: 80px;
+}
+
+</style>
+
 
 
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-primary py-3 shadow" style="border-radius:0px;">
@@ -28,15 +30,23 @@ body {
         <div class="collapse navbar-collapse" id="navbarAppt">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link <?php if ($pageName == 'homepage') {echo 'active';} ?>" aria-current="page"
+                    <a class="nav-link navbutton <?php if ($pageName == 'homepage') {echo 'active';} ?>" aria-current="page"
                         href="./">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?php if ($pageName == 'createappointment') {echo 'active';} ?>" href="./createappointment.php">Create an Appointment</a>
+                    <a class="nav-link navbutton<?php if ($pageName == 'createappointment') {echo 'active';} ?>" href="./createappointment.php">Create an Appointment</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?php if ($pageName == 'viewappointment') {echo 'active';} ?>"
+                    <a class="nav-link navbutton<?php if ($pageName == 'viewappointment') {echo 'active';} ?>"
                         href="./viewappointments.php">View Appointment</a> <!-- HREF NEED TO BE CHANGED -->
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link navbutton<?php if ($pageName == 'viewappointment') {echo 'active';} ?>"
+                        href="#">Search Medicine</a> <!-- HREF NEED TO BE CHANGED -->
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link navbutton<?php if ($pageName == 'viewappointment') {echo 'active';} ?>"
+                        href="#">Conditions and Treatements</a> <!-- HREF NEED TO BE CHANGED -->
                 </li>
             </ul>
                 <div style="display: inline-block;">
@@ -48,7 +58,7 @@ body {
                             <label class="text-light mt-1"><?php echo $user->get_firstname(); ?></label>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-secondary dropdown-menu-end" aria-labelledby="navbarDarkDropdownMenuLink">
-                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><a class="dropdown-item" href="./profile.php">Profile</a></li>
                             <li><a class="dropdown-item" href="./viewappointments.php">View Appointments</a></li>
                             <li><a class="dropdown-item" href="./logout.php">Log out</a></li>
                         </ul>
