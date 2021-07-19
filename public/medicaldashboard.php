@@ -13,6 +13,7 @@ require_once UTIL_MOD . '/StringUtils.php';
 require_once UTIL_MOD . '/Regex.php';
 require_once AUTH_MOD . '/Authentication.php';
 require_once USER_MOD . '/Account_User.php';
+require_once USER_MOD . '/Medical_Personnel.php';
 
 
 //require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
@@ -41,18 +42,21 @@ require_once USER_MOD . '/Account_User.php';
 
     <?php
 
-// if (isset($_SESSION["user"])):
-//     $user = unserialize($_SESSION["user"]);
-    
-//     if (User_Type::check_user_type(User_Type::MEDICAL_PERSONNEL, $user_type)):
-//         $email['credentials']['email'] = $user_email;
+if (isset($_SESSION["user"])):
+    $user = unserialize($_SESSION["user"]);
+    $user_type = $user->get_usertype();
+    $user_email = $user->get_email();
+
+    if (User_Type::check_user_type(User_Type::MEDICAL_PERSONNEL, $user_type)):
+        $email['credentials']['email'] = $user_email;
     
         
 //         include COMPONENTS_PATH . '/navbar-loggedin.php';
-$patient_per_day = Normal_Slot::patient_count_per_date("mf001", "15-07-2021");
-$patient_per_day += Special_Slot::patient_count_per_date("mf001", "15-07-2021");
+$dateToday = date("d-m-Y"); //Date today NEED TO CHANGE ONLY FOR DEBUG
+$patient_per_day = Normal_Slot::patient_count_per_date("mf001", $dateToday);
+$patient_per_day += Special_Slot::patient_count_per_date("mf001", $dateToday);
 
-$dateToday = date("d-m-Y",strtotime('15-07-2021')); //Date today NEED TO CHANGE ONLY FOR DEBUG
+
   
 $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com", $dateToday);
 $numofPatients = count($slot_arr);
@@ -75,8 +79,8 @@ $date5 = date("d-m-Y",strtotime('+5 day', strtotime($dateToday)));
             </div> <!-- col -->
 
             <div class="col-xs-8 col-md-6">
-                <h1 class="display-6">Dr. Mark Spencer<?php //echo $user->get_fullname(); ?> </h1>
-                <h1 class="lead"> Specialist <?php //echo $user->get_gender(); ?> </h1>
+                <h1 class="display-6"><?php echo $user->get_fullname(); ?> </h1>
+                <h1 class="lead"><?php echo $user->get_gender(); ?> </h1>
             </div> <!-- col -->
 
             <div class="col-md-2">
@@ -159,8 +163,8 @@ $date5 = date("d-m-Y",strtotime('+5 day', strtotime($dateToday)));
 
 
 
-    <?php //endif; 
-//endif;?>
+    <?php endif; 
+endif;?>
 </body>
 
 <script>
@@ -315,7 +319,7 @@ new gridjs.Grid({
     data: [
         <?php 
           $pnum = 0;
-          $p_perday = Special_Slot::patient_count_per_date("mf001", "15-07-2021");
+          $p_perday = Special_Slot::patient_count_per_date("mf001", "21-07-2021");
               foreach($slot_arr as $slot):
               $patientid = $slot->get_patient();
               $patient = Patient::retrieve_patient_by_id($patientid);
