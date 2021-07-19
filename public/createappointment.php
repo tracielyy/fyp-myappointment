@@ -15,130 +15,153 @@ require_once ENUMS_PATH . '/User_Type.php';
 require_once ENUMS_PATH . '/Appointment_Type.php';
 
 require_once DB_MOD . '/DbQuery.php';
+require_once DB_MOD . '/DbStorage.php';
 require_once DB_MOD . '/Database.php';
 
 require_once APPT_MOD . '/Normal_Slot.php';
 require_once APPT_MOD . '/Special_Slot.php';
 require_once APPT_MOD . '/Appointment_Record.php';
 
-if (isset($_SESSION['user'])):
+if (!isset($_SESSION['user'])):
+    header("Location:./debuglogin.php"); # -- REDIRECT USER TO THE LOGIN PAGE
+else:
     $user = unserialize($_SESSION["user"]);
-endif;
 
-// -- DISPLAY AVAILABLE SLOTS ($doctor_email is optional -- Only when user select specialist)
-function retrieve_slots(string $facilityid, string $appointmenttype, string $date, ?string $doctor_email = NULL): array {
-    switch ($appointmenttype):
-        case Appointment_Type::CHECK_UP:
-        case Appointment_Type::DOCTOR_CONSULTATION:
-            return Normal_Slot::retrieve_free_slots_by_date($facilityid, $appointmenttype, $date);
-        case Appointment_Type::SPECIALIST_CONSULTATION:
-            if ($doctor_email != NULL):
-                return Special_Slot::retrieve_free_slots_by_date($facilityid, $doctor_email, $date);
-        endif;
-    endswitch;
-}
+    function retrieve_facility_icon(array $facilities): array {
+        $icon_url_arr = array();
+        $db_storage = new DbStorage();
+        foreach ($facilities as $facility):
+            $img_path = "facility/facilityicon/" . $facility->get_facilityid() . ".png";
+            $icon_url_arr[$facility->get_facilityid()] = $db_storage->retrieve_data_url($img_path);
+        endforeach;
+        return $icon_url_arr;
+    }
 
-// -- BOOK AN APPOINTMENT  (Put This Function In The Create Appointment Page)
-function book_appointment(string $patient_email, array $booking_info): ?string {
-
-    $patient_doc_id = Account_User::retrieve_user_doc_id($patient_email);
-
-    # Validate Appointment
-    $valid = Appointment_Record::validate_appt_booking($patient_doc_id, $booking_info);
-    if ($valid):
-        echo "Validate";
-
-        # Create User Appointment Record
-        $appt_id = Appointment_Record::create_appointment_record($patient_doc_id, $booking_info);
-        echo "Appointment Record  Created";
-
-        # Update To Add Patient's ID To Appointment's patient array
-        add_to_slot($patient_doc_id, $booking_info);
-        echo "yes";
-
-        return $appt_id;
-    else:
-        echo "Similar Booking In The Same Day";
-    endif;
-    return null;
-}
-
-// -- Call Appropriate Method For Different Appointment Type
-function add_to_slot(string $patient_doc_id, array $booking_info): void {
-    switch ($booking_info['appointmenttype']):
-        case Appointment_Type::CHECK_UP:
-        case Appointment_Type::DOCTOR_CONSULTATION:
-            Normal_Slot::insert_patient_to_slot($booking_info['slotid'], $patient_doc_id, $booking_info['facilityid']);
-            break;
-        case Appointment_Type::SPECIALIST_CONSULTATION:
-            Special_Slot::insert_patient_to_slot($booking_info['slotid'], $patient_doc_id);
-            break;
-    endswitch;
-}
-
-#-- Get The Next Day -- #
-$cal_default = Time::CALENDAR_FORMAT_DEFAULT;
-$next_day = Time::get_enddate(date($cal_default), 1, $cal_default);
-
-# -- Allow Date Selection For 6 Mths (est. 180 days) -- #
-$future_days = 180;
-$max_date = Time::get_enddate($next_day, $future_days, $cal_default);
-
-# -- Check For Some On Change Event -- #
-$selected_date = Time::date_format_default($next_day);
-$appt_date = $next_day;
+    // -- Retrieve All Facility Icons
+    $facilities = Medical_Facility::retrieve_all_facilities();
+    $facility_icons = retrieve_facility_icon($facilities);
 
 
+    # -- Get The Next Day -- #
+    $cal_default = Time::CALENDAR_FORMAT_DEFAULT;
+    $next_day = Time::get_enddate(date($cal_default), 1, $cal_default);
 
-$appt_info = array(
-    "facilityid" => "",
-    "appointmenttype" => "",
-    "date" => "",
-    "slotid" => "",
-);
-/* Load Appointment Slots */
-if ($_SERVER["REQUEST_METHOD"] == "POST"):
+    # -- Allow Date Selection For 6 Mths (est. 180 days) -- #
+    $future_days = 180;
+    $max_date = Time::get_enddate($next_day, $future_days, $cal_default);
 
-    // -- User Click On BOOK APPOINTMENT
-    if (isset($_POST['book_appt'])):
-        echo "<script>console.log('book appt');</script>";
-        // -- Loop Info To Array
-        foreach ($_POST as $key => $value):
-            if (isset($appt_info[$key])):
-                $appt_info[$key] = htmlspecialchars($value);
-                $valid_arr[$key] = False; // Set All Field Validation Check As False
-                // -- Valid If It Is Not Empty
-                if (!empty($appt_info[$key])):
-                    $valid_arr[$key] = True;
+    # -- Check For Some On Change Event -- #
+    $selected_date = Time::date_format_default($next_day);
+    $appt_date = $next_day;
+
+    $appt_info = array(
+        "facilityid" => "",
+        "appointmenttype" => "",
+        "date" => "",
+        "slotid" => "",
+        "specialist" => ""
+    );
+    /* Load Appointment Slots */
+    if ($_SERVER["REQUEST_METHOD"] == "POST"):
+
+        // -- User Click On BOOK APPOINTMENT
+        if (isset($_POST['book_appt'])):
+            /* ---------  FUNCTIONS FOR CREATING APPOINTMENT ---------  */
+
+            // -- DISPLAY AVAILABLE SLOTS ($doctor_email is optional -- Only when user select specialist)
+            function retrieve_slots(string $facilityid, string $appointmenttype, string $date, ?string $doctor_email = NULL): array {
+                switch ($appointmenttype):
+                    case Appointment_Type::CHECK_UP:
+                    case Appointment_Type::DOCTOR_CONSULTATION:
+                        return Normal_Slot::retrieve_free_slots_by_date($facilityid, $appointmenttype, $date);
+                    case Appointment_Type::SPECIALIST_CONSULTATION:
+                        if ($doctor_email != NULL):
+                            return Special_Slot::retrieve_free_slots_by_date($facilityid, $doctor_email, $date);
+                    endif;
+                endswitch;
+            }
+
+            // -- BOOK AN APPOINTMENT  (Put This Function In The Create Appointment Page)
+            function book_appointment(string $patient_email, array $booking_info): ?Appointment_Record {
+
+                $patient_doc_id = Account_User::retrieve_user_doc_id($patient_email);
+
+                # Validate Appointment
+                $valid = Appointment_Record::validate_appt_booking($patient_doc_id, $booking_info);
+                if ($valid):
+                    echo "Validate";
+
+                    # Create User Appointment Record
+                    $appt_record = Appointment_Record::create_appointment_record($patient_doc_id, $booking_info);
+                    echo "Appointment Record  Created";
+
+                    # Update To Add Patient's ID To Appointment's patient array
+                    add_to_slot($patient_doc_id, $booking_info);
+                    echo "yes";
+
+                    return $appt_record;
+                else:
+                    echo "Similar Booking In The Same Day";
                 endif;
+                return null;
+            }
 
+            // --Call Appropriate Method For Different Appointment Type
+            function add_to_slot(string $patient_doc_id, array $booking_info): void {
+                switch ($booking_info['appointmenttype']):
+                    case Appointment_Type::CHECK_UP:
+                    case Appointment_Type::DOCTOR_CONSULTATION:
+                        Normal_Slot::insert_patient_to_slot($booking_info['slotid'], $patient_doc_id, $booking_info['facilityid']);
+                        break;
+                    case Appointment_Type::SPECIALIST_CONSULTATION:
+                        Special_Slot::insert_patient_to_slot($booking_info['slotid'], $patient_doc_id);
+                        break;
+                endswitch;
+            }
+
+            echo "<script>console.log('book appt');</script>";
+            // -- Loop Info To Array
+            foreach ($_POST as $key => $value):
+                if (isset($appt_info[$key])):
+                    $appt_info[$key] = htmlspecialchars($value);
+                    $valid_arr[$key] = False; // Set All Field Validation Check As False
+                    // -- Valid If It Is Not Empty
+                    if (!empty($appt_info[$key])):
+                        $valid_arr[$key] = True;
+                    endif;
+
+                endif;
+            endforeach; # -- END LOOPING INFO TO ARRAY
+
+
+            if (Appointment_Type::validate_appointment_type($appt_info['appointmenttype'])):
+                $valid_arr['appointmenttype'] = True;
+            else:
+                $valid_arr['appointmenttype'] = False;
+            endif; # -- END VALIDATE APPOINTMENT TYPE
+            // -- Remove The Array Key For Specialist If It Is Not Specialist
+            if ($appt_info['appointmenttype'] !== Appointment_Type::SPECIALIST_CONSULTATION):
+                unset($appt_info['specialist']);
+                unset($valid_arr['specialist']);
             endif;
-        endforeach; # -- END LOOPING INFO TO ARRAY
 
 
-        if (Appointment_Type::validate_appointment_type($appt_info['appointmenttype'])):
-            $valid_arr['appointmenttype'] = True;
-        else:
-            $valid_arr['appointmenttype'] = False;
-        endif; # -- END VALIDATE APPOINTMENT TYPE
+            $appt_info['date'] = Time::date_format_default($appt_info['date']);
 
-        $appt_info['date'] = Time::date_format_default($appt_info['date']);
-
-        if (!in_array(False, $valid_arr)) :
-            $appt_id = book_appointment($user->get_email(), $appt_info);
-            EmailTemplate::template_bookappointment($user->get_email(), $appt_id);
-            header("Location:./debugviewappointments.php");
-
-        else:
-            echo "<script>console.log('Appt Fail');</script>";
-        endif; # -- END VALIDATION
+            if (!in_array(False, $valid_arr)) :
+                $appt_record = book_appointment($user->get_email(), $appt_info);
+                EmailTemplate::template_bookappointment($user->get_email(), $appt_record);
+                header("Location:./debugviewappointments.php");
+            else:
+                echo "<script>console.log('Appt Fail');</script>";
+            endif; # -- END VALIDATION
 
 
 
-    endif; # -- END BOOK APPOINTMENT TRIGGER
+        endif; # -- END BOOK APPOINTMENT TRIGGER
 
-endif; # -- END POST REQUEST
-?>
+    endif; # -- END POST REQUEST
+    ?>
 <!DOCTYPE html>
 <html>
 
@@ -154,21 +177,41 @@ endif; # -- END POST REQUEST
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js'></script>
 
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous">
+    </script>
+
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta2/dist/css/bootstrap-select.min.css">
+
+    <!--Latest compiled and minified JavaScript-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta2/dist/js/bootstrap-select.min.js"> </script>
+
     <script src="./js/calendar.js"></script>
 
     <link rel="stylesheet" href="./css/createappointment.css">
     <script>
-
-    var spinnerhtml = '<div id="spinner" class="d-flex justify-content-center pt-5"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div></div>';
+    var spinnerhtml =
+        '<div id="spinner" class="d-flex justify-content-center pt-5"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div></div>';
 
     var xhr = null;
+
     function set_slotid(slotid) {
         $('#hide_slotid').val(slotid);
         console.log(slotid);
     }
+
+    function set_specialist_id(specialist_id) {
+        $('#hide_specialist').val(specialist_id);
+        $(".next").show();
+        console.log(specialist_id);
+    }
+
     function dateChange(date) {
-        if (xhr)
-        {
+        if (xhr) {
             xhr.abort();
             console.log("ajax aborted");
         };
@@ -176,6 +219,7 @@ endif; # -- END POST REQUEST
         //                var ipt = input.split(",");
         var facilityid = $('#hide_facilityid').val();
         var appointmenttype = $('#hide_appointmenttype').val();
+        var specialist = $('#hide_specialist').val();
         // Set Date
         $('#hide_date').val(date);
         $('#display_slots').empty();
@@ -183,7 +227,7 @@ endif; # -- END POST REQUEST
         $('#spinner_display').append(spinnerhtml);
 
         console.log("js triggered");
-        xhr =  $.ajax({
+        xhr = $.ajax({
             type: "POST",
             url: "loadslots.php",
             data: {
@@ -191,11 +235,11 @@ endif; # -- END POST REQUEST
                 set_location: 1,
                 set_facilityid: facilityid,
                 set_appointmenttype: appointmenttype,
-                set_date: date
+                set_date: date,
+                set_specialist: specialist
             },
             success: function(data) {
                 //                        $('#hide_form').submit();
-                
                 console.log("post submit");
                 console.log("Changed date: " + date);
                 var slot_arr = null;
@@ -204,27 +248,24 @@ endif; # -- END POST REQUEST
                     if (slot_arr.length === 0) {
                         $('#spinner').remove();
                         $('#display_slots').append("<div>No Slots Available</div>");
-                        post = null;
                     } else {
                         for (var i = 0; i < slot_arr.length; i++) {
                             var slot_description = slot_arr[i]['slotdescription'];
 
                             var sid = slot_arr[i]['slotid'];
                             var btn = `<button onclick="set_slotid(this.id)"  type="button" class="list-group-item list-group-item-action timebtn" id="${sid}" name="slotid" value="${sid}" 
-                aria-current="true">${slot_description}</button>`;
+                    aria-current="true">${slot_description}</button>`;
 
                             $('#' + sid).attr('onclick', 'set_slotid()');
-                            //console.log(sid);
+                            console.log(sid);
                             $('#spinner').remove();
                             $('#display_slots').append(btn);
-                            post = null;
                         }
                     }
                 } catch (e) {
                     // forget about it :)
                     console.log("empty");
                     $('#display_slots').append("<div>Invalid Input</div>");
-                    post = null;
                 }
 
             },
@@ -239,12 +280,10 @@ endif; # -- END POST REQUEST
         facilityid = $('#hide_facilityid').attr('value');
         appointmenttype = $('#hide_appointmenttype').attr('value');
 
-
         console.log(facilityid);
         console.log(appointmenttype);
 
     }
-
 
     // BOOK APPOINTMENT ON CLICK TRIGGER
     function book_appt() {
@@ -266,8 +305,6 @@ endif; # -- END POST REQUEST
 
     <!-- One "tab" for each step in the form: -->
 
-
-
     <!-- Navigation -->
     <?php
         include TEMPLATES_PATH . '/navbar-loggedin.php';
@@ -280,12 +317,10 @@ endif; # -- END POST REQUEST
         <input type="hidden" name="facilityid" id="hide_facilityid" value="" />
         <input type="hidden" name="appointmenttype" id="hide_appointmenttype" />
         <input type="hidden" name="date" id="hide_date" />
-        <input type="hidden" name="specialist" id="hide_specialist" />
+        <input type="hidden" name="specialist" id="hide_specialist" /> <!-- Doctor's Email -->
         <input type="hidden" name="slotid" id="hide_slotid" />
     </form>
     <!--HIDDEN FIELDS END-->
-
-
 
     <div class="container mt-5 d-flex justify-content-center" style="min-width:720px!important">
 
@@ -308,30 +343,23 @@ endif; # -- END POST REQUEST
                         <div class="card-body p-4">
                             <div class="radio-group row justify-content-between px-3 text-center"
                                 style="justify-content:center !important">
-
-                                <div id="mf003"
+                                <?php
+                                // -- Loop Each Facilities In Database
+                                foreach ($facilities as $facility):
+                                    ?>
+                                <div id="<?php echo $facility->get_facilityid(); ?>"
                                     class="col-auto me-sm-2 mx-1 card-block py-0 text-center radio radio-facilityid">
-                                    <div class="opt-icon"><img src="./img/cgh.png" class="img-fluid" width="100"
-                                            height="100">
+                                    <div class="opt-icon">
+                                        <img src="<?php echo $facility_icons[$facility->get_facilityid()]; ?>"
+                                            alt="<No Image Available>"
+                                            onerror="this.onerror=null;this.src='../img/example_img.jpg';"
+                                            class="img-fluid" width="80" height="100" />
                                     </div>
-                                    <p><b>Changi General Hospital</b></p>
+                                    <p><b><?php echo $facility->get_facilityname(); ?></b></p>
                                 </div>
-
-                                <div id="mf001"
-                                    class="col-auto me-sm-2 mx-1 card-block py-0 text-center radio radio-facilityid">
-                                    <div class="opt-icon"><img src="./img/nuh.png" class="img-fluid" width="100"
-                                            height="100"></div>
-                                    <p><b>National University Hospital</b></p>
-                                </div>
-
-                                <div id="mf002"
-                                    class="col-auto me-sm-2 mx-1 card-block py-0 text-center radio radio-facilityid">
-                                    <div class="opt-icon"><img src="./img/tts.png" class="img-fluid" width="75"
-                                            height="50">
-                                    </div>
-                                    <p><b>Tan Tock Seng Hospital</b></p>
-                                </div>
-
+                                <?php
+                                endforeach;
+                                ?>
                             </div>
                         </div>
 
@@ -349,36 +377,34 @@ endif; # -- END POST REQUEST
                             <div class="radio-group row justify-content-between px-3 text-center"
                                 style="justify-content:center !important">
 
-                                <div id="cp"
+                                <div id="cp" onclick="hideSpecialist();"
                                     class="col-auto me-sm-2 mx-1 card-block py-0 text-center radio radio-appointmenttype">
                                     <div class="opt-icon"><i class="fas fa-clinic-medical" style="font-size: 80px;"></i>
                                     </div>
                                     <p><b>Check-up</b></p>
                                 </div>
 
-                                <div id="dc"
+                                <div id="dc" onclick="hideSpecialist();"
                                     class="col-auto me-sm-2 mx-1 card-block py-0 text-center radio radio-appointmenttype">
                                     <div class="opt-icon"><i class="fas fa-stethoscope" style="font-size: 80px;"></i>
                                     </div>
                                     <p><b>Doctor Consultation</b></p>
                                 </div>
 
-                                <div id="sc"
+                                <div id="sc" onclick="hideSpecialist();"
                                     class="col-auto ms-sm-2 mx-1 card-block py-0 text-center radio radio-appointmenttype">
                                     <div class="opt-icon"><i class="fas fa-user-md" style="font-size: 80px;"></i></div>
                                     <p><b>Specialist Consultation</b></p>
                                 </div>
-
                             </div>
 
+                            <select id="specSelection" class="form-control" data-live-search="true"
+                                title="Select Specialist">
 
-                            <div class="searchfield input-group px-5">
-                                <span class="input-group-text" id="basic-addon1"><i class="fas fa-search text-white"
-                                        aria-hidden="true"></i></span>
-                                <input id="txt-search" class="form-control" type="text" placeholder="Search"
-                                    aria-label="Search">
-                            </div>
-                            <div id="filter-records" class="mx-5"></div>
+                            </select>
+
+
+                            <div id="display_personnel"></div>
                         </div>
                     </div>
                     <!--END OF STEP 2 -->
@@ -474,96 +500,6 @@ endif; # -- END POST REQUEST
     </script>
 
     <script>
-        
-    /*--------------------------------------
-     |  ONLY FOR SHOWCASE, WILL BE DELETED |
-      --------------------------------------  */
-    var data = [{
-            id: "1",
-            fname: "Tiger",
-            lname: "Noxx",
-            team: 'Team 1',
-            address: 'Ryecroft Field',
-            tel: '0494645879'
-        },
-        {
-            id: "2",
-            fname: "Garrett",
-            lname: "Pellens",
-            team: 'Team 2',
-            address: 'Kiln Circus',
-            tel: '0493658746'
-        },
-        {
-            id: "3",
-            fname: "Ashton",
-            lname: "Fox",
-            team: 'Team 1',
-            address: 'Thurne View',
-            tel: '0498532546'
-        },
-        {
-            id: "4",
-            fname: "Melissa",
-            lname: "Perenboom",
-            team: 'Team 3',
-            address: 'Thornton Glade',
-            tel: '0499454891'
-        },
-        {
-            id: "5",
-            fname: "Frankie",
-            lname: "Winters",
-            team: 'Team 2',
-            address: 'Drayton Brae',
-            tel: '0494678943'
-        },
-        {
-            id: "6",
-            fname: "Benoist",
-            lname: "Muniz",
-            team: 'Team 4',
-            address: 'Foxglove Lane',
-            tel: '0492884618'
-        },
-        {
-            id: "7",
-            fname: "Kelly",
-            lname: "London",
-            team: 'Team 2',
-            address: 'Doxford Park Way',
-            tel: '0497978945'
-        },
-        {
-            id: "8",
-            fname: "Hope",
-            lname: "Gilmore",
-            team: 'Team 3',
-            address: 'Bradford Manor',
-            tel: '0499894125'
-        },
-        {
-            id: "9",
-            fname: "Muriel",
-            lname: "Smith",
-            team: 'Team 3',
-            address: 'Wardle Street',
-            tel: '0491484215'
-        },
-        {
-            id: "10",
-            fname: "Gary",
-            lname: "Hendren",
-            team: 'Team 4',
-            address: 'Church Street',
-            tel: '0493596488'
-        }
-    ];
-
-    /*
-    END OF ONLY FOR SHOWCASE, WILL BE DELETED
-    */
-
     /*
     |-----------------|
     |  DYNAMIC BOX    |
@@ -615,10 +551,16 @@ endif; # -- END POST REQUEST
 
     });
 
+
+    var spec = null;
+    var selectPickerLoaded = false;
     //when clicking the appointment type
-    $(".searchfield").hide();
+    $("#specSelection").hide();
+
     $(".radio-group .radio-appointmenttype").on("click", function() {
-        
+
+
+
         // Remove Any Previous Inputs
         $(".selected .fa").removeClass("fa-check");
         $(".radio").removeClass("selected");
@@ -629,22 +571,148 @@ endif; # -- END POST REQUEST
 
         // APPOINTMENT TYPE
         if ($("#cp").hasClass("selected") === true) {
+            if (selectPickerLoaded) $('#specSelection').selectpicker('hide');
             $(".next").prop("disabled", false);
-            $(".searchfield").hide();
-            $("#filter-records").html("");
+            set_specialist_id("");
             $('#hide_appointmenttype').val("<?php echo Appointment_Type::CHECK_UP; ?>");
         } else if ($("#dc").hasClass("selected") === true) {
+            if (selectPickerLoaded) $('#specSelection').selectpicker('hide');
             $(".next").prop("disabled", false);
-            $(".searchfield").hide();
-            $("#filter-records").html("");
+            set_specialist_id("");
             $('#hide_appointmenttype').val("<?php echo Appointment_Type::DOCTOR_CONSULTATION; ?>");
         } else if ($("#sc").hasClass("selected") === true) {
             $(".next").prop("disabled", true);
-            $(".searchfield").show();
+            $('#display_personnel').children().delay(700).slideDown(100);
             $('#hide_appointmenttype').val("<?php echo Appointment_Type::SPECIALIST_CONSULTATION; ?>");
+
+
+            if (spec) {
+                spec.abort();
+            }
+
+            spec = $.ajax({
+                type: "POST",
+                url: "loadspecialist.php",
+                data: {
+                    load_specialist: true,
+                    facilityid: $('#hide_facilityid').val()
+                },
+                success: function(data) {
+
+                    var personnel_arr = null;
+                    try {
+                        var personnel_arr = JSON.parse(data);
+                        //console.log(Object.keys(personnel_arr).length);
+                        if (Object.keys(personnel_arr).length === 0) {
+                            $('#display_personnel').append("<div>No Personnel</div>");
+                        } else {
+                            // -- Looping Each Specialisation Category (Alphabetical Order NOT IMPLEMENTED)
+                            //console.log("1");
+                            //console.log(personnel_arr);
+
+                            $.each(personnel_arr, function(key) {
+                                console.log(key);
+                                var spec_selection =
+                                    `<option data-token=${key} id=${key}>${key}</option>`; // Outer Layer -- nanta to change
+                                $('#specSelection').append(spec_selection);
+                                $(function() {
+                                    $('#specSelection').selectpicker();
+                                    $('#specSelection').selectpicker('show');
+                                    selectPickerLoaded = true;
+                                });
+
+                                console.log("Retreiving data to dropdown list");
+                            });
+
+                            // for (const specialisation in personnel_arr) {
+                            //     var personnels = personnel_arr[specialisation];
+
+                            // }
+                        }
+                    } catch (e) {
+                        // forget about it :)
+                        console.log(e);
+                        $('#display_slots').append("<div>Invalid Input</div>");
+                    }
+
+                },
+                error: function() {
+                    console.log("Error Specialist Change");
+                }
+            });
+
         } else {
-            $(".searchfield").hide();
+
         }
+
+    });
+
+    function hideSpecialist() {
+        $('#display_personnel').children().hide();
+        if (selectPickerLoaded) $('#specSelection').selectpicker('hide');
+    }
+
+
+    function turnOnNext() {
+        $(".next").prop("disabled", false);
+    }
+
+    $('#specSelection').change(function() {
+        $(".next").prop("disabled", true);
+
+        // You can access the value of your select field using the .val() method
+        var UserChosen = $('#specSelection').val();
+
+        var specAjax = null;
+        $("#display_personnel").slideUp(100, function() {
+            $("#display_personnel").empty();
+            specAjax = $.ajax({
+                type: "POST",
+                url: "loadspecialist.php",
+                data: {
+                    load_specialist: true,
+                    facilityid: $('#hide_facilityid').val()
+                },
+                success: function(data) {
+                    var personnel_arr = null;
+
+                    try {
+                        var personnel_arr = JSON.parse(data);
+                        //console.log(Object.keys(personnel_arr).length);
+                        if (Object.keys(personnel_arr).length === 0) {
+                            $('#display_personnel').append("<div>No Personnel</div>");
+                        } else {
+                            var specObj = personnel_arr[UserChosen];
+                            console.log(specObj);
+
+                            $.each(specObj, function(i, spc) {
+                                var personnel_name = spc.firstname;
+                                var doc_id = spc.email;
+                                var doc_btn = `<button onclick="set_specialist_id(this.id); turnOnNext();"  type="button" class="list-group-item list-group-item-action timebtn" id="${doc_id}" name="slotid" value="${doc_id}" 
+                            aria-current="true">${personnel_name}</button>`;
+                                console.log(personnel_name);
+                                console.log(doc_id);
+                                console.log(spc.specialization);
+                                $('#display_personnel').append(doc_btn);
+                            });
+
+                            $("#display_personnel").slideDown(100);
+
+                        }
+                    } catch (e) {
+                        // forget about it :)
+                        console.log(e);
+                        $('display_personnel').append("<div>Invalid Input</div>");
+                    }
+
+                },
+                error: function() {
+                    console.log("Error Specialist Change");
+                }
+            });
+
+        });
+
 
     });
 
@@ -705,7 +773,7 @@ endif; # -- END POST REQUEST
             .html(currstep + " of 3");
     };
 
-    
+
     // DISPLAY AND HIDE "NEXT", "BACK" AND "SUMBIT" BUTTONS
     hideButtons = function(step) {
         var limit = parseInt($(".step").length);
@@ -722,13 +790,11 @@ endif; # -- END POST REQUEST
             $(".next").hide();
             $(".submit").show();
 
-            // -- Load Appointment
             var facilityid = $('#hide_facilityid').val();
             var appointmenttype = $('#hide_appointmenttype').val();
             var date = $('#hide_date').val();
+            var specialist = $('#hide_specialist').val();
             $('#display_slots').empty();
-
-
             $.ajax({
                 type: "POST",
                 url: "loadslots.php",
@@ -736,7 +802,8 @@ endif; # -- END POST REQUEST
                     ajax: 1,
                     set_facilityid: facilityid,
                     set_appointmenttype: appointmenttype,
-                    set_date: date
+                    set_date: date,
+                    set_specialist: specialist
                 },
                 success: function(data) {
                     //                                            $("#apptform").submit();
@@ -746,7 +813,9 @@ endif; # -- END POST REQUEST
                     console.log("default date: " + date);
                     var slot_arr = null;
                     try {
+                        console.log(JSON.stringify(data));
                         var slot_arr = JSON.parse(data);
+
                         if (slot_arr.length === 0) {
                             $('#spinner').remove();
 
@@ -765,10 +834,9 @@ endif; # -- END POST REQUEST
                         }
                     } catch (e) {
                         // forget about it :)
-                        console.log("empty");
+                        console.log(e);
                         $('#display_slots').append("<div>Invalid Input</div>");
                     }
-
                 },
                 error: function() {
                     console.log("Error Date Change");
@@ -791,6 +859,10 @@ endif; # -- END POST REQUEST
         return valid;
     }
     </script>
+
+
 </body>
+<?php endif; # -- END USER SESSION CHECK 
+    ?>
 
 </html>
