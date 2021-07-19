@@ -75,8 +75,9 @@ class EmailTemplate {
 
         elseif ($recipient_usertype == User_Type::FACIILITY_ADMIN || $recipient_usertype == User_Type::SUPER_ADMIN):
             $to_name = Admin::retrieve_admin_name($to);
+        else:
+            $to_name = "";
         endif;
-
         // -- Email Subject
         $subject = "FYP-21-S2-24: Password has been changed";
 
@@ -89,6 +90,72 @@ class EmailTemplate {
         // -- Message
         $message = "<span style='color:black;'>Hi {$to_name}," . self::LINEBREAK;
         $message .= "Your password was recently changed on {$date} at {$time_12hour} (Singapore Standard Time)." . self::LINEBREAK;
+        $message .= "If you are aware of this change, please disregard this email. " . self::LINEBREAK;
+        $message .= "If it wasn't you who changed it, please reply to this email as someone else may have access to your account. " . self::LINEBREAK;
+        $message .= "{$sign_off}</span>";
+
+        Email::sendEmail($to, $subject, $message);
+    }
+
+    public static function template_emailchanged(string $to, string $new_email) {
+
+        // -- Check User Type &  Set Recipient
+        $recipient_usertype = Account_User::retrieve_user_type($new_email);
+
+        if ($recipient_usertype == User_Type::PATIENT || $recipient_usertype == User_Type::MEDICAL_PERSONNEL):
+            $to_name = Normal_User::retrieve_user_fullname($new_email);
+
+        elseif ($recipient_usertype == User_Type::FACIILITY_ADMIN || $recipient_usertype == User_Type::SUPER_ADMIN):
+            $to_name = Admin::retrieve_admin_name($new_email);
+        else:
+            $to_name = "";
+        endif;
+
+        // -- Email Subject
+        $subject = "FYP-21-S2-24: Email Change";
+
+        // -- Miscellaneous
+        $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
+        $timestamp = new Time();
+        $date = Time::date_format_change($timestamp->get_date());
+        $time_12hour = Time::to_12hours($timestamp->get_time(), false);
+
+        // -- Message
+        $message = "<span style='color:black;'>Hi {$to_name}," . self::LINEBREAK;
+        $message .= "Your <b>email</b> was recently changed from {$to} to {$new_email} on {$date} at {$time_12hour} (Singapore Standard Time)." . self::LINEBREAK;
+        $message .= "If you are aware of this change, please disregard this email. " . self::LINEBREAK;
+        $message .= "If it wasn't you who changed it, please reply to this email as someone else may have access to your account. " . self::LINEBREAK;
+        $message .= "{$sign_off}</span>";
+
+        Email::sendEmail($to, $subject, $message);
+    }
+
+    public static function template_basicinfochanged(string $to) {
+
+        // -- Check User Type &  Set Recipient
+        $recipient_usertype = Account_User::retrieve_user_type($to);
+
+        if ($recipient_usertype == User_Type::PATIENT || $recipient_usertype == User_Type::MEDICAL_PERSONNEL):
+            $to_name = Normal_User::retrieve_user_fullname($to);
+
+        elseif ($recipient_usertype == User_Type::FACIILITY_ADMIN || $recipient_usertype == User_Type::SUPER_ADMIN):
+            $to_name = Admin::retrieve_admin_name($to);
+        else:
+            $to_name = "";
+        endif;
+
+        // -- Email Subject
+        $subject = "FYP-21-S2-24: Basic Profile Information Change";
+
+        // -- Miscellaneous
+        $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
+        $timestamp = new Time();
+        $date = Time::date_format_change($timestamp->get_date());
+        $time_12hour = Time::to_12hours($timestamp->get_time(), false);
+
+        // -- Message
+        $message = "<span style='color:black;'>Hi {$to_name}," . self::LINEBREAK;
+        $message .= "Your contact and/or address was recently updated on {$date} at {$time_12hour} (Singapore Standard Time)." . self::LINEBREAK;
         $message .= "If you are aware of this change, please disregard this email. " . self::LINEBREAK;
         $message .= "If it wasn't you who changed it, please reply to this email as someone else may have access to your account. " . self::LINEBREAK;
         $message .= "{$sign_off}</span>";

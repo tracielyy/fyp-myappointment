@@ -11,12 +11,10 @@ require_once '../resources/config.php';
 require '../vendor/autoload.php';
 
 // -- Import Project Classes -- //
-require_once ENTITIES_PATH . '/Account_User.php';
-require_once UTILS_PATH . '/Email.php';
-require_once UTILS_PATH . '/Regex.php';
-require_once UTILS_PATH . '/Time.php';
-require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
-require_once FUNCTIONS_PATH . '/AdminFunctions.php';
+require_once USER_MOD . '/Account_User.php';
+require_once EMAIL_MOD . '/EmailTemplate.php';
+require_once UTIL_MOD . '/Regex.php';
+require_once TIME_MOD . '/Time.php';
 
 // -- Misc Variables -- //
 $msg = "";
@@ -47,11 +45,11 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
         $url_value .= "?token={$token}&email={$email}";
 
         # Cross Check `email` With Google Cloud Firestore
-        if (AccountUserFunctions::check_user_exist($email)) {
+        if (Account_User::check_user_exist($email)) {
             echo "User Exist";
 
             # Cross Check `token` With Google Cloud Firestore
-            $validURL = AccountUserFunctions::validate_password_token($email, $token);
+            $validURL = Account_User::validate_password_token($email, $token);
             if ($validURL) {
                 
             }
@@ -71,7 +69,7 @@ setcookie($url_name, $url_value, time() + 3600);
         <!-- Title -->
         <title>FYP-21-S2-24: Password Reset</title>
         <!-- Styling -->
-        <?php require COMPONENTS_PATH . '/bootstrap.php' ?>
+        <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
 
     </head>
     <body>
@@ -127,14 +125,14 @@ setcookie($url_name, $url_value, time() + 3600);
 
                 // -- Store The Password To Database -- //
                 echo $_COOKIE['email'];
-                if (AccountUserFunctions::change_password($_COOKIE['email'], $resetArr['password'])) {
-
+                if (Account_User::change_reset_password($_COOKIE['email'], $resetArr['password'])) {
+                    // UPDATE PASSWORD TOKEN
+                    Account_User::update_password_token($_COOKIE['email']);
                     // -- Possible Termination Of Other Sessions -- //
-                    
                     // -- Need To Email To Inform Password Change -- //
                     $to = $_COOKIE['email'];
-                    Email::template_passwordchanged($to);
-                   
+                    EmailTemplate::template_passwordchanged($to);
+
 
                     echo "Password Changed Successfully";
                 } else {
