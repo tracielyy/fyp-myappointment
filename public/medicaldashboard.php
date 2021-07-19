@@ -52,20 +52,27 @@ if (isset($_SESSION["user"])):
     
         
 //         include COMPONENTS_PATH . '/navbar-loggedin.php';
-$dateToday = date("d-m-Y"); //Date today NEED TO CHANGE ONLY FOR DEBUG
+$dateToday = Time::get_current_date(); //Date today NEED TO CHANGE ONLY FOR DEBUG
+$dates = Time::get_date_from_range($dateToday,Time::get_enddate($dateToday,6));
+
 $patient_per_day = Normal_Slot::patient_count_per_date("mf001", $dateToday);
-$patient_per_day += Special_Slot::patient_count_per_date("mf001", $dateToday);
-
-
+$patient_per_day += Special_Slot::patient_count_per_date("mf001", $dates[0]);
   
-$slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com", $dateToday);
-$numofPatients = count($slot_arr);
 
-$date1 = date("d-m-Y",strtotime('+1 day', strtotime($dateToday)));
-$date2 = date("d-m-Y",strtotime('+2 day', strtotime($dateToday)));
-$date3 = date("d-m-Y",strtotime('+3 day', strtotime($dateToday)));
-$date4 = date("d-m-Y",strtotime('+4 day', strtotime($dateToday)));
-$date5 = date("d-m-Y",strtotime('+5 day', strtotime($dateToday)));
+//$slot_arr += Special_Slot::retrieve_booked_slots_by_date($user_email,$dates[2]);
+$slot_arr = array();
+$numofPatientsWeek = array();
+foreach($dates as $date):
+    $slot_addition = Special_Slot::retrieve_booked_slots_by_date($user_email,$date);
+    $numofPatientsWeek[$date] = count($slot_addition);
+    $slot_arr = array_merge($slot_arr,$slot_addition);
+endforeach;
+
+
+// echo "<pre>";
+// echo var_dump($slot_arr);
+// echo "</pre>";
+
 //can use get_date_from_range -- make it to 7 days
 
 
@@ -192,21 +199,25 @@ function checkTime(i) {
     integrity="sha512-VCHVc5miKoln972iJPvkQrUYYq7XpxXzvqNfiul1H4aZDwGBGC0lq373KNleaB2LpnC2a/iNfE5zoRYmB4TRDQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
+    /*THIS IS NOT ON THE DASHBOARD!!!!! 
+    */
 var ctx = document.getElementById('myChart').getContext('2d');
 var myChart = new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: ['<?php echo $dateToday?>', '<?php echo $date1?>', '<?php echo $date2?>', '<?php echo $date3?>', '<?php echo $date4?>', '<?php echo $date5?>'],
+        labels: ['hello','world','waddup','3333','1444'],
         datasets: [{
             label: 'Number of ',
-            data: [<?php echo $numofPatients; ?>, 0,0, 0, 0, 0],
+            data: [<?php //echo $numofPatients; ?>2, 0,0, 0, 0, 0],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)',
                 'rgba(255, 206, 86, 0.2)',
                 'rgba(75, 192, 192, 0.2)',
                 'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
+                'rgba(255, 159, 64, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
             ],
             borderColor: [
                 'rgba(255, 99, 132, 1)',
@@ -214,7 +225,9 @@ var myChart = new Chart(ctx, {
                 'rgba(255, 206, 86, 1)',
                 'rgba(75, 192, 192, 1)',
                 'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
+                'rgba(255, 159, 64, 1)',
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
             ],
             borderWidth: 1
         }]
@@ -227,22 +240,31 @@ var myChart = new Chart(ctx, {
         }
     }
 });
+ /*THIS IS NOT ON THE DASHBOARD!!!!! 
+    */
+
+
+
+/*THIS ONE ON THE BOTTOM IS ON THE DASHBOARD!!!!! 
+*/
 
 var ctx2 = document.getElementById("chart2").getContext("2d");
 var myChart1 = new Chart(ctx2, {
     type: 'bar',
     data: {
-        labels: ['<?php echo $dateToday?>', '<?php echo $date1?>', '<?php echo $date2?>', '<?php echo $date3?>', '<?php echo $date4?>', '<?php echo $date5?>'],
+        labels: [<?php foreach($dates as $date): echo "'". $date . "',";; endforeach; ?>],
         datasets: [{
             label: 'Number of Patients per date',
-            data: [<?php echo $numofPatients; ?>, 2, 3,4,5,5],
+            data: [<?php foreach($numofPatientsWeek as $date=>$count): echo $count.","; endforeach;?>],
             backgroundColor: [
                 'rgba(255, 99, 132, 1)',
                 'rgba(54, 162, 235, 1)',
                 'rgba(255, 206, 86, 1)',
                 'rgba(75, 192, 192, 1)',
                 'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
+                'rgba(255, 159, 64, 1)',
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
             ],
             borderColor: [
                 'rgba(255, 99, 132, 1)',
@@ -250,7 +272,9 @@ var myChart1 = new Chart(ctx2, {
                 'rgba(255, 206, 86, 1)',
                 'rgba(75, 192, 192, 1)',
                 'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
+                'rgba(255, 159, 64, 1)',
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
             ],
             borderWidth: 1
         }]
@@ -319,19 +343,13 @@ new gridjs.Grid({
     data: [
         <?php 
           $pnum = 0;
-          $p_perday = Special_Slot::patient_count_per_date("mf001", "21-07-2021");
+          $p_perday = 3;//Special_Slot::patient_count_per_date("mf001", "21-07-2021");
               foreach($slot_arr as $slot):
               $patientid = $slot->get_patient();
               $patient = Patient::retrieve_patient_by_id($patientid);
-              $str = "[\"" . $patient->get_firstname() . "\",\"" . $patient->get_email() . "\",\"" . $slot->get_appointmentschedule()->get_date() . "\",\"" . $slot->get_appointmentschedule()->get_time()."\"]" ; 
+              $str = "[\"" . $patient->get_firstname() . "\",\"" . $patient->get_email() . "\",\"" . $slot->get_appointmentschedule()->get_date() . "\",\"" . $slot->get_appointmentschedule()->get_time()."\"]," ; 
               echo $str;
-              $pnum++;
-              if ($pnum == $p_perday) :
-                  echo "";
-              else:
-                  echo ",";
-              endif;
-              endforeach; 
+              endforeach;
         ?>],
 
     pagination: {
