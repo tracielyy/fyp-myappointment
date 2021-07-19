@@ -247,13 +247,13 @@ else:
                 }
             </style>
             <script>
-                function set_slotid(slot_id) {
+                function set_slot_id(slot_id) {
                     $('#hide_slotid').val(slot_id);
                     console.log(slot_id);
                 }
                 function set_specialist_id(specialist_id) {
                     $('#hide_specialist').val(specialist_id);
-                    $(".next").show();
+                    $(".next").prop("disabled", false);
                     console.log(specialist_id);
                 }
                 function dateChange(date) {
@@ -262,11 +262,9 @@ else:
                     var facilityid = $('#hide_facilityid').val();
                     var appointmenttype = $('#hide_appointmenttype').val();
                     var specialist = $('#hide_specialist').val();
-
                     // Set Date
                     $('#hide_date').val(date);
                     $('#display_slots').empty();
-
                     console.log("js triggered");
                     $.ajax({
                         type: "POST",
@@ -280,7 +278,7 @@ else:
                             set_specialist: specialist
                         },
                         success: function (data) {
-    //                        $('#hide_form').submit();
+                            //                        $('#hide_form').submit();
                             console.log("post submit");
                             console.log("Changed date: " + date);
                             var slot_arr = null;
@@ -291,12 +289,10 @@ else:
                                 } else {
                                     for (var i = 0; i < slot_arr.length; i++) {
                                         var slot_description = slot_arr[i]['slotdescription'];
-
                                         var sid = slot_arr[i]['slotid'];
-                                        var btn = `<button onclick="set_slotid(this.id)"  type="button" class="list-group-item list-group-item-action timebtn" id="${sid}" name="slotid" value="${sid}" 
+                                        var btn = `<button onclick="set_slot_id(this.id)"  type="button" class="list-group-item list-group-item-action timebtn" id="${sid}" name="slotid" value="${sid}" 
                     aria-current="true">${slot_description}</button>`;
-
-                                        $('#' + sid).attr('onclick', 'set_slotid()');
+                                        $('#' + sid).attr('onclick', 'set_slot_id()');
                                         console.log(sid);
                                         $('#display_slots').append(btn);
                                     }
@@ -318,11 +314,8 @@ else:
                 function set_appt_fields() {
                     facilityid = $('#hide_facilityid').attr('value');
                     appointmenttype = $('#hide_appointmenttype').attr('value');
-
-
                     console.log(facilityid);
                     console.log(appointmenttype);
-
                 }
 
 
@@ -438,16 +431,9 @@ else:
                                         </div>
 
                                     </div>
-                                    <div id="display_personnel">
-                                    </div>
 
-                                    <div class = "searchfield input-group px-5">
-                                        <span class = "input-group-text" id = "basic-addon1"><i class = "fas fa-search text-white"
-                                                                                                aria-hidden = "true"></i></span>
-                                        <input id = "txt-search" class = "form-control" type = "text" placeholder = "Search"
-                                               aria-label = "Search">
-                                    </div>
-                                    <div id = "filter-records" class = "mx-5"></div>
+                                    <!-- DISPLAY OF ALL SPECIALIST BY THEIR CATEGORY -->
+                                    <div id="display_personnel"></div>
                                 </div>
                             </div> <!--END OF STEP 2 -->
 
@@ -567,7 +553,6 @@ else:
                         tel: '0493596488'
                     }
                 ];
-
                 $('#txt-search').keyup(function () {
                     $('.next').prop('disabled', true);
                     var searchField = $(this).val();
@@ -586,24 +571,19 @@ else:
                     });
                     $('#filter-records').html(output);
                 });
-
                 $(document).on("click", ".li-search", function () {
                     $("#txt-search").val($(this).html());
                     setFormFields($(this).attr("id"));
                     $("#filter-records").html("");
                     $(".next").prop("disabled", false);
                 });
-
-
                 // CALLING RADIO GROUP
                 $(".radio-group .radio").on("click", function () {
                     // Remove Any Previous Inputs
                     $(".selected .fa").removeClass("fa-check");
                     $(".radio").removeClass("selected");
-
                     // Add The Triggering "Radio" With "selected" class
                     $(this).addClass("selected");
-
                     //  FACILITY ID
                     if ($("#mf001").hasClass("selected") === true) {
                         $(".next").prop("disabled", false);
@@ -620,24 +600,22 @@ else:
                     // APPOINTMENT TYPE
                     $('#display_personnel').empty(); // -- Remove All The Sections
                     if ($("#cp").hasClass("selected") === true) {
+                        $sc_call.abort();
                         $(".next").prop("disabled", false);
-                        $(".searchfield").hide();
+                        $(".display_personnel").hide();
                         $("#filter-records").html("");
                         $('#hide_appointmenttype').val("<?php echo Appointment_Type::CHECK_UP; ?>");
                     } else if ($("#dc").hasClass("selected") === true) {
                         $(".next").prop("disabled", false);
-                        $(".searchfield").hide();
+                        $(".display_personnel").hide();
                         $("#filter-records").html("");
                         $('#hide_appointmenttype').val("<?php echo Appointment_Type::DOCTOR_CONSULTATION; ?>");
                     } else if ($("#sc").hasClass("selected") === true) {
                         $(".next").prop("disabled", true);
-                        //$(".searchfield").show();
+                        $(".display_personnel").show();
                         $('#hide_appointmenttype').val("<?php echo Appointment_Type::SPECIALIST_CONSULTATION; ?>");
-
                         console.log($('#hide_facilityid').val());
-
                         // -- CALL TO LOAD THE SPECIALIST
-
                         $.ajax({
                             type: "POST",
                             url: "loadspecialist.php",
@@ -648,7 +626,6 @@ else:
                             success: function (data) {
 
                                 var personnel_arr = null;
-
                                 try {
                                     var personnel_arr = JSON.parse(data);
                                     console.log(Object.keys(personnel_arr).length);
@@ -661,11 +638,10 @@ else:
                                             var personnels = personnel_arr[specialisation];
                                             var specialist_section = `<div id=${specialisation}>${specialisation}</div>`; // Outer Layer -- nanta to change
                                             $('#display_personnel').append(specialist_section);
-
                                             for (var i = 0; i < personnels.length; i++) {
                                                 var personnel_name = personnels[i]['firstname'] + " " + personnels[i]['lastname'];
                                                 var doc_id = personnels[i]['email'];
-                                                var doc_btn = `<button onclick="set_specialist_id(this.id)"  type="button" class="list-group-item list-group-item-action timebtn" id="${doc_id}" name="slotid" value="${doc_id}" 
+                                                var doc_btn = `<button onclick="set_specialist_id(this.id)"  type="button" class="list-group-item list-group-item-action timebtn" id="${doc_id}" name="specialist" value="${doc_id}" 
                     aria-current="true">${personnel_name}</button>`; // Inner Layer (personnel) -- nanta to change
 
                                                 console.log(doc_id);
@@ -689,7 +665,6 @@ else:
                     }
 
                 });
-
                 var step = 1;
                 $(document).ready(function () {
                     stepProgress(step);
@@ -717,15 +692,12 @@ else:
                     if (step > 1) {
                         step = step - 2;
                         $(".next").trigger("click");
-
                         // Set Facility ID
                         var facilityid = $('#hide_facilityid').val();
                         $("#" + facilityid).addClass("selected");
-
                         // Set Appointment Type
                         var appointmenttype = $('#hide_appointmenttype').val();
                         $("#" + appointmenttype).addClass("selected");
-
                     }
                     hideButtons(step);
                 });
@@ -751,7 +723,6 @@ else:
                     if (step === limit) {
                         $(".next").hide();
                         $(".submit").show();
-
                         // -- Load Appointment
                         var facilityid = $('#hide_facilityid').val();
                         var appointmenttype = $('#hide_appointmenttype').val();
@@ -775,7 +746,7 @@ else:
                                 console.log("appointment type: " + appointmenttype);
                                 console.log("default date: " + date);
                                 var slot_arr = null;
-//                                console.log(JSON.stringify(data));
+                                //                                console.log(JSON.stringify(data));
                                 try {
                                     var slot_arr = JSON.parse(data);
                                     if (slot_arr.length === 0) {
@@ -784,9 +755,8 @@ else:
                                         for (var i = 0; i < slot_arr.length; i++) {
                                             var slot_description = slot_arr[i]['slotdescription'];
                                             var sid = slot_arr[i]['slotid'];
-                                            var btn = `<button onclick="set_slotid(this.id)"  type="button" class="list-group-item list-group-item-action timebtn" id="${sid}" name="slotid" value="${sid}" 
+                                            var btn = `<button onclick="set_slot_id(this.id)"  type="button" class="list-group-item list-group-item-action timebtn" id="${sid}" name="slotid" value="${sid}" 
                     aria-current="true">${slot_description}</button>`;
-
                                             console.log(sid);
                                             $('#display_slots').append(btn);
                                         }
