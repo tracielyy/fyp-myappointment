@@ -13,6 +13,8 @@ require_once AUTH_MOD . '/Session.php';
 require_once TIME_MOD . '/Time.php';
 require_once ENUMS_PATH . '/User_Type.php';
 
+//require_once EMAIL_MOD . '/EmailTemplate.php';
+
 class Account_User {
 
     // Properties
@@ -175,29 +177,34 @@ class Account_User {
     }
 
     // -- UPDATE  BASIC PROFILE (name, address, contact etc)
-    public static function update_general_profile(array $profile_arr, string $email, string $password) {
+    public static function change_basic_details(string $email, string $contactnumber, string $address): bool {
 
         # Limiting Field Array
-        $profile_limit = array(
-            "profile.contactnumber" => "",
-            "profile.address" => ""
+        $basic_profile_details = array(
+            "profile.contactnumber" => $contactnumber,
+            "profile.address" => $address
         );
 
-        # Update User Email        
+        # Removing The Key That Have NULL or Empty Value
+        foreach ($basic_profile_details as $key => $value) {
+            if (is_null($value) || empty($value)):
+                unset($basic_profile_details[$key]);
+            endif;
+        }
+
+        # Get User ID Via Email      
         $db = new DbQuery();
-        $user_doc_id = self::retrieve_user_doc_id($email, $password);
+        $user_doc_id = self::retrieve_user_doc_id($email);
 
         # If Valid User
-        if ($user_doc_id !== NULL):
-            $db->get_db()->collection(Database::ACCOUNT_USER)->document($user_doc_id)->update([
-                ['path' => 'profile.contactnumber', 'value' => $profile_arr['profile.contactnumber']],
-                ['path' => 'profile.address', 'value' => $profile_arr['profile.address']]
-            ]);
-
+        if ($user_doc_id !== NULL && !empty($basic_profile_details)):
+            $doc_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->document($user_doc_id);
+            $db->update_values($doc_ref, $basic_profile_details);
+            return true;
         endif;
 
         # Return Boolean (Success or Failure)
-        return $changed;
+        return false; # -- WRONG CREDENTIALS
     }
 
     // -- PASSWORD RESET (VALID FOR 24 HOURS) 
@@ -233,7 +240,7 @@ class Account_User {
             $mapData = $db->fetch_one_document(Database::ACCOUNT_USER, $email_arr);
 
             # Validate The Database's Requested Dates
-            if (self::verify_requested_date($mapData['passwordreset']['requestedon']['date'], $mapData['password']['requestedon']['time'])):
+            if (self::verify_requested_date($mapData['passwordreset']['requestedon']['date'], $mapData['passwordreset']['requestedon']['time'])):
 
                 # Set The Dates
                 $currentDate = new Time();
@@ -246,7 +253,7 @@ class Account_User {
                 echo $requestedon->get_current_date();
 
                 # Return bool On Validity
-                return self::verify_token($originaltoken, $passwordtoken, $duration, $mapData['tokenused']);
+                return self::verify_token($originaltoken, $passwordtoken, $duration, $mapData['passwordreset']['tokenused']);
 
             endif;
             return false;
@@ -285,42 +292,88 @@ class Account_User {
     }
 
     // -- PASSWORD CHANGE
-    public static function change_password(string $email, string $password): bool {
-
-        # Condition Array (EMAIL)
-        $conditionArr['credentials'] = array(
-            'email' => $email
-        );
-
-        # Changed Array (PASSWORD)
-        $changedArr['credentials'] = array(
-            'password' => $password
-        );
+    public static function change_password(string $email, string $new_password, string $current_password): bool {
 
         # Update The New Password
-        $db = new DbQuery();
-        $db->update_field(Database::ACCOUNT_USER, $conditionArr, $changedArr);
+        $user_doc_id = self::retrieve_user_doc_id($email, $current_password);
 
-        # Retrieve Document Again To Check Changes
-        $user_data = $db->select_exact_match(Database::ACCOUNT_USER, $conditionArr);
 
-        # Update Token Usage (WIP)
-        $passwordreset_arr = ArrayCreation::used_passwordreset_array();
+        # If Valid User
+        if ($user_doc_id !== NULL):
+            $db = new DbQuery();
 
-        $db->update_field(Database::ACCOUNT_USER, $conditionArr, $passwordreset_arr);
+            # Update To New Password
+            $db->get_db()->collection(Database::ACCOUNT_USER)->document($user_doc_id)
+                    ->update([
+                        ['path' => 'credentials.password', 'value' => $new_password]
+            ]);
 
-        return StringUtils::string_equal($user_data['credentials']['password'], $password);  // -- Bool -- //
+            # Check If Password Updated Correctly
+            $new_user_doc_id = self::retrieve_user_doc_id($email, $new_password);
+
+            if ($new_user_doc_id !== Null):
+
+                return true; # -- END OF PASSWORD CHANGE PROCESS
+            endif; # -- CHECK FOR NEW USER ID
+            return false; # -- HAVE ISSUES IN CHANGING PASSWORD
+        endif; # -- CHECK IF THE USER ENTERS A CORRECT PASSWORD
+        return false; # -- USER ENTER WRONG PASSWORD
     }
 
-    // -- UPDATE BASIC PROFILE INFORMATION
-    public static function edit_basic_profile(array $credentials_arr, array $profile_changed_arr): bool {
+    // -- PASSWORD CHANGE
+    public static function change_reset_password(string $email, string $new_password): bool {
 
-        # Double Check If Patient Exist For The Given Credentials
-        $user_data = self::retrieve_account_data($credentials_arr);
-        if ($user_data !== null):
+        # Update The New Password
+        $user_doc_id = self::retrieve_user_doc_id($email);
 
-            # Get User Document ID
-            $user_doc_id = self::retrieve_user_doc_id($credentials_arr['email']);
+        # If Valid User
+        if ($user_doc_id !== NULL):
+            $db = new DbQuery();
+
+            # Update To New Password
+            $db->get_db()->collection(Database::ACCOUNT_USER)->document($user_doc_id)
+                    ->update([
+                        ['path' => 'credentials.password', 'value' => $new_password]
+            ]);
+
+            # Check If Password Updated Correctly
+            $new_user_doc_id = self::retrieve_user_doc_id($email, $new_password);
+
+            if ($new_user_doc_id !== Null):
+
+                return true; # -- END OF PASSWORD CHANGE PROCESS
+            endif; # -- CHECK FOR NEW USER ID
+            return false; # -- HAVE ISSUES IN CHANGING PASSWORD
+        endif; # -- CHECK IF THE USER ENTERS A CORRECT PASSWORD
+        return false; # -- USER ENTER WRONG PASSWORD
+    }
+
+    // -- Update the Password Token In The Database After A Success Password Change
+    public static function update_password_token(string $email): bool {
+
+        $user_doc_id = self::retrieve_user_doc_id($email);
+
+        # Check If Email Is Correct
+        if ($user_doc_id !== Null):
+
+            $passwordreset_arr = ArrayCreation::used_passwordreset_array();
+            $db = new DbQuery();
+
+            # Update Token Usage (ONLY FOR PASSWORD RESET)
+            $user_doc_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->document($user_doc_id);
+            $db->update_values($user_doc_ref, $passwordreset_arr);
+            return true;
+        endif;
+        return false;
+    }
+
+    // -- UPDATE BASIC PROFILE INFORMATION (CONTACT AND HOME ADDRESS)
+    public static function edit_basic_profile(string $user_email, array $profile_changed_arr): bool {
+
+        # Get User Document ID
+        $user_doc_id = self::retrieve_user_doc_id($user_email);
+
+        if ($user_doc_id !== null):
 
             # Modify The Patient Profile Based On The Given Array
             $db = new DbQuery();
