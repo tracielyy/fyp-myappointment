@@ -40,6 +40,19 @@ class StringUtils {
         return $token;
     }
 
+    public static function generate_otp(int $length): string {
+        $otp = "";
+        $otp_repo = "0123456789"; // Digits
+        $repo_size = strlen($otp_repo);
+
+        # Randomly Pick Numbers From The Index Of `$otp_repo`
+        for ($i = 0; $i < $length; $i++):
+            $otp .= $otp_repo[random_int(0, $repo_size - 1)];
+        endfor;
+        
+        return $otp;
+    }
+
     public static function object_to_array($obj) {
         if (is_object($obj)) {
             $obj = (array) self::dismount($obj);

@@ -126,6 +126,20 @@ class ArrayCreation {
         return $passwordreset_arr;
     }
 
+    public static function email_verify_array(string $otp): array {
+        # -- Create New Time Object -- #
+        $time = new Time();
+        $email_verify_arr = array(
+            'otp' => $otp,
+            'requestedon' => array(
+                'date' => $time->get_current_date(),
+                'time' => $time->get_current_time()
+            )
+        );
+        
+        return $email_verify_arr;
+    }
+
 }
 
 ?>

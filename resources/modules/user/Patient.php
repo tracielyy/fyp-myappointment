@@ -13,7 +13,7 @@ require_once TIME_MOD . '/Time.php';
 
 require_once AUTH_MOD . '/Session.php';
 require_once USER_MOD . '/Normal_User.php';
-require_once USER_MOD . '/Super_Admin.php';
+
 require_once APPT_MOD . '/Appointment_Record.php';
 
 class Patient extends Normal_User {

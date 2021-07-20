@@ -1,9 +1,12 @@
 <?php
+session_start();
 /* Load Config File */
 require_once '../resources/config.php';
 require '../vendor/autoload.php';
 require_once TIME_MOD . '/Time.php';
 require_once FACILITY_MOD . '/Operating_Hours.php';
+require_once USER_MOD . '/Account_User.php';
+
 require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
 require_once DB_MOD . '/DbStorage.php';
@@ -12,10 +15,17 @@ require_once DB_MOD . '/DbStorage.php';
 require_once APPT_MOD . '/Normal_Slot.php';
 require_once APPT_MOD . '/Special_Slot.php';
 
+
 require_once USER_MOD . '/Medical_Personnel.php';
+require_once EMAIL_MOD . '/EmailTemplate.php';
+require_once EMAIL_MOD . '/EmailVerify.php';
+
+if (isset($_SESSION['email_verified'])):
+
+    unset($_SESSION['email_verified']);
+endif;
 
 # ---------------------------------------------  BUSINESS LOGIC START --------------------------------------------- #
-
 // -- BOOK AN APPOINTMENT  (Put This Function In The Create Appointment Page)
 function book_appointment(string $patient_email, array $booking_info): bool {
 
@@ -229,16 +239,172 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
 
         endif;
         echo nl2br(PHP_EOL . "Testing Display Personnel By Facility -- HARDCODE --" . PHP_EOL);
-        $personnel_by_specialisation_arr = Medical_Personnel::retrieve_personnel_by_facility("mf001");
-        foreach ($personnel_by_specialisation_arr as $specialisation => $personnels):
-            echo "<br/><br/>" . $specialisation . "<br/>";
-            foreach ($personnels as $p):
-                echo $p->get_firstname() . ", ";
-            endforeach;
-        endforeach;
+//        $personnel_by_specialisation_arr = Medical_Personnel::retrieve_personnel_by_facility("mf001");
+//        foreach ($personnel_by_specialisation_arr as $specialisation => $personnels):
+//            echo "<br/><br/>" . $specialisation . "<br/>";
+//            foreach ($personnels as $p):
+//                echo $p->get_firstname() . ", ";
+//            endforeach;
+//        endforeach;
+
+        echo nl2br(PHP_EOL . "Testing Password Change -- HARDCODE --" . PHP_EOL);
+
+        function user_change_password(string $user_email, string $current_password, string $new_password): bool {
+            $success = Account_User::change_password($user_email, $current_password, $new_password);
+            if ($success):
+                EmailTemplate::template_passwordchanged("yanying25@outlook.com");
+                return true;
+            endif;
+            return false;
+        }
+
+        if ($_SERVER["REQUEST_METHOD"] == "POST"):
+            if (isset($_POST['changepassword'])):
+                $user_email = "yanying25@outlook.com";
+                $current_password = "Tracie@123";
+                $new_password = "Line@123";
+                $status = user_change_password($user_email, $current_password, $new_password);
+            endif;
+        endif;
         ?>
 
+        <form id="change_password" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <button type="submit" name="changepassword" class="action back btn btn-sm btn-outline-primary">Change Password</button>
+        </form>
 
+
+        <?php
+        echo nl2br(PHP_EOL . "Testing Email Verify & Change-- HARDCODE --" . PHP_EOL);
+
+        function otp_valid(Time $requestedon): bool {
+            $current_datetime = new Time();
+
+            // -- Check For Expiration Date
+            $time_diff = $current_datetime->datetime_second_diff($current_datetime, $requestedon);
+            $validity_duration = 60 * 60; # 1 hour
+            if ($time_diff < $validity_duration):
+                return true; # -- NOT EXPIRED
+            endif;
+            return false; # -- EXPIRED
+        }
+
+        // -- Checks If OTP Matches
+        function compare_otp(string $input_otp, string $db_otp): bool {
+
+            if ($input_otp === $db_otp):
+
+                return true; # -- OTP MATCHES
+            endif;
+            echo "otp false";
+            return false; # -- OTP DOES NOT MATCH
+        }
+
+        function verify_user_email(string $user_email, string $input_otp): void {
+
+            # STEP 0: INITIALISE OTP INFO
+            $email_verify = new EmailVerify($user_email);
+            $email_verify->set_verify_data();
+
+            # STEP 1: CHECK IF THE EMAIL HAS REQUESTED FOR OTP & CHECK IF THE OTP IS STILL VALID
+            if (($email_verify->has_requested()) && (otp_valid($email_verify->get_requestedon()))):
+
+                # STEP 2: COMPARE THE OTP
+                if (compare_otp($input_otp, $email_verify->get_otp())):
+                    $_SESSION['email_verified'] = true;
+                else:
+                    $_SESSION['email_verified'] = false;
+                endif;
+            endif;
+        }
+
+        function user_change_email(string $current_email, string $new_email, string $password): bool {
+            $success = Account_User::change_email($current_email, $new_email, $password);
+            if ($success):
+                EmailTemplate::template_emailchanged($current_email, $new_email);
+                return true;
+            endif;
+            return false;
+        }
+
+        if ($_SERVER["REQUEST_METHOD"] == "POST"):
+            if (isset($_POST['verifyemail'])):
+                if (isset($_SESSION['email_verified'])):
+                    if ($_SESSION['email_verified'] == true):
+                        $otp_requester = $_POST['user_email'];
+                        // Generate OTP
+                        $otp = StringUtils::generate_otp(6);
+
+                        // Update OTP In Database
+                        Account_User::update_email_otp($otp_requester, $otp);
+
+                        // Send OTP To OTP Requester
+                        EmailTemplate::template_emailotp($otp_requester, $otp);
+
+//                echo "<style>#submit_email_otp{display:inline-block;}</style>";
+                    endif;
+                endif;
+
+            endif;
+            if (isset($_POST['submitotp'])):
+                verify_user_email("lingyanying@gmail.com", $_POST['email_otp']);
+            endif;
+            if (isset($_POST['changeemail'])):
+//                $current_email = "yanying25@outlook.com";
+//                $new_email = "lingyanying@gmail.com";
+                $new_email = "yanying25@outlook.com";
+                $current_email = "lingyanying@gmail.com";
+                $password = "Line@123";
+                $status = user_change_email($current_email, $new_email, $password);
+            endif;
+        endif;
+        ?>
+        <form id="verify_email" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <input type="text" name="user_email" placeholder="New Email" />
+            <button type="submit" name="verifyemail" class="action back btn btn-sm btn-outline-primary">Verify Email</button>
+        </form>
+        <form id="submit_email_otp" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" >
+            <input type="text" name="email_otp" placeholder="Email OTP" />
+            <button type="submit" name="submitotp" class="action back btn btn-sm btn-outline-primary">Submit OTP</button>
+        </form>
+        <?php
+        if (isset($_SESSION['email_verified'])):
+            if ($_SESSION['email_verified'] == true):
+                echo "Email Verified";
+            endif;
+        else:
+            echo "Email verified not set";
+        endif;
+        ?>
+        <form id="change_email" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" >
+            <button type="submit" name="changeemail" class="action back btn btn-sm btn-outline-primary">Change Email</button>
+        </form>
+        <?php
+        echo nl2br(PHP_EOL . "Testing BASIC DETAILS CHANGE-- HARDCODE --" . PHP_EOL);
+
+        function user_change_basic_details(string $email, string $contact, string $address): bool {
+            $success = Account_User::change_basic_details($email, $contact, $address);
+            if ($success):
+                EmailTemplate::template_basicinfochanged($email);
+                return true;
+            endif;
+            return false;
+        }
+
+        if ($_SERVER["REQUEST_METHOD"] == "POST"):
+            if (isset($_POST['changebasicdetails'])):
+                $email = "yanying25@outlook.com";
+                $contact = "83452990";
+
+//                $contact = "";
+//                $address = "345 Bubble Town";
+                $address = "";
+
+                $status = user_change_basic_details($email, $contact, $address);
+            endif;
+        endif;
+        ?>        <form id="change_basic_details" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <button type="submit" name="changebasicdetails" class="action back btn btn-sm btn-outline-primary">Change Basic Details</button>
+        </form>
 
     </body>
 </html>

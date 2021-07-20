@@ -303,7 +303,7 @@ class DbQuery {
         return True;
     }
 
-    private function update_values(DocumentReference $doc_ref, array $changedArr): void {
+    public function update_values(DocumentReference $doc_ref, array $changedArr): void {
 
         # Modify The Document Via `DocumentReference`
         foreach ($changedArr as $field => $value) :
