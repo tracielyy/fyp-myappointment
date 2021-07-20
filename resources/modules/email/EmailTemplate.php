@@ -97,7 +97,29 @@ class EmailTemplate {
         Email::sendEmail($to, $subject, $message);
     }
 
-    public static function template_emailchanged(string $to, string $new_email) {
+    // -- OTP IS SENT TO THE USER EMAIL TO VERIFY THE LEGITIMACY OF THE EMAIL
+    public static function template_emailotp(string $to, string $otp) {
+        // -- Email Subject
+        $subject = "FYP-21-S2-24: Email OTP Request";
+
+        // -- Miscellaneous
+        $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
+        $timestamp = new Time();
+        $date = Time::date_format_change($timestamp->get_date());
+        $time_12hour = Time::to_12hours($timestamp->get_time(), false);
+
+        // -- Message
+        $message = "<span style='color:black;'>Dear Value User, " . self::LINEBREAK;
+        $message .= "You have requested for a One-time Pin from MyAppointment on {$date} at {$time_12hour} (Singapore Standard Time)." . self::LINEBREAK;
+        $message .= "Your OTP is: <b>{$otp}</b>" . self::LINEBREAK;
+        $message .= "If you are aware of this change, please disregard this email. " . self::LINEBREAK;
+        $message .= "If it wasn't you who changed it, please reply to this email as someone else may have access to your account. " . self::LINEBREAK;
+        $message .= "{$sign_off}</span>";
+
+        Email::sendEmail($to, $subject, $message);
+    }
+
+    public static function template_emailchanged(string $to, string $new_email): void {
 
         // -- Check User Type &  Set Recipient
         $recipient_usertype = Account_User::retrieve_user_type($new_email);
@@ -130,7 +152,7 @@ class EmailTemplate {
         Email::sendEmail($to, $subject, $message);
     }
 
-    public static function template_basicinfochanged(string $to) {
+    public static function template_basicinfochanged(string $to): void {
 
         // -- Check User Type &  Set Recipient
         $recipient_usertype = Account_User::retrieve_user_type($to);

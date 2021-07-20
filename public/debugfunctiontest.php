@@ -1,4 +1,5 @@
 <?php
+session_start();
 /* Load Config File */
 require_once '../resources/config.php';
 require '../vendor/autoload.php';
@@ -17,10 +18,14 @@ require_once APPT_MOD . '/Special_Slot.php';
 
 require_once USER_MOD . '/Medical_Personnel.php';
 require_once EMAIL_MOD . '/EmailTemplate.php';
+require_once EMAIL_MOD . '/EmailVerify.php';
 
+if (isset($_SESSION['email_verified'])):
+
+    unset($_SESSION['email_verified']);
+endif;
 
 # ---------------------------------------------  BUSINESS LOGIC START --------------------------------------------- #
-
 // -- BOOK AN APPOINTMENT  (Put This Function In The Create Appointment Page)
 function book_appointment(string $patient_email, array $booking_info): bool {
 
@@ -269,7 +274,48 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
 
 
         <?php
-        echo nl2br(PHP_EOL . "Testing Email Change-- HARDCODE --" . PHP_EOL);
+        echo nl2br(PHP_EOL . "Testing Email Verify & Change-- HARDCODE --" . PHP_EOL);
+
+        function otp_valid(Time $requestedon): bool {
+            $current_datetime = new Time();
+
+            // -- Check For Expiration Date
+            $time_diff = $current_datetime->datetime_second_diff($current_datetime, $requestedon);
+            $validity_duration = 60 * 60; # 1 hour
+            if ($time_diff < $validity_duration):
+                return true; # -- NOT EXPIRED
+            endif;
+            return false; # -- EXPIRED
+        }
+
+        // -- Checks If OTP Matches
+        function compare_otp(string $input_otp, string $db_otp): bool {
+
+            if ($input_otp === $db_otp):
+
+                return true; # -- OTP MATCHES
+            endif;
+            echo "otp false";
+            return false; # -- OTP DOES NOT MATCH
+        }
+
+        function verify_user_email(string $user_email, string $input_otp): void {
+
+            # STEP 0: INITIALISE OTP INFO
+            $email_verify = new EmailVerify($user_email);
+            $email_verify->set_verify_data();
+
+            # STEP 1: CHECK IF THE EMAIL HAS REQUESTED FOR OTP & CHECK IF THE OTP IS STILL VALID
+            if (($email_verify->has_requested()) && (otp_valid($email_verify->get_requestedon()))):
+
+                # STEP 2: COMPARE THE OTP
+                if (compare_otp($input_otp, $email_verify->get_otp())):
+                    $_SESSION['email_verified'] = true;
+                else:
+                    $_SESSION['email_verified'] = false;
+                endif;
+            endif;
+        }
 
         function user_change_email(string $current_email, string $new_email, string $password): bool {
             $success = Account_User::change_email($current_email, $new_email, $password);
@@ -281,6 +327,27 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
         }
 
         if ($_SERVER["REQUEST_METHOD"] == "POST"):
+            if (isset($_POST['verifyemail'])):
+                if (isset($_SESSION['email_verified'])):
+                    if ($_SESSION['email_verified'] == true):
+                        $otp_requester = $_POST['user_email'];
+                        // Generate OTP
+                        $otp = StringUtils::generate_otp(6);
+
+                        // Update OTP In Database
+                        Account_User::update_email_otp($otp_requester, $otp);
+
+                        // Send OTP To OTP Requester
+                        EmailTemplate::template_emailotp($otp_requester, $otp);
+
+//                echo "<style>#submit_email_otp{display:inline-block;}</style>";
+                    endif;
+                endif;
+
+            endif;
+            if (isset($_POST['submitotp'])):
+                verify_user_email("lingyanying@gmail.com", $_POST['email_otp']);
+            endif;
             if (isset($_POST['changeemail'])):
 //                $current_email = "yanying25@outlook.com";
 //                $new_email = "lingyanying@gmail.com";
@@ -291,7 +358,24 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
             endif;
         endif;
         ?>
-        <form id="change_email" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+        <form id="verify_email" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <input type="text" name="user_email" placeholder="New Email" />
+            <button type="submit" name="verifyemail" class="action back btn btn-sm btn-outline-primary">Verify Email</button>
+        </form>
+        <form id="submit_email_otp" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" >
+            <input type="text" name="email_otp" placeholder="Email OTP" />
+            <button type="submit" name="submitotp" class="action back btn btn-sm btn-outline-primary">Submit OTP</button>
+        </form>
+        <?php
+        if (isset($_SESSION['email_verified'])):
+            if ($_SESSION['email_verified'] == true):
+                echo "Email Verified";
+            endif;
+        else:
+            echo "Email verified not set";
+        endif;
+        ?>
+        <form id="change_email" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" >
             <button type="submit" name="changeemail" class="action back btn btn-sm btn-outline-primary">Change Email</button>
         </form>
         <?php
@@ -309,7 +393,7 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
         if ($_SERVER["REQUEST_METHOD"] == "POST"):
             if (isset($_POST['changebasicdetails'])):
                 $email = "yanying25@outlook.com";
-                            $contact = "83452990";
+                $contact = "83452990";
 
 //                $contact = "";
 //                $address = "345 Bubble Town";

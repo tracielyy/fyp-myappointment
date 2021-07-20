@@ -391,6 +391,21 @@ class Account_User {
         return false;
     }
 
+
+
+   
+
+    public static function update_email_otp(string $user_email, string $otp): void {
+
+        # Modify The Patient Profile Based On The Given Array
+        $db = new DbQuery();
+        $email_verify_path = Database::EMAIL_VERIFY;
+
+        $email_verify_arr = ArrayCreation::email_verify_array($otp);
+
+        $db->get_db()->collection($email_verify_path)->document($user_email)->set($email_verify_arr);
+    }
+
     // -- Verify Account (Email Verification) --//
     public static function email_verified(string $email): bool {
 
