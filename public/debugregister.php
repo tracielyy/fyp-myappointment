@@ -8,7 +8,6 @@ require_once USER_MOD . '/Patient.php';
 require_once UTIL_MOD . '/Regex.php';
 require_once UTIL_MOD . '/StringUtils.php';
 
-
 // Used to store correct data
 $registerArr = array(
     'firstname' => '',
