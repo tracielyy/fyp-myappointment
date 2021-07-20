@@ -202,149 +202,179 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "<div style='color:red;'>Register Fail!</div>";
     }
 }
-?><!DOCTYPE html>
+?>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Register</title>
-        <!-- Styling -->
-        <link rel="stylesheet" href="./css/loginRegister.css">
-        <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
-    </head>
-    <body>
-        <!-- Navigation -->
-        <?php require TEMPLATES_PATH . '/navbar.php' ?>
-        <!-- Registration -->
-        <div class="row m-4">
-            <div class="container center col-md-10 col-lg-6">
-                <div class="col-auto">
-                    <div class="shadow card p-2 rounded1">
-                        <div class="card-body m-2">
-                            <h1 class="card-title px-5 py-3">Register</h1>
-                            <div class="px-5">
-                                <!-- Form -->
-                                <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-                                    <div class="row">
-                                        <div class="col d-none d-lg-block">First Name</div>
-                                        <div class="col d-none d-lg-block">Last Name</div>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register</title>
+    <!-- Styling -->
+    <link rel="stylesheet" href="./css/loginRegister.css">
+    <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <?php require TEMPLATES_PATH . '/navbar.php' ?>
+    <!-- Registration -->
+    <div class="row m-4">
+        <div class="container center col-md-10 col-lg-6">
+            <div class="col-auto">
+                <div class="shadow card p-2 rounded1">
+                    <div class="card-body m-2">
+                        <h1 class="card-title px-5 py-3">Register</h1>
+                        <div class="px-5">
+                            <!-- Form -->
+                            <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                                <div class="row">
+                                    <div class="col d-none d-lg-block">First Name</div>
+                                    <div class="col d-none d-lg-block">Last Name</div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col">
+                                        <!-- First Name -->
+                                        <input id="firstname" class="form-control" type="text" name="firstname"
+                                            placeholder="First Name" value="<?php echo $registerArr['firstname']; ?>" />
                                     </div>
-                                    <div class="row pb-3">
-                                        <div class="col">
-                                            <!-- First Name -->
-                                            <input id="firstname" class="form-control" type="text" name="firstname"
-                                                   placeholder="First Name"
-                                                   value="<?php echo $registerArr['firstname']; ?>" />
-                                        </div>
-                                        <div class="col">
-                                            <!-- Last Name -->
-                                            <input id="lastname" class="form-control" type="text" name="lastname"
-                                                   placeholder="Last Name"
-                                                   value="<?php echo $registerArr['lastname']; ?>" />
-                                        </div>
+                                    <div class="col">
+                                        <!-- Last Name -->
+                                        <input id="lastname" class="form-control" type="text" name="lastname"
+                                            placeholder="Last Name" value="<?php echo $registerArr['lastname']; ?>" />
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col d-none d-lg-block">Date of Birth</div>
+                                    <div class="col d-none d-lg-block">Select Gender:</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <!-- Date Of Birth -->
+                                        <input id="dob" class="form-control" type="date" name="dob"
+                                            value="<?php echo htmlspecialchars($registerArr['dob']); ?>" /><br />
                                     </div>
 
-                                    <div class="row">
-                                        <div class="col d-none d-lg-block">Date of Birth</div>
-                                        <div class="col d-none d-lg-block">Select Gender:</div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col">
-                                            <!-- Date Of Birth -->
-                                            <input id="dob" class="form-control" type="date" name="dob"
-                                                   value="<?php echo htmlspecialchars($registerArr['dob']); ?>" /><br />
-                                        </div>
-
-                                        <div class="col py-2">
-                                            <!-- Gender -->
-                                            <input class="form-check-input" type="radio" id="Female" name="gender" value="F" <?php
+                                    <div class="col py-2">
+                                        <!-- Gender -->
+                                        <input class="form-check-input" type="radio" id="Female" name="gender" value="F" <?php
                                             if ($registerArr['gender'] == "F") {
                                                 echo "checked";
                                             }
                                             ?> /><label for="Female" class="btnLabel">Female</label>
 
-                                            <input class="form-check-input" type="radio" name="gender" id="Male" value="M" <?php
+                                        <input class="form-check-input" type="radio" name="gender" id="Male" value="M" <?php
                                             if ($registerArr['gender'] == "M") {
                                                 echo "checked";
                                             }
                                             ?> />
-                                            <label for="Male">Male</label>
-                                            </select><br />
+                                        <label for="Male">Male</label>
+                                        </select><br />
 
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col d-none d-lg-block">Email</div>
+                                    <div class="col d-none d-lg-block">Contact Number</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <!-- Email -->
+                                        <div class="input-group">
+                                            <input id="email" type="text" class="form-control" placeholder="Email"
+                                                aria-label="Email" aria-describedby="button-addon2"
+                                                value="<?php echo htmlspecialchars($registerArr['email']); ?>">
+                                            <button class="btn btn-outline-secondary" type="button"
+                                                id="vrfyEmailBttn">Verify</button>
                                         </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col d-none d-lg-block">Email</div>
-                                        <div class="col d-none d-lg-block">Contact Number</div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col">
-                                            <!-- Email -->
-                                            <input id="email" class="form-control" type="text" name="email"
-                                                   placeholder="Email"
-                                                   value="<?php echo htmlspecialchars($registerArr['email']); ?>" /><br />
+                                        
+                                        <!-- OTP -->
+                                        <div class="input-group my-1" id="onetimepass">
+                                            <input id="otp" type="text" class="form-control" placeholder="Enter OTP"
+                                                aria-label="otp" aria-describedby="button-addon2"
+                                                value="">
+                                            <button class="btn btn-outline-secondary" type="button"
+                                                id="submitOTP">Submit OTP</button>
                                         </div>
-                                        <div class="col">
-                                            <!-- Contact Number -->
-                                            <input id="contactnumber" class="form-control" type="text" name="contactnumber"
-                                                   placeholder="Contact Number"
-                                                   value="<?php echo htmlspecialchars($registerArr['contactnumber']); ?>" /><br />
-                                        </div>
+                                       
+                                        
                                     </div>
+                                    <div class="col">
+                                        <!-- Contact Number -->
+                                        <input id="contactnumber" class="form-control" type="text" name="contactnumber"
+                                            placeholder="Contact Number"
+                                            value="<?php echo htmlspecialchars($registerArr['contactnumber']); ?>" /><br />
+                                    </div>
+                                </div>
 
-                                    <div class="row">
-                                        <div class="col d-none d-lg-block">Address</div>
-                                        <div class="col"></div>
-                                    </div>
+                                <div class="row">
+                                    <div class="col d-none d-lg-block">Address</div>
+                                    <div class="col">NRIC</div>
+                                </div>
 
-                                    <div class="row">
-                                        <div class="col">
-                                            <!-- Address -->
-                                            <input id="address" class="form-control" type="text" name="address"
-                                                   placeholder="Address"
-                                                   value="<?php echo htmlspecialchars($registerArr['address']); ?>" /><br />
-                                        </div>
-                                        <div class="col"></div>
+                                <div class="row">
+                                    <div class="col">
+                                        <!-- Address -->
+                                        <input id="address" class="form-control" type="text" name="address"
+                                            placeholder="Address"
+                                            value="<?php echo htmlspecialchars($registerArr['address']); ?>" /><br />
                                     </div>
+                                    <div class="col">
+                                        <!-- NRIC -->
+                                        <input id="nric" class="form-control" type="text" name="nric" placeholder="NRIC"
+                                            value="<?php //echo htmlspecialchars($registerArr['address']); ?>" /><br />
+                                    </div>
+                                </div>
 
-                                    <div class="row">
-                                        <div class="col d-none d-lg-block">Password</div>
-                                        <div class="col d-none d-lg-block">Confirm Password</div>
-                                    </div>
+                                <div class="row">
+                                    <div class="col d-none d-lg-block">Password</div>
+                                    <div class="col d-none d-lg-block">Confirm Password</div>
+                                </div>
 
-                                    <div class="row">
-                                        <div class="col">
-                                            <!-- Password -->
-                                            <input id="password" class="form-control" type="password" name="password"
-                                                   placeholder="Password"
-                                                   value="<?php echo htmlspecialchars($registerArr['password']); ?>" /><br />
-                                        </div>
-                                        <div class="col">
-                                            <!-- Confirmation Password -->
-                                            <input id="confirmpassword" class="form-control" type="password"
-                                                   name="confirmpassword" placeholder="Confirm Password"
-                                                   value="<?php echo htmlspecialchars($registerArr['confirmpassword']); ?>" /><br />
-                                        </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <!-- Password -->
+                                        <input id="password" class="form-control" type="password" name="password"
+                                            placeholder="Password"
+                                            value="<?php echo htmlspecialchars($registerArr['password']); ?>" /><br />
                                     </div>
+                                    <div class="col">
+                                        <!-- Confirmation Password -->
+                                        <input id="confirmpassword" class="form-control" type="password"
+                                            name="confirmpassword" placeholder="Confirm Password"
+                                            value="<?php echo htmlspecialchars($registerArr['confirmpassword']); ?>" /><br />
+                                    </div>
+                                </div>
 
-                                    <div class="row">
-                                        <div class="col d-none d-lg-block">
-                                        </div>
-                                        <!-- Registration Submission -->
-                                        <div class="col py-3"><button class="btn btn-primary" type="submit"
-                                                                      style="float: right" ;>Register</button><br /></div>
+                                <div class="row">
+                                    <div class="col d-none d-lg-block">
                                     </div>
-                                </form>
-                            </div>
+                                    <!-- Registration Submission -->
+                                    <div class="col py-3"><button class="btn btn-primary" type="submit"
+                                            style="float: right" ;>Register</button><br /></div>
+                                </div>
+                            </form>
                         </div>
-                        <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                     </div>
+                    <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                 </div>
             </div>
         </div>
-    </body>
+    </div>
+
+<script>
+    $('#onetimepass').children().hide();
+     $("#vrfyEmailBttn").on('click',function clickedVerify()
+  {
+    $('#onetimepass').children().show();
+  });
+    </script>
+</body>
+
 </html>
