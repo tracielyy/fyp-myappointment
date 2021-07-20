@@ -301,7 +301,7 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
             return false; # -- OTP DOES NOT MATCH
         }
 
-        function verify_user_email(string $user_email, string $input_otp): void {
+        function verify_user_email(string $user_email, string $input_otp): bool {
 
             # STEP 0: INITIALISE OTP INFO
             $email_verify = new EmailVerify($user_email);
@@ -312,11 +312,12 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
 
                 # STEP 2: COMPARE THE OTP
                 if (compare_otp($input_otp, $email_verify->get_otp())):
-                    $_SESSION['email_verified'] = true;
+                    return true;
                 else:
-                    $_SESSION['email_verified'] = false;
+                    return false;
                 endif;
             endif;
+            return false;
         }
 
         function user_change_email(string $current_email, string $new_email, string $password): bool {
@@ -417,7 +418,7 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
                 if ($validate_nric->validate_nric()):
                     echo "Valid";
                 else:
-                   echo "Invalid";
+                    echo "Invalid";
                 endif;
             endif;
         endif;

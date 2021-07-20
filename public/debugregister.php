@@ -7,9 +7,15 @@ require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Patient.php';
 require_once UTIL_MOD . '/Regex.php';
 require_once UTIL_MOD . '/StringUtils.php';
+require_once EMAIL_MOD . '/EmailTemplate.php';
+require_once EMAIL_MOD . '/EmailVerify.php';
+
+require_once SECURE_MOD . '/ValidateIC.php';
+
 
 // Used to store correct data
 $registerArr = array(
+    'nric' => '',
     'firstname' => '',
     'lastname' => '',
     'contactnumber' => '',
@@ -28,7 +34,8 @@ $patient_register = array(
         'contactnumber' => '',
         'address' => '',
         'dob' => '',
-        'gender' => ''
+        'gender' => '',
+        'nric' => ''
     ),
     'credentials' => array('email' => '', 'password' => '')
 );
@@ -48,161 +55,177 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // 
+    if (isset($_POST['ajax_emailverify'])):
+        $otp_requester = $_POST['email'];
+        // Generate OTP
+        $otp = StringUtils::generate_otp(6);
+
+        // Update OTP In Database
+        Account_User::update_email_otp($otp_requester, $otp);
+
+        // Send OTP To OTP Requester
+        EmailTemplate::template_emailotp($otp_requester, $otp);
+    endif;
 
 
 
-    /* ------------ Start Validation ------------ */
-
-    // -- First Name
-    if (empty($registerArr['firstname'])) {
-        $err_firstname = "Field Cannot Be Empty";
-        echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
-    } else if (!Regex::validate_name($registerArr['firstname'])) {
-        $err_firstname = "Invalid";
-        echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
-    } else {
-        $validArr['firstname'] = True; // Pass Validation
-    }
-
-    // -- Last Name
-    if (empty($registerArr['lastname'])) {
-        $err_lastname = "Field Cannot Be Empty";
-    } else if (!Regex::validate_name($registerArr['lastname'])) {
-        $err_lastname = "Invalid";
-    } else {
-        $validArr['lastname'] = True; // Pass Validation
-    }
-
-    // -- Contact Number Validation
-    if (empty($registerArr['contactnumber'])) {
-        $err_contactnumber = "Field Cannot Be Empty";
-    } else if (!Regex::validate_phone($registerArr['contactnumber'])) {
-        $err_contactnumber = "Invalid";
-    } else {
-        $validArr['contactnumber'] = True; // Pass Validation
-    }
-
-    // -- Gender Validation (Just Make Sure Either Male Or Female Is 'Checked')
-    if (empty($registerArr['gender'])) {
-        // Store Some Error Message
-        $err_gender = "Not Selected";
-    } else if (!($registerArr['gender'] == 'F' || $registerArr['gender'] == 'M')) {
-        // Store Some Error Message
-        $err_gender = "Invalid";
-    } else {
-        $validArr['gender'] = True; // Pass Validation
-    }
-
-    // -- Date Of Birth (DOB) Validation
-    if (empty($registerArr['dob'])) {
-        $err_dob = "Field Cannot Be Empty";
-    } else {
-        $validArr['dob'] = True; // Pass Validation
-    }
-    /*
-      -- DOB (Data Accuracy) --
-      > Check Leap Year For 29th Feb
-      > Check Months (01-12)
-     */
 
 
+    if (isset($_POST['register_patient'])):
+        /* ------------ Start Validation ------------ */
 
-    // -- Address Validation (Unsure Of What Further Validation To Be Done)
-    if (empty($registerArr['address'])) {
-        $err_address = "Field Cannot Be Empty";
-    } else {
-        $validArr['address'] = True; // Pass Validation
-    }
-
-
-    // -- Email Validation
-    if (empty($registerArr['email'])) {
-        // Store Some Error Message
-        $err_email = "Field Cannot Be Empty";
-    } else if (!Regex::validate_email($registerArr['email'])) {
-        // Store Some Error Message
-        $err_email = "Invalid";
-    } else {
-        $registerArr['email'] = StringUtils::clean_input($registerArr['email']);
-        $validArr['email'] = True; // Pass Validation
-    }
-
-    // -- Password Validation
-    if (empty($registerArr['password'])) {
-        // Store Some Error Message
-        $err_password = "Field Cannot Be Empty";
-    } else if (!Regex::validate_password($registerArr['password'])) {
-        // Store Some Error Message
-        $err_password = "Invalid";
-    } else {
-        $validArr['password'] = True; // Pass Validation
-    }
-
-    // -- Confirm Password Validation (Check if it is the same as 'Password')
-    if (empty($registerArr['confirmpassword'])) {
-        // Store Some Error Message
-        $err_confirmpassword = "Field Cannot Be Empty";
-    } else if ($registerArr['confirmpassword'] !== $registerArr['password']) {
-        // Store Some Error Message
-        $err_confirmpassword = "Password Does Not Match";
-    } else {
-        $validArr['confirmpassword'] = True; // Pass Validation
-    }
-
-
-    /* ------------ End Validation ------------ */
-
-    // If Valid User Information (After Validation)
-    if (!in_array(False, $validArr)) {
-        // > Check If User Already Exist (Email & Contact Number)
-        $exist = Account_User::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
-        if (!$exist) {
-
-            # Change The Date Back To Database Default
-            $registerArr['dob'] = Time::date_format_default($registerArr['dob']);
-
-            /* Load To Patient Registration Array */
-            foreach ($registerArr as $key => $value) {
-
-                # Loading Of Basic Profile Information
-                if (isset($patient_register['profile'][$key])) {
-                    $patient_register['profile'][$key] = htmlspecialchars($value);
-                } else if (isset($patient_register['credentials'][$key])) {
-                    $patient_register['credentials'][$key] = htmlspecialchars($value);
-                } else if (isset($patient_register['profile']['name'][$key])) {
-                    $patient_register['profile']['name'][$key] = htmlspecialchars($value);
-                }
-            }
-
-
-            // > Salt Generation (?)
-            // > Need To Encrypt The Password Then Store In Database
-            Patient::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
-            // Reset Information
-            $registerArr = array(
-                'firstname' => '',
-                'lastname' => '',
-                'contactnumber' => '',
-                'address' => '',
-                'dob' => '',
-                'gender' => '',
-                'email' => '',
-                'password' => '',
-                'confirmpassword' => ''
-            );
-            echo "<br/> Success Registration <br/>";
-            // -- Need To Send A Email To Ask Patient To Verify Email -- //
+        // -- First Name
+        if (empty($registerArr['firstname'])) {
+            $err_firstname = "Field Cannot Be Empty";
+            echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
+        } else if (!Regex::validate_name($registerArr['firstname'])) {
+            $err_firstname = "Invalid";
+            echo "<style type='text/css'> #firstname{border:1.5px solid red;}</style>";
         } else {
-            echo "User already exist";
+            $validArr['firstname'] = True; // Pass Validation
         }
-    } else {
-        // Any Actions Or Displays For Errors
-        echo "<div style='color:red;'>Register Fail!</div>";
-    }
+
+        // -- Last Name
+        if (empty($registerArr['lastname'])) {
+            $err_lastname = "Field Cannot Be Empty";
+        } else if (!Regex::validate_name($registerArr['lastname'])) {
+            $err_lastname = "Invalid";
+        } else {
+            $validArr['lastname'] = True; // Pass Validation
+        }
+
+        // -- Contact Number Validation
+        if (empty($registerArr['contactnumber'])) {
+            $err_contactnumber = "Field Cannot Be Empty";
+        } else if (!Regex::validate_phone($registerArr['contactnumber'])) {
+            $err_contactnumber = "Invalid";
+        } else {
+            $validArr['contactnumber'] = True; // Pass Validation
+        }
+
+        // -- Gender Validation (Just Make Sure Either Male Or Female Is 'Checked')
+        if (empty($registerArr['gender'])) {
+            // Store Some Error Message
+            $err_gender = "Not Selected";
+        } else if (!($registerArr['gender'] == 'F' || $registerArr['gender'] == 'M')) {
+            // Store Some Error Message
+            $err_gender = "Invalid";
+        } else {
+            $validArr['gender'] = True; // Pass Validation
+        }
+
+        // -- Date Of Birth (DOB) Validation
+        if (empty($registerArr['dob'])) {
+            $err_dob = "Field Cannot Be Empty";
+        } else {
+            $validArr['dob'] = True; // Pass Validation
+        }
+        /*
+          -- DOB (Data Accuracy) --
+          > Check Leap Year For 29th Feb
+          > Check Months (01-12)
+         */
+
+
+
+        // -- Address Validation (Unsure Of What Further Validation To Be Done)
+        if (empty($registerArr['address'])) {
+            $err_address = "Field Cannot Be Empty";
+        } else {
+            $validArr['address'] = True; // Pass Validation
+        }
+
+
+        // -- Email Validation
+        if (empty($registerArr['email'])) {
+            // Store Some Error Message
+            $err_email = "Field Cannot Be Empty";
+        } else if (!Regex::validate_email($registerArr['email'])) {
+            // Store Some Error Message
+            $err_email = "Invalid";
+        } else {
+            $registerArr['email'] = StringUtils::clean_input($registerArr['email']);
+            $validArr['email'] = True; // Pass Validation
+        }
+
+        // -- Password Validation
+        if (empty($registerArr['password'])) {
+            // Store Some Error Message
+            $err_password = "Field Cannot Be Empty";
+        } else if (!Regex::validate_password($registerArr['password'])) {
+            // Store Some Error Message
+            $err_password = "Invalid";
+        } else {
+            $validArr['password'] = True; // Pass Validation
+        }
+
+        // -- Confirm Password Validation (Check if it is the same as 'Password')
+        if (empty($registerArr['confirmpassword'])) {
+            // Store Some Error Message
+            $err_confirmpassword = "Field Cannot Be Empty";
+        } else if ($registerArr['confirmpassword'] !== $registerArr['password']) {
+            // Store Some Error Message
+            $err_confirmpassword = "Password Does Not Match";
+        } else {
+            $validArr['confirmpassword'] = True; // Pass Validation
+        }
+
+
+        /* ------------ End Validation ------------ */
+
+        // If Valid User Information (After Validation)
+        if (!in_array(False, $validArr)) {
+            // > Check If User Already Exist (Email & Contact Number)
+            $exist = Account_User::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
+            if (!$exist) {
+
+                # Change The Date Back To Database Default
+                $registerArr['dob'] = Time::date_format_default($registerArr['dob']);
+
+                /* Load To Patient Registration Array */
+                foreach ($registerArr as $key => $value) {
+
+                    # Loading Of Basic Profile Information
+                    if (isset($patient_register['profile'][$key])) {
+                        $patient_register['profile'][$key] = htmlspecialchars($value);
+                    } else if (isset($patient_register['credentials'][$key])) {
+                        $patient_register['credentials'][$key] = htmlspecialchars($value);
+                    } else if (isset($patient_register['profile']['name'][$key])) {
+                        $patient_register['profile']['name'][$key] = htmlspecialchars($value);
+                    }
+                }
+
+
+                // > Salt Generation (?)
+                // > Need To Encrypt The Password Then Store In Database
+                Patient::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
+                // Reset Information
+                $registerArr = array(
+                    'firstname' => '',
+                    'lastname' => '',
+                    'contactnumber' => '',
+                    'address' => '',
+                    'dob' => '',
+                    'gender' => '',
+                    'email' => '',
+                    'password' => '',
+                    'confirmpassword' => ''
+                );
+                echo "<br/> Success Registration <br/>";
+                // -- Need To Send A Email To Ask Patient To Verify Email -- //
+            } else {
+                echo "User already exist";
+            }
+        } else {
+            // Any Actions Or Displays For Errors
+            echo "<div style='color:red;'>Register Fail!</div>";
+        }
+    endif; # END REGISTER PATIENT
 }
-?><!DOCTYPE html>
+?>
+<!DOCTYPE html>
 <html lang="en">
+
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -211,7 +234,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <!-- Styling -->
         <link rel="stylesheet" href="./css/loginRegister.css">
         <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     </head>
+
     <body>
         <!-- Navigation -->
         <?php require TEMPLATES_PATH . '/navbar.php' ?>
@@ -233,14 +258,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <div class="col">
                                             <!-- First Name -->
                                             <input id="firstname" class="form-control" type="text" name="firstname"
-                                                   placeholder="First Name"
-                                                   value="<?php echo $registerArr['firstname']; ?>" />
+                                                   placeholder="First Name" value="<?php echo $registerArr['firstname']; ?>" />
                                         </div>
                                         <div class="col">
                                             <!-- Last Name -->
                                             <input id="lastname" class="form-control" type="text" name="lastname"
-                                                   placeholder="Last Name"
-                                                   value="<?php echo $registerArr['lastname']; ?>" />
+                                                   placeholder="Last Name" value="<?php echo $registerArr['lastname']; ?>" />
                                         </div>
                                     </div>
 
@@ -283,9 +306,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <div class="row">
                                         <div class="col">
                                             <!-- Email -->
-                                            <input id="email" class="form-control" type="text" name="email"
-                                                   placeholder="Email"
-                                                   value="<?php echo htmlspecialchars($registerArr['email']); ?>" /><br />
+                                            <div class="input-group" id="email_container">
+                                                <input id="email" type="text" class="form-control" placeholder="Email"
+                                                       aria-label="Email" aria-describedby="button-addon2" name="email"
+                                                       value="<?php echo htmlspecialchars($registerArr['email']); ?>" autocomplete="off">
+                                                <button class="btn btn-outline-secondary" type="button"
+                                                        id="vrfyEmailBttn">Verify</button>
+                                            </div>
+
+                                            <!-- OTP -->
+                                            <div class="input-group my-1" id="onetimepass">
+                                                <input id="otp" type="text" class="form-control" placeholder="Enter OTP"
+                                                       aria-label="otp" aria-describedby="button-addon2"
+                                                       value="">
+                                                <button class="btn btn-outline-secondary" type="button"
+                                                        id="submitOTP">Submit OTP</button>
+                                            </div>
+
+
                                         </div>
                                         <div class="col">
                                             <!-- Contact Number -->
@@ -297,7 +335,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                                     <div class="row">
                                         <div class="col d-none d-lg-block">Address</div>
-                                        <div class="col"></div>
+                                        <div class="col">NRIC</div>
                                     </div>
 
                                     <div class="row">
@@ -307,7 +345,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                    placeholder="Address"
                                                    value="<?php echo htmlspecialchars($registerArr['address']); ?>" /><br />
                                         </div>
-                                        <div class="col"></div>
+                                        <div class="col">
+                                            <!-- NRIC -->
+                                            <input id="nric" class="form-control" type="text" name="nric" placeholder="NRIC"
+                                                   value="<?php //echo htmlspecialchars($registerArr['address']);                              ?>" /><br />
+                                        </div>
                                     </div>
 
                                     <div class="row">
@@ -334,7 +376,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <div class="col d-none d-lg-block">
                                         </div>
                                         <!-- Registration Submission -->
-                                        <div class="col py-3"><button class="btn btn-primary" type="submit"
+                                        <div class="col py-3"><button class="btn btn-primary" type="submit" name="register_patient"
                                                                       style="float: right" ;>Register</button><br /></div>
                                     </div>
                                 </form>
@@ -344,6 +386,63 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                 </div>
             </div>
-        </div>
+        </div> 
+
+        <script>
+            $('#onetimepass').children().hide();
+            $("#vrfyEmailBttn").on('click', function clickedVerify()
+            {
+                $('#onetimepass').children().show();
+                // -- EMAIL VERIFY TRIGGER
+                $.ajax({
+                    type: "POST",
+                    url: "<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>",
+                    data: {
+                        ajax_emailverify: true,
+                        email: $('#email').val()
+                    },
+                    success: function () {
+                        console.log("Email Sent");
+                    },
+                    error: function () {
+                        console.log("Email Not Sent");
+                    }
+                });
+
+            });
+
+
+            $("#submitOTP").on('click', function clickedSubmitOTP()
+            {
+                // -- EMAIL VERIFY TRIGGER
+                $.ajax({
+                    type: "POST",
+                    url: "otpvalidate.php",
+                    data: {
+                        ajax_otp: true,
+                        email: $('#email').val(),
+                        otp: $('#otp').val()
+                    },
+                    success: function (msg) {
+                        console.log("Email Validate");
+                        console.log(msg);
+                        console.log(JSON.stringify(msg.replace(/(\r\n|\n|\r)/gm, "")));
+                        if (msg.replace(/(\r\n|\n|\r)/gm, "") === 'true') {
+                            $("#vrfyEmailBttn").remove();
+
+                            $("#email").addClass("is-valid");
+                            $('#onetimepass').remove();
+                            console.log('tick');
+                        }
+                    },
+                    error: function () {
+                        console.log("Email Validation Error");
+                    }
+                });
+
+            });
+
+        </script>
     </body>
+
 </html>
