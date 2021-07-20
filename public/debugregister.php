@@ -2,6 +2,7 @@
 session_start();
 /* Load Config File */
 require_once '../resources/config.php';
+require '../vendor/autoload.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Patient.php';
 require_once UTIL_MOD . '/Regex.php';
