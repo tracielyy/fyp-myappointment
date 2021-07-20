@@ -32,6 +32,7 @@ require_once USER_MOD . '/Account_User.php';
     <title>Document</title>
     <!-- font awesome cdn -->
     <script src="https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 </head>
 
 <body onload="openTab(event, 'Account')">
@@ -91,9 +92,35 @@ if (User_Type::check_user_type(User_Type::PATIENT, $user_type)):
             <div class="container chart-container mt-3">
                 <h3 class="text-center mb-4">Account</h3>
 
-                <form class="form-inline">
-                <input type="text" class="form-control w-25" id="staticEmail2" value="email@example.com">
-                <button type="submit" class="btn btn-primary mb-2">Confirm identity</button> 
+                <div class="mb-2">Current Email Address: example@example.com</div>
+
+                <div><strong>Change Email Address:</strong></div>
+                <form class="form-group form-inline mt-1" action="/action_page.php">
+                    <input onkeyup="typedEmail()" class="form-control w-75" type="email" id="newEmail" style="display:inline;"
+                        placeholder="Enter new email" name="email">
+                    <button id="chgEmailBttn" type="button" class="btn btn-primary" style="margin-bottom:5px;" type="submit" disabled="disable">Change
+                        Email Address
+                    </button>
+                </form>
+                <div id="onetimepass" class="onetimepass" style="display: hidden;">
+                    <form  class="form-group form-inline mt-1" style="display: hidden;" action="/action_page.php">
+                        <input class="form-control w-75" type="otp" id="otp" style="display:inline;"
+                            placeholder="Enter OTP" name="otp">
+                        <button type="button" class="btn btn-primary" style="margin-bottom:5px;" type="submit">Submit
+                            OTP
+                        </button>
+                    </form>
+                    <span class="text-muted">Didn't receive OTP? </span><a id="resendotp" href=#> Resend OTP </a>
+                </div>
+
+                <div class="mt-3 mb-1"><strong>Change Password:</strong></div>
+                <form class="form-group form-inline" action="/action_page.php">
+                    <input type="password" class="form-control w-75" id="InputOldPassword1"
+                        placeholder="Old Password">
+                    <input type="password" class="form-control w-75 mt-2" style="display:inline;"
+                        id="InputNewPassword1" placeholder="New Password">
+                    <button type="button" class="btn btn-primary" style="margin-bottom:5px;" type="submit">Change
+                        Password</button>
                 </form>
             </div>
         </div>
@@ -101,34 +128,67 @@ if (User_Type::check_user_type(User_Type::PATIENT, $user_type)):
         <div id="Profile" class="tabcontent shadow rounded">
             <div class="container mt-3">
                 <h3 class="text-center">Profile</h3>
-                <div id="wrapper"></div>
-            </div>
-        </div>
-
-        <div id="Help" class="tabcontent shadow rounded">
-            <div class="container mt-3">
-                <h3 class="text-center">Help</h3>
                 <div>
-                    <canvas id="myChart" width="400" height="120"></canvas>
+                    <div class="row my-3">
+                        <div class="col">
+                            First Name:
+                            <input class="form-control" type="text" id="firstname" value="Yan" name="firstname" readonly>
+                        </div>
+                        <div class="col">
+                            Last Name:
+                            <input class="form-control" type="text" id="lastname" value="Ying Ling" name="lastname"
+                                readonly>
+                        </div>
+                    </div>
+                    <div class="row my-3">
+                        <div class="col">
+                            Date of Birth:
+                            <input class="form-control" type="text" id="dob" value="01-01-2000" name="dob"
+                                readonly>
+                        </div>
+                        <div class="col">
+                            Gender:
+                            <input class="form-control" type="text" id="gender" value="Female" name="gender" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row my-3">
+                        <div class="col">
+                            Address:
+                            <input class="form-control" type="text" id="address" value="Singapore River Valley"
+                                name="address" readonly>
+                        </div>
+                        <div class="col">
+                            Contact Number:
+                            <input class="form-control" type="text" id="number" value="8888822" name="number"
+                                readonly>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
 
-
-        <div id="Settings" class="tabcontent shadow rounded">
-            <div class="container mt-5">
-                <h3 class="text-center">Shift</h3>
-                <p>Shows to set the timing of work</p>
-            </div>
-        </div>
-
-    </div>
-
-
-    <?php endif; 
+        <?php endif; 
 endif;?>
 </body>
+<script type="text/javascript">
+  $('#onetimepass').children().hide();
+
+  function typedEmail()
+  {
+    if(document.getElementById("newEmail").value==="") { 
+            document.getElementById('chgEmailBttn').disabled = true; 
+        } else { 
+            document.getElementById('chgEmailBttn').disabled = false;
+        }
+  }
+
+  $("#chgEmailBttn").on('click',function clickedChangeEmail()
+  {
+    $('#onetimepass').children().show();
+  });
+</script>
 <script>
 function openTab(evt, tabName) {
     var i, tabcontent, tablinks;
@@ -146,6 +206,9 @@ function openTab(evt, tabName) {
 
 // Get the element with id="defaultOpen" and click on it
 document.getElementById("defaultOpen").click();
+
+	
+
 </script>
 
 </html>
