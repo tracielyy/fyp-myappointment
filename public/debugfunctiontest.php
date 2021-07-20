@@ -15,6 +15,7 @@ require_once DB_MOD . '/DbStorage.php';
 require_once APPT_MOD . '/Normal_Slot.php';
 require_once APPT_MOD . '/Special_Slot.php';
 
+require_once SECURE_MOD . '/ValidateIC.php';
 
 require_once USER_MOD . '/Medical_Personnel.php';
 require_once EMAIL_MOD . '/EmailTemplate.php';
@@ -27,20 +28,21 @@ endif;
 
 # ---------------------------------------------  BUSINESS LOGIC START --------------------------------------------- #
 // -- BOOK AN APPOINTMENT  (Put This Function In The Create Appointment Page)
+
 function book_appointment(string $patient_email, array $booking_info): bool {
 
     $patient_doc_id = Account_User::retrieve_user_doc_id($patient_email);
 
-    # Validate Appointment
+# Validate Appointment
     $valid = Appointment_Record::validate_appt_booking($patient_doc_id, $booking_info);
     if ($valid):
         echo "Validate";
 
-        # Create User Appointment Record
+# Create User Appointment Record
         Appointment_Record::create_appointment_record($patient_doc_id, $booking_info);
         echo "Appointment Record  Created";
 
-        # Update To Add Patient's ID To Appointment's patient array
+# Update To Add Patient's ID To Appointment's patient array
         add_to_slot($patient_doc_id, $booking_info);
         echo "yes";
 
@@ -56,11 +58,11 @@ function cancel_appointment(string $patient_email, string $appointmentid) {
 
     $patient_doc_id = Account_User::retrieve_user_doc_id($patient_email);
 
-    # Remove Appointment Record From The Patient DB
+# Remove Appointment Record From The Patient DB
     $appt_record = Appointment_Record::remove_appointment_record($patient_doc_id, $appointmentid);
     echo $appt_record->get_appointmentid();
 
-    # Remove Patient From The Slot
+# Remove Patient From The Slot
     remove_from_slot($patient_doc_id, $appt_record);
 }
 
@@ -127,7 +129,7 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
     </head>
     <body>
         <?php // echo $patient_per_day;        ?>
-        <?php // echo var_dump($slot_arr);         ?>
+        <?php // echo var_dump($slot_arr);          ?>
 
         <?php
 //       $slots_arr = Normal_Slot::retrieve_free_slots_by_date("mf001", Appointment_Type::DOCTOR_CONSULTATION, "15-07-2021");
@@ -402,9 +404,29 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
                 $status = user_change_basic_details($email, $contact, $address);
             endif;
         endif;
-        ?>        <form id="change_basic_details" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+        ?>       
+        <form id="change_basic_details" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
             <button type="submit" name="changebasicdetails" class="action back btn btn-sm btn-outline-primary">Change Basic Details</button>
         </form>
+
+        <?php
+        echo nl2br(PHP_EOL . "Testing VALIDATE NRIC -- HARDCODE --" . PHP_EOL);
+        if ($_SERVER["REQUEST_METHOD"] == "POST"):
+            if (isset($_POST['validate_nric'])):
+                $validate_nric = new ValidateIC($_POST['nric']);
+                if ($validate_nric->validate_nric()):
+                    echo "Valid";
+                else:
+                   echo "Invalid";
+                endif;
+            endif;
+        endif;
+        ?>
+        <form id="validate_nric" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <input type="text" name="nric" placeholder="NRIC" />
+            <button type="submit" name="validate_nric" class="action back btn btn-sm btn-outline-primary">Validate NRIC</button>
+        </form>
+
 
     </body>
 </html>
