@@ -73,6 +73,187 @@ if (isset($_COOKIE['email_verified'])):
     endif;
 
 endif;
+
+
+
+
+// Upon clicking "Login" Button 
+if ($_SERVER["REQUEST_METHOD"] == "POST") :
+
+
+
+    if (isset($_POST['ajax_emailverify'])):
+        $otp_requester = $_POST['email'];
+        // Generate OTP
+        $otp = StringUtils::generate_otp(6);
+
+        // Update OTP In Database
+        Account_User::update_email_otp($otp_requester, $otp);
+
+        // Send OTP To OTP Requester
+        EmailTemplate::template_emailotp($otp_requester, $otp);
+    endif;
+
+
+    if (isset($_POST['register_patient'])):
+        /* ------------ Start Validation ------------ */
+
+        // -- First Name
+        if (empty($registerArr['firstname'])) {
+            $err_msg['firstname'] = "Required";
+        } elseif (!Regex::validate_name($registerArr['firstname'])) {
+            $err_msg['firstname'] = "Invalid Firstname";
+        } else {
+            $validArr['firstname'] = True; // Pass Validation
+        }
+
+        // -- Last Name
+        if (empty($registerArr['lastname'])) {
+            $err_msg['lastname'] = "Required";
+        } elseif (!Regex::validate_name($registerArr['lastname'])) {
+            $err_msg['lastname'] = "Invalid Lastname";
+        } else {
+            $validArr['lastname'] = True; // Pass Validation
+        }
+
+        // -- Contact Number Validation
+        if (empty($registerArr['contactnumber'])) {
+            $err_msg['contactnumber'] = "Required";
+        } elseif (!Regex::validate_phone($registerArr['contactnumber'])) {
+            $err_msg['contactnumber'] = "Incorrect Format";
+        } else {
+            $validArr['contactnumber'] = True; // Pass Validation
+        }
+
+// -- Gender Validation (Just Make Sure Either Male Or Female Is 'Checked')
+        if (empty($registerArr['gender'])) {
+            // Store Some Error Message
+            $err_msg['gender'] = "Not Selected";
+        } elseif (!($registerArr['gender'] == 'F' || $registerArr['gender'] == 'M')) {
+            // Store Some Error Message
+            $err_msg['gender'] = "Invalid";
+        } else {
+            $validArr['gender'] = True; // Pass Validation
+        }
+
+        // -- Date Of Birth (DOB) Validation
+        if (empty($registerArr['dob'])) {
+            $err_msg['dob'] = "Required";
+        } else {
+            $validArr['dob'] = True; // Pass Validation
+        }
+
+
+        // -- Address Validation (Unsure Of What Further Validation To Be Done)
+        if (empty($registerArr['address'])) {
+            $err_msg['address'] = "Required";
+        } else {
+            $validArr['address'] = True; // Pass Validation
+        }
+
+
+        // VALIDATE NRIC
+        $validate_ic = new ValidateIC($registerArr['nric']);
+        $valid_nric = $validate_ic->validate_nric();
+        if (empty($registerArr['nric'])) {
+            $err_msg['nric'] = "Required";
+        } elseif (!$valid_nric) {
+            $err_msg['nric'] = "Invalid NRIC Format";
+        } else {
+            $validArr['nric'] = True; // Pass Validation
+        }
+
+
+        // -- Email Validation
+        if (empty($registerArr['email'])) {
+            // Store Some Error Message
+            $err_msg['email'] = "Field Cannot Be Empty";
+        } elseif (!Regex::validate_email($registerArr['email'])) {
+            // Store Some Error Message
+            $err_msg['email'] = "Invalid";
+        } elseif (isset($_COOKIE['email_verified']) && $_COOKIE['email_verified'] === true) {
+            echo "<script>console.log('{$_COOKIE['email_verified']}');</script>";
+            $registerArr['email'] = StringUtils::clean_input($registerArr['email']);
+            $validArr['email'] = True; // Pass Validation
+        }
+
+// -- Password Validation
+        if (empty($registerArr['password'])) {
+            // Store Some Error Message
+            $err_msg['password'] = "Required";
+        } elseif (!Regex::validate_password($registerArr['password'])) {
+            // Store Some Error Message
+            $err_msg['password'] = "Invalid";
+        } else {
+            $validArr['password'] = True; // Pass Validation
+        }
+
+// -- Confirm Password Validation (Check if it is the same as 'Password')
+        if (empty($registerArr['confirmpassword'])) {
+            // Store Some Error Message
+            $err_msg['confirmpassword'] = "Required";
+        } elseif ($registerArr['confirmpassword'] !== $registerArr['password']) {
+            // Store Some Error Message
+            $err_msg['confirmpassword'] = "Password Does Not Match";
+        } else {
+            $validArr['confirmpassword'] = True; // Pass Validation
+        }
+
+
+
+
+        /* ------------ End Validation ------------ */
+
+// If Valid User Information (After Validation)
+        if (!in_array(False, $validArr)) {
+// > Check If User Already Exist (Email & Contact Number)
+            $exist = Account_User::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
+            if (!$exist) {
+
+# Change The Date Back To Database Default
+                $registerArr['dob'] = Time::date_format_default($registerArr['dob']);
+
+                /* Load To Patient Registration Array */
+                foreach ($registerArr as $key => $value) {
+
+# Loading Of Basic Profile Information
+                    if (isset($patient_register['profile'][$key])) {
+                        $patient_register['profile'][$key] = htmlspecialchars($value);
+                    } elseif (isset($patient_register['credentials'][$key])) {
+                        $patient_register['credentials'][$key] = htmlspecialchars($value);
+                    } elseif (isset($patient_register['profile']['name'][$key])) {
+                        $patient_register['profile']['name'][$key] = htmlspecialchars($value);
+                    }
+                }
+
+
+// > Salt Generation (?)
+// > Need To Encrypt The Password Then Store In Database
+                Patient::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
+// Reset Information
+                $registerArr = array(
+                    'firstname' => '',
+                    'lastname' => '',
+                    'contactnumber' => '',
+                    'address' => '',
+                    'dob' => '',
+                    'gender' => '',
+                    'email' => '',
+                    'password' => '',
+                    'confirmpassword' => ''
+                );
+                header("Location:./debuglogin.php");
+
+// -- Need To Send A Email To Ask Patient To Verify Email -- //
+            } else {
+                echo "User already exist";
+            }
+        } else {
+// Any Actions Or Displays For Errors
+            echo "<div style='color:red;'>Register Fail!</div>";
+        }
+    endif; # END REGISTER PATIENT
+endif; # END POST REQUEST
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -265,102 +446,9 @@ endif;
                 ";
         endif;
 
-        // Upon clicking "Login" Button 
-        if ($_SERVER["REQUEST_METHOD"] == "POST") :
-
-
-
-            if (isset($_POST['ajax_emailverify'])):
-                $otp_requester = $_POST['email'];
-                // Generate OTP
-                $otp = StringUtils::generate_otp(6);
-
-                // Update OTP In Database
-                Account_User::update_email_otp($otp_requester, $otp);
-
-                // Send OTP To OTP Requester
-                EmailTemplate::template_emailotp($otp_requester, $otp);
-            endif;
-
-
+        if ($_SERVER['REQUEST_METHOD'] == "POST"):
             if (isset($_POST['register_patient'])):
-                /* ------------ Start Validation ------------ */
-
-                // -- First Name
-
-                if (empty($registerArr['firstname'])) {
-                    $err_msg['firstname'] = "Required";
-                } elseif (!Regex::validate_name($registerArr['firstname'])) {
-                    $err_msg['firstname'] = "Invalid";
-                } else {
-                    $validArr['firstname'] = True; // Pass Validation
-                }
-
-// -- Last Name
-                if (empty($registerArr['lastname'])) {
-                    $err_msg['lastname'] = "Required";
-                } elseif (!Regex::validate_name($registerArr['lastname'])) {
-                    $err_msg['lastname'] = "Invalid";
-                } else {
-                    $validArr['lastname'] = True; // Pass Validation
-                }
-
-// -- Contact Number Validation
-                if (empty($registerArr['contactnumber'])) {
-                    $err_msg['contactnumber'] = "Required";
-                } elseif (!Regex::validate_phone($registerArr['contactnumber'])) {
-                    $err_msg['contactnumber'] = "Incorrect Format";
-                } else {
-                    $validArr['contactnumber'] = True; // Pass Validation
-                }
-
-// -- Gender Validation (Just Make Sure Either Male Or Female Is 'Checked')
-                if (empty($registerArr['gender'])) {
-                    // Store Some Error Message
-                    $err_msg['gender'] = "Not Selected";
-                } elseif (!($registerArr['gender'] == 'F' || $registerArr['gender'] == 'M')) {
-                    // Store Some Error Message
-                    $err_msg['gender'] = "Invalid";
-                } else {
-                    $validArr['gender'] = True; // Pass Validation
-                }
-
-                // -- Date Of Birth (DOB) Validation
-                if (empty($registerArr['dob'])) {
-                    $err_msg['dob'] = "Required";
-                } else {
-                    $validArr['dob'] = True; // Pass Validation
-                }
-
-
-                // -- Address Validation (Unsure Of What Further Validation To Be Done)
-                if (empty($registerArr['address'])) {
-                    $err_msg['address'] = "Required";
-                } else {
-                    $validArr['address'] = True; // Pass Validation
-                }
-
-
-                // VALIDATE NRIC
-                $validate_ic = new ValidateIC($registerArr['nric']);
-                $valid_nric = $validate_ic->validate_nric();
-                if (empty($registerArr['nric'])) {
-                    $err_msg['nric'] = "Required";
-                } elseif (!$valid_nric) {
-                    $err_msg['nric'] = "Invalid NRIC Format";
-                } else {
-                    $validArr['nric'] = True; // Pass Validation
-                }
-
-
-                // -- Email Validation
-                if (empty($registerArr['email'])) {
-                    // Store Some Error Message
-                    $err_msg['email'] = "Field Cannot Be Empty";
-                } elseif (!Regex::validate_email($registerArr['email'])) {
-                    // Store Some Error Message
-                    $err_msg['email'] = "Invalid";
-                } elseif (isset($_COOKIE['email_verified']) && $_COOKIE['email_verified'] === false) {
+                if (isset($_COOKIE['email_verified']) && $_COOKIE['email_verified'] === false):
                     echo "
                         <script>
                             console.log('the email not verified');
@@ -374,114 +462,38 @@ endif;
                             $('#vrfyEmailBttn').prop('disabled', false);
                         </script>
                         ";
-                } else {
-                    echo "<script>console.log('{$_COOKIE['email_verified']}');</script>";
-                    $registerArr['email'] = StringUtils::clean_input($registerArr['email']);
-                    $validArr['email'] = True; // Pass Validation
-                }
+                endif;
 
-// -- Password Validation
-                if (empty($registerArr['password'])) {
-                    // Store Some Error Message
-                    $err_msg['password'] = "Required";
-                } elseif (!Regex::validate_password($registerArr['password'])) {
-                    // Store Some Error Message
-                    $err_msg['password'] = "Invalid";
-                } else {
-                    $validArr['password'] = True; // Pass Validation
-                }
-
-// -- Confirm Password Validation (Check if it is the same as 'Password')
-                if (empty($registerArr['confirmpassword'])) {
-                    // Store Some Error Message
-                    $err_msg['confirmpassword'] = "Required";
-                } elseif ($registerArr['confirmpassword'] !== $registerArr['password']) {
-                    // Store Some Error Message
-                    $err_msg['confirmpassword'] = "Password Does Not Match";
-                } else {
-                    $validArr['confirmpassword'] = True; // Pass Validation
-                }
-
+                // VALIDATION AND SHOW ERROR MESSAGE
                 foreach ($validArr as $key => $value):
                     # If Not Valid
                     if (!$value):
-                        echo
-                        "
-                            <script>
-                                console.log('{$key}');
-                                var feedback = \"<div id='{$key}-feedback' class='invalid-feedback'>{$err_msg[$key]}</div>\";
-                                $('#{$key}_container').append(feedback);
-                                $('#{$key}').addClass('is-invalid');
-                            </script>
+                        echo "
+                        <script>
+                            console.log('{$key}');
+                            var feedback = \"<div id='{$key}-feedback' class='invalid-feedback'>{$err_msg[$key]}</div>\";
+                            $('#{$key}_container').append(feedback);
+                            $('#{$key}').addClass('is-invalid');
+                        </script>
                          ";
                         if ($key == 'gender'):
                             echo "
-                                <script>
-                                    $('#{$key}_f').addClass('is-invalid');
-                                    $('#{$key}_m').addClass('is-invalid');
-                                </script>
+                            <script>
+                                $('#{$key}_f').addClass('is-invalid');
+                                $('#{$key}_m').addClass('is-invalid');
+                            </script>
                              ";
                         endif;
                     endif;
                 endforeach;
-
-
-                /* ------------ End Validation ------------ */
-
-// If Valid User Information (After Validation)
-                if (!in_array(False, $validArr)) {
-// > Check If User Already Exist (Email & Contact Number)
-                    $exist = Account_User::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
-                    if (!$exist) {
-
-# Change The Date Back To Database Default
-                        $registerArr['dob'] = Time::date_format_default($registerArr['dob']);
-
-                        /* Load To Patient Registration Array */
-                        foreach ($registerArr as $key => $value) {
-
-# Loading Of Basic Profile Information
-                            if (isset($patient_register['profile'][$key])) {
-                                $patient_register['profile'][$key] = htmlspecialchars($value);
-                            } elseif (isset($patient_register['credentials'][$key])) {
-                                $patient_register['credentials'][$key] = htmlspecialchars($value);
-                            } elseif (isset($patient_register['profile']['name'][$key])) {
-                                $patient_register['profile']['name'][$key] = htmlspecialchars($value);
-                            }
-                        }
-
-
-// > Salt Generation (?)
-// > Need To Encrypt The Password Then Store In Database
-                        Patient::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
-// Reset Information
-                        $registerArr = array(
-                            'firstname' => '',
-                            'lastname' => '',
-                            'contactnumber' => '',
-                            'address' => '',
-                            'dob' => '',
-                            'gender' => '',
-                            'email' => '',
-                            'password' => '',
-                            'confirmpassword' => ''
-                        );
-                        echo "<br/> Success Registration <br/>";
-// -- Need To Send A Email To Ask Patient To Verify Email -- //
-                    } else {
-                        echo "User already exist";
-                    }
-                } else {
-// Any Actions Or Displays For Errors
-                    echo "<div style='color:red;'>Register Fail!</div>";
-                }
-            endif; # END REGISTER PATIENT
-        endif; # END POST REQUEST
+            endif; # -- WHEN CLICK ON REGISTER PATIENT
+        endif;
         ?>
         <script>
             // DISABLE THE `VERIFY` BUTTON WHEN NEEDED
             function typedEmail()
             {
+                $("#vrfyEmailBttn").show();
                 document.cookie = 'email_verified=false';
                 console.log(document.cookie);
                 $('#email_container').remove('#email_feedback');
@@ -500,8 +512,14 @@ endif;
             // WHEN USER CLICKS TO VERIFY EMAIL
             $("#vrfyEmailBttn").on('click', function clickedVerify()
             {
+                $('#onetimepass').show();
+                $('#otp').val("");
+                $('#otp').removeClass("is-invalid");
+
                 $('#email_container').remove('#email_feedback');
                 $("#email").removeClass("is-invalid");
+                $("#email").removeClass("is-valid");
+
                 $('#onetimepass').children().show();
                 // -- EMAIL VERIFY TRIGGER
                 $.ajax({
@@ -539,13 +557,16 @@ endif;
                         console.log(JSON.stringify(valid_otp.replace(/(\r\n|\n|\r)/gm, "")));
                         var valid_status = valid_otp.replace(/(\r\n|\n|\r)/gm, "");
                         if (valid_status === 'true') {
-//                            $("#vrfyEmailBttn").remove();
+                            $("#vrfyEmailBttn").hide();
                             var email_feedback = "<div id='email-feedback' class='valid-feedback'>Verified</div>";
                             $('#email_container').append(email_feedback);
+                            $('#email-feedback').remove();
                             $("#email").addClass("is-valid");
-                            $('#onetimepass').remove();
+                            $('#onetimepass').hide();
                             document.cookie = 'email_verified=true';
                             console.log('tick');
+                        } else {
+                            $("#otp").addClass("is-invalid");
                         }
                     },
                     error: function () {
