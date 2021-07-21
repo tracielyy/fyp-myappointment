@@ -1,8 +1,8 @@
 <?php
 session_start();
 /* Load Config File */
-require_once '../resources/config.php';
-require '../vendor/autoload.php';
+require_once '../../resources/config.php';
+require '../../vendor/autoload.php';
 require_once EMAIL_MOD . '/Email.php';
 require_once UTIL_MOD . '/StringUtils.php';
 require_once UTIL_MOD . '/Regex.php';
@@ -12,7 +12,6 @@ require_once USER_MOD . '/Super_Admin.php';
 require_once USER_MOD . '/Facility_admin.php';
 require_once USER_MOD . '/Medical_Personnel.php';
 
-//require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?>
 <!DOCTYPE html>
 
@@ -27,7 +26,7 @@ require_once USER_MOD . '/Medical_Personnel.php';
 
     <!-- Styling -->
     <?php include TEMPLATES_PATH . '/bootstrap.php'; ?>
-    <link rel="stylesheet" href="./css/loginRegister.css">
+    <link rel="stylesheet" href="./../css/loginRegister.css">
 
 
 </head>
