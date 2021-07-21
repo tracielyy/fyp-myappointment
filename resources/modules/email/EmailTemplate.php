@@ -186,29 +186,29 @@ class EmailTemplate {
     }
 
     // -- Verification Email Sent To User -- //
-    public static function template_registerverifyemail(string $to) {
+    public static function template_patientregistration(string $to) {
 
-        // -- Recipient
-        $to_name = Normal_User::retrieve_user_fullname($to);
+        // -- Check User Type &  Set Recipient
+        $recipient_usertype = Account_User::retrieve_user_type($to);
+
+        if ($recipient_usertype == User_Type::PATIENT || $recipient_usertype == User_Type::MEDICAL_PERSONNEL):
+            $to_name = Normal_User::retrieve_user_fullname($to);
+
+        elseif ($recipient_usertype == User_Type::FACIILITY_ADMIN || $recipient_usertype == User_Type::SUPER_ADMIN):
+            $to_name = Admin::retrieve_admin_name($to);
+        else:
+            $to_name = "";
+        endif;
 
         // -- Email Subject
-        $subject = "FYP-21-S2-24: Verify Email Address";
-
-        // -- Clickable Links
-        $user_email = "<a href=mailto:{$to}>{$to}</a>";
+        $subject = "FYP-21-S2-24: Registration";
 
         // -- Miscellaneous
-        $break = "<br/><br/>";
         $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
-        $timestamp = new Time();
-        $date = Time::date_format_change($timestamp->get_date());
-        $time_12hour = Time::to_12hours($timestamp->get_time(), false);
 
         // -- Message
         $message = "<span style='color:black;'>Hi {$to_name}, " . self::LINEBREAK;
         $message .= "Thank you for registering with FYP-21-S2-24's MyAppointment. " . self::LINEBREAK;
-        $message .= "MyAppointment needs to verify your email address before you can start making any appointment." . self::LINEBREAK;
-        $message .= "Please verify your email address {$user_email}" . self::LINEBREAK;
         $message .= "{$sign_off}</span>";
 
         Email::sendEmail($to, $subject, $message);

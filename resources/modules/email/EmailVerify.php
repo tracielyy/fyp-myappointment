@@ -35,7 +35,12 @@ class EmailVerify {
             $this->requestedon = $requestedon;
         }
     }
-    
-    
+
+    public function remove_db_verify(): void {
+        if ($this->has_requested()) {
+            $db = new DbQuery();
+            $db->get_db()->collection(Database::EMAIL_VERIFY)->document($this->email)->delete();
+        }
+    }
 
 }

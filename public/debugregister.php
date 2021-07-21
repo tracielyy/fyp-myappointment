@@ -15,7 +15,6 @@ require_once SECURE_MOD . '/ValidateIC.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     setcookie("email_verified", "", time() - 3600);
-    echo "get request";
 }
 // -- SETTING A EXPIRABLE COOKIE (ONLY VIA SECURE PROTOCOL) -- valid for 1hr
 setcookie("email_verified", false, time() + 3600, "/", "MyAppointment.tracieqwynn.tech", 1);
@@ -207,7 +206,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
 // If Valid User Information (After Validation)
         if (!in_array(False, $validArr)) {
 // > Check If User Already Exist (Email & Contact Number)
-            $exist = Account_User::check_user_exist($registerArr['email'], $registerArr['contactnumber']);
+            $exist = Account_User::check_user_exist($registerArr['email']);
             if (!$exist) {
 
 # Change The Date Back To Database Default
@@ -230,6 +229,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
 // > Salt Generation (?)
 // > Need To Encrypt The Password Then Store In Database
                 Patient::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
+                $patient_created = Account_User::check_user_exist($registerArr['email']);
+                if ($patient_created) {
+                    # Send Email To Inform Patient
+                    EmailTemplate::template_patientregistration($registerArr['email']);
+                    
+                    # Remove The OTP
+                    $email_verify = new EmailVerify($registerArr['email']);
+                    $email_verify->remove_db_verify();
+                }
 // Reset Information
                 $registerArr = array(
                     'firstname' => '',
@@ -557,6 +565,8 @@ endif; # END POST REQUEST
                         console.log(JSON.stringify(valid_otp.replace(/(\r\n|\n|\r)/gm, "")));
                         var valid_status = valid_otp.replace(/(\r\n|\n|\r)/gm, "");
                         if (valid_status === 'true') {
+                            $("#otp").removeClass("is-invalid");
+                            $('#otp-feedback').remove();
                             $("#vrfyEmailBttn").hide();
                             var email_feedback = "<div id='email-feedback' class='valid-feedback'>Verified</div>";
                             $('#email_container').append(email_feedback);
@@ -566,7 +576,10 @@ endif; # END POST REQUEST
                             document.cookie = 'email_verified=true';
                             console.log('tick');
                         } else {
+                            // WHEN THE OTP IS INVALID
                             $("#otp").addClass("is-invalid");
+                            var otp_feedback = "<div id='otp-feedback' class='invalid-feedback'>Incorrect OTP Entered</div>";
+                             $('#onetimepass').append(otp_feedback);
                         }
                     },
                     error: function () {
