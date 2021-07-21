@@ -57,20 +57,12 @@ function verify_user_email(string $user_email, string $input_otp): bool {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST"):
     if (isset($_POST['ajax_otp'])):
-
-//        echo "hello";
-
-//        echo "<script>console.log('omg');</script>";
-//
-    if (verify_user_email($_POST['email'], $_POST['otp'])):
-        echo "true";
-//            echo "<script>var tick = '<div class='valid-feedback'>; $(#email_container).append(tick);console.log('tick');</script>";
-    else:
-//            echo "<script>console.log('tick');</script>";
-        echo "false";
-    endif;
-// Nanta To Add A Tick
-    endif;
-endif;
+        if (verify_user_email($_POST['email'], $_POST['otp'])):
+            echo "true";
+        else:
+            echo "false";
+        endif;
+    endif; # -- END AJAX REQUEST
+endif; # -- END POST REQUEST
 ?>
 
