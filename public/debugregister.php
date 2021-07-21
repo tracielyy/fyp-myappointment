@@ -307,10 +307,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <div class="col">
                                             <!-- Email -->
                                             <div class="input-group" id="email_container">
-                                                <input id="email" type="text" class="form-control" placeholder="Email"
+                                                <input onkeyup="typedEmail()" id="email" type="text" class="form-control" placeholder="Email"
                                                        aria-label="Email" aria-describedby="button-addon2" name="email"
                                                        value="<?php echo htmlspecialchars($registerArr['email']); ?>" autocomplete="off">
-                                                <button class="btn btn-outline-secondary" type="button"
+                                                <button class="btn btn-outline-secondary" type="button" disabled="disable"
                                                         id="vrfyEmailBttn">Verify</button>
                                             </div>
 
@@ -348,7 +348,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <div class="col">
                                             <!-- NRIC -->
                                             <input id="nric" class="form-control" type="text" name="nric" placeholder="NRIC"
-                                                   value="<?php //echo htmlspecialchars($registerArr['address']);                              ?>" /><br />
+                                                   value="<?php //echo htmlspecialchars($registerArr['address']);                               ?>" /><br />
                                         </div>
                                     </div>
 
@@ -389,6 +389,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div> 
 
         <script>
+            function typedEmail()
+            {
+                if (document.getElementById("email").value === "") {
+                    document.getElementById('vrfyEmailBttn').disabled = true;
+                } else {
+                    document.getElementById('vrfyEmailBttn').disabled = false;
+                }
+            }
             $('#onetimepass').children().hide();
             $("#vrfyEmailBttn").on('click', function clickedVerify()
             {
