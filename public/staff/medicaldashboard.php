@@ -11,7 +11,7 @@ require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Medical_Personnel.php';
 
 if (!isset($_SESSION['user'])):
-    header("Location:./"); # -- REDIRECT USER TO THE INDEX PAGE
+    header("Location:./../"); # -- REDIRECT USER TO THE INDEX PAGE
 else:
     $user = unserialize($_SESSION["user"]);
     $user_type = $user->get_usertype();
