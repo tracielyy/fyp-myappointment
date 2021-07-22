@@ -14,7 +14,7 @@ require_once SECURE_MOD . '/ValidateIC.php';
 
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    setcookie("email_verified", "", time() - 3600);
+    setcookie("email_verified", "", time() - 3600); // resetting
 }
 // -- SETTING A EXPIRABLE COOKIE (ONLY VIA SECURE PROTOCOL) -- valid for 1hr
 setcookie("email_verified", false, time() + 3600, "/", "MyAppointment.tracieqwynn.tech", 1);
@@ -96,7 +96,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
 
     if (isset($_POST['register_patient'])):
         /* ------------ Start Validation ------------ */
-
         // -- First Name
         if (empty($registerArr['firstname'])) {
             $err_msg['firstname'] = "Required";
@@ -233,7 +232,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
                 if ($patient_created) {
                     # Send Email To Inform Patient
                     EmailTemplate::template_patientregistration($registerArr['email']);
-                    
+
                     # Remove The OTP
                     $email_verify = new EmailVerify($registerArr['email']);
                     $email_verify->remove_db_verify();
@@ -258,7 +257,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
             }
         } else {
 // Any Actions Or Displays For Errors
-            echo "<div style='color:red;'>Register Fail!</div>";
+//            echo "<div style='color:red;'>Register Fail!</div>";
         }
     endif; # END REGISTER PATIENT
 endif; # END POST REQUEST
@@ -266,311 +265,215 @@ endif; # END POST REQUEST
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Register</title>
-    <!-- Styling -->
-    <link rel="stylesheet" href="./css/loginRegister.css">
-    <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
-    <style>
-    .help-block {
-        color: red;
-    }
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Register</title>
+        <!-- Styling -->
+        <link rel="stylesheet" href="./css/loginRegister.css">
+        <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+        <style>
+            .help-block {
+                color: red;
+            }
 
-    .new-class {
-        float: right;
-    }
+            .new-class {
+                float: right;
+            }
 
-    @media (max-width: 767px) {
-        .new-class {
-            display: block;
-            float: none;
-        }
+            @media (max-width: 767px) {
+                .new-class {
+                    display: block;
+                    float: none;
+                }
 
-        .newer-class {
-            display: block;
-            float: none !important;
-        }
-    }
-    </style>
-</head>
+                .newer-class {
+                    display: block;
+                    float: none !important;
+                }
+            }
+        </style>
+    </head>
 
-<body>
-    <!-- Navigation -->
-    <?php require TEMPLATES_PATH . '/navbar.php' ?>
-    <!-- Registration -->
-    <div class="row m-1 m-md-4">
-        <div class="container center col-md-11 col-lg-10 col-xl-6">
-            <div class="col-auto">
-                <div class="shadow card p-2 rounded1">
-                    <div class="card-body m-0 m-md-2">
-                        <h1 class="card-title px-1 px-md-5 py-3">Register</h1>
-                        <div class="px-1 px-md-5">
-                            <!-- Form -->
-                            <form id="registerForm" method="post"
-                                action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" novalidate="novalidate">
-                                <div class="row">
-                                    <div class="col d-none d-lg-block">First Name</div>
-                                    <div class="col d-none d-lg-block">Last Name</div>
-                                </div>
-                                <div class="row pb-3">
-                                    <div class="col-md-6 col-sm-12">
-                                        <!-- First Name -->
-                                        <input id="firstname" class="form-control d-md-block" type="text"
-                                            name="firstname" placeholder="First Name"
-                                            value="<?php echo $registerArr['firstname']; ?>"/>
+    <body>
+        <!-- Navigation -->
+        <?php require TEMPLATES_PATH . '/navbar.php' ?>
+        <!-- Registration -->
+        <div class="row m-1 m-md-4">
+            <div class="container center col-md-11 col-lg-10 col-xl-6">
+                <div class="col-auto">
+                    <div class="shadow card p-2 rounded1">
+                        <div class="card-body m-0 m-md-2">
+                            <h1 class="card-title px-1 px-md-5 py-3">Register</h1>
+                            <div class="px-1 px-md-5">
+                                <!-- Form -->
+                                <form id="registerForm" method="post"
+                                      action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" novalidate="novalidate">
+                                    <div class="row">
+                                        <div class="col d-none d-lg-block">First Name</div>
+                                        <div class="col d-none d-lg-block">Last Name</div>
+                                    </div>
+                                    <div class="row pb-3">
+                                        <div class="col-md-6 col-sm-12" id="firstname_container">
+                                            <!-- First Name -->
+                                            <input id="firstname" class="form-control d-md-block" type="text"
+                                                   name="firstname" placeholder="First Name"
+                                                   value="<?php echo $registerArr['firstname']; ?>"/>
+                                        </div>
+
+                                        <div class="d-md-none my-2"><!-- For responsiveness phone, hidden on bigger screens--></div>
+
+                                        <div class="col-md-6 col-sm-12" id="lastname_container">
+                                            <!-- Last Name -->
+                                            <input id="lastname" class="form-control d-md-block" type="text" name="lastname"
+                                                   placeholder="Last Name" value="<?php echo $registerArr['lastname']; ?>" />
+                                        </div>
                                     </div>
 
-                                    <div class="d-md-none my-2"><!-- For responsiveness phone, hidden on bigger screens--></div>
-
-                                    <div class="col-md-6 col-sm-12">
-                                        <!-- Last Name -->
-                                        <input id="lastname" class="form-control d-md-block" type="text" name="lastname"
-                                            placeholder="Last Name" value="<?php echo $registerArr['lastname']; ?>" />
+                                    <div class="row">
+                                        <div class="col d-none d-lg-block">Date of Birth</div>
+                                        <div class="col d-none d-lg-block">Select Gender:</div>
                                     </div>
-                                </div>
 
-                                <div class="row">
-                                    <div class="col d-none d-lg-block">Date of Birth</div>
-                                    <div class="col d-none d-lg-block">Select Gender:</div>
-                                </div>
+                                    <div class="row ">
+                                        <div class="col-md-6 col-sm-12" id="dob_container">
+                                            <!-- Date Of Birth -->
+                                            <input id="dob" class="form-control" type="date" name="dob"
+                                                   value="<?php echo htmlspecialchars($registerArr['dob']); ?>" /><br />
+                                        </div>
 
-                                <div class="row ">
-                                    <div class="col-md-6 col-sm-12">
-                                        <!-- Date Of Birth -->
-                                        <input id="dob" class="form-control" type="date" name="dob"
-                                            value="<?php echo htmlspecialchars($registerArr['dob']); ?>" /><br />
+                                        <div class="col-md-6 col-sm-12" id="gender_container">
+                                            <select class="form-select" name="gender">
+                                                <option value="" selected hidden>Select Gender</option>
+                                                <option id="gender_f" value="F" <?php
+                                                if ($registerArr['gender'] == "F") {
+                                                    echo "selected";
+                                                }
+                                                ?>>Female</option>
+                                                <option id="gender_m" value="M" <?php
+                                                if ($registerArr['gender'] == "M") {
+                                                    echo "selected";
+                                                }
+                                                ?>>Male</option>
+                                            </select>
+                                        </div>
                                     </div>
-                               
-                                    <div class="col-md-6 col-sm-12">
-                                        <select class="form-select" name="gender">
-                                            <option value="" selected hidden>Select Gender</option>
-                                            <option id="gender_f" value="F" <?php
-                                            if ($registerArr['gender'] == "F") {
-                                                echo "checked";
-                                            }
-                                            ?>>Female</option>
-                                            <option id="gender_m" value="M" <?php
-                                            if ($registerArr['gender'] == "M") {
-                                                echo "checked";
-                                            }
-                                            ?>>Male</option>
-                                        </select>
+
+                                    <div class="d-md-none mb-3"><!-- For responsiveness phone, hidden on bigger screens--></div>
+
+                                    <div class="row">
+                                        <div class="col d-none d-lg-block">Email</div>
+                                        <div class="col d-none d-lg-block">Contact Number</div>
                                     </div>
-                                </div>
-                                
-                                <div class="d-md-none mb-3"><!-- For responsiveness phone, hidden on bigger screens--></div>
 
-                                <div class="row">
-                                    <div class="col d-none d-lg-block">Email</div>
-                                    <div class="col d-none d-lg-block">Contact Number</div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6 col-sm-12">
-                                        <!-- Email -->
-                                        <div onkeyup="typedEmail()" id="emailgroup" class="input-group">
-                                            <input id="email" name="email" type="text" class="form-control"
-                                                placeholder="Email" aria-label="Email"
-                                                value="<?php echo htmlspecialchars($registerArr['email']); ?>">
-                                            <button class="btn btn-outline-secondary" type="button"
-                                                id="vrfyEmailBttn">Verify</button></input>
-                                            <?php
-                                                // THIS SET OF PHP CODE MUST BE AFTER THE EMAIL HTML
-                                                if (isset($_COOKIE['email_verified']) && $_COOKIE['email_verified'] === true):
-                                                    echo "  
+                                    <div class="row mb-3">
+                                        <div class="col-md-6 col-sm-12">
+                                            <!-- Email -->
+                                            <div onkeyup="typedEmail()" id="email_container" class="input-group">
+                                                <input id="email" name="email" type="text" class="form-control"
+                                                       placeholder="Email" aria-label="Email"
+                                                       value="<?php echo htmlspecialchars($registerArr['email']); ?>">
+                                                <button class="btn btn-outline-secondary" type="button"
+                                                        id="vrfyEmailBttn">Verify</button></input>
+                                                        <?php
+                                                        // THIS SET OF PHP CODE MUST BE AFTER THE EMAIL HTML
+                                                        if (isset($_COOKIE['email_verified']) && $_COOKIE['email_verified'] === true):
+                                                            echo "  
                                                     <script>
                                                         console.log('{$_COOKIE['email_verified']
-                                                    }');
+                                                            }');
                                                         console.log('the email is verified');
                                                         var email_feedback = \"<div id='email-feedback' class='valid-feedback'>Verified</div>\";
-                                                        $('#email_container').append(email_feedback);
+                                                        $('#emailgroup').append(email_feedback);
                                                         $('#email').addClass('is-valid');
                                                     </script>";
-                                                endif;
-                                                ?>
+                                                        endif;
+                                                        ?>
+                                            </div>
+
+                                            <!-- OTP -->
+                                            <div class="input-group my-1" id="onetimepass">
+                                                <input id="otp" name="otp" type="text" class="form-control"
+                                                       placeholder="Enter OTP" aria-label="otp" max-length="6" value="">
+                                                <button class="btn btn-outline-secondary" type="button"
+                                                        id="submitOTP">Submit OTP</button>
+                                            </div>
+
+                                            <div class="d-md-none mb-3"><!-- For responsiveness phone, hidden on bigger screens--></div>
                                         </div>
-
-                                        <!-- OTP -->
-                                        <div class="input-group my-1" id="onetimepass">
-                                            <input id="otp" name="otp" type="text" class="form-control"
-                                                placeholder="Enter OTP" aria-label="otp" max-length="6" value="">
-                                            <button class="btn btn-outline-secondary" type="button"
-                                                id="submitOTP">Submit OTP</button>
-                                            
-                                        </div>
-
-                                        <div class="d-md-none mb-3"><!-- For responsiveness phone, hidden on bigger screens--></div>
-                                    </div>
-                                    <div class="col-md-6 col-sm-12">
-                                        <!-- Contact Number -->
-                                        <div class="input-group">
-                                            <span class="input-group-text" id="basic-addon">+65</span>
-                                            <input id="contactnumber" class="form-control" type="text"
-                                                name="contactnumber" placeholder="Contact No."
-                                                value="<?php echo htmlspecialchars($registerArr['contactnumber']); ?>" /><br />
+                                        <div class="col-md-6 col-sm-12">
+                                            <!-- Contact Number -->
+                                            <div class="input-group">
+                                                <span class="input-group-text" id="basic-addon">+65</span>
+                                                <input id="contactnumber" class="form-control" type="text"
+                                                       name="contactnumber" placeholder="Contact No."
+                                                       value="<?php echo htmlspecialchars($registerArr['contactnumber']); ?>" /><br />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="row">
-                                    <div class="col d-none d-lg-block">Address</div>
-                                    <div class="col d-none d-lg-block">NRIC</div>
-                                </div>  
+                                    <div class="row mt-3">
+                                        <div class="col d-none d-lg-block">Address</div>
+                                        <div class="col d-none d-lg-block">NRIC</div>
+                                    </div>  
 
-                                <div class="d-md-none mb-3"><!-- For responsiveness phone, hidden on bigger screens--></div>
+                                    <div class="d-md-none mb-3"><!-- For responsiveness phone, hidden on bigger screens--></div>
 
-                                <div class="row">
-                                    <div class="col-md-6 col-sm-12">
-                                        <!-- Address -->
-                                        <input id="address" class="form-control" type="text" name="address"
-                                            placeholder="Address"
-                                            value="<?php echo htmlspecialchars($registerArr['address']); ?>" /><br />
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-12" id="address_container">
+                                            <!-- Address -->
+                                            <input id="address" class="form-control" type="text" name="address"
+                                                   placeholder="Address"
+                                                   value="<?php echo htmlspecialchars($registerArr['address']); ?>" /><br />
+                                        </div>
+                                        <div class="col-md-6 col-sm-12" id="nric_container">
+                                            <!-- NRIC -->
+                                            <input id="nric" class="form-control" type="text" name="nric" placeholder="NRIC"
+                                                   value="<?php echo htmlspecialchars($registerArr['nric']); ?>" /><br />
+                                        </div>
                                     </div>
-                                    <div class="col-md-6 col-sm-12">
-                                        <!-- NRIC -->
-                                        <input id="nric" class="form-control" type="text" name="nric" placeholder="NRIC"
-                                            value="<?php echo htmlspecialchars($registerArr['nric']); ?>" /><br />
-                                    </div>
-                                </div>
 
-                                <div class="row">
-                                    <div class="col d-none d-lg-block">Password</div>
-                                    <div class="col d-none d-lg-block">Confirm Password</div>
-                                </div>
+                                    <div class="row">
+                                        <div class="col d-none d-lg-block">Password</div>
+                                        <div class="col d-none d-lg-block">Confirm Password</div>
+                                    </div>
 
-                                <div class="row">
-                                    <div class="col-md-6 col-sm-12">
-                                        <!-- Password -->
-                                        <input id="password" class="form-control" type="password" name="password"
-                                            placeholder="Password"
-                                            value="<?php echo htmlspecialchars($registerArr['password']); ?>" /><br />
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-12" id="password_container">
+                                            <!-- Password -->
+                                            <input id="password" class="form-control" type="password" name="password"
+                                                   placeholder="Password"
+                                                   value="<?php echo htmlspecialchars($registerArr['password']); ?>" /><br />
+                                        </div>
+                                        <div class="col-md-6 col-sm-12" id="confirmpassword_container">
+                                            <!-- Confirmation Password -->
+                                            <input id="confirmpassword" class="form-control" type="password"
+                                                   name="confirmpassword" placeholder="Confirm Password"
+                                                   value="<?php echo htmlspecialchars($registerArr['confirmpassword']); ?>" /><br />
+                                        </div>
                                     </div>
-                                    <div class="col-md-6 col-sm-12">
-                                        <!-- Confirmation Password -->
-                                        <input id="confirmpassword" class="form-control" type="password"
-                                            name="confirmpassword" placeholder="Confirm Password"
-                                            value="<?php echo htmlspecialchars($registerArr['confirmpassword']); ?>" /><br />
-                                    </div>
-                                </div>
 
-                                <div class="row">
-                                    <div class="col-md-6 col-sm-12">
-                                        <div class="text-muted mb-3">*All fields are required</div>
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-12">
+                                            <div class="text-muted mb-3">*All fields are required</div>
+                                        </div>
+                                        <!-- Registration Submission -->
+                                        <div class="d-grid gap-2 d-lg-block"><button class="btn btn-primary" type="submit" name="register_patient"
+                                                                                     style="float: right" ;>Register</button><br /></div>
                                     </div>
-                                    <!-- Registration Submission -->
-                                    <div class="d-grid gap-2 d-lg-block"><button class="btn btn-primary" type="submit"
-                                            style="float: right" ;>Register</button><br /></div>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
+                        <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                     </div>
-                    <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                 </div>
             </div>
         </div>
-    </div>
 
-    <script>
-    // DISABLE THE `VERIFY` BUTTON WHEN NEEDED
-    function typedEmail() {
-        $("#vrfyEmailBttn").show();
-        document.cookie = 'email_verified=false';
-        console.log(document.cookie);
-        $('#email_container').remove('#email_feedback');
-        $("#email").removeClass("is-valid");
-        $("#email").removeClass("is-invalid");
-
-        if (document.getElementById("email").value === "") {
-            document.getElementById('vrfyEmailBttn').disabled = true;
-        } else {
-            document.getElementById('vrfyEmailBttn').disabled = false;
-        }
-    }
-
-    // DEFAULT HIDE THE CONTENT INSIDE THE `onetimepass`
-    $('#onetimepass').children().hide();
-    // WHEN USER CLICKS TO VERIFY EMAIL
-    $("#vrfyEmailBttn").on('click', function clickedVerify() {
-        $('#onetimepass').show();
-        $('#otp').val("");
-        $('#otp').removeClass("is-invalid");
-
-        $('#email_container').remove('#email_feedback');
-        $("#email").removeClass("is-invalid");
-        $("#email").removeClass("is-valid");
-
-        $('#onetimepass').children().show();
-        // -- EMAIL VERIFY TRIGGER
-        $.ajax({
-            type: "POST",
-            url: "<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>",
-            data: {
-                ajax_emailverify: true,
-                email: $('#email').val()
-            },
-            success: function() {
-                console.log("Email Sent");
-            },
-            error: function() {
-                console.log("Email Not Sent");
-            }
-        });
-
-    });
-
-    // WHEN USER SUBMITS THE OTP
-    $("#submitOTP").on('click', function clickedSubmitOTP() {
-        // -- EMAIL VERIFY TRIGGER
-        $.ajax({
-            type: "POST",
-            url: "otpvalidate.php",
-            data: {
-                ajax_otp: true,
-                email: $('#email').val(),
-                otp: $('#otp').val()
-            },
-            success: function(valid_otp) {
-                console.log("Email Validate");
-                console.log(valid_otp);
-                console.log(JSON.stringify(valid_otp.replace(/(\r\n|\n|\r)/gm, "")));
-                var valid_status = valid_otp.replace(/(\r\n|\n|\r)/gm, "");
-                if (valid_status === 'true') {
-                    $("#otp").removeClass("is-invalid");
-                    $('#otp-feedback').remove();
-                    $("#vrfyEmailBttn").hide();
-                    var email_feedback =
-                        "<div id='email-feedback' class='valid-feedback'>Verified</div>";
-                    $('#email_container').append(email_feedback);
-                    $('#email-feedback').remove();
-                    $("#email").addClass("is-valid");
-                    $('#onetimepass').hide();
-                    email_verified_validation = true;
-                    document.cookie = 'email_verified=true';
-                    console.log('tick');
-                } else {
-                    // WHEN THE OTP IS INVALID
-                    $("#otp").addClass("is-invalid");
-                    var otp_feedback =
-                        "<div id='otp-feedback' class='error help-block invalid-feedback'><i>Incorrect OTP entered</i></div>";
-                    $('#onetimepass').append(otp_feedback);
-                }
-            },
-            error: function() {
-                console.log("Email Validation Error");
-            }
-        });
-
-    });
-
-    
-    </script>
-
-<?php
+        <?php
         if ($_SERVER["REQUEST_METHOD"] == "GET"):
             echo "
                 <script>
@@ -630,9 +533,8 @@ endif; # END POST REQUEST
                 $("#vrfyEmailBttn").show();
                 document.cookie = 'email_verified=false';
                 console.log(document.cookie);
-                $('#email_container').remove('#email_feedback');
-                $("#email").removeClass("is-valid");
-                $("#email").removeClass("is-invalid");
+                $('#onetimepass').hide();
+                email_verified_validation = false;
 
                 if (document.getElementById("email").value === "") {
                     document.getElementById('vrfyEmailBttn').disabled = true;
@@ -651,6 +553,7 @@ endif; # END POST REQUEST
                 $('#otp').removeClass("is-invalid");
 
                 $('#email_container').remove('#email_feedback');
+
                 $("#email").removeClass("is-invalid");
                 $("#email").removeClass("is-valid");
 
@@ -692,21 +595,32 @@ endif; # END POST REQUEST
                         console.log(JSON.stringify(valid_otp.replace(/(\r\n|\n|\r)/gm, "")));
                         var valid_status = valid_otp.replace(/(\r\n|\n|\r)/gm, "");
                         if (valid_status === 'true') {
+
+                            // hide the otp section
                             $("#otp").removeClass("is-invalid");
                             $('#otp-feedback').remove();
                             $("#vrfyEmailBttn").hide();
+                            $('#onetimepass').hide();
+
+                            // reset by removing email feedback
+                            $('#email-feedback').remove();
+                            $('#email-error').remove();
+
+                            // create new feedback
                             var email_feedback = "<div id='email-feedback' class='valid-feedback'>Verified</div>";
                             $('#email_container').append(email_feedback);
-                            $('#email-feedback').remove();
-                           //$("#email").addClass("is-valid");
-                            $('#onetimepass').hide();
+
+                            // add the new email feedback
+                            $("#email").addClass("is-valid");
+
+                            // set the email verification cookie to true
                             document.cookie = 'email_verified=true';
                             console.log('tick');
                         } else {
                             // WHEN THE OTP IS INVALID
                             $("#otp").addClass("is-invalid");
                             var otp_feedback = "<div id='otp-feedback' class='invalid-feedback'>Incorrect OTP Entered</div>";
-                             $('#onetimepass').append(otp_feedback);
+                            $('#onetimepass').append(otp_feedback);
                         }
                     },
                     error: function () {
@@ -716,185 +630,181 @@ endif; # END POST REQUEST
 
             });
 
-    /*
-       Validation
-    */
-    $.validator.setDefaults({
-        submitHandler: function() {
-            alert("submitted!");
-        }
-    });
+            /*
+             Validation
+             */
 
-    $("#registerForm").validate({
-        rules: {
-            firstname: "required",
-            lastname: "required",
-            dob: "required",
-            password: {
-                required: true,
-                oneDigit: true,
-                lowerCase: true,
-                upperCase: true,
-                specialChar: true,
-                minlength: 8,
-                maxlength: 32
 
-            },
-            confirmpassword: {
-                required: true,
-                equalTo: "#password"
-            },
-            email: {
-                required: true,
-                email: true,
-                emailRegex: true,
-                verifyEmail: true
-            },
-            contactnumber: {
-                required: true,
-                phoneRegex: true
-            },
-            address: {
-                required: true
-            },
-            nric: {
-                required: true,
-                nricRegex: true
-            },
-            gender: {
-                required: true
-            },
-            otp: {
-                required: true,
-                invalidotp: true,
-                minlength: 6,
-                maxlength: 6,
-                digits: true
-            }
-        },
-        messages: {
-            firstname: "Please enter your first Name",
-            lastname: "Please enter your Last Name",
-            dob: "Please specify your date of birth",
-            password: {
-                required: "Please provide a password",
-                minlength: "Password needs to be at least 8 characters",
-                maxlength: "Password exceeded 32 characters limit"
-            },
-            confirmpassword: {
-                required: "Please provide a confirm password",
-                equalTo: "Please enter the same password"
-            },
-            email: {
-                required: "Please enter a valid email address",
-                email: "email is invalid",
-                emailRegex: "email format is invalid",
-                verifyEmail: "Please verify the email"
-            },
-            contactnumber: {
-                required: "Please enter a phone number"
-            },
-            address: "Please enter your address",
-            nric: {
-                required: "Please enter your NRIC",
-                nricRegex: "Format for NRIC is Invalid"
-            },
-            gender: "Please select Gender",
-            otp: {
-                required: "Please Enter OTP",
-                minlength: "OTP needs to be 6 integers",
-                maxlength: "OTP needs to be 6 integers",
-                digits: "OTP must only contain digits",
-            }
-        },
-        errorElement: "em",
-        errorPlacement: function(error, element) {
-            // Add the `help-block` class to the error element
-            error.addClass("help-block invalid-feedback");
+            $("#registerForm").validate({
+                rules: {
+                    firstname: "required",
+                    lastname: "required",
+                    dob: "required",
+                    password: {
+                        required: true,
+                        oneDigit: true,
+                        lowerCase: true,
+                        upperCase: true,
+                        specialChar: true,
+                        minlength: 8,
+                        maxlength: 32
 
-            console.log(element);
-            if (element.is("#email")) {
-                error.insertAfter(element.parents('#emailgroup'));
+                    },
+                    confirmpassword: {
+                        required: true,
+                        equalTo: "#password"
+                    },
+                    email: {
+                        required: true,
+                        email: true,
+                        emailRegex: true,
+                        verifyEmail: true
+                    },
+                    contactnumber: {
+                        required: true,
+                        phoneRegex: true
+                    },
+                    address: {
+                        required: true
+                    },
+                    nric: {
+                        required: true,
+                        nricRegex: true
+                    },
+                    gender: {
+                        required: true
+                    },
+                    otp: {
+                        required: true,
+                        minlength: 6,
+                        maxlength: 6,
+                        digits: true
+                    }
+                },
+                messages: {
+                    firstname: "Please enter your first Name",
+                    lastname: "Please enter your Last Name",
+                    dob: "Please specify your date of birth",
+                    password: {
+                        required: "Please provide a password",
+                        minlength: "Password needs to be at least 8 characters",
+                        maxlength: "Password exceeded 32 characters limit"
+                    },
+                    confirmpassword: {
+                        required: "Please provide a confirm password",
+                        equalTo: "Please enter the same password"
+                    },
+                    email: {
+                        required: "Please enter a valid email address",
+                        email: "email is invalid",
+                        emailRegex: "email format is invalid",
+                        verifyEmail: "Please verify the email"
+                    },
+                    contactnumber: {
+                        required: "Please enter a phone number"
+                    },
+                    address: "Please enter your address",
+                    nric: {
+                        required: "Please enter your NRIC",
+                        nricRegex: "Format for NRIC is Invalid"
+                    },
+                    gender: "Please select Gender",
+                    otp: {
+                        required: "Please Enter OTP",
+                        minlength: "OTP needs to be 6 integers",
+                        maxlength: "OTP needs to be 6 integers",
+                        digits: "OTP must only contain digits",
+                    }
+                },
+                errorElement: "em",
+                errorPlacement: function (error, element) {
+                    // Add the `help-block` class to the error element
+                    error.addClass("help-block invalid-feedback");
 
-            } else if (element.is("#otp")) {
-                error.insertAfter(element.parents('#onetimepass'))
-            } else { // This is the default behavior 
-                error.insertAfter(element);
-            };
-        },
-        success: function(label, element) {
-            // Add the span element, if doesn't exists, and apply the icon classes to it.
+                    console.log(element);
+                    if (element.is("#email")) {
+                        error.insertAfter(element.parents('#email_container'));
 
-            $(element).addClass("is-valid");
+                    } else if (element.is("#otp")) {
+                        error.insertAfter(element.parents('#onetimepass'))
+                    } else { // This is the default behavior 
+                        error.insertAfter(element);
+                    }
+                    ;
+                },
+                success: function (label, element) {
+                    // Add the span element, if doesn't exists, and apply the icon classes to it.
 
-        },
-        highlight: function(element, errorClass, validClass) {
-            $(element).addClass("is-invalid").removeClass("is-valid");
-        },
-        unhighlight: function(element, errorClass, validClass) {
-            $(element).addClass("is-valid").removeClass("is-invalid");
-            // if (element.is(":radio")) {
-            //     $("#Male").addClass("is-valid").removeClass("is-invalid");
-            // }
-        }
-    });
+                    $(element).addClass("is-valid");
 
-    /*---------------------------------------------------
-       CLIENT SIDE REGULAR EXPRESSION FOR CONTACT NUMBER
-    -----------------------------------------------------*/
-    $.validator.addMethod("phoneRegex", function(value, element) {
-        return this.optional(element) || /^[689]{1}[0-9]{7}$/.test(value);
-    }, "Contact number format is incorrect.");
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass("is-invalid").removeClass("is-valid");
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).addClass("is-valid").removeClass("is-invalid");
+                    // if (element.is(":radio")) {
+                    //     $("#Male").addClass("is-valid").removeClass("is-invalid");
+                    // }
+                }
+            });
 
-    /*------------------------------------------------------
-       CLIENT SIDE REGULAR EXPRESSION FOR EMAIL VERIFICATION
-    --------------------------------------------------------*/
-    var email_verified_validation = false;
+            /*---------------------------------------------------
+             CLIENT SIDE REGULAR EXPRESSION FOR CONTACT NUMBER
+             -----------------------------------------------------*/
+            $.validator.addMethod("phoneRegex", function (value, element) {
+                return this.optional(element) || /^[689]{1}[0-9]{7}$/.test(value);
+            }, "Contact number format is incorrect.");
 
-    $.validator.addMethod("verifyEmail", function(value, element) {
-        return this.optional(element) || (email_verified_validation == true);
-    }, "Email must be verified first");
+            /*------------------------------------------------------
+             CLIENT SIDE REGULAR EXPRESSION FOR EMAIL VERIFICATION
+             --------------------------------------------------------*/
+            var email_verified_validation = false;
 
-    $.validator.addMethod("emailRegex", function(value, element) {
-        return this.optional(element) ||
-            /^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})/
-            .test(value);
-    }, "Email format is incorrect.");
+            $.validator.addMethod("verifyEmail", function (value, element) {
+                return this.optional(element) || (email_verified_validation == true);
+            }, "Email must be verified first");
 
-    /*----------------------------------------------
-       CLIENT SIDE REGULAR EXPRESSION FOR PASSWORD
-    -----------------------------------------------*/
+            $.validator.addMethod("emailRegex", function (value, element) {
+                return this.optional(element) ||
+                        /^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})/
+                        .test(value);
+            }, "Email format is incorrect.");
 
-    $.validator.addMethod("oneDigit", function(value, element) {
-        return this.optional(element) ||
-            /(?=.*[0-9])/
-            .test(value);
-    }, "Password needs at least one digit.");
+            /*----------------------------------------------
+             CLIENT SIDE REGULAR EXPRESSION FOR PASSWORD
+             -----------------------------------------------*/
 
-    $.validator.addMethod("lowerCase", function(value, element) {
-        return this.optional(element) ||
-            /(?=.*[a-z])/
-            .test(value);
-    }, "Password needs at least one lower case character.");
+            $.validator.addMethod("oneDigit", function (value, element) {
+                return this.optional(element) ||
+                        /(?=.*[0-9])/
+                        .test(value);
+            }, "Password needs at least one digit.");
 
-    $.validator.addMethod("upperCase", function(value, element) {
-        return this.optional(element) ||
-            /(?=.*[A-Z])/
-            .test(value);
-    }, "Password needs at least one upper case character.");
+            $.validator.addMethod("lowerCase", function (value, element) {
+                return this.optional(element) ||
+                        /(?=.*[a-z])/
+                        .test(value);
+            }, "Password needs at least one lower case character.");
 
-    $.validator.addMethod("specialChar", function(value, element) {
-        return this.optional(element) ||
-            /(?=.*[\*\.\!\@\$\%\^\&\(\)\{\}\[\]\:\;\<\>\,\?\/\~\_\+\-\=\|\#])/.test(value);
-    }, "Password needs at least one special character. e.g. [!@#$%^&*]");
+            $.validator.addMethod("upperCase", function (value, element) {
+                return this.optional(element) ||
+                        /(?=.*[A-Z])/
+                        .test(value);
+            }, "Password needs at least one upper case character.");
 
-    $.validator.addMethod("nricRegex", function(value, element) {
-        return this.optional(element) ||
-            /^[STFGstfg]\d{7}[A-Za-z]$/.test(value);
-    }, "Invalid format for NRIC");
+            $.validator.addMethod("specialChar", function (value, element) {
+                return this.optional(element) ||
+                        /(?=.*[\*\.\!\@\$\%\^\&\(\)\{\}\[\]\:\;\<\>\,\?\/\~\_\+\-\=\|\#])/.test(value);
+            }, "Password needs at least one special character. e.g. [!@#$%^&*]");
 
-    //REGEX FOR NRIC ALPHABET INFRONT AND BACK, 9 CHARACTERS INCLUDING THE ALPHABETS
-    </script>
-</body>
+            $.validator.addMethod("nricRegex", function (value, element) {
+                return this.optional(element) ||
+                        /^[STFGstfg]\d{7}[A-Za-z]$/.test(value);
+            }, "Invalid format for NRIC");
+
+            //REGEX FOR NRIC ALPHABET INFRONT AND BACK, 9 CHARACTERS INCLUDING THE ALPHABETS
+        </script>
+    </body>
 
 </html>
