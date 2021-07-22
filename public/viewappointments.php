@@ -1,16 +1,52 @@
 <?php
 session_start();
 require_once '../resources/config.php';
+require '../vendor/autoload.php';
+
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Patient.php';
+
 require_once APPT_MOD . '/Appointment_Record.php';
+
+require_once EMAIL_MOD . '/EmailTemplate.php';
+
 require_once ENUMS_PATH . '/User_Type.php';
+
 require_once TIME_MOD . '/CalendarICS.php';
 require_once TIME_MOD . '/Time.php';
 
-require '../vendor/autoload.php';
-
 $pageName = "viewappointment";
+
+// -- CANCEL APPOINTMENT
+function cancel_appointment(string $patient_email, string $appointmentid): Appointment_Record {
+
+    $patient_doc_id = Account_User::retrieve_user_doc_id($patient_email);
+
+    # Get Appointment Record Information Before Removal
+    $appt_record = Appointment_Record::retrieve_appointment_by_id($patient_email, $appointmentid);
+
+    # Remove Appointment Record From The Patient DB
+    Appointment_Record::remove_appointment_record($patient_doc_id, $appointmentid);
+
+    # Remove Patient From The Slot
+    remove_from_slot($patient_doc_id, $appt_record);
+
+    return $appt_record;
+}
+
+// Remove Patient From Slot
+function remove_from_slot(string $patient_doc_id, Appointment_Record $appt_record): void {
+
+    switch ($appt_record->get_appointmenttype()):
+        case Appointment_Type::CHECK_UP:
+        case Appointment_Type::DOCTOR_CONSULTATION:
+            Normal_Slot::remove_patient_from_slot($appt_record->get_appointmentslot()->get_slotid(), $appt_record->get_facility()->get_facilityid(), $patient_doc_id);
+            break;
+        case Appointment_Type::SPECIALIST_CONSULTATION:
+            Special_Slot::remove_patient_from_slot($appt_record->get_appointmentslot()->get_slotid());
+            break;
+    endswitch;
+}
 
 // -- Check If User Is Signed In (When Redirect or Load The Page) -- //
 if (isset($_SESSION["user"])):
@@ -28,7 +64,6 @@ if (isset($_SESSION["user"])):
 
     # Update Appt Record
     $user->set_appointmentrecords($updated_appt_records);
-
 
 
     // -- When User Click On The Buttons -- //
@@ -49,10 +84,12 @@ if (isset($_SESSION["user"])):
             # Delimit & Get Information
             $appointmentid = $_POST['cancel'];
 
-
             # -- Cancel The Appointment : Function is working (COMMENT IT FOR  OTHER TESTING PURPOSE) -- #
-            //PatientFunctions::cancel_appointment($user_email, $appointmentid);
-            echo $appointmentid;
+            $appt_record = cancel_appointment($user_email, $appointmentid);
+
+            # -- Alert User Of Cancelled Appointment
+            EmailTemplate::template_cancelappointment($user_email, $appt_record);
+            header("Location:./debugviewappointments.php");
 
         // -- RESCHEDULE APPOINTMENT
         elseif (isset($_POST['reschedule'])):
@@ -67,6 +104,9 @@ if (isset($_SESSION["user"])):
 
     if (User_Type::check_user_type(User_Type::PATIENT, $user_type)):
 
+
+
+
 //        // -- Upcoming Appointments -- //
 //        $upcoming_arr = RetrieveAppointment::get_upcoming_appointments($email);
 //        // -- Missed Appointments -- //
@@ -76,7 +116,6 @@ if (isset($_SESSION["user"])):
         $appt_sorted_container = Appointment_Record::sort_appointment_by_status($appt_container);
         $upcoming_arr = $appt_sorted_container['upcoming'];
         $missed_arr = $appt_sorted_container['missed'];
-
         ?><!DOCTYPE html>
         <html lang="en">
             <head>
@@ -97,6 +136,7 @@ if (isset($_SESSION["user"])):
                 <title>View Appointments</title>
                 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
                 <script>
+                    // -- Pass Information To Modal
                     function upcoming_cancel_appt(appt_info) {
                         var info = appt_info.split("~");
                         var appt_id = info[0];
@@ -111,7 +151,7 @@ if (isset($_SESSION["user"])):
                         $("#upcoming_cancel_appt_type").html(appt_type);
                         $("#upcoming_cancel_appt_date").html(appt_date);
                         $("#upcoming_cancel_appt_time").html(appt_time);
-                        $("#upcoming_cancel_btn").val(appt_id);
+                        $("#upcoming_cancel_btn").val(appt_id); // Set Appt ID To Btn
                     }
 
                 </script>
@@ -184,7 +224,7 @@ if (isset($_SESSION["user"])):
                                             <div class="col">
                                                 <div class="card shadow" style="border-radius: 10px;">
                                                     <div class="card-header">
-                                                        <?php echo $record->get_appointmenttype(); // Return String         ?>
+                                                        <?php echo $record->get_appointmenttype(); // Return String           ?>
                                                     </div> <!-- CARD HEADER -->
                                                     <div class="card-body">
                                                         <!-- Add Event To Calendar (ICS FILE) -->
@@ -195,13 +235,13 @@ if (isset($_SESSION["user"])):
                                                         <button id="<?php echo $calendar_event_data; ?>" type="submit" value="<?php echo $calendar_event_data; ?>" name="calendar-invite" href="#" class="btn btn-outline-secondary" style="float: right;" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to calendar">
                                                             <i class="fas fa-calendar-alt"></i></button><br>
                                                         Appointment ID:
-                                                        <?php echo $record->get_appointmentid(); // Return Appointment ID          ?>
+                                                        <?php echo $record->get_appointmentid(); // Return Appointment ID            ?>
                                                         <br>Appointment Status:
-                                                        <?php echo $record->get_appointmentstatus(); // Return Appointment status         ?>
+                                                        <?php echo $record->get_appointmentstatus(); // Return Appointment status           ?>
                                                         <br>
-                                                        <br>Date: <?php echo Time::date_format_change($date, Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                     ?>
-                                                        <br>Time: <?php echo Time::to_12hours($time, false); // Returns Time                                                                                                                                        ?>
-                                                        <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                          ?>
+                                                        <br>Date: <?php echo Time::date_format_change($date, Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                         ?>
+                                                        <br>Time: <?php echo Time::to_12hours($time, false); // Returns Time                                                                                                                                            ?>
+                                                        <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                              ?>
 
                                                         <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                                         <br>Address: <?php echo $record->get_facility()->get_address(); ?>
@@ -215,6 +255,7 @@ if (isset($_SESSION["user"])):
                                                                     "~" . Time::to_12hours($appt_schedule->get_time(), false);
                                                             ?>
                                                             <div class="col">
+                                                                <!-- CANCEL (INFORMATION WILL BE PASSED TO MODAL) -->
                                                                 <button value="<?php echo $appt_info; ?>" type="button" class="btn btn-danger col-12" data-bs-toggle="modal" data-bs-target="#cancelappt"
                                                                         onclick="upcoming_cancel_appt(this.value)">Cancel</button>
                                                             </div> <!-- BUTTON CANCEL COLUMN -->
@@ -274,18 +315,18 @@ if (isset($_SESSION["user"])):
                                         <div class="col">
                                             <div class="card shadow" style="border-radius: 10px;">
                                                 <div class="card-header">
-                                                    <?php echo $record->get_appointmenttype(); // Return String                  ?>
+                                                    <?php echo $record->get_appointmenttype(); // Return String                    ?>
                                                 </div> <!-- CARD HEADER -->
                                                 <div class="card-body">
                                                     Appointment ID:
-                                                    <?php echo $record->get_appointmentid(); // Return Appointment ID                  ?>
+                                                    <?php echo $record->get_appointmentid(); // Return Appointment ID                    ?>
                                                     <br>Appointment Status:
-                                                    <?php echo $record->get_appointmentstatus(); // Return Appointment status                 ?>
+                                                    <?php echo $record->get_appointmentstatus(); // Return Appointment status                   ?>
                                                     <br>
                                                     <?php $appt_schedule = $record->get_appointmentslot()->get_appointmentschedule(); ?>
-                                                    <br>Date: <?php echo Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                    ?>
-                                                    <br>Time: <?php echo Time::to_12hours($appt_schedule->get_time(), false); // Returns Time                                                                                                                                        ?>
-                                                    <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                         ?>
+                                                    <br>Date: <?php echo Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                      ?>
+                                                    <br>Time: <?php echo Time::to_12hours($appt_schedule->get_time(), false); // Returns Time                                                                                                                                            ?>
+                                                    <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                             ?>
 
                                                     <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                                     <br>Address: <?php echo $record->get_facility()->get_address(); ?>
