@@ -249,7 +249,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
                     'password' => '',
                     'confirmpassword' => ''
                 );
-                header("Location:./debuglogin.php");
+                header("Location:./login.php");
 
 // -- Need To Send A Email To Ask Patient To Verify Email -- //
             } else {
