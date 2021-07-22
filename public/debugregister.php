@@ -515,7 +515,8 @@ endif; # END POST REQUEST
                 }
             }
 
-            // DEFAULT HIDE THE CONTENT INSIDE THE `onetimepass`
+
+            // DEFAULT HIDE THE CONTENT INSIDE THE `onetimepass` 
             $('#onetimepass').children().hide();
             // WHEN USER CLICKS TO VERIFY EMAIL
             $("#vrfyEmailBttn").on('click', function clickedVerify()
