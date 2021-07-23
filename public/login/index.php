@@ -210,35 +210,41 @@ else:
         </body>
         <?php
         /* ERROR MESSAGES */
+
         function set_login_err_msg(string $err_msg): void {
-            $login_err_msg = "
-                        <script>
-                            console.log('Wrong Credentials');
+            echo "
+                <script>
+                    if(document.getElementById('login-feedback')){
+                        $('#login-card').remove('#login-feedback');
+                    }                     
 
-                            if(document.getElementById('login-feedback')){
-                                $('#login-card').remove('#login-feedback');
-                            }
-                            //if($('#email').hasClass('is-invalid')){
-                                $('#email').addClass('is-invalid');
-                           // }
-                            if(!$('#password').hasClass('is-invalid')){
-                                $('#password').addClass('is-invalid');
-                            }                           
+                    var login_feedback = \"<div id='login-feedback' class='alert alert-danger'>{$err_msg}</div>\";
+                    $('#login-card').prepend(login_feedback);
 
-                            var login_feedback = \"<div id='login-feedback' class='alert alert-danger'>{$err_msg}</div>\";
-                            $('#login-card').prepend(login_feedback);
- 
-                        </script>
-                        ";
-            echo $login_err_msg;
+                </script>
+                ";
+        }
+
+        function remove_login_err_message(): void {
+            echo "
+                <script>
+                    $('#login-feedback').remove();
+                </script>
+                ";
         }
 
         if ($login_status['auth'] === false):
             set_login_err_msg("Invalid Credentials, please try again");
         elseif ($login_status['single_logon'] === false):
             set_login_err_msg("The account is logged in at another location");
-
         endif;
+
+        if ($_SERVER["REQUEST_METHOD"] != "POST"):
+            remove_login_err_message();
+        endif;
+
+
+
     endif; # -- END IF SESSION CHECK
     ?>
 </html>
