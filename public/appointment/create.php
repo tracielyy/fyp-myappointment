@@ -1,8 +1,8 @@
 <?php
 session_start();
 /* Load Config File */
-require_once '../resources/config.php';
-require '../vendor/autoload.php';
+require_once '../../resources/config.php';
+require '../../vendor/autoload.php';
 
 require_once TIME_MOD . '/Time.php';
 require_once EMAIL_MOD . '/EmailTemplate.php';
@@ -151,7 +151,7 @@ else:
             if (!in_array(False, $valid_arr)) :
                 $appt_record = book_appointment($user->get_email(), $appt_info);
                 EmailTemplate::template_bookappointment($user->get_email(), $appt_record);
-                header("Location:./debugviewappointments.php");
+                header("Location:". APPT_WEB);
             else:
                 echo "<script>console.log('Appt Fail');</script>";
             endif; # -- END VALIDATION
@@ -190,9 +190,9 @@ else:
     <!--Latest compiled and minified JavaScript-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta2/dist/js/bootstrap-select.min.js"> </script>
 
-    <script src="./js/calendar.js"></script>
+    <script src="./../js/calendar.js"></script>
 
-    <link rel="stylesheet" href="./css/createappointment.css">
+    <link rel="stylesheet" href="./../css/createappointment.css">
     <script>
     var spinnerhtml =
         '<div id="spinner" class="d-flex justify-content-center pt-5"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div></div>';
@@ -469,12 +469,12 @@ else:
         var dayToQuery = prefixZero(pickedDay.getDate()) + "-" + prefixZero((pickedDay.getMonth() + 1)) + "-" +
             pickedDay.getFullYear();
         console.log(dayToQuery);
-        $('#hide_date')
+        $('#hide_date');
         dateChange(dayToQuery);
     }
 
     var dateTomorrow = new Date();
-    dateTomorrow.setDate(dateTomorrow.getDate() + 1)
+    dateTomorrow.setDate(dateTomorrow.getDate() + 1);
 
     var defaultConfig = {
         weekDayLength: 1,
@@ -488,10 +488,10 @@ else:
         disable: function(date) {
             var dateMax = new Date();
             var dateToday = new Date();
-            dateToday.setDate(dateToday.getDate())
-            dateMax.setDate(dateMax.getDate() + <?php echo $future_days?>)
+            dateToday.setDate(dateToday.getDate());
+            dateMax.setDate(dateMax.getDate() + <?php echo $future_days?>);
             return (date < dateToday || date > dateMax); // Disable the days
-        },
+        }
     };
 
     $('.calendar-wrapper').calendar(defaultConfig);
