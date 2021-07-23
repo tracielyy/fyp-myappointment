@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once '../resources/config.php';
-require '../vendor/autoload.php';
+require_once '../../resources/config.php';
+require '../../vendor/autoload.php';
 
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Patient.php';

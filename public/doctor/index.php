@@ -10,6 +10,12 @@ require_once AUTH_MOD . '/Authentication.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Medical_Personnel.php';
 
+
+/*
+ *  MEDICAL DASHBOARD
+ */
+
+
 if (!isset($_SESSION['user'])):
     header("Location:./../"); # -- REDIRECT USER TO THE INDEX PAGE
 else:

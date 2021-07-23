@@ -12,6 +12,10 @@ require_once USER_MOD . '/Super_Admin.php';
 require_once USER_MOD . '/Facility_admin.php';
 require_once USER_MOD . '/Medical_Personnel.php';
 
+/*
+ * STAFF LOGIN
+ */
+
 ?>
 <!DOCTYPE html>
 

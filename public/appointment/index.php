@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once '../resources/config.php';
-require '../vendor/autoload.php';
+require_once '../../resources/config.php';
+require '../../vendor/autoload.php';
 
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Patient.php';
@@ -14,6 +14,11 @@ require_once ENUMS_PATH . '/User_Type.php';
 
 require_once TIME_MOD . '/CalendarICS.php';
 require_once TIME_MOD . '/Time.php';
+
+/*
+ * VIEW APPOINTMENT
+ */
+
 
 $pageName = "viewappointment";
 
@@ -103,14 +108,6 @@ if (isset($_SESSION["user"])):
     include TEMPLATES_PATH . '/bootstrap.php';
 
     if (User_Type::check_user_type(User_Type::PATIENT, $user_type)):
-
-
-
-
-//        // -- Upcoming Appointments -- //
-//        $upcoming_arr = RetrieveAppointment::get_upcoming_appointments($email);
-//        // -- Missed Appointments -- //
-//        $missed_arr = RetrieveAppointment::get_missed_appointments($email);
         # -- TESTING
         $appt_container = $user->get_appointmentrecords();
         $appt_sorted_container = Appointment_Record::sort_appointment_by_status($appt_container);
@@ -239,9 +236,9 @@ if (isset($_SESSION["user"])):
                                                         <br>Appointment Status:
                                                         <?php echo $record->get_appointmentstatus(); // Return Appointment status           ?>
                                                         <br>
-                                                        <br>Date: <?php echo Time::date_format_change($date, Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                         ?>
-                                                        <br>Time: <?php echo Time::to_12hours($time, false); // Returns Time                                                                                                                                            ?>
-                                                        <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                              ?>
+                                                        <br>Date: <?php echo Time::date_format_change($date, Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                           ?>
+                                                        <br>Time: <?php echo Time::to_12hours($time, false); // Returns Time                                                                                                                                              ?>
+                                                        <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                                ?>
 
                                                         <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                                         <br>Address: <?php echo $record->get_facility()->get_address(); ?>
@@ -324,9 +321,9 @@ if (isset($_SESSION["user"])):
                                                     <?php echo $record->get_appointmentstatus(); // Return Appointment status                   ?>
                                                     <br>
                                                     <?php $appt_schedule = $record->get_appointmentslot()->get_appointmentschedule(); ?>
-                                                    <br>Date: <?php echo Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                      ?>
-                                                    <br>Time: <?php echo Time::to_12hours($appt_schedule->get_time(), false); // Returns Time                                                                                                                                            ?>
-                                                    <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                             ?>
+                                                    <br>Date: <?php echo Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                        ?>
+                                                    <br>Time: <?php echo Time::to_12hours($appt_schedule->get_time(), false); // Returns Time                                                                                                                                              ?>
+                                                    <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                               ?>
 
                                                     <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                                     <br>Address: <?php echo $record->get_facility()->get_address(); ?>
@@ -356,9 +353,9 @@ if (isset($_SESSION["user"])):
 
                 <?php
             else:
-                header("Location:login.php");
+                header("Location:" . LOGIN_WEB);
             endif;
-        else: header("Location:login.php");
+        else: header("Location:" . LOGIN_WEB);
         endif;
         ?>
         <script>

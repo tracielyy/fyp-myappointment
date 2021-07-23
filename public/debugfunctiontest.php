@@ -6,6 +6,7 @@ require '../vendor/autoload.php';
 require_once TIME_MOD . '/Time.php';
 require_once FACILITY_MOD . '/Operating_Hours.php';
 require_once USER_MOD . '/Account_User.php';
+require_once MEDDOC_MOD . '/Medical_Record.php';
 
 require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
@@ -427,7 +428,15 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
             <input type="text" name="nric" placeholder="NRIC" />
             <button type="submit" name="validate_nric" class="action back btn btn-sm btn-outline-primary">Validate NRIC</button>
         </form>
-
+        <?php
+        echo nl2br(PHP_EOL . "Testing Medical Record ID Generation -- HARDCODE --" . PHP_EOL);
+        $user_doc_id = Account_User::retrieve_user_doc_id("yanying25@outlook.com");
+        echo Medical_Record::generate_medical_record_id($user_doc_id);
+        
+        echo nl2br(PHP_EOL . "Testing Login Redirect Lcoation -- HARDCODE --" . PHP_EOL);
+//        echo LOGIN_WEB;
+//        header("Location:". LOGIN_WEB);
+        ?>
 
     </body>
 </html>
