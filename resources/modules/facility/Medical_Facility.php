@@ -130,7 +130,7 @@ class Medical_Facility {
         # Find The Last ID & Increment
         $db = new DbQuery();
         $doc_path = Database::MEDICAL_FACILITY;
-        $last_id_facility = $db->get_documentid_ordered($doc_path, $orderBy, false);
+        $last_id_facility = $db->get_first_id_ordered($doc_path, $orderBy, false);
 
         # If There Is Any Present ID In Database
         if ($last_id_facility != null) :
