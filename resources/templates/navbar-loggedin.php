@@ -78,7 +78,7 @@
                             <label class="text-light mt-1"><?php echo $user->get_firstname(); ?></label>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-secondary dropdown-menu-end" aria-labelledby="navbarDarkDropdownMenuLink">
-                            <li><a class="dropdown-item" href="./profile.php">Profile</a></li>
+                            <li><a class="dropdown-item" href="<?php echo ACC_WEB. '/editprofile.php';?>">Profile</a></li>
                             <li><a class="dropdown-item" href="<?php echo APPT_WEB; ?>">View Appointments</a></li>
                             <li><a class="dropdown-item" href="<?php echo LOGIN_WEB . "/logout.php"; ?>">Log out</a></li>
                         </ul>

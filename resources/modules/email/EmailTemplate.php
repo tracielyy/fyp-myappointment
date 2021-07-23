@@ -28,7 +28,7 @@ class EmailTemplate {
             $to_name = Normal_User::retrieve_user_fullname($to);
 
         elseif ($recipient_usertype == User_Type::FACIILITY_ADMIN || $recipient_usertype == User_Type::SUPER_ADMIN):
-
+            $to_name = Admin::retrieve_admin_name($to);
         endif;
 
         // -- Email Subject
@@ -37,8 +37,8 @@ class EmailTemplate {
         # -- Token Expiry Date Needs To Be Set -- #
         // -- Password Reset Link With Token (To Be Added To The Email Message)
         // <link>?token=<passwordtoken>&email=<email>
-        $unique_password_url = "https://myappointment.tracieqwynn.tech/debugpasswordreset.php?token={$token}&email={$to}";
-        $request_another_url = "https://myappointment.tracieqwynn.tech/debugemail-reset.php";
+        $unique_password_url = "https://myappointment.tracieqwynn.tech/forgotpassword/reset.php?token={$token}&email={$to}";
+        $request_another_url = "https://myappointment.tracieqwynn.tech/forgotpassword/";
 
 
         // -- Clickable Links

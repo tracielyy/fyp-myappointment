@@ -23,6 +23,8 @@ define("LOGIN_WEB", '/login');
 define("REGISTER_WEB", '/register');
 define("APPT_WEB", '/appointment');
 define("FORGOT_PW_WEB", '/forgotpassword');
+define("ACC_WEB", '/account');
+
 
 
 ?>
