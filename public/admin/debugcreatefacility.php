@@ -16,7 +16,9 @@ require_once APPT_MOD . '/Special_Slot.php';
 require_once USER_MOD . '/Medical_Personnel.php';
 require_once USER_MOD . '/Patient.php';
 
-/* THIS TO BE CHANGED TO BE CLIENT REGISTRATION BASIS */
+/*
+ * CREATE FACILITY (onboarding a new facility)
+ */
 
 if (!isset($_SESSION['user'])):
     echo '<script>window.location.href = "./../";</script>'; # -- REDIRECT BACK TO THE HOME PAGE
@@ -76,7 +78,7 @@ else:
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
                 <!-- Styling -->
-        <?php include TEMPLATES_PATH . '/bootstrap.php'; ?>
+                <?php include TEMPLATES_PATH . '/bootstrap.php'; ?>
                 <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
                 <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js'></script>
@@ -126,8 +128,8 @@ else:
 
                 </form>
             </body>
-    <?php
-    endif; # -- END SUPER ADMIN CHECK
-endif; # -- END USER SESSION CHECK 
-?>
+        <?php
+        endif; # -- END SUPER ADMIN CHECK
+    endif; # -- END USER SESSION CHECK 
+    ?>
 </html>
