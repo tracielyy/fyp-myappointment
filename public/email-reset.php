@@ -2,11 +2,11 @@
 <?php
 /* Load Config File */
 require_once '../resources/config.php';
+require '../vendor/autoload.php';
 require_once USER_MOD . '/Account_User.php';
-require_once EMAIL_MOD . '/Email.php';
+require_once EMAIL_MOD . '/EmailTemplate.php';
 require_once UTIL_MOD . '/Regex.php';
 require_once UTIL_MOD . '/StringUtils.php';
-//require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
