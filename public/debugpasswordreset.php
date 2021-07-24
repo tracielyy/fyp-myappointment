@@ -120,7 +120,7 @@ setcookie($url_name, $url_value, time() + 3600);
 
 
             /* ------------ End Validation ------------ */
-            if (!in_array(FALSE, $validArr)) {
+            if (in_array(FALSE, $validArr)) {
                 echo "Password Pass";
 
                 // -- Store The Password To Database -- //
