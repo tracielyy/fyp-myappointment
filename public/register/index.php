@@ -9,6 +9,7 @@ require_once UTIL_MOD . '/Regex.php';
 require_once UTIL_MOD . '/StringUtils.php';
 require_once EMAIL_MOD . '/EmailTemplate.php';
 require_once EMAIL_MOD . '/EmailVerify.php';
+require_once SECURE_MOD. '/Security.php';
 
 require_once SECURE_MOD . '/ValidateIC.php';
 
