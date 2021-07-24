@@ -109,8 +109,14 @@ class Medical_Personnel extends Normal_User {
         $db->get_db()->collection(Database::ACCOUNT_USER)
                 ->document($medical_personnel_data['profile']['nric'])
                 ->set($medical_personnel_data);
-//        $added_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->add($medical_personnel_data);
-//        return $added_ref ? True : False;
+    }
+    
+    // -- RETRIEVE MEDICAL PERSONNEL BY ID  
+    public static function retrieve_practitioner_by_id(string $user_doc_id): ?Medical_Personnel{
+        
+        $db = new DbQuery();
+        $practitioner_data = $db->fetch_document_by_id(Database::ACCOUNT_USER,$user_doc_id);
+        return self::initialise_medical_personnel($practitioner_data);
     }
 
     // -- RETRIEVE ALL MEDICAL PERSONNEL
