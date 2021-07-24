@@ -151,7 +151,6 @@ require_once USER_MOD . '/Medical_Personnel.php';
                             'password' => '',
                             'usertype' => ''
                         );
-                        $login_status['single_logon'] = true;
                     endif; # -- END CHECK FOR SINGLE LOGON
 
                 endif; # -- END OF AUTHENTICATION
