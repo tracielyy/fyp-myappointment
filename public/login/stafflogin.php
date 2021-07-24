@@ -302,12 +302,14 @@ require_once USER_MOD . '/Medical_Personnel.php';
         <script>
             /* SET DISABLED IF ON LOAD NO USERTYPE SELECTED */
             $('#usertype').ready(function () {
-                $('#login-btn').prop('disabled', true);
+
                 var usertype = $('#usertype');
                 if (usertype.val() === " " || usertype.val() === undefined) {
+                    $('#login-btn').prop('disabled', true);
                     $('#email').prop('disabled', true);
                     $('#password').prop('disabled', true);
                 } else {
+                    $('#login-btn').prop('disabled', false);
                     $('#email').prop('disabled', false);
                     $('#password').prop('disabled', false);
                 }
