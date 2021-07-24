@@ -1,8 +1,8 @@
 <?php
 session_start();
 /* Load Config File */
-require_once '../resources/config.php';
-require '../vendor/autoload.php';
+require_once '../../resources/config.php';
+require '../../vendor/autoload.php';
 
 require_once TIME_MOD . '/Time.php';
 require_once EMAIL_MOD . '/EmailTemplate.php';
@@ -23,6 +23,8 @@ require_once APPT_MOD . '/Special_Slot.php';
 require_once APPT_MOD . '/Appointment_Record.php';
 
 
+
+// CHECK IF USER IS SET
 if (!isset($_SESSION['user'])):
     header("Location:./debuglogin.php"); # -- REDIRECT USER TO THE LOGIN PAGE
 else:

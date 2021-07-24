@@ -3,12 +3,15 @@
 session_start();
 /* Load Config File */
 require_once '../resources/config.php';
+require_once EMAIL_MOD . '/Email.php';
+require_once UTIL_MOD . '/StringUtils.php';
+require_once UTIL_MOD . '/Regex.php';
+require_once AUTH_MOD . '/Authentication.php';
+require_once USER_MOD . '/Account_User.php';
+require_once USER_MOD . '/Super_Admin.php';
+require_once USER_MOD . '/Facility_admin.php';
+require_once USER_MOD . '/Medical_Personnel.php';
 require_once ENUMS_PATH . '/User_Type.php';
-require_once ENTITIES_PATH . '/Account_User.php';
-require_once ENTITIES_PATH . '/Patient.php';
-require_once UTILS_PATH . '/Regex.php';
-require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
-require_once FUNCTIONS_PATH . '/AdminFunctions.php';
 
 $valid_user = false;
 
@@ -21,15 +24,15 @@ if (isset($_SESSION["user"])) :
     $user_type = $user->get_usertype();
 
     // -- Make Sure The User Is Admin -- //
-    if (User_Type::check_user_type(User_Type::ADMIN, $user_type)) :
+    if (User_Type::check_user_type(User_Type::SUPER_ADMIN, $user_type)) :
 
         # -- Turn The `Switch` On -- #
         $valid_user = true;
 
         # -- Retrieve All Information For Viewing -- #
-        $facility_list = AdminFunctions::display_all_facilities();
-        $patient_list = AdminFunctions::display_all_patients($user_email);
-        $practitioner_list = AdminFunctions::display_all_practitioner($user_email);
+        $facility_list = Medical_Facility::retrieve_all_facilities();
+        $patient_list = Patient::retrieve_all_patients($user_email);
+        $practitioner_list = Medical_Personnel::retrieve_all_practitioner($user_email);
     endif;
 endif;
 
@@ -498,7 +501,7 @@ endif;
         </div>
 
         <h3>Display All Facilities</h3>
-        <!--        <p>Last Facility ID: <?php //echo Medical_Facility::get_last_medical_id();                          ?></p>-->
+        <!--        <p>Last Facility ID: <?php //echo Medical_Facility::get_last_medical_id();                              ?></p>-->
         <div>
             <?php
             # -- Display All The Medical Facilities -- #

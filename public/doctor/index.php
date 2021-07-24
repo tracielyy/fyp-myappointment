@@ -10,8 +10,14 @@ require_once AUTH_MOD . '/Authentication.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Medical_Personnel.php';
 
+
+/*
+ *  MEDICAL DASHBOARD
+ */
+
+
 if (!isset($_SESSION['user'])):
-    header("Location:./"); # -- REDIRECT USER TO THE INDEX PAGE
+    header("Location:./../"); # -- REDIRECT USER TO THE INDEX PAGE
 else:
     $user = unserialize($_SESSION["user"]);
     $user_type = $user->get_usertype();
@@ -25,7 +31,6 @@ else:
 
             <head>
                 <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
-
 
                 <!-- Styling -->
                 <link rel="stylesheet" href="./../css/medicaldashboard.css">

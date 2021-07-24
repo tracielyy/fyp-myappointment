@@ -192,33 +192,28 @@ class Appointment_Record {
         # Find The Last ID & Increment
         $db = new DbQuery();
         $doc_path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
-        $last_id_appointment = $db->get_documentid_ordered($doc_path, $orderBy, false);
+        $last_id_appointment = $db->get_first_id_ordered($doc_path, $orderBy, false);
 
-        echo "The last id:" . $last_id_appointment;
         # If There Is Any Present ID In Database
         $current_year = Time::get_current_year();
         if ($last_id_appointment != null) :
 
             $last_id = explode("-", $last_id_appointment);
-            $last_id_date = $last_id[1];
 
             # Compare Year
-            if ($last_id_date == $current_year):
+            if ($last_id[1] == $current_year):
 
                 # Increase The Number
                 $new_id = ++$last_id[2];
-                echo "Same Year";
-                return $last_id[0] . "-" . $last_id[1] . "-" . $new_id;
-            else:
-                echo "A New Year";
-                return $last_id[0] . "-" . $current_year . "-1000";
 
+                return $last_id[0] . "-" . $last_id[1] . "-" . $new_id; # -- There is A Current Year Id
             endif;
 
-        # No ID Present In Database
-        else:
-            return "appt-" . $current_year . "-1000";
+            return $last_id[0] . "-" . $current_year . "-1000"; # -- There Is No Current Year Id
+
         endif;
+            return "appt-" . $current_year . "-1000"; # -- Totally No ID Present In Database
+        
     }
 
     // -- Retrieve Of Appointment Records Of Certain Type -- //

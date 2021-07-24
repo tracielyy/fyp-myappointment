@@ -528,7 +528,7 @@ class DbQuery {
     }
 
     // -- Get Nested Collection Document Ordered -- //
-    public function get_documentid_ordered(string $path, array $orderBy, bool $asc) {
+    public function get_first_id_ordered(string $path, array $orderBy, bool $asc) {
 
         # Get Nested Sub Document
         $sub_col_ref = $this->db->collection($path);

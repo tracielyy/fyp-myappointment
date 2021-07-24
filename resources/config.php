@@ -16,7 +16,16 @@ define("UTIL_MOD", realpath(dirname(__FILE__) . '/modules/utility'));
 define("APPT_MOD", realpath(dirname(__FILE__) . '/modules/appointment'));
 define("TIME_MOD", realpath(dirname(__FILE__) . '/modules/time'));
 define("SECURE_MOD", realpath(dirname(__FILE__) . '/modules/security'));
-define("MEDICALDOC_MOD", realpath(dirname(__FILE__) . '/modules/medicaldocument'));
+define("MEDDOC_MOD", realpath(dirname(__FILE__) . '/modules/medicaldocument'));
+
+############## -- CONFIGURATIONS FOR PAGES -- ################
+define("LOGIN_WEB", '/login');
+define("REGISTER_WEB", '/register');
+define("APPT_WEB", '/appointment');
+define("FORGOT_PW_WEB", '/forgotpassword');
+define("ACC_WEB", '/account');
+
+
 
 ?>
 

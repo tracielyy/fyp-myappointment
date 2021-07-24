@@ -1,13 +1,16 @@
-<!-- When User Is Directed To Email Reset -->
 <?php
 /* Load Config File */
-require_once '../resources/config.php';
-require '../vendor/autoload.php';
+require_once '../../resources/config.php';
+require '../../vendor/autoload.php';
 require_once USER_MOD . '/Account_User.php';
 require_once EMAIL_MOD . '/EmailTemplate.php';
 require_once UTIL_MOD . '/Regex.php';
 require_once UTIL_MOD . '/StringUtils.php';
-?><!DOCTYPE html>
+/*
+ * FORGOT PASSWORD
+ */
+?>
+<!DOCTYPE html>
 <html lang="en">
 
     <head>
@@ -19,8 +22,11 @@ require_once UTIL_MOD . '/StringUtils.php';
         <title>FYP-21-S2-24: Password Reset</title>
         <!-- Styling -->
         <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
-        <link rel='stylesheet' href='./css/loginRegister.css'>
 
+        <style>
+<?php include './../css/loginRegister.css';
+?>
+        </style>
     </head>
 
     <body>
@@ -81,10 +87,6 @@ require_once UTIL_MOD . '/StringUtils.php';
                 $msg = "Successfully sent";
                 // -- Updating The Token To The Database
                 Account_User::request_password_reset($to, $token);
-
-                $resetArr = array(
-                    'email' => '',
-                );
             } else {
                 $msg = "This email does not exist";
             }

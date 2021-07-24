@@ -1,15 +1,13 @@
-<!DOCTYPE html>
+<?php
+session_start();
+require_once '../../resources/config.php';
+require_once ENTITIES_PATH . '/Account_User.php';
+require_once ENTITIES_PATH . '/Appointment_Record.php';
+require_once ENUMS_PATH . '/User_Type.php';
+require_once FUNCTIONS_PATH . '/PatientFunctions.php';
+require_once FUNCTIONS_PATH . '/AccountUserFunctions.php';
+?><!DOCTYPE html>
 <html lang="en" dir="ltr">
-    <?php
-    session_start();
-    require_once '../resources/config.php';
-    require_once USER_MOD . '/Account_User.php';
-    require_once USER_MOD . '/Patient.php';
-    require_once USER_MOD . '/Medical_Personnel.php';
-    require_once APPT_MOD . '/Appointment_Record.php';
-    require_once ENUMS_PATH . '/User_Type.php';
-    ?>
-
     <head>
         <meta charset="utf-8">
         <title>Edit Profile</title>
@@ -25,7 +23,7 @@
     <?php
     if (isset($_SESSION["user"])):
         $user = unserialize($_SESSION["user"]);
-        include TEMPLATES_PATH . '/navbar-loggedin.php';
+        include COMPONENTS_PATH . '/navbar-loggedin.php';
         ?>
 
         <body class="bg-light">

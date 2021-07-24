@@ -30,7 +30,6 @@ if (isset($_SESSION["user"])):
 
 
 ?>
-
 <body class="bg-light">
     <section class="editProfileCard">
         <h3 class="mt-5 text-center font-weight-bold display-6"><b>Edit Profile</b></h3>

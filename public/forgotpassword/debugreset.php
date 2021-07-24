@@ -1,20 +1,17 @@
-<!--
-   Developed By FYP-21-S2-24
--->
-<!-- This File Is Solely Used For Debugging -->
 <?php
-/*
- * When User Clicks On The Link Sent To Their Email For Password Reset
- */
 /* Load Config File */
-require_once '../resources/config.php';
-require '../vendor/autoload.php';
+require_once '../../resources/config.php';
+require '../../vendor/autoload.php';
 
 // -- Import Project Classes -- //
 require_once USER_MOD . '/Account_User.php';
 require_once EMAIL_MOD . '/EmailTemplate.php';
 require_once UTIL_MOD . '/Regex.php';
 require_once TIME_MOD . '/Time.php';
+
+/*
+ * PASSWORD RESET
+ */
 
 // -- Misc Variables -- //
 $msg = "";
