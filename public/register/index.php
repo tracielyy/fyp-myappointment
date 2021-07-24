@@ -67,12 +67,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
     $validArr['gender'] = False; // Set All Field Validation Check As False
 
 endif;
-
+?>
+  <script>  var email_verified_validation = false; </script>
+<?php
 if (isset($_COOKIE['email_verified'])):
     if ($_COOKIE['email_verified'] == 'true'):
         $_COOKIE['email_verified'] = true;
+        ?> <script>  email_verified_validation = true; </script> <?php
     elseif ($_COOKIE['email_verified'] == 'false'):
         $_COOKIE['email_verified'] = false;
+        ?> <script>  email_verified_validation = true; </script> <?php
     endif;
 
 endif;
@@ -82,8 +86,6 @@ endif;
 
 // Upon clicking "Login" Button 
 if ($_SERVER["REQUEST_METHOD"] == "POST") :
-
-
 
     if (isset($_POST['ajax_emailverify'])):
         $otp_requester = $_POST['email'];
@@ -160,8 +162,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
         if (empty($registerArr['nric'])) {
             $err_msg['nric'] = "Required";
         } elseif (!$valid_nric) {
+            ?> <script> nric_checksum_verified = false; </script> <?php
             $err_msg['nric'] = "Invalid NRIC Format";
         } else {
+            ?> <script> nric_checksum_verified = true; </script> <?php
             $validArr['nric'] = True; // Pass Validation
         }
 
@@ -435,8 +439,8 @@ endif; # END POST REQUEST
                                         </div>
                                         <div class="col-md-6 col-sm-12" id="nric_container">
                                             <!-- NRIC -->
-                                            <input id="nric" class="form-control" type="text" name="nric" placeholder="NRIC"
-                                                   value="<?php echo htmlspecialchars($registerArr['nric']); ?>" /><br />
+                                            <input id="nric" onkeyup="typedNRIC()" class="form-control" type="text" name="nric" placeholder="NRIC"
+                                                   value="<?php echo htmlspecialchars($registerArr['nric']); ?>" />
                                         </div>
                                     </div>
 
@@ -531,6 +535,12 @@ endif; # END POST REQUEST
         endif;
         ?>
         <script>
+
+            function typedNRIC()
+            {
+                nric_checksum_verified = true;
+            }
+            
             // DISABLE THE `VERIFY` BUTTON WHEN NEEDED
             function typedEmail()
             {
@@ -622,6 +632,7 @@ endif; # END POST REQUEST
                             console.log('tick');
                         } else {
                             // WHEN THE OTP IS INVALID
+                            $("#otp").removeCLass("is-invalid");
                             $("#otp").addClass("is-invalid");
                             var otp_feedback = "<div id='otp-feedback' class='invalid-feedback'>Incorrect OTP Entered</div>";
                             $('#onetimepass').append(otp_feedback);
@@ -673,7 +684,8 @@ endif; # END POST REQUEST
                     },
                     nric: {
                         required: true,
-                        nricRegex: true
+                        nricRegex: true,
+                        nricVerify: true
                     },
                     gender: {
                         required: true
@@ -760,11 +772,19 @@ endif; # END POST REQUEST
                 return this.optional(element) || /^[689]{1}[0-9]{7}$/.test(value);
             }, "Contact number format is incorrect.");
 
+
+             /*------------------------------------------------------
+             CLIENT SIDE REGULAR EXPRESSION FOR NRIC VERIFICATION
+             --------------------------------------------------------*/
+            var nric_checksum_verified;
+            $.validator.addMethod("nricVerify", function (value, element) {
+                return this.optional(element) || (nric_checksum_verified == true);
+            });
+
             /*------------------------------------------------------
              CLIENT SIDE REGULAR EXPRESSION FOR EMAIL VERIFICATION
              --------------------------------------------------------*/
-            var email_verified_validation = false;
-
+            
             $.validator.addMethod("verifyEmail", function (value, element) {
                 return this.optional(element) || (email_verified_validation == true);
             }, "Email must be verified first");
