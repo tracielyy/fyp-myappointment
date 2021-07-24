@@ -312,7 +312,7 @@ endif; # END POST REQUEST
                         <div class="px-1 px-md-5">
                             <!-- Form -->
                             <form id="registerForm" method="post"
-                                action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" novalidate="novalidate">
+                                action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                                 <div class="row">
                                     <div class="col d-none d-lg-block">First Name</div>
                                     <div class="col d-none d-lg-block">Last Name</div>
@@ -475,101 +475,6 @@ endif; # END POST REQUEST
         </div>
     </div>
 
-    <script>
-    // DISABLE THE `VERIFY` BUTTON WHEN NEEDED
-    function typedEmail() {
-        $("#vrfyEmailBttn").show();
-        document.cookie = 'email_verified=false';
-        console.log(document.cookie);
-        $('#email_container').remove('#email_feedback');
-        $("#email").removeClass("is-valid");
-        $("#email").removeClass("is-invalid");
-
-        if (document.getElementById("email").value === "") {
-            document.getElementById('vrfyEmailBttn').disabled = true;
-        } else {
-            document.getElementById('vrfyEmailBttn').disabled = false;
-        }
-    }
-
-    // DEFAULT HIDE THE CONTENT INSIDE THE `onetimepass`
-    $('#onetimepass').children().hide();
-    // WHEN USER CLICKS TO VERIFY EMAIL
-    $("#vrfyEmailBttn").on('click', function clickedVerify() {
-        $('#onetimepass').show();
-        $('#otp').val("");
-        $('#otp').removeClass("is-invalid");
-
-        $('#email_container').remove('#email_feedback');
-        $("#email").removeClass("is-invalid");
-        $("#email").removeClass("is-valid");
-
-        $('#onetimepass').children().show();
-        // -- EMAIL VERIFY TRIGGER
-        $.ajax({
-            type: "POST",
-            url: "<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>",
-            data: {
-                ajax_emailverify: true,
-                email: $('#email').val()
-            },
-            success: function() {
-                console.log("Email Sent");
-            },
-            error: function() {
-                console.log("Email Not Sent");
-            }
-        });
-
-    });
-
-    // WHEN USER SUBMITS THE OTP
-    $("#submitOTP").on('click', function clickedSubmitOTP() {
-        // -- EMAIL VERIFY TRIGGER
-        $.ajax({
-            type: "POST",
-            url: "otpvalidate.php",
-            data: {
-                ajax_otp: true,
-                email: $('#email').val(),
-                otp: $('#otp').val()
-            },
-            success: function(valid_otp) {
-                console.log("Email Validate");
-                console.log(valid_otp);
-                console.log(JSON.stringify(valid_otp.replace(/(\r\n|\n|\r)/gm, "")));
-                var valid_status = valid_otp.replace(/(\r\n|\n|\r)/gm, "");
-                if (valid_status === 'true') {
-                    $("#otp").removeClass("is-invalid");
-                    $('#otp-feedback').remove();
-                    $("#vrfyEmailBttn").hide();
-                    var email_feedback =
-                        "<div id='email-feedback' class='valid-feedback'>Verified</div>";
-                    $('#email_container').append(email_feedback);
-                    $('#email-feedback').remove();
-                    $("#email").addClass("is-valid");
-                    $('#onetimepass').hide();
-                    email_verified_validation = true;
-                    document.cookie = 'email_verified=true';
-                    console.log('tick');
-                } else {
-                    // WHEN THE OTP IS INVALID
-                    $("#otp").addClass("is-invalid");
-                    var otp_feedback =
-                        "<div id='otp-feedback' class='error help-block invalid-feedback'><i>Incorrect OTP entered</i></div>";
-                    $('#onetimepass').append(otp_feedback);
-                }
-            },
-            error: function() {
-                console.log("Email Validation Error");
-            }
-        });
-
-    });
-
-    
-    </script>
-
 <?php
         if ($_SERVER["REQUEST_METHOD"] == "GET"):
             echo "
@@ -633,6 +538,7 @@ endif; # END POST REQUEST
                 $('#email_container').remove('#email_feedback');
                 $("#email").removeClass("is-valid");
                 $("#email").removeClass("is-invalid");
+                email_verified_validation = false;
 
                 if (document.getElementById("email").value === "") {
                     document.getElementById('vrfyEmailBttn').disabled = true;
@@ -651,8 +557,8 @@ endif; # END POST REQUEST
                 $('#otp').removeClass("is-invalid");
 
                 $('#email_container').remove('#email_feedback');
-                $("#email").removeClass("is-invalid");
-                $("#email").removeClass("is-valid");
+                //$("#email").removeClass("is-invalid");
+                //$("#email").removeClass("is-valid");
 
                 $('#onetimepass').children().show();
                 // -- EMAIL VERIFY TRIGGER
@@ -686,7 +592,7 @@ endif; # END POST REQUEST
                         otp: $('#otp').val()
                     },
                     success: function (valid_otp) {
-                        email_verified_validation = true;
+                        
                         console.log("Email Validate");
                         console.log(valid_otp);
                         console.log(JSON.stringify(valid_otp.replace(/(\r\n|\n|\r)/gm, "")));
@@ -702,11 +608,13 @@ endif; # END POST REQUEST
                             $('#onetimepass').hide();
                             document.cookie = 'email_verified=true';
                             console.log('tick');
+                            email_verified_validation = true;
                         } else {
                             // WHEN THE OTP IS INVALID
                             $("#otp").addClass("is-invalid");
                             var otp_feedback = "<div id='otp-feedback' class='invalid-feedback'>Incorrect OTP Entered</div>";
                              $('#onetimepass').append(otp_feedback);
+                             email_verified_validation = false;
                         }
                     },
                     error: function () {
@@ -766,7 +674,6 @@ endif; # END POST REQUEST
             },
             otp: {
                 required: true,
-                invalidotp: true,
                 minlength: 6,
                 maxlength: 6,
                 digits: true
