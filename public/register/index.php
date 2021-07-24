@@ -17,6 +17,8 @@ require_once SECURE_MOD . '/ValidateIC.php';
  *  REGISTER (PATIENT)
  */
 
+ echo 'Update-2';
+
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     setcookie("email_verified", "", time() - 3600); // resetting
 }
@@ -68,15 +70,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
 
 endif;
 ?>
-  <script>  var email_verified_validation = false; </script>
+  <script>  var email_verified_validation; </script>
 <?php
 if (isset($_COOKIE['email_verified'])):
     if ($_COOKIE['email_verified'] == 'true'):
         $_COOKIE['email_verified'] = true;
-        ?> <script>  email_verified_validation = true; </script> <?php
+        ?> <script>  email_verified_validation = true; 
+            $("#vrfyEmailBttn").hide(); </script> <?php
     elseif ($_COOKIE['email_verified'] == 'false'):
         $_COOKIE['email_verified'] = false;
-        ?> <script>  email_verified_validation = true; </script> <?php
+        ?> <script>  email_verified_validation = false; </script> <?php
     endif;
 
 endif;
@@ -324,7 +327,7 @@ endif; # END POST REQUEST
                                         <div class="col d-none d-lg-block">First Name</div>
                                         <div class="col d-none d-lg-block">Last Name</div>
                                     </div>
-                                    <div class="row pb-3">
+                                    <div class="row mb-3">
                                         <div class="col-md-6 col-sm-12" id="firstname_container">
                                             <!-- First Name -->
                                             <input id="firstname" class="form-control d-md-block" type="text"
@@ -350,10 +353,10 @@ endif; # END POST REQUEST
                                         <div class="col-md-6 col-sm-12" id="dob_container">
                                             <!-- Date Of Birth -->
                                             <input id="dob" class="form-control" type="date" name="dob"
-                                                   value="<?php echo htmlspecialchars($registerArr['dob']); ?>" /><br />
+                                                   value="<?php echo htmlspecialchars($registerArr['dob']); ?>" />
                                         </div>
 
-                                        <div class="col-md-6 col-sm-12" id="gender_container">
+                                        <div class="col-md-6 col-sm-12 mb-3" id="gender_container">
                                             <select class="form-select" name="gender">
                                                 <option value="" selected hidden>Select Gender</option>
                                                 <option id="gender_f" value="F" <?php
@@ -377,7 +380,7 @@ endif; # END POST REQUEST
                                         <div class="col d-none d-lg-block">Contact Number</div>
                                     </div>
 
-                                    <div class="row mb-3">
+                                    <div class="row">
                                         <div class="col-md-6 col-sm-12">
                                             <!-- Email -->
                                             <div onkeyup="typedEmail()" id="email_container" class="input-group">
@@ -418,7 +421,7 @@ endif; # END POST REQUEST
                                                 <span class="input-group-text" id="basic-addon">+65</span>
                                                 <input id="contactnumber" class="form-control" type="text"
                                                        name="contactnumber" placeholder="Contact No."
-                                                       value="<?php echo htmlspecialchars($registerArr['contactnumber']); ?>" /><br />
+                                                       value="<?php echo htmlspecialchars($registerArr['contactnumber']); ?>" />
                                             </div>
                                         </div>
                                     </div>
@@ -430,12 +433,12 @@ endif; # END POST REQUEST
 
                                     <div class="d-md-none mb-3"><!-- For responsiveness phone, hidden on bigger screens--></div>
 
-                                    <div class="row">
+                                    <div class="row mb-3">
                                         <div class="col-md-6 col-sm-12" id="address_container">
                                             <!-- Address -->
                                             <input id="address" class="form-control" type="text" name="address"
                                                    placeholder="Address"
-                                                   value="<?php echo htmlspecialchars($registerArr['address']); ?>" /><br />
+                                                   value="<?php echo htmlspecialchars($registerArr['address']); ?>" />
                                         </div>
                                         <div class="col-md-6 col-sm-12" id="nric_container">
                                             <!-- NRIC -->
@@ -449,18 +452,18 @@ endif; # END POST REQUEST
                                         <div class="col d-none d-lg-block">Confirm Password</div>
                                     </div>
 
-                                    <div class="row">
+                                    <div class="row mb-3">
                                         <div class="col-md-6 col-sm-12" id="password_container">
                                             <!-- Password -->
                                             <input id="password" class="form-control" type="password" name="password"
                                                    placeholder="Password"
-                                                   value="<?php echo htmlspecialchars($registerArr['password']); ?>" /><br />
+                                                   value="<?php echo htmlspecialchars($registerArr['password']); ?>" />
                                         </div>
                                         <div class="col-md-6 col-sm-12" id="confirmpassword_container">
                                             <!-- Confirmation Password -->
                                             <input id="confirmpassword" class="form-control" type="password"
                                                    name="confirmpassword" placeholder="Confirm Password"
-                                                   value="<?php echo htmlspecialchars($registerArr['confirmpassword']); ?>" /><br />
+                                                   value="<?php echo htmlspecialchars($registerArr['confirmpassword']); ?>" />
                                         </div>
                                     </div>
 
@@ -470,7 +473,7 @@ endif; # END POST REQUEST
                                         </div>
                                         <!-- Registration Submission -->
                                         <div class="d-grid gap-2 d-lg-block"><button class="btn btn-primary" type="submit" name="register_patient"
-                                                                                     style="float: right" ;>Register</button><br /></div>
+                                                                                     style="float: right" ;>Register</button></div>
                                     </div>
                                 </form>
                             </div>
@@ -540,7 +543,7 @@ endif; # END POST REQUEST
             {
                 nric_checksum_verified = true;
             }
-            
+
             // DISABLE THE `VERIFY` BUTTON WHEN NEEDED
             function typedEmail()
             {
@@ -556,6 +559,10 @@ endif; # END POST REQUEST
                     document.getElementById('vrfyEmailBttn').disabled = false;
                 }
             }
+
+            //DEBUGING ONLY
+            console.log("nric verify: " + nric_checksum_verified);
+            console.log("email verify: " + email_verified_validation);
 
             // DEFAULT HIDE THE CONTENT INSIDE THE `onetimepass`
             $('#onetimepass').children().hide();
@@ -737,7 +744,7 @@ endif; # END POST REQUEST
                     // Add the `help-block` class to the error element
                     error.addClass("help-block invalid-feedback");
 
-                    console.log(element);
+                    console.log(error);
                     if (element.is("#email")) {
                         error.insertAfter(element.parents('#email_container'));
 
@@ -779,7 +786,7 @@ endif; # END POST REQUEST
             var nric_checksum_verified;
             $.validator.addMethod("nricVerify", function (value, element) {
                 return this.optional(element) || (nric_checksum_verified == true);
-            });
+            }),"";
 
             /*------------------------------------------------------
              CLIENT SIDE REGULAR EXPRESSION FOR EMAIL VERIFICATION
