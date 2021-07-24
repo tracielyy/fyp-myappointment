@@ -38,10 +38,19 @@ require_once SECURE_MOD. '/Security.php';
             echo '<br><br>';
             echo "verification : " . $password_verify;
 
-        endif;
-          
+            if (true) :
+                ?><script> testing = false; </script> <?php
+            else:
+                ?><script> testing = true; </script> <?php
+            endif;
+
+        endif; 
         ?>
 
+<p id="demo"></p>
+    <script> var testing; 
+    document.getElementById("demo").innerHTML = testing;
+</script> 
     <form method="post">
 
     <input type="text" name="textToDecrpyt"placeholder="some text" >
