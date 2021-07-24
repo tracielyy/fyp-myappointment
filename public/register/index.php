@@ -70,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
 
 endif;
 ?>
-  <script>  var email_verified_validation = false; </script>
+  <script>  var email_verified_validation; </script>
 <?php
 if (isset($_COOKIE['email_verified'])):
     if ($_COOKIE['email_verified'] == 'true'):
@@ -78,7 +78,7 @@ if (isset($_COOKIE['email_verified'])):
         ?> <script>  email_verified_validation = true; </script> <?php
     elseif ($_COOKIE['email_verified'] == 'false'):
         $_COOKIE['email_verified'] = false;
-        ?> <script>  email_verified_validation = true; </script> <?php
+        ?> <script>  email_verified_validation = false; </script> <?php
     endif;
 
 endif;
@@ -558,6 +558,10 @@ endif; # END POST REQUEST
                     document.getElementById('vrfyEmailBttn').disabled = false;
                 }
             }
+
+            //DEBUGING ONLY
+            console.log("nric verify: " + nric_checksum_verified);
+            console.log("email verify: " + email_verified_validation);
 
             // DEFAULT HIDE THE CONTENT INSIDE THE `onetimepass`
             $('#onetimepass').children().hide();
