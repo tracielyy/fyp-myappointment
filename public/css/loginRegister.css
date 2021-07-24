@@ -1,14 +1,14 @@
 .center {
     padding-top: 60px;
-  }
+}
 
 .rounded1
 {
-  border-radius: 22px;
+    border-radius: 22px;
 }
 
 @media (min-width: 300px) {
-  .card-columns.custom-columns {
-      column-count: 1;
-  }
+    .card-columns.custom-columns {
+        column-count: 1;
+    }
 }
