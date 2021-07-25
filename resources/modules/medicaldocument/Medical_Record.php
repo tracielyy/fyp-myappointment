@@ -80,7 +80,6 @@ class Medical_Record {
             #Time (Createdon)
             $createdon = new Time($record_data['createdon']['date'], $record_data['createdon']['time']);
 
-
             # Medical Facility
             $facility = Medical_Facility::retrieve_facility_by_id($record_data['facilityid']);
 
@@ -94,6 +93,7 @@ class Medical_Record {
 
             return $medical_record;
         } catch (Exception $ex) {
+//            echo "error";
             return null;
         }
     }
@@ -166,13 +166,12 @@ class Medical_Record {
         $mr_path = Database::ACCOUNT_USER . '/' . $patient_doc_id . '/' . Database::MEDICAL_RECORD;
         $mr_data = $db->fetch_document_by_id($mr_path, $mrid);
 
-        return self::initialise_medical_record($mr_data);
+        return ($mr_data !== null) ? self::initialise_medical_record($mr_data) : null;
     }
 
     // -- Edit Medical Record -- //
     public static function edit_medical_record() {
         
     }
-    
 
 }
