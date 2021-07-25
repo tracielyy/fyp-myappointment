@@ -17,6 +17,8 @@ require_once SECURE_MOD . '/ValidateIC.php';
  *  REGISTER (PATIENT)
  */
 
+ echo 'Update-2';
+
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     setcookie("email_verified", "", time() - 3600); // resetting
 }

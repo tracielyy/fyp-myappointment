@@ -1,8 +1,8 @@
 <?php
 session_start();
 /* Load Config File */
-require_once '../resources/config.php';
-require '../vendor/autoload.php';
+require_once '../../resources/config.php';
+require '../../vendor/autoload.php';
 require_once TIME_MOD . '/Time.php';
 require_once FACILITY_MOD . '/Operating_Hours.php';
 require_once USER_MOD . '/Account_User.php';
@@ -432,10 +432,65 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
         echo nl2br(PHP_EOL . "Testing Medical Record ID Generation -- HARDCODE --" . PHP_EOL);
         $user_doc_id = Account_User::retrieve_user_doc_id("yanying25@outlook.com");
         echo Medical_Record::generate_medical_record_id($user_doc_id);
-        
+
         echo nl2br(PHP_EOL . "Testing Login Redirect Lcoation -- HARDCODE --" . PHP_EOL);
 //        echo LOGIN_WEB;
 //        header("Location:". LOGIN_WEB);
+
+        echo nl2br(PHP_EOL . "Testing Create Medical Record -- HARDCODE --" . PHP_EOL);
+        $spec_medical = array(
+            'facilityid' => 'mf001',
+            'slotid' => '1002~24-07-2021~S1990250A',
+            'appointmenttype' => Appointment_Type::SPECIALIST_CONSULTATION,
+            'practitioner' => 'S1990250A',
+            'diagnosisdesc' => 'Just a minor flu',
+            'prescriptions' => []
+        );
+//        Medical_Record::create_medical_record('S1499902G', $spec_medical);
+//        $mr = Medical_Record::create_medical_record('S1499902G', $spec_medical);
+        echo nl2br(PHP_EOL . "Testing Create Medical Record -- HARDCODE --" . PHP_EOL);
+        $pt = 'S1499902G';
+//        $mr_data = Medical_Record::retrieve_medical_record('S1499902G', 'mrid-2021-1000');
+//        echo $mr_data->get_medicalrecordid();
+
+        // -- RETRIEVE MEDICAL RECORD BY APPOINTMENT TYPE
+        function get_med_record_apptslot(Medical_Record $medical_record): ?Appointment_Slot {
+            $slotid = $medical_record->get_slotid();
+            $fid = $medical_record->get_facility()->get_facilityid();
+            $appt_slot = null;
+            switch ($medical_record->get_appointmenttype()):
+                case Appointment_Type::CHECK_UP:
+                case Appointment_Type::DOCTOR_CONSULTATION:
+                    $appt_slot = Normal_Slot::retrieve_apptslot_by_id($slotid, $fid);
+                    break;
+                case Appointment_Type::SPECIALIST_CONSULTATION:
+                    $appt_slot = Special_Slot::retrieve_apptslot_by_id($slotid);
+                    break;
+            endswitch;
+            return $appt_slot;
+        }
+
+        echo nl2br(PHP_EOL . "Testing Retrieve Medical Record -- HARDCODE --" . PHP_EOL);
+
+        // When Click On 1 Of The Patient's Appt Medical Record
+//        $appt_slot = get_med_record_apptslot($mr_data);
+//
+//        // Patient Appointment Info
+//        $appt_type = $mr_data->get_appointmenttype();
+//        $appt_facility = $mr_data->get_facility()->get_facilityname();
+//        $appt_date = $appt_slot->get_appointmentschedule()->get_date();
+//        $appt_time = $appt_slot->get_appointmentschedule()->get_time();
+//
+//        echo nl2br(PHP_EOL . "Consultation Type: " . $appt_type . PHP_EOL . "Facility: " . $appt_facility . PHP_EOL .
+//                "Date: " . $appt_date . PHP_EOL . "Time: " . $appt_time);
+
+//        echo nl2br(PHP_EOL . "Testing Multiple Return Type-- HARDCODE --" . PHP_EOL);
+//        function multi_return_type (string $str = "1"): string|int{
+//            return $str;
+//        }
+//        echo multi_return_type("omg");
+        
+
         ?>
 
     </body>

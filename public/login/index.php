@@ -136,10 +136,6 @@ else:
                             $auth_patient = Patient::retrieve_patient($loginArr); // Reload After Login Session Update
                             $_SESSION['user'] = serialize($auth_patient); // Store User Data In Session
                             header("Location:./../"); // Redirect Upon Success Authenticate
-                            echo nl2br(PHP_EOL . "Success" . PHP_EOL);
-                            echo $auth_patient . "<br/>";
-                            echo (int) $login_status;
-
                             # -- Clear Fields
                             $loginArr = array(
                                 'email' => '',
@@ -207,12 +203,11 @@ else:
                 <!-- After the "Login" button -->
                 <!-- ("Register Now") & ("Forgot your password?") [Hyperlink(s)] -->
             </div>
-        </body>
-        <?php
-        /* ERROR MESSAGES */
+            <?php
+            /* ERROR MESSAGES */
 
-        function set_login_err_msg(string $err_msg): void {
-            echo "
+            function set_login_err_msg(string $err_msg): void {
+                echo "
                 <script>
                     if(document.getElementById('login-feedback')){
                         $('#login-card').remove('#login-feedback');
@@ -223,28 +218,27 @@ else:
 
                 </script>
                 ";
-        }
+            }
 
-        function remove_login_err_message(): void {
-            echo "
+            function remove_login_err_message(): void {
+                echo "
                 <script>
                     $('#login-feedback').remove();
                 </script>
                 ";
-        }
+            }
 
-        if ($login_status['auth'] === false):
-            set_login_err_msg("Invalid Credentials, please try again");
-        elseif ($login_status['single_logon'] === false):
-            set_login_err_msg("The account is logged in at another location");
-        endif;
+            if ($login_status['auth'] === false):
+                set_login_err_msg("Invalid Credentials, please try again");
+            elseif ($login_status['single_logon'] === false):
+                set_login_err_msg("The account is logged in at another location");
+            endif;
 
-        if ($_SERVER["REQUEST_METHOD"] != "POST"):
-            remove_login_err_message();
-        endif;
+            if ($_SERVER["REQUEST_METHOD"] != "POST"):
+                remove_login_err_message();
+            endif;
 
-
-
-    endif; # -- END IF SESSION CHECK
-    ?>
+        endif; # -- END IF SESSION CHECK
+        ?>
+    </body>
 </html>

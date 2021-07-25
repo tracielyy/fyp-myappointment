@@ -85,6 +85,7 @@ class Normal_Slot extends Appointment_Slot {
             ['path' => 'patientlist', 'value' => FieldValue::arrayUnion([$patient_doc_id])]
         ]);
     }
+    
 
     // -- REMOVE PATIENT FROM SLOT WHEN CANCELLING APPOINTMENT
     public static function remove_patient_from_slot(string $slotid, string $facilityid, string $patient_doc_id): bool {
@@ -198,11 +199,7 @@ class Normal_Slot extends Appointment_Slot {
             return "1001~" . $date . "~" . $appointmenttype;
         endif;
     }
-
-    public static function check_slot_id(string $facilityid, string $slotid) {
-        
-    }
-
+    
     // -- PATIENT COUNT OF ALL APPOINTMENT TYPES BY FACILITY
     public static function patient_count_per_date(string $facilityid, string $date): int {
         $patient_counter = 0;
