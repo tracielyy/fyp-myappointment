@@ -17,8 +17,6 @@ require_once SECURE_MOD . '/ValidateIC.php';
  *  REGISTER (PATIENT)
  */
 
- echo 'Update-1';
-
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     setcookie("email_verified", "", time() - 3600); // resetting
 }
@@ -75,7 +73,8 @@ endif;
 if (isset($_COOKIE['email_verified'])):
     if ($_COOKIE['email_verified'] == 'true'):
         $_COOKIE['email_verified'] = true;
-        ?> <script>  email_verified_validation = true; </script> <?php
+        ?> <script>  email_verified_validation = true; 
+            $("#vrfyEmailBttn").hide(); </script> <?php
     elseif ($_COOKIE['email_verified'] == 'false'):
         $_COOKIE['email_verified'] = false;
         ?> <script>  email_verified_validation = false; </script> <?php
@@ -86,7 +85,7 @@ endif;
 
 
 
-// Upon clicking "Login" Button 
+// Upon clicking "Register" Button 
 if ($_SERVER["REQUEST_METHOD"] == "POST") :
 
     if (isset($_POST['ajax_emailverify'])):
@@ -743,7 +742,7 @@ endif; # END POST REQUEST
                     // Add the `help-block` class to the error element
                     error.addClass("help-block invalid-feedback");
 
-                    console.log(element);
+                    console.log(error);
                     if (element.is("#email")) {
                         error.insertAfter(element.parents('#email_container'));
 
@@ -785,7 +784,7 @@ endif; # END POST REQUEST
             var nric_checksum_verified;
             $.validator.addMethod("nricVerify", function (value, element) {
                 return this.optional(element) || (nric_checksum_verified == true);
-            });
+            }),"";
 
             /*------------------------------------------------------
              CLIENT SIDE REGULAR EXPRESSION FOR EMAIL VERIFICATION
