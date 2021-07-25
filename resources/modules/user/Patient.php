@@ -15,6 +15,7 @@ require_once AUTH_MOD . '/Session.php';
 require_once USER_MOD . '/Normal_User.php';
 
 require_once APPT_MOD . '/Appointment_Record.php';
+require_once SECURE_MOD. '/Security.php';
 
 class Patient extends Normal_User {
 
@@ -109,12 +110,21 @@ class Patient extends Normal_User {
     // -- CREATE PATIENT ACCOUNT
     public static function create_patient(array $patient_info): void {
 
+        $sec = new Security();
         # Declaration Of Basic Information To Include To Account_User
         $account_user_arr = ArrayCreation::account_creation_array(User_Type::PATIENT);
 
         # Load Basic Account User Fields & Values To Array
         foreach ($account_user_arr as $field => $value) :
-            $patient_info[$field] = $value;
+            if  ($field == 'password')
+            {
+                //Create hash on the password (salt is already generated in the function)
+                $patient_info[$field] = $sec->hash($value); 
+            }else
+            {
+                $patient_info[$field] = $value;
+            }
+            
         endforeach;
 
         # Add Patient Data To Database
