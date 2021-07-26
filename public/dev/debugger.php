@@ -1,8 +1,8 @@
 <?php
 session_start();
 /* Load Config File */
-require_once '../../resources/config.php';
-require '../../vendor/autoload.php';
+require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/config.php';
+require VENDOR_PATH . '/autoload.php';
 require_once TIME_MOD . '/Time.php';
 require_once FACILITY_MOD . '/Operating_Hours.php';
 require_once USER_MOD . '/Account_User.php';
@@ -11,7 +11,6 @@ require_once MEDDOC_MOD . '/Medical_Record.php';
 require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
 require_once DB_MOD . '/DbStorage.php';
-
 
 require_once APPT_MOD . '/Normal_Slot.php';
 require_once APPT_MOD . '/Special_Slot.php';
@@ -129,7 +128,7 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
         <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
     </head>
     <body>
-        <?php // echo $patient_per_day;        ?>
+        <?php // echo $patient_per_day;         ?>
         <?php // echo var_dump($slot_arr);          ?>
 
         <?php
@@ -164,9 +163,6 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
         echo nl2br(PHP_EOL . "Testing Reschedule Appointment -- HARDCODE --" . PHP_EOL);
         echo nl2br(PHP_EOL . "Testing Create Medical Personnel -- HARDCODE --" . PHP_EOL);
 
-
-
-
         echo nl2br(PHP_EOL . "Testing DISPLAY APPT SLOTS -- HARDCODE --" . PHP_EOL);
         # -- Display Specialist Slots
 //        $slot_appt_type = Appointment_Type::SPECIALIST_CONSULTATION;
@@ -196,7 +192,6 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
         $db_storage = new DbStorage();
         $file = $db_storage->retrieve_data_url("facility/facilityicon/sunset.png");
         echo "<img src='{$file}' width=100 height=100/>";
-
 
         echo nl2br(PHP_EOL . "Testing SAVE Image -- HARDCODE --" . PHP_EOL);
         ?>
@@ -291,7 +286,7 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
             return false; # -- EXPIRED
         }
 
-        // -- Checks If OTP Matches
+// -- Checks If OTP Matches
         function compare_otp(string $input_otp, string $db_otp): bool {
 
             if ($input_otp === $db_otp):
@@ -450,9 +445,9 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
 //        $mr = Medical_Record::create_medical_record('S1499902G', $spec_medical);
         echo nl2br(PHP_EOL . "Testing Create Medical Record -- HARDCODE --" . PHP_EOL);
         $pt = 'S1499902G';
+
 //        $mr_data = Medical_Record::retrieve_medical_record('S1499902G', 'mrid-2021-1000');
 //        echo $mr_data->get_medicalrecordid();
-
         // -- RETRIEVE MEDICAL RECORD BY APPOINTMENT TYPE
         function get_med_record_apptslot(Medical_Record $medical_record): ?Appointment_Slot {
             $slotid = $medical_record->get_slotid();
@@ -483,14 +478,22 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
 //
 //        echo nl2br(PHP_EOL . "Consultation Type: " . $appt_type . PHP_EOL . "Facility: " . $appt_facility . PHP_EOL .
 //                "Date: " . $appt_date . PHP_EOL . "Time: " . $appt_time);
-
 //        echo nl2br(PHP_EOL . "Testing Multiple Return Type-- HARDCODE --" . PHP_EOL);
 //        function multi_return_type (string $str = "1"): string|int{
 //            return $str;
 //        }
 //        echo multi_return_type("omg");
-        
+        echo nl2br(PHP_EOL . "Testing Update Medical Record-- HARDCODE --" . PHP_EOL);
+        $mrid = '035f05cbf562436d8f30';
+        $pt_id = 'S1499902G';
+//        $dr_id = 'S1990250A';
+        $dr_id = 'S1990250D'; // Fake id
 
+        $diagnosisdesc = "This is a flu. Fever for 4 days straight";
+        $prescriptions = array('Fever Med', 'Flu Med');
+
+        $medical_record_update = Medical_Record::update_medical_record($dr_id, $pt_id, $mrid, $diagnosisdesc, $prescriptions);
+        echo ($medical_record_update) ? "true" : "false";
         ?>
 
     </body>

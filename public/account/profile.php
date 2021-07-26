@@ -1,8 +1,8 @@
 <?php
 session_start();
 /* Load Config File */
-require_once '../resources/config.php';
-require '../vendor/autoload.php';
+require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/config.php';
+require VENDOR_PATH . '/autoload.php';
 require_once EMAIL_MOD . '/Email.php';
 require_once UTIL_MOD . '/StringUtils.php';
 require_once UTIL_MOD . '/Regex.php';

@@ -1,20 +1,21 @@
 <?php
 session_start();
 /* Load Config File */
-require_once '../../resources/config.php';
-require '../../vendor/autoload.php';
+require_once '../../../resources/config.php';
+require '../../../autoload.php';
 require_once TIME_MOD . '/Time.php';
 require_once FACILITY_MOD . '/Operating_Hours.php';
 require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
 require_once DB_MOD . '/DbStorage.php';
 
-
 require_once APPT_MOD . '/Normal_Slot.php';
 require_once APPT_MOD . '/Special_Slot.php';
 
 require_once USER_MOD . '/Medical_Personnel.php';
 require_once USER_MOD . '/Patient.php';
+require_once USER_MOD . '/Super_Admin.php';
+require_once USER_MOD . '/Facility_Admin.php';
 
 /*
  * CREATE FACILITY (onboarding a new facility)
@@ -46,11 +47,22 @@ else:
                 $db_storage->store_data($type, (int) $size, $tmp_path, 'facility/facilityicon/' . $file_name);
             }
 
-            function facility_account_creation(array $facility_info) {
+            function facility_account_creation(array $icon_info, array $facility_info, array $fadmin_info) {
 
                 # STEP 1: Insert Facility (save image & create new facility record in database)
-                # STEP 2: Get The Facility From The Database After Insert
-                # STEP 3: Insert Facility Admin
+                save_facility_icon($icon_info);
+
+                # STEP 2: Get The Facility From The Database After Insert (Medical_Facility Creation)
+                $mf = Medical_Facility::create_medical_facility($facility_info);
+
+                if (!$mf /* If Medical Facility Is Created */) {
+
+                    # Include More Information In Attained Array
+                    $fadmin_info['profile']['facilityid'] = $mf->get_facilityid();
+
+                    # STEP 3: Insert Facility Admin (Facility_Admin Creation)
+                    Facility_Admin::create_facility_admin($fadmin_info);
+                }
             }
 
             /* ---------  END OF FUNCTION FOR CREATING FACILITY ---------  */
@@ -64,7 +76,6 @@ else:
                 endif; # -- END OF FACILITY ICON ERROR CHECK
 
                 echo "here";
-
 
             endif; # -- END OF FACILITY ICON
 
