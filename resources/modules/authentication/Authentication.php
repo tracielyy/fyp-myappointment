@@ -72,6 +72,7 @@ class Authentication {
         $db = new DbQuery();
         $user_data = $db->fetch_one_document(Database::ACCOUNT_USER, $condition_arr);
 
+        
         /*
          * NANTA TO DO HASH COMPARISON
          */
@@ -79,7 +80,15 @@ class Authentication {
 
         # Check If There Are Any User Returned From The Query
         if ($user_data != NULL):
-            return True;
+            $stored_password = $user_data['credentials']['password'];
+            $pass_authenticate = $secure->compareHash($password,$stored_password);
+            if( $pass_authenticate == 'CORRECT_PASSWORD')
+            {
+                return True;
+            } elseif($pass_authenticate == 'CORRECT_PASSWORD')
+            {
+                return False;
+            }
         endif;
 
         return False;
