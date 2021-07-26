@@ -8,6 +8,7 @@ require_once USER_MOD . '/Account_User.php';
 require_once EMAIL_MOD . '/EmailTemplate.php';
 require_once UTIL_MOD . '/Regex.php';
 require_once TIME_MOD . '/Time.php';
+require_once SECURE_MOD . '/Security.php';
 
 /*
  * PASSWORD RESET
@@ -93,7 +94,7 @@ setcookie($url_name, $url_value, time() + 3600);
                     $validArr[$key] = False; // Set All Field Validation Check As False
                 }
             }
-
+            echo "here";
             // Possible Validation of Email Before Firestore Query
             /* ------------ Start Validation ------------ */
 
@@ -117,7 +118,7 @@ setcookie($url_name, $url_value, time() + 3600);
 
 
             /* ------------ End Validation ------------ */
-            if (in_array(FALSE, $validArr)) {
+            if (!in_array(FALSE, $validArr)) {
                 echo "Password Pass";
 
                 // -- Store The Password To Database -- //
@@ -129,7 +130,6 @@ setcookie($url_name, $url_value, time() + 3600);
                     // -- Need To Email To Inform Password Change -- //
                     $to = $_COOKIE['email'];
                     EmailTemplate::template_passwordchanged($to);
-
 
                     echo "Password Changed Successfully";
                 } else {
@@ -148,29 +148,24 @@ setcookie($url_name, $url_value, time() + 3600);
         <?php
         # Check If The Given URL Is Valid
         if ($validURL) {
+            ?>  
+            <!-- Form -->
+            <form method ="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
 
-            # Form
-            echo "<form method ='post' action='";
-            echo htmlspecialchars($_SERVER['PHP_SELF']);
-            echo "'>";
+                <!-- Title -->
+                <p>Password Reset For <?php echo $email; ?></p>
 
-            # Title
-            echo "<p>Password Reset For {$email}</p>";
+                <!-- Password-->
+                <input type="password" name="password" required placeholder="Password"  value="<?php echo $resetArr['password']; ?>"/>
 
-            # Password
-            echo '<input type="password" name="password" required placeholder="Password"  value="';
-            echo $resetArr['password'];
-            echo '"/>';
+                <!-- Confirm Password-->
+                <input type="password" name="confirmpassword" required placeholder="Confirm Password"  value="<?php echo $resetArr['confirmpassword']; ?>"/>
 
-            # Confirm Password
-            echo '<input type="password" name="confirmpassword" required placeholder="Confirm Password"  value="';
-            echo $resetArr['confirmpassword'];
-            echo '"/>';
+                <!-- Submit For Reset-->
+                <button type="submit" name="resetpassword" value="reset">Reset</button>
 
-            # Submit For Reset
-            echo '<button type="submit" name="resetpassword" value="reset">Reset</button>';
-
-            echo '</form>';
+            </form>
+            <?php
         } else {
 
             # Display Invalid URL
