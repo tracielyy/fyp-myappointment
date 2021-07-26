@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-require_once '../resources/config.php';
-require '../vendor/autoload.php';
+require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/config.php';
+require VENDOR_PATH . '/autoload.php';
 require_once SECURE_MOD. '/Security.php';
 ?>
 <head>
