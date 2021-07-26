@@ -85,7 +85,7 @@ class Authentication {
             if( $pass_authenticate == 'CORRECT_PASSWORD')
             {
                 return True;
-            } elseif($pass_authenticate == 'CORRECT_PASSWORD')
+            } elseif($pass_authenticate == 'INCORRECT_PASSWORD')
             {
                 return False;
             }
