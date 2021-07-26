@@ -54,7 +54,7 @@ class Authentication {
 
         # Credentials
         $credentials = array(
-            "credentials" => $credentialArr
+            "credentials" => $credentialArr 
         );
 
         # User Type
