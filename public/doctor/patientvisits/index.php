@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 session_start();
 /* Load Config File */
 require_once '../../../resources/config.php';

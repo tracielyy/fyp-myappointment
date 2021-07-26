@@ -7,9 +7,12 @@ require_once USER_MOD . '/Account_User.php';
 require_once EMAIL_MOD . '/EmailTemplate.php';
 require_once UTIL_MOD . '/Regex.php';
 require_once UTIL_MOD . '/StringUtils.php';
+/*
+ * FORGOT PASSWORD PAGE
+ */
+
 ?><!DOCTYPE html>
 <html lang="en">
-
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -22,7 +25,6 @@ require_once UTIL_MOD . '/StringUtils.php';
         <link rel='stylesheet' href='./../css/loginRegister.css'>
 
     </head>
-
     <body>
         <!-- PHP Script -->
         <?php
@@ -38,8 +40,6 @@ require_once UTIL_MOD . '/StringUtils.php';
         $email_pattern = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
         // Upon clicking "Login" Button
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-
 
             /* Load Data to Array */
             foreach ($_POST as $key => $value) {
@@ -92,9 +92,7 @@ require_once UTIL_MOD . '/StringUtils.php';
         ?>
         <!-- Display Message Info -->
         <div><?php echo $msg; ?></div>
-
         <!-- HTML FRONT END CODE -->
-
         <div>
             <!-- Navigation -->
             <?php include TEMPLATES_PATH . '/navbar.php' ?>
@@ -135,10 +133,7 @@ require_once UTIL_MOD . '/StringUtils.php';
                         </div>
                     </div>
                 </div>
-            </div>
+            </div><!-- END LOGIN -->
         </div>
-
-
     </body>
-
 </html>

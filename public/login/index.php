@@ -101,7 +101,7 @@ else:
                 if (!in_array(FALSE, $validArr)):
 
                     # -- Start Authenticating User (boolean)
-                    $login_status['auth'] = Authentication::authenticate_user($loginArr, User_Type::PATIENT);
+                    $login_status['auth'] = Authentication::authenticate_user($loginArr['email'], User_Type::PATIENT, $loginArr['password']);
 
                     # -- Check If There Is Any "token" generated ---
                     if (!isset($_SESSION['token'])) :

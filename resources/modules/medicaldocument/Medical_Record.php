@@ -8,6 +8,8 @@ require_once USER_MOD . '/Medical_Personnel.php';
 require_once FACILITY_MOD . '/Medical_Facility.php';
 require_once TIME_MOD . '/Time.php';
 
+use Google\Cloud\Firestore\Transaction;
+
 class Medical_Record {
     # Medical Record ID
 
@@ -19,10 +21,10 @@ class Medical_Record {
     private Medical_Facility $facility;
 
     # Medical Diagnosis (Some Descriptions)
-    private string $diagnosisdesc;
+    private string $diagnosisdesc; /* editable */
 
     # Prescription -- Multiple Medications. (Possible `Prescription` Class)
-    private array $prescriptions;
+    private array $prescriptions; /* editable */
 
     # Attending Medical Personnel
     private Medical_Personnel $practitioner;
@@ -141,7 +143,7 @@ class Medical_Record {
         $createdon = new Time();
 
         # Get Appointment ID
-//        $id = self::generate_medical_record_id($patient_doc_id);
+        /* $id = self::generate_medical_record_id($patient_doc_id); */
         $patient_mr_path = Database::ACCOUNT_USER . "/" . $patient_doc_id . "/" . Database::MEDICAL_RECORD;
         $doc_ref = $db->get_db()->collection($patient_mr_path)->newDocument();
         $medical_record_arr = array(
@@ -155,7 +157,6 @@ class Medical_Record {
             'prescriptions' => $medical_record_info['prescriptions']
         );
 
-//        $db->get_db()->collection($patient_mr_path)->document($id)->set($medical_record_arr);
         $doc_ref->set($medical_record_arr);
         return self::initialise_medical_record($medical_record_arr);
     }
@@ -169,9 +170,37 @@ class Medical_Record {
         return ($mr_data !== null) ? self::initialise_medical_record($mr_data) : null;
     }
 
-    // -- Edit Medical Record -- //
-    public static function edit_medical_record() {
-        
+    /*
+     * EDIT MEDICAL RECORD DETAIL
+     *      - Once created only limited amount of info can be edited
+     *      - Only diagnosisdesc and prescriptions can be edited
+     *      - Only the patient's practitioner can edit the medical record
+     */
+
+    public static function update_medical_record(string $practitioner_doc_id, string $patient_doc_id, string $mrid,
+            string $diagnosisdesc, array $prescriptions): bool {
+
+        $db = new DbQuery();
+        $mr_path = Database::ACCOUNT_USER . '/' . $patient_doc_id . '/' . Database::MEDICAL_RECORD;
+        $mr_doc_ref = $db->get_db()->collection($mr_path)->document($mrid);
+        $trnx_result = $db->get_db()->runTransaction(function (Transaction $transaction)
+        use ($mr_doc_ref, $practitioner_doc_id, $diagnosisdesc, $prescriptions) {
+
+            $snapshot = $transaction->snapshot($mr_doc_ref);
+            $db_practitioner = $snapshot['practitioner'];
+
+            # Check If Practitioner Is The One That Is Changing The Information
+            if ($db_practitioner === $practitioner_doc_id) {
+                $transaction->update($mr_doc_ref, [
+                    ['path' => 'diagnosisdesc', 'value' => $diagnosisdesc],
+                    ['path' => 'prescription', 'value' => $prescriptions]
+                ]);
+                return true;
+            }
+            return false; # NOT THE PRACTITIONER WHOM INITIATE THE EDIT
+        });
+
+        return $trnx_result;
     }
 
 }

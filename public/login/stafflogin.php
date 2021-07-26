@@ -109,7 +109,8 @@ require_once USER_MOD . '/Medical_Personnel.php';
                 );
 
                 # -- Start Authenticating User (boolean)
-                $login_status['auth'] = Authentication::authenticate_user($credentials, $loginArr['usertype']);
+                    $login_status['auth'] = Authentication::authenticate_user($loginArr['email'], $loginArr['usertype'], $loginArr['password']);
+
 
                 # -- Check If There Is Any "token" generated ---
                 if (!isset($_SESSION['token'])) :

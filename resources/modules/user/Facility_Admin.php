@@ -49,7 +49,7 @@ class Facility_Admin extends Admin {
 
         # Facility Admin Object
         $facility_admin = new Facility_Admin($session_obj, $facility_admin_info['accountdetails']['usertype'], $time_obj, $facility_admin_info['profile']['adminid'],
-                $facility_admin_info['profile']['adminname'], $facility_obj,$facility_admin_info['credentials']['email']);
+                $facility_admin_info['profile']['adminname'], $facility_obj, $facility_admin_info['credentials']['email']);
 
         return $facility_admin;
     }
@@ -58,8 +58,19 @@ class Facility_Admin extends Admin {
     //      Methods Accessing Firestore Database 
     //============================================
     // -- CREATE FACILITY ADMIN ACCOUNT
-    public static function create_facility_admin(array $facility_admin_data): bool {
-        
+    public static function create_facility_admin(array $fadmin_info): void {
+
+        # Basic Account Information To Be Added
+        $account_user_arr = ArrayCreation::account_creation_array(User_Type::FACIILITY_ADMIN);
+
+        # Load Basic Account User Fields & Values To Array
+        foreach ($account_user_arr as $field => $value) :
+            $fadmin_info[$field] = $value;
+        endforeach;
+
+        # Add Patient Data To Database (use auto-id)
+        $db = new DbQuery();
+        $db->get_db()->collection(Database::ACCOUNT_USER)->add($fadmin_info);
     }
 
     // -- RETRIEVE  FACILITY ADMIN DATA

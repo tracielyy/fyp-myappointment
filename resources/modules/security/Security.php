@@ -1,6 +1,6 @@
 <?php
 /*
- * @author yanying (Tracy)
+ * @author yanying (Tracie)
  * @author nanta
  */
 
