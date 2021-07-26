@@ -15,6 +15,8 @@ require_once ENUMS_PATH . '/User_Type.php';
 
 require_once SECURE_MOD . '/Security.php';
 
+use Google\Cloud\Firestore\Transaction;
+
 class Account_User {
 
     // Properties
@@ -294,7 +296,7 @@ class Account_User {
     public static function change_password(string $email, string $new_password, string $current_password): bool {
 
         # Update The New Password
-        $user_doc_id = self::retrieve_user_doc_id($email, $current_password);
+        $user_doc_id = self::retrieve_user_doc_id($email);
 
         # If Valid User
         if ($user_doc_id !== NULL):
@@ -303,21 +305,25 @@ class Account_User {
             # Update To New Password
             $secure = new Security();
             $new_hashed_pw = $secure->hash($new_password);
-            $db->get_db()->collection(Database::ACCOUNT_USER)->document($user_doc_id)
-                    ->update([
+            $user_doc_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->document($user_doc_id);
+            $trnx_result = $db->get_db()->runTransaction(function (Transaction $transaction)
+            use ($user_doc_ref, $new_hashed_pw, $current_password) {
+
+                $snapshot = $transaction->snapshot($user_doc_ref);
+                $db_password = $snapshot['credentials']['password'];
+
+                $secure = new Security();
+                if ($secure->compareHash($current_password, $db_password)):
+                    $transaction->update($user_doc_ref, [
                         ['path' => 'credentials.password', 'value' => $new_hashed_pw]
-            ]);
+                    ]);
+                    return true;
+                endif;
 
-            # Check If Password Updated Correctly
-            $new_user_doc_id = self::retrieve_user_doc_id($email, $new_password);
-
-            if ($new_user_doc_id !== Null):
-
-                return true; # -- END OF PASSWORD CHANGE PROCESS
-            endif; # -- CHECK FOR NEW USER ID
-            return false; # -- HAVE ISSUES IN CHANGING PASSWORD
+                return false; # -- HAVE ISSUES IN CHANGING PASSWORD
+            });
         endif; # -- CHECK IF THE USER ENTERS A CORRECT PASSWORD
-        return false; # -- USER ENTER WRONG PASSWORD
+        return $trnx_result;
     }
 
     // -- PASSWORD CHANGE
