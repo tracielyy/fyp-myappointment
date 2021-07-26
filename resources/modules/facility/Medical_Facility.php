@@ -151,7 +151,7 @@ class Medical_Facility {
 
             $doc_path = Database::MEDICAL_FACILITY;
             $db = new DbQuery();
-            return $db->insert_data($doc_path, $facility_info, False, $facility_id);
+            return $db->insert_document($doc_path, $facility_info, False, $facility_id);
         endif;
         return False;
     }

@@ -44,7 +44,7 @@ class ArrayCreation {
         # -- ONLY FOR PATIENTS
         if (User_Type::check_user_type(User_Type::PATIENT, $usertype)):
             $verified_arr['verification'] = array(
-                'verified' => false,
+                'verified' => true,
                 'vtoken' => $vtoken
             );
             $user_data_arr['accountdetails'] = array_merge($user_data_arr['accountdetails'], $verified_arr);
