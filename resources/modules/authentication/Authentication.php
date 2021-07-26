@@ -58,7 +58,7 @@ class Authentication {
     public static function authenticate_user(string $user_email, string $usertype, string $password): bool {
 
         # Credentials
-        $credentials['credentials'] = $user_email;
+        $credentials ['credentials'] = array('email' => $user_email);
 
         # User Type
         $account_type ['accountdetails'] = array(
