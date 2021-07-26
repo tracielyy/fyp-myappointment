@@ -15,7 +15,7 @@ require_once AUTH_MOD . '/Session.php';
 require_once USER_MOD . '/Normal_User.php';
 
 require_once APPT_MOD . '/Appointment_Record.php';
-require_once SECURE_MOD. '/Security.php';
+require_once SECURE_MOD . '/Security.php';
 
 class Patient extends Normal_User {
 
@@ -114,21 +114,19 @@ class Patient extends Normal_User {
         # Declaration Of Basic Information To Include To Account_User
         $account_user_arr = ArrayCreation::account_creation_array(User_Type::PATIENT);
 
+        if (isset($patient_info['credentials']['password'])):
+            $patient_info['credentials']['password'] = $sec->hash($patient_info['credentials']['password']);
+        endif;
+
+        //Create hash on the password (salt is already generated in the function)
+        if (isset($patient_info['profile']['nric'])):
+            $patient_info['profile']['nric'] = $sec->encrypt($patient_info['profile']['nric']);
+        endif;
+        
         # Load Basic Account User Fields & Values To Array
         foreach ($account_user_arr as $field => $value) :
-            if  ($field == 'password')
-            {
-                //Create hash on the password (salt is already generated in the function)
-                $patient_info[$field] = $sec->hash($value); 
-            }elseif ($field == 'NRIC')
-            {
-                $patient_info[$field] = $sec->encrypt($value); 
-            }
-            else
-            {
-                $patient_info[$field] = $value;
-            }
-            
+            $patient_info[$field] = $value;
+
         endforeach;
 
         # Add Patient Data To Database
