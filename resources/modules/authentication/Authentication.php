@@ -14,8 +14,13 @@ require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
 
 require_once USER_MOD . '/Patient.php';
+require_once USER_MOD . '/Medical_Personnel.php';
+require_once USER_MOD . '/Super_Admin.php';
+require_once USER_MOD . '/Facility_Admin.php';
 
 require_once ENUMS_PATH . '/User_Type.php';
+
+require_once SECURE_MOD . '/Security.php';
 
 require_once UTIL_MOD . '/ArrayCreation.php';
 
@@ -50,12 +55,10 @@ class Authentication {
     }
 
     // -- Authenticate & Return The User Data If Authenticated Successfully -- //
-    public static function authenticate_user(array $credentialArr, string $usertype): bool {
+    public static function authenticate_user(string $user_email, string $usertype, string $password): bool {
 
         # Credentials
-        $credentials = array(
-            "credentials" => $credentialArr
-        );
+        $credentials['credentials'] = $user_email;
 
         # User Type
         $account_type ['accountdetails'] = array(
@@ -68,6 +71,11 @@ class Authentication {
         # Query For User Using Given Credentials & Condition
         $db = new DbQuery();
         $user_data = $db->fetch_one_document(Database::ACCOUNT_USER, $condition_arr);
+
+        /*
+         * NANTA TO DO HASH COMPARISON
+         */
+        $secure = new Security();
 
         # Check If There Are Any User Returned From The Query
         if ($user_data != NULL):
