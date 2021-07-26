@@ -120,7 +120,11 @@ class Patient extends Normal_User {
             {
                 //Create hash on the password (salt is already generated in the function)
                 $patient_info[$field] = $sec->hash($value); 
-            }else
+            }elseif ($field == 'NRIC')
+            {
+                $patient_info[$field] = $sec->encrypt($value); 
+            }
+            else
             {
                 $patient_info[$field] = $value;
             }
