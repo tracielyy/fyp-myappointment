@@ -151,7 +151,6 @@ include TEMPLATES_PATH . '/bootstrap.php';
             </div>
         </div>
 
-       
 
         <script type="text/javascript">
         $('#onetimepass').children().hide();
@@ -185,7 +184,6 @@ include TEMPLATES_PATH . '/bootstrap.php';
             evt.currentTarget.className += " active";
         }
           
-       
         </script>
 </body>
 
