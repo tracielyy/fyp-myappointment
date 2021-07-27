@@ -34,14 +34,27 @@ require_once USER_MOD . '/Medical_Personnel.php';
         <?php
 
         function retrieve_user(array $login_arr): Account_User {
-            $credentials = array('email' => $login_arr['email'], 'password' => $login_arr['password']);
             switch ($login_arr['usertype']):
                 case User_Type::SUPER_ADMIN:
-                    return Super_Admin::retrieve_super_admin($credentials);
+                    return Super_Admin::retrieve_super_admin($login_arr['email']);
                 case User_Type::FACIILITY_ADMIN:
-                    return Facility_Admin::retrieve_facility_admin($credentials);
+                    return Facility_Admin::retrieve_facility_admin($login_arr['email']);
                 case User_Type::MEDICAL_PERSONNEL:
-                    return Medical_Personnel::retrieve_medical_personnel($credentials);
+                    return Medical_Personnel::retrieve_medical_personnel($login_arr['email']);
+            endswitch;
+        }
+
+        function route_user(Account_User $user): void {
+            switch ($user->get_usertype()):
+                case User_Type::SUPER_ADMIN:
+                    header("Location:" . SADMIN_WEB);
+                    break;
+                case User_Type::FACIILITY_ADMIN:
+                    header("Location:" . FADMIN_WEB);
+                    break;
+                case User_Type::MEDICAL_PERSONNEL:
+                    header("Location:" . DOC_WEB);
+                    break;
             endswitch;
         }
 
@@ -100,7 +113,6 @@ require_once USER_MOD . '/Medical_Personnel.php';
             // -- PASSWORD VALIDATION
             $validArr["password"] = True;
 
-
             /* ------------ End Validation ------------ */
             if (!in_array(FALSE, $validArr)) :
                 $credentials = array(
@@ -109,8 +121,7 @@ require_once USER_MOD . '/Medical_Personnel.php';
                 );
 
                 # -- Start Authenticating User (boolean)
-                    $login_status['auth'] = Authentication::authenticate_user($loginArr['email'], $loginArr['usertype'], $loginArr['password']);
-
+                $login_status['auth'] = Authentication::authenticate_user($loginArr['email'], $loginArr['usertype'], $loginArr['password']);
 
                 # -- Check If There Is Any "token" generated ---
                 if (!isset($_SESSION['token'])) :
@@ -152,6 +163,7 @@ require_once USER_MOD . '/Medical_Personnel.php';
                             'password' => '',
                             'usertype' => ''
                         );
+                    route_user ($auth_staff);
                     endif; # -- END CHECK FOR SINGLE LOGON
 
                 endif; # -- END OF AUTHENTICATION

@@ -33,7 +33,8 @@ if (isset($_SESSION['user'])) {
             header("Location:" . LOGIN_WEB);
             break;
     }
+} else {
+    header("Location:/");
 }
-header("Location:/");
 ?>
 
