@@ -74,12 +74,9 @@
         <!-- Title -->
         <title>FYP-21-S2-24: Password Reset</title>
         <!-- Styling -->
-<?php require TEMPLATES_PATH . '/bootstrap.php' ?>
+        <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
+        <link rel="stylesheet" href="./../css/loginRegister.css">
 
-        <style>
-<?php include './css/loginRegister.css';
-?>
-        </style>
     </head>
 
     <body>
@@ -164,7 +161,7 @@
             ?>
             <div>
                 <!-- Navigation -->
-    <?php include TEMPLATES_PATH . '/navbar.php' ?>
+                <?php include TEMPLATES_PATH . '/navbar.php' ?>
 
                 <!-- Login Card -->
                 <div class="center row m-4">
@@ -173,7 +170,7 @@
                             <div class="shadow card p-2 rounded1">
                                 <div class="card-body m-1">
                                     <h1 class="card-title pt-2 " style="padding: 0px;margin: 0px;">Password Recovery<h3>
-    <?php echo $email; ?></h3>
+                                            <?php echo $email; ?></h3>
                                     </h1>
                                     <div class="px-1">
                                         <p class="text-muted mt-2"> Enter your new password and confirm it </p>
