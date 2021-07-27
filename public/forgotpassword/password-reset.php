@@ -69,11 +69,12 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
         <!-- Title -->
         <title>FYP-21-S2-24: Password Reset</title>
         <!-- Styling -->
-        <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
+<?php require TEMPLATES_PATH . '/bootstrap.php' ?>
 
         <style>
 <?php include './css/loginRegister.css';
@@ -163,7 +164,7 @@
             ?>
             <div>
                 <!-- Navigation -->
-                <?php include TEMPLATES_PATH . '/navbar.php' ?>
+    <?php include TEMPLATES_PATH . '/navbar.php' ?>
 
                 <!-- Login Card -->
                 <div class="center row m-4">
@@ -171,12 +172,14 @@
                         <div class="my-5 col-sm-12">
                             <div class="shadow card p-2 rounded1">
                                 <div class="card-body m-1">
-                                    <h1 class="card-title pt-2 " style="padding: 0px;margin: 0px;">Password Recovery<h3><?php echo $email; ?></h3>
+                                    <h1 class="card-title pt-2 " style="padding: 0px;margin: 0px;">Password Recovery<h3>
+    <?php echo $email; ?></h3>
                                     </h1>
                                     <div class="px-1">
                                         <p class="text-muted mt-2"> Enter your new password and confirm it </p>
                                         <!-- Form -->
-                                        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                                        <form method="post" id="resetpassword"
+                                              action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
 
                                             <div class="row pb-2">
                                                 <div class="col-4 d-none d-lg-block">
@@ -184,8 +187,8 @@
                                                 </div>
                                                 <div class="col-lg-8 col-xs-12">
                                                     <!-- NEW PASSWORD -->
-                                                    <input type="password" name="password" class="form-control" required
-                                                           placeholder="New Password"
+                                                    <input type="password" id="password" name="password" class="form-control"
+                                                           required placeholder="New Password"
                                                            value="<?php echo $resetArr['password']; ?>" />
                                                 </div>
                                             </div>
@@ -206,7 +209,7 @@
                                                 <div class="d-grid gap-2 d-lg-block">
                                                     <!-- Reset Submission -->
                                                     <button class="btn btn-primary" style="float: right" type="submit"
-                                                            name="resetpassword" value="reset">Reset Password</button><br />
+                                                            name="resetpasswordbttn" value="reset">Reset Password</button><br />
                                                 </div>
                                             </div>
 
@@ -219,6 +222,82 @@
                     </div>
                 </div>
             </div>
+            <script>
+                $("#resetpassword").validate({
+                    rules: {
+                        password: {
+                            required: true,
+                            oneDigit: true,
+                            lowerCase: true,
+                            upperCase: true,
+                            specialChar: true,
+                            minlength: 8,
+                            maxlength: 32
+
+                        },
+                        confirmpassword: {
+                            required: true,
+                            equalTo: "#password"
+                        }
+                    },
+                    messages: {
+                        password: {
+                            required: "Please provide a password",
+                            minlength: "Password needs to be at least 8 characters",
+                            maxlength: "Password exceeded 32 characters limit"
+                        },
+                        confirmpassword: {
+                            required: "Please provide a confirm password",
+                            equalTo: "Please enter the same password"
+                        }
+                    },
+                    errorElement: "em",
+                    errorPlacement: function (error, element) {
+                        // This is the default behavior 
+                        error.insertAfter(element);
+                        error.addClass("help-block invalid-feedback");
+                    },
+                    success: function (label, element) {
+
+                        $(element).addClass("is-valid");
+
+                    },
+                    highlight: function (element, errorClass, validClass) {
+                        $(element).addClass("is-invalid").removeClass("is-valid");
+                    },
+                    unhighlight: function (element, errorClass, validClass) {
+                        $(element).addClass("is-valid").removeClass("is-invalid");
+
+                    }
+                });
+
+                /*----------------------------------------------
+                 CLIENT SIDE REGULAR EXPRESSION FOR PASSWORD
+                 -----------------------------------------------*/
+
+                $.validator.addMethod("oneDigit", function (value, element) {
+                    return this.optional(element) ||
+                            /(?=.*[0-9])/
+                            .test(value);
+                }, "Password needs at least one digit.");
+
+                $.validator.addMethod("lowerCase", function (value, element) {
+                    return this.optional(element) ||
+                            /(?=.*[a-z])/
+                            .test(value);
+                }, "Password needs at least one lower case character.");
+
+                $.validator.addMethod("upperCase", function (value, element) {
+                    return this.optional(element) ||
+                            /(?=.*[A-Z])/
+                            .test(value);
+                }, "Password needs at least one upper case character.");
+
+                $.validator.addMethod("specialChar", function (value, element) {
+                    return this.optional(element) ||
+                            /(?=.*[\*\.\!\@\$\%\^\&\(\)\{\}\[\]\:\;\<\>\,\?\/\~\_\+\-\=\|\#])/.test(value);
+                }, "Password needs at least one special character. e.g. [!@#$%^&*]");
+            </script>
 
             <?php
         } else {
@@ -227,8 +306,6 @@
             echo "Invalid URL";
         }
         ?>
-
-
 
     </body>
 
