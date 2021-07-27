@@ -163,7 +163,7 @@ require_once USER_MOD . '/Medical_Personnel.php';
                             'password' => '',
                             'usertype' => ''
                         );
-                    route_user ($auth_staff);
+                        route_user($auth_staff);
                     endif; # -- END CHECK FOR SINGLE LOGON
 
                 endif; # -- END OF AUTHENTICATION
@@ -242,7 +242,7 @@ require_once USER_MOD . '/Medical_Personnel.php';
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <a href="email-reset.php" style="float: right">Forgot password?</a>
+                                            <a href="<?php echo FORGOT_PW_WEB; ?>" style="float: right">Forgot password?</a>
                                         </div>
                                         <div class="row pt-2">
                                             <div class="d-grid gap-2 d-lg-block">

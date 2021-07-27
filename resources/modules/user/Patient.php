@@ -114,6 +114,15 @@ class Patient extends Normal_User {
         # Declaration Of Basic Information To Include To Account_User
         $account_user_arr = ArrayCreation::account_creation_array(User_Type::PATIENT);
 
+        if (isset($patient_info['credentials']['password'])):
+            $patient_info['credentials']['password'] = $sec->hash($patient_info['credentials']['password']);
+        endif;
+
+        //Create hash on the password (salt is already generated in the function)
+        if (isset($patient_info['profile']['nric'])):
+            $patient_info['profile']['nric'] = $sec->encrypt($patient_info['profile']['nric']);
+        endif;
+        
         # Load Basic Account User Fields & Values To Array
         foreach ($account_user_arr as $field => $value) :
             $patient_info[$field] = $value;

@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+<<<<<<< HEAD
 <?php
+=======
+    <?php
+>>>>>>> origin/traciedevelop
     /* Load Config File */
     require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/config.php';
     require VENDOR_PATH . '/autoload.php';
@@ -64,16 +68,16 @@
     setcookie($url_name, $url_value, time() + 3600);
     ?>
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
-    <!-- Title -->
-    <title>FYP-21-S2-24: Password Reset</title>
-    <!-- Styling -->
-    <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+        <!-- Title -->
+        <title>FYP-21-S2-24: Password Reset</title>
+        <!-- Styling -->
+<?php require TEMPLATES_PATH . '/bootstrap.php' ?>
 
     <style>
     <?php include './css/loginRegister.css';
@@ -83,8 +87,8 @@
 
 <body>
 
-    <!-- PHP Script -->
-    <?php
+        <!-- PHP Script -->
+        <?php
         // -- Used to store correct data
         $resetArr = array(
             'password' => '',
@@ -154,151 +158,151 @@
             }
         }
         ?>
-    <!-- Display Message Info -->
-    <div><?php echo $msg; ?></div>
-    <!-- Reset Form (Ask For Email To Reset) -->
-    <?php
+        <!-- Display Message Info -->
+        <div><?php echo $msg; ?></div>
+        <!-- Reset Form (Ask For Email To Reset) -->
+        <?php
         # Check If The Given URL Is Valid
         if ($validURL) {
             ?>
-    <div>
-        <!-- Navigation -->
-        <?php include TEMPLATES_PATH . '/navbar.php' ?>
+            <div>
+                <!-- Navigation -->
+    <?php include TEMPLATES_PATH . '/navbar.php' ?>
 
-        <!-- Login Card -->
-        <div class="center row m-4">
-            <div class="container col-md-10 col-lg-6 col-xl-4 col-xxl-4">
-                <div class="my-5 col-sm-12">
-                    <div class="shadow card p-2 rounded1">
-                        <div class="card-body m-1">
-                            <h1 class="card-title pt-2 " style="padding: 0px;margin: 0px;">Password Recovery<h3>
-                                    <?php echo $email; ?></h3>
-                            </h1>
-                            <div class="px-1">
-                                <p class="text-muted mt-2"> Enter your new password and confirm it </p>
-                                <!-- Form -->
-                                <form method="post" id="resetpassword"
-                                    action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                <!-- Login Card -->
+                <div class="center row m-4">
+                    <div class="container col-md-10 col-lg-6 col-xl-4 col-xxl-4">
+                        <div class="my-5 col-sm-12">
+                            <div class="shadow card p-2 rounded1">
+                                <div class="card-body m-1">
+                                    <h1 class="card-title pt-2 " style="padding: 0px;margin: 0px;">Password Recovery<h3>
+    <?php echo $email; ?></h3>
+                                    </h1>
+                                    <div class="px-1">
+                                        <p class="text-muted mt-2"> Enter your new password and confirm it </p>
+                                        <!-- Form -->
+                                        <form method="post" id="resetpassword"
+                                              action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
 
-                                    <div class="row pb-2">
-                                        <div class="col-4 d-none d-lg-block">
-                                            <p class="pt-2"> New Password: </p>
-                                        </div>
-                                        <div class="col-lg-8 col-xs-12">
-                                            <!-- NEW PASSWORD -->
-                                            <input type="password" id="password" name="password" class="form-control"
-                                                required placeholder="New Password"
-                                                value="<?php echo $resetArr['password']; ?>" />
-                                        </div>
+                                            <div class="row pb-2">
+                                                <div class="col-4 d-none d-lg-block">
+                                                    <p class="pt-2"> New Password: </p>
+                                                </div>
+                                                <div class="col-lg-8 col-xs-12">
+                                                    <!-- NEW PASSWORD -->
+                                                    <input type="password" id="password" name="password" class="form-control"
+                                                           required placeholder="New Password"
+                                                           value="<?php echo $resetArr['password']; ?>" />
+                                                </div>
+                                            </div>
+
+                                            <div class="row pb-2">
+                                                <div class="col-4 d-none d-lg-block">
+                                                    <p class="pt-2"> Confirm Password: </p>
+                                                </div>
+                                                <div class="col-lg-8 col-xs-12">
+                                                    <!-- CONFIRM PASSWORD -->
+                                                    <input type="password" name="confirmpassword" class="form-control" required
+                                                           placeholder="Confirm Password"
+                                                           value="<?php echo $resetArr['confirmpassword']; ?>" />
+                                                </div>
+                                            </div>
+
+                                            <div class="row pt-2">
+                                                <div class="d-grid gap-2 d-lg-block">
+                                                    <!-- Reset Submission -->
+                                                    <button class="btn btn-primary" style="float: right" type="submit"
+                                                            name="resetpasswordbttn" value="reset">Reset Password</button><br />
+                                                </div>
+                                            </div>
+
+                                        </form>
                                     </div>
-
-                                    <div class="row pb-2">
-                                        <div class="col-4 d-none d-lg-block">
-                                            <p class="pt-2"> Confirm Password: </p>
-                                        </div>
-                                        <div class="col-lg-8 col-xs-12">
-                                            <!-- CONFIRM PASSWORD -->
-                                            <input type="password" name="confirmpassword" class="form-control" required
-                                                placeholder="Confirm Password"
-                                                value="<?php echo $resetArr['confirmpassword']; ?>" />
-                                        </div>
-                                    </div>
-
-                                    <div class="row pt-2">
-                                        <div class="d-grid gap-2 d-lg-block">
-                                            <!-- Reset Submission -->
-                                            <button class="btn btn-primary" style="float: right" type="submit"
-                                                name="resetpasswordbttn" value="reset">Reset Password</button><br />
-                                        </div>
-                                    </div>
-
-                                </form>
+                                </div>
+                                <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                             </div>
                         </div>
-                        <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <script>
-    $("#resetpassword").validate({
-        rules: {
-            password: {
-                required: true,
-                oneDigit: true,
-                lowerCase: true,
-                upperCase: true,
-                specialChar: true,
-                minlength: 8,
-                maxlength: 32
+            <script>
+                $("#resetpassword").validate({
+                    rules: {
+                        password: {
+                            required: true,
+                            oneDigit: true,
+                            lowerCase: true,
+                            upperCase: true,
+                            specialChar: true,
+                            minlength: 8,
+                            maxlength: 32
 
-            },
-            confirmpassword: {
-                required: true,
-                equalTo: "#password"
-            }
-        },
-        messages: {
-            password: {
-                required: "Please provide a password",
-                minlength: "Password needs to be at least 8 characters",
-                maxlength: "Password exceeded 32 characters limit"
-            },
-            confirmpassword: {
-                required: "Please provide a confirm password",
-                equalTo: "Please enter the same password"
-            }
-        },
-        errorElement: "em",
-        errorPlacement: function(error, element) {
-            // This is the default behavior 
-            error.insertAfter(element);
-            error.addClass("help-block invalid-feedback");
-        },
-        success: function(label, element) {
+                        },
+                        confirmpassword: {
+                            required: true,
+                            equalTo: "#password"
+                        }
+                    },
+                    messages: {
+                        password: {
+                            required: "Please provide a password",
+                            minlength: "Password needs to be at least 8 characters",
+                            maxlength: "Password exceeded 32 characters limit"
+                        },
+                        confirmpassword: {
+                            required: "Please provide a confirm password",
+                            equalTo: "Please enter the same password"
+                        }
+                    },
+                    errorElement: "em",
+                    errorPlacement: function (error, element) {
+                        // This is the default behavior 
+                        error.insertAfter(element);
+                        error.addClass("help-block invalid-feedback");
+                    },
+                    success: function (label, element) {
 
-            $(element).addClass("is-valid");
+                        $(element).addClass("is-valid");
 
-        },
-        highlight: function(element, errorClass, validClass) {
-            $(element).addClass("is-invalid").removeClass("is-valid");
-        },
-        unhighlight: function(element, errorClass, validClass) {
-            $(element).addClass("is-valid").removeClass("is-invalid");
+                    },
+                    highlight: function (element, errorClass, validClass) {
+                        $(element).addClass("is-invalid").removeClass("is-valid");
+                    },
+                    unhighlight: function (element, errorClass, validClass) {
+                        $(element).addClass("is-valid").removeClass("is-invalid");
 
-        }
-    });
+                    }
+                });
 
-    /*----------------------------------------------
-     CLIENT SIDE REGULAR EXPRESSION FOR PASSWORD
-     -----------------------------------------------*/
+                /*----------------------------------------------
+                 CLIENT SIDE REGULAR EXPRESSION FOR PASSWORD
+                 -----------------------------------------------*/
 
-    $.validator.addMethod("oneDigit", function(value, element) {
-        return this.optional(element) ||
-            /(?=.*[0-9])/
-            .test(value);
-    }, "Password needs at least one digit.");
+                $.validator.addMethod("oneDigit", function (value, element) {
+                    return this.optional(element) ||
+                            /(?=.*[0-9])/
+                            .test(value);
+                }, "Password needs at least one digit.");
 
-    $.validator.addMethod("lowerCase", function(value, element) {
-        return this.optional(element) ||
-            /(?=.*[a-z])/
-            .test(value);
-    }, "Password needs at least one lower case character.");
+                $.validator.addMethod("lowerCase", function (value, element) {
+                    return this.optional(element) ||
+                            /(?=.*[a-z])/
+                            .test(value);
+                }, "Password needs at least one lower case character.");
 
-    $.validator.addMethod("upperCase", function(value, element) {
-        return this.optional(element) ||
-            /(?=.*[A-Z])/
-            .test(value);
-    }, "Password needs at least one upper case character.");
+                $.validator.addMethod("upperCase", function (value, element) {
+                    return this.optional(element) ||
+                            /(?=.*[A-Z])/
+                            .test(value);
+                }, "Password needs at least one upper case character.");
 
-    $.validator.addMethod("specialChar", function(value, element) {
-        return this.optional(element) ||
-            /(?=.*[\*\.\!\@\$\%\^\&\(\)\{\}\[\]\:\;\<\>\,\?\/\~\_\+\-\=\|\#])/.test(value);
-    }, "Password needs at least one special character. e.g. [!@#$%^&*]");
-    </script>
+                $.validator.addMethod("specialChar", function (value, element) {
+                    return this.optional(element) ||
+                            /(?=.*[\*\.\!\@\$\%\^\&\(\)\{\}\[\]\:\;\<\>\,\?\/\~\_\+\-\=\|\#])/.test(value);
+                }, "Password needs at least one special character. e.g. [!@#$%^&*]");
+            </script>
 
-    <?php
+            <?php
         } else {
 
             # Display Invalid URL
@@ -306,6 +310,10 @@
         }
         ?>
 
+<<<<<<< HEAD
 </body>
+=======
+    </body>
+>>>>>>> origin/traciedevelop
 
 </html>
