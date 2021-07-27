@@ -77,7 +77,7 @@ class Authentication {
          * NANTA TO DO HASH COMPARISON
          */
         $secure = new Security();
-
+        
         # Check If There Are Any User Returned From The Query
         if ($user_data != NULL):
             $stored_password = $user_data['credentials']['password'];

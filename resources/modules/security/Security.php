@@ -49,11 +49,11 @@ class Security {
     {
         if(password_verify($password, $stored_password))
         {
-            return "CORRECT_PASSWORD";
+            return 'CORRECT_PASSWORD';
         }
         else
         {
-            return "INCORRECT_PASSWORD";
+            return 'INCORRECT_PASSWORD';
         }
     }
 
