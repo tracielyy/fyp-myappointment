@@ -10,6 +10,8 @@ require_once EMAIL_MOD . '/Email.php';
 require_once ENUMS_PATH . '/User_Type.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Normal_User.php';
+require_once USER_MOD . '/Admin.php';
+
 require_once APPT_MOD . '/Appointment_Record.php';
 
 class EmailTemplate {
