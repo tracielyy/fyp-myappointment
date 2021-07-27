@@ -86,14 +86,14 @@ else:
                             <?php
                         else: /* If The Variables Exists In The Database */
                             ?>
-                        <div>Valid</div>
+                            <div>Valid</div>
                         </body>
-                    <?php
-                    endif; # -- END VARS CHECKS
-                endif; # -- END CHECK IF VARS SET
-            endif; # -- END GET REQUEST
-        endif; # -- END OF USER TYPE CHECK
-    endif; # -- END OF SESSION CHECK
-    ?>
 
-</html>
+                    </html>
+                <?php
+                endif; # -- END VARS CHECKS
+            endif; # -- END CHECK IF VARS SET
+        endif; # -- END GET REQUEST
+    endif; # -- END OF USER TYPE CHECK
+endif; # -- END OF SESSION CHECK
+?>
