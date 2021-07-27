@@ -134,6 +134,9 @@ else:
                         <button class="tablinks" onclick="openTab(event, 'Settings')">
                             <i class="far fa-clock tab-icon"></i>Shift Settings
                         </button> 
+                        <button class="tablinks" onclick="openTab(event, 'Post')">
+                            <i class="far fa-clipboard tab-icon"></i>Post Forum
+                        </button> 
                     </div>
 
                     <div id="Dashboard" class="tabcontent shadow rounded">
@@ -181,12 +184,17 @@ else:
                         </div>
                     </div>
 
-
-
                     <div id="Settings" class="tabcontent shadow rounded">
                         <div class="container mt-5">
                             <h3 class="text-center">Shift</h3>
                             <p>Shows to set the timing of work</p>
+                        </div>
+                    </div>
+
+                    <div id="Post" class="tabcontent shadow rounded">
+                        <div class="container mt-5">
+                            <h3 class="text-center">Post Medical Information</h3>
+                            <p>Shows to post</p>
                         </div>
                     </div>
 
