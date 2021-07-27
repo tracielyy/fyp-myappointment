@@ -28,26 +28,22 @@ else:
     else:
         ?><!DOCTYPE html>
         <html lang="en">
-
             <head>
                 <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
 
                 <!-- Styling -->
                 <link rel="stylesheet" href="./../css/medicaldashboard.css">
 
-
-
                 <?php
                 include TEMPLATES_PATH . '/bootstrap.php';
-                include_once TEMPLATES_PATH . '/navbar.php';
+                include_once TEMPLATES_PATH . '/navbar-loggedin.php';
                 ?>
                 <meta charset="UTF-8">
                 <meta http-equiv="X-UA-Compatible" content="IE=edge">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Document</title>
+                <title>Medical Dashboard</title>
                 <!-- font awesome cdn -->
                 <script src="https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
-
                 <script>
                     function startTime() {
                         const today = new Date();
@@ -75,7 +71,6 @@ else:
                 crossorigin="anonymous" referrerpolicy="no-referrer"></script>
                 <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
             </head>
-
             <body onload="startTime()">
 
                 <?php
@@ -345,9 +340,6 @@ else:
     <!-- END OF CHARTJS -->
 
     <!-- GRIDJS -->
-
-
-
 
 
     <script>
