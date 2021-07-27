@@ -153,9 +153,9 @@ class Medical_Personnel extends Normal_User {
     }
 
     // -- RETRIEVE  MEDICAL PERSONNEL DATA
-    public static function retrieve_medical_personnel(array $login_arr): Medical_Personnel {
+    public static function retrieve_medical_personnel(string $user_email): Medical_Personnel {
 
-        $medical_personnel_data = Account_User::retrieve_account_data($login_arr);
+        $medical_personnel_data = Account_User::retrieve_account_data($user_email);
         return self::initialise_medical_personnel($medical_personnel_data);
     }
 

@@ -3,7 +3,7 @@
 /*  Main Configuration File: Creating Constants For Heavily Used Paths */
 define("TEMPLATES_PATH", realpath(dirname(__FILE__) . '/templates'));
 define("ENUMS_PATH", realpath(dirname(__FILE__) . '/enums'));
-define("VENDOR_PATH", realpath(dirname($_SERVER['DOCUMENT_ROOT']) . '/vendor'));
+define("VENDOR_PATH", realpath(dirname(dirname(__FILE__)) . '/vendor'));
 
 ############## -- CONFIGURATIONS FOR MODULES -- ################
 define("DB_MOD", realpath(dirname(__FILE__) . '/modules/database'));
@@ -23,8 +23,9 @@ define("REGISTER_WEB", '/register');
 define("APPT_WEB", '/appointment');
 define("FORGOT_PW_WEB", '/forgotpassword');
 define("ACC_WEB", '/account');
-
-
+define("FADMIN_WEB", '/admin/f');
+define("SADMIN_WEB", '/admin/s');
+define("DOC_WEB", '/doctor');
 
 ?>
 

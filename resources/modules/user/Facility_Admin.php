@@ -79,9 +79,9 @@ class Facility_Admin extends Admin {
     }
 
     // -- RETRIEVE  FACILITY ADMIN DATA
-    public static function retrieve_facility_admin(array $login_arr): Facility_Admin {
+    public static function retrieve_facility_admin(string $user_email): Facility_Admin {
 
-        $facility_admin_data = Account_User::retrieve_account_data($login_arr);
+        $facility_admin_data = Account_User::retrieve_account_data($user_email);
         return self::initialise_facility_admin($facility_admin_data);
     }
 

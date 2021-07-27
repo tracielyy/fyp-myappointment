@@ -26,14 +26,15 @@ if (isset($_SESSION['user'])) {
     switch ($usertype) {
         case User_Type::FACIILITY_ADMIN:
         case User_Type::SUPER_ADMIN:
+        case User_Type::MEDICAL_PERSONNEL:
             header("Location:" . LOGIN_WEB . "/stafflogin.php");
             break;
-        case User_Type::MEDICAL_PERSONNEL:
         case User_Type::PATIENT:
             header("Location:" . LOGIN_WEB);
             break;
     }
+} else {
+    header("Location:/");
 }
-header("Location:/");
 ?>
 

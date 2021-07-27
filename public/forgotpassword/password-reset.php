@@ -1,90 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-<?php
-/* Load Config File */
-require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/config.php';
-require VENDOR_PATH . '/autoload.php';
+    <?php
+    /* Load Config File */
+    require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/config.php';
+    require VENDOR_PATH . '/autoload.php';
 
 // -- Import Project Classes -- //
-require_once USER_MOD . '/Account_User.php';
-require_once EMAIL_MOD . '/EmailTemplate.php';
-require_once UTIL_MOD . '/Regex.php';
-require_once TIME_MOD . '/Time.php';
-require_once SECURE_MOD . '/Security.php';
+    require_once USER_MOD . '/Account_User.php';
+    require_once EMAIL_MOD . '/EmailTemplate.php';
+    require_once UTIL_MOD . '/Regex.php';
+    require_once TIME_MOD . '/Time.php';
+    require_once SECURE_MOD . '/Security.php';
 
-/*
- * PASSWORD RESET
- */
+    /*
+     * PASSWORD RESET
+     */
 
 // -- Misc Variables -- //
-$msg = "";
-$validURL = false;
+    $msg = "";
+    $validURL = false;
 
 # Set Cookie MUST Be Done Before The <html> tag
-$url_name = "url";
-$url_value = htmlspecialchars($_SERVER['PHP_SELF']);
+    $url_name = "url";
+    $url_value = htmlspecialchars($_SERVER['PHP_SELF']);
 
-$email_name = "email";
-$email_value = "";
+    $email_name = "email";
+    $email_value = "";
 // -- Check If User Is Signed In (When Redirect or Load The Page) -- //
-if ($_SERVER['REQUEST_METHOD'] == "GET") {
-    if (isset($_GET['token']) && isset($_GET['email'])) {
+    if ($_SERVER['REQUEST_METHOD'] == "GET") {
+        if (isset($_GET['token']) && isset($_GET['email'])) {
 
-        # Variable Assignment
-        $token = $_GET['token'];
-        echo $token;
+            # Variable Assignment
+            $token = $_GET['token'];
+            echo $token;
 
 //        $email = urlencode( $_GET['email']);
 //        $email = str_replace("+", "%2B", $email);
 //        $email = urldecode($email);
 
-        $email = $_GET['email'];
-        $email_value = $email;
+            $email = $_GET['email'];
+            $email_value = $email;
 
-        # Only Add `token` & `email` If It Is Present
-        $url_value .= "?token={$token}&email={$email}";
+            # Only Add `token` & `email` If It Is Present
+            $url_value .= "?token={$token}&email={$email}";
 
-        # Cross Check `email` With Google Cloud Firestore
-        if (Account_User::check_user_exist($email)) {
-            echo "User Exist";
+            # Cross Check `email` With Google Cloud Firestore
+            if (Account_User::check_user_exist($email)) {
+                echo "User Exist";
 
-            # Cross Check `token` With Google Cloud Firestore
-            $validURL = Account_User::validate_password_token($email, $token);
-            if ($validURL) {
-                
+                # Cross Check `token` With Google Cloud Firestore
+                $validURL = Account_User::validate_password_token($email, $token);
+                if ($validURL) {
+                    
+                }
+            } else {
+                $msg = "";
             }
-        } else {
-            $msg = "";
+            # TBD
         }
-        # TBD
     }
-}
 
 # Setting Cookies
-setcookie($email_name, $email_value, time() + 3600);
-setcookie($url_name, $url_value, time() + 3600);
-?>
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Title -->
-    <title>FYP-21-S2-24: Password Reset</title>
-    <!-- Styling -->
-    <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
-
-    <style>
-    <?php include './css/loginRegister.css';
+    setcookie($email_name, $email_value, time() + 3600);
+    setcookie($url_name, $url_value, time() + 3600);
     ?>
-    </style>
-</head>
 
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- PHP Script -->
-    <?php
+        <!-- Title -->
+        <title>FYP-21-S2-24: Password Reset</title>
+        <!-- Styling -->
+        <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
+
+        <style>
+<?php include './css/loginRegister.css';
+?>
+        </style>
+    </head>
+
+    <body>
+
+        <!-- PHP Script -->
+        <?php
         // -- Used to store correct data
         $resetArr = array(
             'password' => '',
@@ -154,73 +154,73 @@ setcookie($url_name, $url_value, time() + 3600);
             }
         }
         ?>
-    <!-- Display Message Info -->
-    <div><?php echo $msg; ?></div>
-    <!-- Reset Form (Ask For Email To Reset) -->
-    <?php
+        <!-- Display Message Info -->
+        <div><?php echo $msg; ?></div>
+        <!-- Reset Form (Ask For Email To Reset) -->
+        <?php
         # Check If The Given URL Is Valid
         if ($validURL) {
             ?>
-    <div>
-        <!-- Navigation -->
-        <?php include TEMPLATES_PATH . '/navbar.php' ?>
+            <div>
+                <!-- Navigation -->
+                <?php include TEMPLATES_PATH . '/navbar.php' ?>
 
-        <!-- Login Card -->
-        <div class="center row m-4">
-            <div class="container col-md-10 col-lg-6 col-xl-4 col-xxl-4">
-                <div class="my-5 col-sm-12">
-                    <div class="shadow card p-2 rounded1">
-                        <div class="card-body m-1">
-                            <h1 class="card-title pt-2 " style="padding: 0px;margin: 0px;">Password Recovery<h3><?php echo $email; ?></h3>
-                            </h1>
-                            <div class="px-1">
-                                <p class="text-muted mt-2"> Enter your new password and confirm it </p>
-                                <!-- Form -->
-                                <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                <!-- Login Card -->
+                <div class="center row m-4">
+                    <div class="container col-md-10 col-lg-6 col-xl-4 col-xxl-4">
+                        <div class="my-5 col-sm-12">
+                            <div class="shadow card p-2 rounded1">
+                                <div class="card-body m-1">
+                                    <h1 class="card-title pt-2 " style="padding: 0px;margin: 0px;">Password Recovery<h3><?php echo $email; ?></h3>
+                                    </h1>
+                                    <div class="px-1">
+                                        <p class="text-muted mt-2"> Enter your new password and confirm it </p>
+                                        <!-- Form -->
+                                        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
 
-                                    <div class="row pb-2">
-                                        <div class="col-4 d-none d-lg-block">
-                                            <p class="pt-2"> New Password: </p>
-                                        </div>
-                                        <div class="col-lg-8 col-xs-12">
-                                            <!-- NEW PASSWORD -->
-                                            <input type="password" name="password" class="form-control" required
-                                                placeholder="New Password"
-                                                value="<?php echo $resetArr['password']; ?>" />
-                                        </div>
+                                            <div class="row pb-2">
+                                                <div class="col-4 d-none d-lg-block">
+                                                    <p class="pt-2"> New Password: </p>
+                                                </div>
+                                                <div class="col-lg-8 col-xs-12">
+                                                    <!-- NEW PASSWORD -->
+                                                    <input type="password" name="password" class="form-control" required
+                                                           placeholder="New Password"
+                                                           value="<?php echo $resetArr['password']; ?>" />
+                                                </div>
+                                            </div>
+
+                                            <div class="row pb-2">
+                                                <div class="col-4 d-none d-lg-block">
+                                                    <p class="pt-2"> Confirm Password: </p>
+                                                </div>
+                                                <div class="col-lg-8 col-xs-12">
+                                                    <!-- CONFIRM PASSWORD -->
+                                                    <input type="password" name="confirmpassword" class="form-control" required
+                                                           placeholder="Confirm Password"
+                                                           value="<?php echo $resetArr['confirmpassword']; ?>" />
+                                                </div>
+                                            </div>
+
+                                            <div class="row pt-2">
+                                                <div class="d-grid gap-2 d-lg-block">
+                                                    <!-- Reset Submission -->
+                                                    <button class="btn btn-primary" style="float: right" type="submit"
+                                                            name="resetpassword" value="reset">Reset Password</button><br />
+                                                </div>
+                                            </div>
+
+                                        </form>
                                     </div>
-
-                                    <div class="row pb-2">
-                                        <div class="col-4 d-none d-lg-block">
-                                            <p class="pt-2"> Confirm Password: </p>
-                                        </div>
-                                        <div class="col-lg-8 col-xs-12">
-                                            <!-- CONFIRM PASSWORD -->
-                                            <input type="password" name="confirmpassword" class="form-control" required
-                                                placeholder="Confirm Password"
-                                                value="<?php echo $resetArr['confirmpassword']; ?>" />
-                                        </div>
-                                    </div>
-
-                                    <div class="row pt-2">
-                                        <div class="d-grid gap-2 d-lg-block">
-                                            <!-- Reset Submission -->
-                                            <button class="btn btn-primary" style="float: right" type="submit"
-                                                name="resetpassword" value="reset">Reset Password</button><br />
-                                        </div>
-                                    </div>
-
-                                </form>
+                                </div>
+                                <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                             </div>
                         </div>
-                        <!-- Should Insert ("Already have an account? Sign In")  [Hyperlink to login.php] -->
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <?php
+            <?php
         } else {
 
             # Display Invalid URL
