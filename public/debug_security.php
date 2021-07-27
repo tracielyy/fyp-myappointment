@@ -27,13 +27,19 @@ require_once SECURE_MOD. '/Security.php';
             echo 'encrypted<br>';
             echo $encrypted_text;
 
-            echo '<br><br>decryption<br>';
-            $decrypted_text = $sec->decrypt($encrypted_text);
-            echo $decrypted_text;
+
+            echo '<br><br>password<br>';
+            echo $password;
+            echo '<br><br>second password<br>';
+            echo $verify;
+
+            //echo '<br><br>decryption<br>';
+            //$decrypted_text = $sec->decrypt($encrypted_text);
+            //echo $decrypted_text;
             echo '<br><br>hashed password<br>';
             echo $hash_password;
 
-            $password_verify = $sec->compareHash($verify,'$2y$10$ynGkLfsLWRaSX5YxfQvDveWy8tiY0lYVaRQHyyrVG4sxmyTfWamEi');
+            $password_verify = $sec->compareHash($verify,$hash_password);
 
             echo '<br><br>';
             echo "verification : " . $password_verify;

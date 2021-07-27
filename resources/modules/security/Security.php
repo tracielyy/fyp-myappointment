@@ -21,6 +21,8 @@ class Security {
     }
 
     // -- Static Functions -- //
+
+    //encryption of data with AES-256-CBC
     public function encrypt($data) {
         $encrypt_key = base64_decode(self::$key);
         $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
@@ -28,6 +30,7 @@ class Security {
         return base64_encode($encrypted . '::' . $iv);
         }
     
+    //decryption of data with AES-256-CBC
     public function decrypt($data) {
         $decrypt_key = base64_decode(self::$key);
         list($encrypted_data, $iv) = array_pad(explode('::', base64_decode($data), 2),2,null);
