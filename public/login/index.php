@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once '../../resources/config.php';
-require '../../vendor/autoload.php';
+require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/config.php';
+require VENDOR_PATH . '/autoload.php';
 require_once EMAIL_MOD . '/Email.php';
 require_once UTIL_MOD . '/StringUtils.php';
 require_once UTIL_MOD . '/Regex.php';
@@ -115,7 +115,7 @@ else:
                     if ($login_status['auth']) :
 
                         # -- Check If There Are Any Other Login Session (Terminate Other Session?)
-                        $auth_patient = Patient::retrieve_patient($loginArr);
+                        $auth_patient = Patient::retrieve_patient($loginArr['email']);
                         $login_status['single_logon'] = Authentication::check_session($auth_patient->get_session(), session_id(), $_SESSION['token']);
 
                         # -- Get IP Address ---
@@ -134,7 +134,7 @@ else:
 
                         if ($login_status['single_logon'] /* There Is Only ONE Logon */) :
                             $login_status = Authentication::login($auth_patient->get_email(), session_id(), $_SESSION['token'], $ipaddress); # Error
-                            $auth_patient = Patient::retrieve_patient($loginArr); // Reload After Login Session Update
+                            $auth_patient = Patient::retrieve_patient($loginArr['email']); // Reload After Login Session Update
                             $_SESSION['user'] = serialize($auth_patient); // Store User Data In Session
                             header("Location:./../"); // Redirect Upon Success Authenticate
                             # -- Clear Fields

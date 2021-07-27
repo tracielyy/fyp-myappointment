@@ -146,9 +146,9 @@ class Patient extends Normal_User {
     }
 
     // -- RETRIEVE PATIENT DATA
-    public static function retrieve_patient(array $login_arr): Patient {
+    public static function retrieve_patient(string $user_email): Patient {
 
-        $patient_data = Account_User::retrieve_account_data($login_arr);
+        $patient_data = Account_User::retrieve_account_data($user_email);
         return self::initialise_patient($patient_data);
     }
 

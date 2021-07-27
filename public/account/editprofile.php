@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once '../../resources/config.php';
+require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/config.php';
+require VENDOR_PATH . '/autoload.php';
 require_once ENTITIES_PATH . '/Account_User.php';
 require_once ENTITIES_PATH . '/Appointment_Record.php';
 require_once ENUMS_PATH . '/User_Type.php';

@@ -13,7 +13,9 @@ require_once AUTH_MOD . '/Session.php';
 require_once TIME_MOD . '/Time.php';
 require_once ENUMS_PATH . '/User_Type.php';
 
-//require_once EMAIL_MOD . '/EmailTemplate.php';
+require_once SECURE_MOD . '/Security.php';
+
+use Google\Cloud\Firestore\Transaction;
 
 class Account_User {
 
@@ -89,16 +91,15 @@ class Account_User {
             $credentials['credentials'] = array('email' => $user_email, 'password' => $user_password);
         endif;
 
+        # Get The Document ID 
         return $db->get_document_id(Database::ACCOUNT_USER, $credentials);
     }
 
     // -- RETRIEVE ACCOUNT USER DATA
-    public static function retrieve_account_data(array $credentialArr): ?array {
+    public static function retrieve_account_data(string $user_email): ?array {
 
         # Credentials   
-        $credentials = array(
-            "credentials" => $credentialArr
-        );
+        $credentials ['credentials'] = array('email' => $user_email);
 
         # Retrieve User From Given Credentials
         $db = new DbQuery();
@@ -295,29 +296,34 @@ class Account_User {
     public static function change_password(string $email, string $new_password, string $current_password): bool {
 
         # Update The New Password
-        $user_doc_id = self::retrieve_user_doc_id($email, $current_password);
-
+        $user_doc_id = self::retrieve_user_doc_id($email);
 
         # If Valid User
         if ($user_doc_id !== NULL):
             $db = new DbQuery();
 
             # Update To New Password
-            $db->get_db()->collection(Database::ACCOUNT_USER)->document($user_doc_id)
-                    ->update([
-                        ['path' => 'credentials.password', 'value' => $new_password]
-            ]);
+            $secure = new Security();
+            $new_hashed_pw = $secure->hash($new_password);
+            $user_doc_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->document($user_doc_id);
+            $trnx_result = $db->get_db()->runTransaction(function (Transaction $transaction)
+            use ($user_doc_ref, $new_hashed_pw, $current_password) {
 
-            # Check If Password Updated Correctly
-            $new_user_doc_id = self::retrieve_user_doc_id($email, $new_password);
+                $snapshot = $transaction->snapshot($user_doc_ref);
+                $db_password = $snapshot['credentials']['password'];
 
-            if ($new_user_doc_id !== Null):
+                $secure = new Security();
+                if ($secure->compareHash($current_password, $db_password)):
+                    $transaction->update($user_doc_ref, [
+                        ['path' => 'credentials.password', 'value' => $new_hashed_pw]
+                    ]);
+                    return true;
+                endif;
 
-                return true; # -- END OF PASSWORD CHANGE PROCESS
-            endif; # -- CHECK FOR NEW USER ID
-            return false; # -- HAVE ISSUES IN CHANGING PASSWORD
+                return false; # -- HAVE ISSUES IN CHANGING PASSWORD
+            });
         endif; # -- CHECK IF THE USER ENTERS A CORRECT PASSWORD
-        return false; # -- USER ENTER WRONG PASSWORD
+        return $trnx_result;
     }
 
     // -- PASSWORD CHANGE
@@ -331,13 +337,15 @@ class Account_User {
             $db = new DbQuery();
 
             # Update To New Password
+            $secure = new Security();
+            $new_hashed_pw = $secure->hash($new_password);
             $db->get_db()->collection(Database::ACCOUNT_USER)->document($user_doc_id)
                     ->update([
-                        ['path' => 'credentials.password', 'value' => $new_password]
+                        ['path' => 'credentials.password', 'value' => $new_hashed_pw]
             ]);
 
             # Check If Password Updated Correctly
-            $new_user_doc_id = self::retrieve_user_doc_id($email, $new_password);
+            $new_user_doc_id = self::retrieve_user_doc_id($email, $new_hashed_pw);
 
             if ($new_user_doc_id !== Null):
 
@@ -390,10 +398,6 @@ class Account_User {
         endif;
         return false;
     }
-
-
-
-   
 
     public static function update_email_otp(string $user_email, string $otp): void {
 
