@@ -67,9 +67,9 @@ class Super_Admin extends Admin {
     }
 
     // -- RETRIEVE SUPER ADMIN DATA
-    public static function retrieve_super_admin(array $login_arr): Super_Admin {
+    public static function retrieve_super_admin(string $user_email): Super_Admin {
 
-        $super_admin_data = Account_User::retrieve_account_data($login_arr);
+        $super_admin_data = Account_User::retrieve_account_data($user_email);
         return self::initialise_super_admin($super_admin_data);
     }
 
