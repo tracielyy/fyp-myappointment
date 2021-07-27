@@ -18,11 +18,11 @@ define("SECURE_MOD", realpath(dirname(__FILE__) . '/modules/security'));
 define("MEDDOC_MOD", realpath(dirname(__FILE__) . '/modules/medicaldocument'));
 
 ############## -- CONFIGURATIONS FOR PAGES -- ################
-define("LOGIN_WEB", './login');
-define("REGISTER_WEB", './register');
-define("APPT_WEB", './appointment');
-define("FORGOT_PW_WEB", './forgotpassword');
-define("ACC_WEB", './account');
+define("LOGIN_WEB", '/login');
+define("REGISTER_WEB", '/register');
+define("APPT_WEB", '/appointment');
+define("FORGOT_PW_WEB", '/forgotpassword');
+define("ACC_WEB", '/account');
 
 
 
