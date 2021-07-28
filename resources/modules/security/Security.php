@@ -13,7 +13,8 @@ class Security {
     //Properties
 
     //Encryption key DO NOT CHANGE!
-    private static $key = 'FYffB2s#k6BO@%6SM&zJny150MlQJg5&@ztZbz!V90@tUYMx';
+    private const KEY = 'FYffB2s#k6BO@%6SM&zJny150MlQJg5&@ztZbz!V90@tUYMx';
+    private const HASH_KEY = 'ZE0WeuFhR9i7Ry0+eopq3QkPIoaOVPfhU1j73Gijkps=';
 
     // -- Constructor -- //
     public function __construct(){
@@ -57,5 +58,13 @@ class Security {
         }
     }
 
+    public function hash_256($data): string
+    {
+        $hash_key = base64_decode(self::HASH_KEY);
+        return hash_hmac("sha256",$data,$hash_key);
+    }
+
 }
+
+   
 ?>
