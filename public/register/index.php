@@ -9,7 +9,7 @@ require_once UTIL_MOD . '/Regex.php';
 require_once UTIL_MOD . '/StringUtils.php';
 require_once EMAIL_MOD . '/EmailTemplate.php';
 require_once EMAIL_MOD . '/EmailVerify.php';
-require_once SECURE_MOD. '/Security.php';
+require_once SECURE_MOD . '/Security.php';
 
 require_once SECURE_MOD . '/ValidateIC.php';
 
@@ -17,15 +17,14 @@ require_once SECURE_MOD . '/ValidateIC.php';
  *  REGISTER (PATIENT)
  */
 
- echo 'Update-2';
+echo 'Update-2';
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     setcookie("email_verified", "", time() - 3600); // resetting
 }
 // -- SETTING A EXPIRABLE COOKIE (ONLY VIA SECURE PROTOCOL) -- valid for 1hr
 setcookie("email_verified", false, time() + 3600, "/", "MyAppointment.tracieqwynn.tech", 1);
-//setcookie("email_verified", false, time() + 3600);
-//echo (isset($_COOKIE["email_verified"]) && $_COOKIE["email_verified"]) ? "true" : "false";
+
 // Used to store correct data
 $registerArr = array(
     'nric' => '',
@@ -53,7 +52,6 @@ $patient_register = array(
     'credentials' => array('email' => '', 'password' => '')
 );
 
-
 // Some Variables
 $err_msg = array();
 if ($_SERVER["REQUEST_METHOD"] == "POST") :
@@ -70,105 +68,101 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
 
 endif;
 ?>
-  <script>  var email_verified_validation; </script>
+<script>  var email_verified_validation;</script>
 <?php
 if (isset($_COOKIE['email_verified'])):
     if ($_COOKIE['email_verified'] == 'true'):
         $_COOKIE['email_verified'] = true;
-        ?> <script>  email_verified_validation = true; 
-            $("#vrfyEmailBttn").hide(); </script> <?php
+        ?> <script>  email_verified_validation = true;
+                    $("#vrfyEmailBttn").hide();</script> <?php
     elseif ($_COOKIE['email_verified'] == 'false'):
         $_COOKIE['email_verified'] = false;
-        ?> <script>  email_verified_validation = false; </script> <?php
+        ?> <script>  email_verified_validation = false;</script> <?php
+        endif;
+
     endif;
-
-endif;
-
-
-
 
 // Upon clicking "Register" Button 
-if ($_SERVER["REQUEST_METHOD"] == "POST") :
+    if ($_SERVER["REQUEST_METHOD"] == "POST") :
 
-    if (isset($_POST['ajax_emailverify'])):
-        $otp_requester = $_POST['email'];
-        // Generate OTP
-        $otp = StringUtils::generate_otp(6);
+        if (isset($_POST['ajax_emailverify'])):
+            $otp_requester = $_POST['email'];
+            // Generate OTP
+            $otp = StringUtils::generate_otp(6);
 
-        // Update OTP In Database
-        Account_User::update_email_otp($otp_requester, $otp);
+            // Update OTP In Database
+            Account_User::update_email_otp($otp_requester, $otp);
 
-        // Send OTP To OTP Requester
-        EmailTemplate::template_emailotp($otp_requester, $otp);
-    endif;
+            // Send OTP To OTP Requester
+            EmailTemplate::template_emailotp($otp_requester, $otp);
+        endif;
 
+        if (isset($_POST['register_patient'])):
+            /* ------------ Start Validation ------------ */
+            // -- First Name
+            if (empty($registerArr['firstname'])) {
+                $err_msg['firstname'] = "Required";
+            } elseif (!Regex::validate_name($registerArr['firstname'])) {
+                $err_msg['firstname'] = "Invalid Firstname";
+            } else {
+                $validArr['firstname'] = True; // Pass Validation
+            }
 
-    if (isset($_POST['register_patient'])):
-        /* ------------ Start Validation ------------ */
-        // -- First Name
-        if (empty($registerArr['firstname'])) {
-            $err_msg['firstname'] = "Required";
-        } elseif (!Regex::validate_name($registerArr['firstname'])) {
-            $err_msg['firstname'] = "Invalid Firstname";
-        } else {
-            $validArr['firstname'] = True; // Pass Validation
-        }
+            // -- Last Name
+            if (empty($registerArr['lastname'])) {
+                $err_msg['lastname'] = "Required";
+            } elseif (!Regex::validate_name($registerArr['lastname'])) {
+                $err_msg['lastname'] = "Invalid Lastname";
+            } else {
+                $validArr['lastname'] = True; // Pass Validation
+            }
 
-        // -- Last Name
-        if (empty($registerArr['lastname'])) {
-            $err_msg['lastname'] = "Required";
-        } elseif (!Regex::validate_name($registerArr['lastname'])) {
-            $err_msg['lastname'] = "Invalid Lastname";
-        } else {
-            $validArr['lastname'] = True; // Pass Validation
-        }
-
-        // -- Contact Number Validation
-        if (empty($registerArr['contactnumber'])) {
-            $err_msg['contactnumber'] = "Required";
-        } elseif (!Regex::validate_phone($registerArr['contactnumber'])) {
-            $err_msg['contactnumber'] = "Incorrect Format";
-        } else {
-            $validArr['contactnumber'] = True; // Pass Validation
-        }
+            // -- Contact Number Validation
+            if (empty($registerArr['contactnumber'])) {
+                $err_msg['contactnumber'] = "Required";
+            } elseif (!Regex::validate_phone($registerArr['contactnumber'])) {
+                $err_msg['contactnumber'] = "Incorrect Format";
+            } else {
+                $validArr['contactnumber'] = True; // Pass Validation
+            }
 
 // -- Gender Validation (Just Make Sure Either Male Or Female Is 'Checked')
-        if (empty($registerArr['gender'])) {
-            // Store Some Error Message
-            $err_msg['gender'] = "Not Selected";
-        } elseif (!($registerArr['gender'] == 'F' || $registerArr['gender'] == 'M')) {
-            // Store Some Error Message
-            $err_msg['gender'] = "Invalid";
-        } else {
-            $validArr['gender'] = True; // Pass Validation
-        }
+            if (empty($registerArr['gender'])) {
+                // Store Some Error Message
+                $err_msg['gender'] = "Not Selected";
+            } elseif (!($registerArr['gender'] == 'F' || $registerArr['gender'] == 'M')) {
+                // Store Some Error Message
+                $err_msg['gender'] = "Invalid";
+            } else {
+                $validArr['gender'] = True; // Pass Validation
+            }
 
-        // -- Date Of Birth (DOB) Validation
-        if (empty($registerArr['dob'])) {
-            $err_msg['dob'] = "Required";
-        } else {
-            $validArr['dob'] = True; // Pass Validation
-        }
-
-
-        // -- Address Validation (Unsure Of What Further Validation To Be Done)
-        if (empty($registerArr['address'])) {
-            $err_msg['address'] = "Required";
-        } else {
-            $validArr['address'] = True; // Pass Validation
-        }
+            // -- Date Of Birth (DOB) Validation
+            if (empty($registerArr['dob'])) {
+                $err_msg['dob'] = "Required";
+            } else {
+                $validArr['dob'] = True; // Pass Validation
+            }
 
 
-        // VALIDATE NRIC
-        $validate_ic = new ValidateIC($registerArr['nric']);
-        $valid_nric = $validate_ic->validate_nric();
-        if (empty($registerArr['nric'])) {
-            $err_msg['nric'] = "Required";
-        } elseif (!$valid_nric) {
-            ?> <script> nric_checksum_verified = false; </script> <?php
+            // -- Address Validation (Unsure Of What Further Validation To Be Done)
+            if (empty($registerArr['address'])) {
+                $err_msg['address'] = "Required";
+            } else {
+                $validArr['address'] = True; // Pass Validation
+            }
+
+
+            // VALIDATE NRIC
+            $validate_ic = new ValidateIC($registerArr['nric']);
+            $valid_nric = $validate_ic->validate_nric();
+            if (empty($registerArr['nric'])) {
+                $err_msg['nric'] = "Required";
+            } elseif (!$valid_nric) {
+                ?> <script> nric_checksum_verified = false;</script> <?php
             $err_msg['nric'] = "Invalid NRIC Format";
         } else {
-            ?> <script> nric_checksum_verified = true; </script> <?php
+            ?> <script> nric_checksum_verified = true;</script> <?php
             $validArr['nric'] = True; // Pass Validation
         }
 
@@ -210,13 +204,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
 
 
 
-        
+
         /* ------------ End Validation ------------ */
 
 // If Valid User Information (After Validation)
         if (!in_array(False, $validArr)) {
 // > Check If User Already Exist (Email & Contact Number)
-            $exist = Account_User::check_user_exist($registerArr['email']);
+            $exist = Account_User::check_email_exist($registerArr['email']);
             if (!$exist) {
 
 # Change The Date Back To Database Default
@@ -239,7 +233,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
 // > Salt Generation (?)
 // > Need To Encrypt The Password Then Store In Database
                 Patient::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
-                $patient_created = Account_User::check_user_exist($registerArr['email']);
+                $patient_created = Account_User::check_email_exist($registerArr['email']);
                 if ($patient_created) {
                     # Send Email To Inform Patient
                     EmailTemplate::template_patientregistration($registerArr['email']);
@@ -260,7 +254,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
                     'password' => '',
                     'confirmpassword' => ''
                 );
-                header("Location:". LOGIN_WEB);
+                header("Location:" . LOGIN_WEB);
 
 // -- Need To Send A Email To Ask Patient To Verify Email -- //
             } else {
@@ -780,18 +774,18 @@ endif; # END POST REQUEST
             }, "Contact number format is incorrect.");
 
 
-             /*------------------------------------------------------
+            /*------------------------------------------------------
              CLIENT SIDE REGULAR EXPRESSION FOR NRIC VERIFICATION
              --------------------------------------------------------*/
             var nric_checksum_verified;
             $.validator.addMethod("nricVerify", function (value, element) {
                 return this.optional(element) || (nric_checksum_verified == true);
-            }),"";
+            }), "";
 
             /*------------------------------------------------------
              CLIENT SIDE REGULAR EXPRESSION FOR EMAIL VERIFICATION
              --------------------------------------------------------*/
-            
+
             $.validator.addMethod("verifyEmail", function (value, element) {
                 return this.optional(element) || (email_verified_validation == true);
             }, "Email must be verified first");
