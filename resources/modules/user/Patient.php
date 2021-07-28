@@ -120,7 +120,7 @@ class Patient extends Normal_User {
 
         //Create hash on the password (salt is already generated in the function)
         if (isset($patient_info['profile']['nric'])):
-            $patient_info['profile']['nric'] = $sec->encrypt($patient_info['profile']['nric']);
+            $patient_info['profile']['nric'] = $sec->hash_256($patient_info['profile']['nric']);
         endif;
         
         # Load Basic Account User Fields & Values To Array

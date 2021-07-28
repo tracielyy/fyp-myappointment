@@ -57,12 +57,26 @@ function verify_user_email(string $user_email, string $input_otp): bool {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST"):
     if (isset($_POST['ajax_otp'])):
+
+        // Verify If OTP Matches
         if (verify_user_email($_POST['email'], $_POST['otp'])):
             echo "true";
         else:
             echo "false";
         endif;
+    else:
+        header("Location:" . REGISTER_WEB);
     endif; # -- END AJAX REQUEST
 endif; # -- END POST REQUEST
+
+
+/*
+ * Make Sure User Will Be Redirected Away If Accessing This File Directly
+ */
+if ($_SERVER["REQUEST_METHOD"] == "GET"):
+    header("Location:" . REGISTER_WEB);
+endif;
 ?>
+
+
 

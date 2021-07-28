@@ -117,7 +117,7 @@ class Account_User {
     public static function check_nric_exist(string $nric): bool {
 
         $secure = new Security();
-        $secure_nric = $secure->encrypt($nric);
+        $secure_nric = $secure->hash_256($nric);
 
         # Query For User With The Given Email
         $db = new DbQuery();
