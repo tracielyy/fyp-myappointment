@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<<<<<<< HEAD
 <?php
-=======
-    <?php
->>>>>>> origin/traciedevelop
     /* Load Config File */
     require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/config.php';
     require VENDOR_PATH . '/autoload.php';
