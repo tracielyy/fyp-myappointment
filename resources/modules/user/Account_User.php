@@ -26,8 +26,6 @@ class Account_User {
     private Time $createdon; // Date which the account is created
     private Session $session; // Session Object
 
-    private const PASSWORD_RESET = "passwordreset";
-
     // Constructor
     public function __construct(Session $session, string $usertype, Time $createdon, string $email, string $password = NULL) {
 
@@ -116,8 +114,28 @@ class Account_User {
         return NULL;
     }
 
+    public static function check_nric_exist(string $nric): bool {
+
+        $secure = new Security();
+        $secure_nric = $secure->encrypt($nric);
+
+        # Query For User With The Given Email
+        $db = new DbQuery();
+        $snapshot = $db->get_db()->collection(Database::ACCOUNT_USER)
+
+                ->where('profile.nric', '=', $secure_nric)->documents();
+
+        # Check If There Are Any Value Returned
+        foreach ($snapshot as $document) :
+            if ($document->exists()) :
+                return true;
+            endif;
+        endforeach;
+        return false;
+    }
+
     //  -- CHECK IF USER EXIST IN THE DATABASE
-    public static function check_user_exist(string $email): bool {
+    public static function check_email_exist(string $email): bool {
 
         # Email Array
         $emailArr ["credentials"] = array(
@@ -228,7 +246,7 @@ class Account_User {
     public static function validate_password_token(string $email, string $passwordtoken): bool {
 
         # Need To Make Sure The Email Is Valid
-        $exist = self::check_user_exist($email);
+        $exist = self::check_email_exist($email);
         if ($exist):
 
             # Store Email In An Array

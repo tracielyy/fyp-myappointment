@@ -45,7 +45,7 @@
             $url_value .= "?token={$token}&email={$email}";
 
             # Cross Check `email` With Google Cloud Firestore
-            if (Account_User::check_user_exist($email)) {
+            if (Account_User::check_email_exist($email)) {
                 echo "User Exist";
 
                 # Cross Check `token` With Google Cloud Firestore
