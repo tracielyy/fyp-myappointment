@@ -24,22 +24,37 @@ require_once EMAIL_MOD . '/EmailVerify.php';
 /*
  * FACILITY ADMIN LANDING PAGE (After Login)
  */
-?><!DOCTYPE html>
-<html lang="en">
-    <head>
-        <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
-        <?php
-        include TEMPLATES_PATH . '/bootstrap.php';
-        include_once TEMPLATES_PATH . '/navbar.php';
-        ?>
-        <meta charset = "UTF-8">
-        <meta http-equiv = "X-UA-Compatible" content = "IE=edge">
-        <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
-        <title>Facility Admin Main Page</title>
-        <!--font awesome cdn-->
-        <script src = "https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
-    </head>
-    <body>
+if (!isset($_SESSION['user'])):
+    header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
+else:
+    $user = unserialize($_SESSION["user"]);
+    $user_type = $user->get_usertype();
+    $user_email = $user->get_email();
 
-    </body>
-</html>
+    // Check If User Is Facility Admin
+    if (!User_Type::check_user_type(User_Type::FACIILITY_ADMIN, $user_type)):
+        header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
+    else:
+        ?><!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+                <?php
+                include TEMPLATES_PATH . '/bootstrap.php';
+                include_once TEMPLATES_PATH . '/navbar-loggedin.php';
+                ?>
+                <meta charset = "UTF-8">
+                <meta http-equiv = "X-UA-Compatible" content = "IE=edge">
+                <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
+                <title>Facility Admin Main Page</title>
+                <!--font awesome cdn-->
+                <script src = "https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
+            </head>
+            <body>
+
+            </body>
+        </html>
+    <?php
+    endif; # -- END USER TYPE CHECK
+endif; # -- END SESSION CHECK
+?>

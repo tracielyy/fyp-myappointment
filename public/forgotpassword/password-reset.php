@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<?php
+    <?php
     /* Load Config File */
     require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/config.php';
     require VENDOR_PATH . '/autoload.php';
@@ -45,12 +45,13 @@
             $url_value .= "?token={$token}&email={$email}";
 
             # Cross Check `email` With Google Cloud Firestore
-            if (Account_User::check_user_exist($email)) {
+            if (Account_User::check_email_exist($email)) {
                 echo "User Exist";
 
                 # Cross Check `token` With Google Cloud Firestore
                 $validURL = Account_User::validate_password_token($email, $token);
-                if ($validURL) {                   
+                if ($validURL) {
+                    
                 }
             } else {
                 $msg = "";
@@ -73,15 +74,12 @@
         <!-- Title -->
         <title>FYP-21-S2-24: Password Reset</title>
         <!-- Styling -->
-<?php require TEMPLATES_PATH . '/bootstrap.php' ?>
+        <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
+        <link rel="stylesheet" href="./../css/loginRegister.css">
 
-    <style>
-    <?php include './css/loginRegister.css';
-    ?>
-    </style>
-</head>
+    </head>
 
-<body>
+    <body>
 
         <!-- PHP Script -->
         <?php
@@ -163,7 +161,7 @@
             ?>
             <div>
                 <!-- Navigation -->
-    <?php include TEMPLATES_PATH . '/navbar.php' ?>
+                <?php include TEMPLATES_PATH . '/navbar.php' ?>
 
                 <!-- Login Card -->
                 <div class="center row m-4">
@@ -172,7 +170,7 @@
                             <div class="shadow card p-2 rounded1">
                                 <div class="card-body m-1">
                                     <h1 class="card-title pt-2 " style="padding: 0px;margin: 0px;">Password Recovery<h3>
-    <?php echo $email; ?></h3>
+                                            <?php echo $email; ?></h3>
                                     </h1>
                                     <div class="px-1">
                                         <p class="text-muted mt-2"> Enter your new password and confirm it </p>
@@ -306,10 +304,6 @@
         }
         ?>
 
-<<<<<<< HEAD
-</body>
-=======
     </body>
->>>>>>> origin/traciedevelop
 
 </html>

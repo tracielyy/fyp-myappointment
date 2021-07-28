@@ -25,7 +25,7 @@ class Security {
 
     //encryption of data with AES-256-CBC
     public function encrypt($data) {
-        $encrypt_key = base64_decode(self::$key);
+        $encrypt_key = base64_decode(self::KEY);
         $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
         $encrypted = openssl_encrypt($data, 'aes-256-cbc', $encrypt_key, 0, $iv);
         return base64_encode($encrypted . '::' . $iv);
@@ -33,7 +33,7 @@ class Security {
     
     //decryption of data with AES-256-CBC
     public function decrypt($data) {
-        $decrypt_key = base64_decode(self::$key);
+        $decrypt_key = base64_decode(self::KEY);
         list($encrypted_data, $iv) = array_pad(explode('::', base64_decode($data), 2),2,null);
         return openssl_decrypt($encrypted_data, 'aes-256-cbc', $decrypt_key, 0, $iv);
         }

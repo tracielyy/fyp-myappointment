@@ -39,8 +39,6 @@ function retrieve_slots(string $facilityid, string $appointmenttype, string $dat
 $cal_default = Time::CALENDAR_FORMAT_DEFAULT;
 $next_day = Time::get_enddate(date($cal_default), 1, $cal_default);
 
-
-
 /* Load Appointment Slots */
 if ($_SERVER["REQUEST_METHOD"] == "POST"):
     if (isset($_POST['ajax'])):
@@ -60,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"):
             $slot_box[] = $slot;
         endforeach;
         $encode_slots = json_encode($slot_box);
-        echo $encode_slots; 
+        echo $encode_slots;
 
     else:
         $selected_date = Time::date_format_default($next_day);
@@ -71,39 +69,11 @@ else:
     $selected_date = Time::date_format_default($next_day);
     $appt_date = $next_day;
 endif; # -- END POST REQUEST
-# -- TESTING
-$slot_appt_type = Appointment_Type::DOCTOR_CONSULTATION;
-$slot_facilityid = "mf001";
-$slot_date = "15-07-2021";
-$slot_doctor = "wynterz2525@gmail.com";
-
-//echo nl2br(PHP_EOL . "Test Retrieve Slots" . PHP_EOL);
-//$raw_slots = retrieve_slots($slot_facilityid, $slot_appt_type, $slot_date);
-////echo var_dump($raw_slots);
-//echo nl2br(PHP_EOL . PHP_EOL);
-//$arr = array();
-//echo nl2br(PHP_EOL . PHP_EOL);
-//$slots_arr = StringUtils::object_to_array($raw_slots);
-//echo '<pre>';
-////    var_dump(json_encode($slots_arr));
-//        var_dump(json_encode($slots_arr));
-//echo '</pre>';
-//$slot_box = array();
-//foreach ($slots_arr as $slot):
-//    $date = Time::date_format_change($slot['appointmentschedule']['date'], Time::DATE_FORMAT_APPOINTMENT);
-//    $time = Time::to_12hours($slot['appointmentschedule']['date'], false);
-//    $slotdescription = $date . ',' . $time;
-//    $slot['slotdescription'] = $slotdescription;
-//    $slot_box[] = $slot;
-//endforeach;
-//$encode_slots = json_encode($slot_box);
-//echo $encode_slots;
-
-//echo '</pre>';
-//
-//$test_arr = array("tracie", "qwynn");
-//$encoded = "'" . json_encode($test_arr) . "'";
-//
-//echo $encoded;
+/*
+ * Make Sure User Will Be Redirected Away If Accessing This File Directly
+ */
+if ($_SERVER["REQUEST_METHOD"] == "GET"):
+    header("Location:/");
+endif;
 ?>
 

@@ -210,7 +210,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
 // If Valid User Information (After Validation)
         if (!in_array(False, $validArr)) {
 // > Check If User Already Exist (Email & Contact Number)
-            $exist = Account_User::check_user_exist($registerArr['email']);
+            $exist = Account_User::check_email_exist($registerArr['email']);
             if (!$exist) {
 
 # Change The Date Back To Database Default
@@ -233,7 +233,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
 // > Salt Generation (?)
 // > Need To Encrypt The Password Then Store In Database
                 Patient::create_patient($patient_register);  // -- Need To Monitor & Change If Database Info Change -- //
-                $patient_created = Account_User::check_user_exist($registerArr['email']);
+                $patient_created = Account_User::check_email_exist($registerArr['email']);
                 if ($patient_created) {
                     # Send Email To Inform Patient
                     EmailTemplate::template_patientregistration($registerArr['email']);

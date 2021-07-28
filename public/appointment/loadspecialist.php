@@ -23,7 +23,6 @@ require_once APPT_MOD . '/Normal_Slot.php';
 require_once APPT_MOD . '/Special_Slot.php';
 require_once APPT_MOD . '/Appointment_Record.php';
 
-
 if ($_SERVER["REQUEST_METHOD"] == "POST"):
 
     if (isset($_POST['load_specialist'])):
@@ -41,17 +40,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"):
 
 
 endif; # -- END POST REQUEST
-//// -- TEST
-//echo "Testing";
-//$personnel_by_specialisation_arr = Medical_Personnel::retrieve_personnel_by_facility("mf001", true);
-//echo "<pre>";
-//var_dump($personnel_by_specialisation_arr);
-//echo "</pre>";
-//echo "Json Encode";
-//$personnel_arr = StringUtils::object_to_array($personnel_by_specialisation_arr);
-//echo "<pre>";
-//echo var_dump($personnel_arr);
-//echo "</pre>";
-//$encode_personnel = json_encode($personnel_arr);
-//echo "<br/><br/>";
-//echo $encode_personnel;
+/*
+ * Make Sure User Will Be Redirected Away If Accessing This File Directly
+ */
+if ($_SERVER["REQUEST_METHOD"] == "GET"):
+    header("Location:/");
+endif;
+?>

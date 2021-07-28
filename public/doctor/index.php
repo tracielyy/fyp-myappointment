@@ -10,7 +10,6 @@ require_once AUTH_MOD . '/Authentication.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Medical_Personnel.php';
 
-
 /*
  *  MEDICAL DASHBOARD
  */
@@ -19,11 +18,10 @@ require_once USER_MOD . '/Medical_Personnel.php';
 if (!isset($_SESSION['user'])):
     header("Location:./../"); # -- REDIRECT USER TO THE INDEX PAGE
 else:
-    $user = unserialize($_SESSION["user"]);
+    $user = unserialize((string) $_SESSION["user"]);
     $user_type = $user->get_usertype();
     $user_email = $user->get_email();
     if (!User_Type::check_user_type(User_Type::MEDICAL_PERSONNEL, $user_type)):
-        $email['credentials']['email'] = $user_email;
         header("Location:./../"); # -- REDIRECT USER TO THE INDEX PAGE
     else:
         ?><!DOCTYPE html>
@@ -81,7 +79,6 @@ else:
                 $patient_per_day = Normal_Slot::patient_count_per_date("mf001", $dateToday);
                 $patient_per_day += Special_Slot::patient_count_per_date("mf001", $dates[0]);
 
-
                 //$slot_arr += Special_Slot::retrieve_booked_slots_by_date($user_email,$dates[2]);
                 $slot_arr = array();
                 $numofPatientsWeek = array();
@@ -90,7 +87,6 @@ else:
                     $numofPatientsWeek[$date] = count($slot_addition);
                     $slot_arr = array_merge($slot_arr, $slot_addition);
                 endforeach;
-
 
                 // echo "<pre>";
                 // echo var_dump($slot_arr);
@@ -199,223 +195,222 @@ else:
                     </div>
 
                 </div><!-- END OF SIDE NAVIGATION TAB -->
+            </body>
 
-            <?php
-            endif; # -- END OF USER TYPE CHECK
-
-        endif; # -- END OF SESSION CHECK
-        ?>
-    </body>
-
-    <script>
-        /*THIS IS NOT ON THE DASHBOARD!!!!! 
-         */
-        var ctx = document.getElementById('myChart').getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['hello', 'world', 'waddup', '3333', '1444'],
-                datasets: [{
-                        label: 'Number of ',
-                        data: [<?php //echo $numofPatients;                           ?>2, 0, 0, 0, 0, 0],
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)',
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)',
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
+            <script>
+                /*THIS IS NOT ON THE DASHBOARD!!!!! 
+                 */
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['hello', 'world', 'waddup', '3333', '1444'],
+                        datasets: [{
+                                label: 'Number of ',
+                                data: [<?php //echo $numofPatients;                            ?>2, 0, 0, 0, 0, 0],
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)',
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)',
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
                     }
-                }
-            }
-        });
-        /*THIS IS NOT ON THE DASHBOARD!!!!! 
-         */
+                });
+                /*THIS IS NOT ON THE DASHBOARD!!!!! 
+                 */
 
 
 
-        /*THIS ONE ON THE BOTTOM IS ON THE DASHBOARD!!!!! 
-         */
+                /*THIS ONE ON THE BOTTOM IS ON THE DASHBOARD!!!!! 
+                 */
 
-        var ctx2 = document.getElementById("chart2").getContext("2d");
-        var myChart1 = new Chart(ctx2, {
-            type: 'bar',
-            data: {
-                labels: [<?php
+                var ctx2 = document.getElementById("chart2").getContext("2d");
+                var myChart1 = new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: [<?php
         foreach ($dates as $date):
             echo "'" . $date . "',";
         endforeach;
         ?>],
-                datasets: [{
-                        label: 'Number of Patients per date',
-                        data: [<?php
+                        datasets: [{
+                                label: 'Number of Patients per date',
+                                data: [<?php
         foreach ($numofPatientsWeek as $date => $count): echo $count . ",";
         endforeach;
         ?>],
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)',
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)',
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 10,
-                        min: 0,
-                        ticks: {
-                            stepSize: 1
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)',
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)',
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 10,
+                                min: 0,
+                                ticks: {
+                                    stepSize: 1
+                                }
+
+                            }
                         }
+                    }
+                });
+
+                var ctx3 = document.getElementById("chart3").getContext("2d");
+                var myChart2 = new Chart(ctx3, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                        datasets: [{
+                                label: '# of Votes',
+                                data: [12, 19, 3, 5, 2, 3],
+                                backgroundColor: [
+                                    'rgba(255, 99, 132,1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                    },
+                    options: {
+                        maintainAspectRatio: false
 
                     }
+                });
+            </script>
+
+            <!-- END OF CHARTJS -->
+
+            <!-- GRIDJS -->
+
+
+            <script>
+                new gridjs.Grid({
+                    columns: ["Name", "Email", "Date", "Time"],
+                    data: [
+        <?php
+        $pnum = 0;
+        $p_perday = 3; //Special_Slot::patient_count_per_date("mf001", "21-07-2021");
+        foreach ($slot_arr as $slot):
+            $patientid = $slot->get_patient();
+            $patient = Patient::retrieve_patient_by_id($patientid);
+            $str = "[\"" . $patient->get_firstname() . "\",\"" . $patient->get_email() . "\",\"" . $slot->get_appointmentschedule()->get_date() . "\",\"" . $slot->get_appointmentschedule()->get_time() . "\"],";
+            echo $str;
+        endforeach;
+        ?>],
+
+                    pagination: {
+                        enabled: true,
+                        limit: 3,
+                        summary: false
+                    }
+                }).render(document.getElementById("wrapper2"));
+
+                new gridjs.Grid({
+                    columns: ["Name", "Email", "Date", "Time"],
+                    data: [
+                        ["John", "john@example.com", "24-June-2021", "14:00"],
+                        ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
+                        ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
+                        ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
+                        ["Afshin", "afshin@mail.com", "24-June-2021", "14:00"],
+                        ["John", "john@example.com", "24-June-2021", "14:00"],
+                        ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
+                        ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
+                        ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
+                        ["John", "john@example.com", "24-June-2021", "14:00"],
+                        ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
+                        ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
+                        ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"]
+                    ],
+
+                    pagination: {
+                        enabled: true,
+                        limit: 6,
+                        summary: false
+                    },
+
+                    sort: true,
+                    search: true,
+                }).render(document.getElementById("wrapper"));
+
+                function openTab(evt, tabName) {
+                    var i, tabcontent, tablinks;
+                    tabcontent = document.getElementsByClassName("tabcontent");
+                    for (i = 0; i < tabcontent.length; i++) {
+                        tabcontent[i].style.display = "none";
+                    }
+                    tablinks = document.getElementsByClassName("tablinks");
+                    for (i = 0; i < tablinks.length; i++) {
+                        tablinks[i].className = tablinks[i].className.replace(" active", "");
+                    }
+                    document.getElementById(tabName).style.display = "block";
+                    evt.currentTarget.className += " active";
                 }
-            }
-        });
 
-        var ctx3 = document.getElementById("chart3").getContext("2d");
-        var myChart2 = new Chart(ctx3, {
-            type: 'doughnut',
-            data: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                datasets: [{
-                        label: '# of Votes',
-                        data: [12, 19, 3, 5, 2, 3],
-                        backgroundColor: [
-                            'rgba(255, 99, 132,1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-            },
-            options: {
-                maintainAspectRatio: false
+                // Get the element with id="defaultOpen" and click on it
+                document.getElementById("defaultOpen").click();
+            </script>
 
-            }
-        });
-    </script>
+        </html>
+    <?php
+    endif; # -- END OF USER TYPE CHECK
 
-    <!-- END OF CHARTJS -->
-
-    <!-- GRIDJS -->
-
-
-    <script>
-        new gridjs.Grid({
-            columns: ["Name", "Email", "Date", "Time"],
-            data: [
-<?php
-$pnum = 0;
-$p_perday = 3; //Special_Slot::patient_count_per_date("mf001", "21-07-2021");
-foreach ($slot_arr as $slot):
-    $patientid = $slot->get_patient();
-    $patient = Patient::retrieve_patient_by_id($patientid);
-    $str = "[\"" . $patient->get_firstname() . "\",\"" . $patient->get_email() . "\",\"" . $slot->get_appointmentschedule()->get_date() . "\",\"" . $slot->get_appointmentschedule()->get_time() . "\"],";
-    echo $str;
-endforeach;
-?>],
-
-            pagination: {
-                enabled: true,
-                limit: 3,
-                summary: false
-            }
-        }).render(document.getElementById("wrapper2"));
-
-        new gridjs.Grid({
-            columns: ["Name", "Email", "Date", "Time"],
-            data: [
-                ["John", "john@example.com", "24-June-2021", "14:00"],
-                ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
-                ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
-                ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
-                ["Afshin", "afshin@mail.com", "24-June-2021", "14:00"],
-                ["John", "john@example.com", "24-June-2021", "14:00"],
-                ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
-                ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
-                ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
-                ["John", "john@example.com", "24-June-2021", "14:00"],
-                ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
-                ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
-                ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"]
-            ],
-
-            pagination: {
-                enabled: true,
-                limit: 6,
-                summary: false
-            },
-
-            sort: true,
-            search: true,
-        }).render(document.getElementById("wrapper"));
-
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-        }
-
-        // Get the element with id="defaultOpen" and click on it
-        document.getElementById("defaultOpen").click();
-    </script>
-
-</html>
+endif; # -- END OF SESSION CHECK
+?>
