@@ -85,8 +85,6 @@ if (isset($_COOKIE['email_verified'])):
 endif;
 
 
-
-
 // Upon clicking "Register" Button 
 if ($_SERVER["REQUEST_METHOD"] == "POST") :
 
