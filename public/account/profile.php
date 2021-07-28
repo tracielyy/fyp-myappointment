@@ -56,7 +56,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
 
     <div class="container-fluid mt-3">
         <div class="tab">
-            <button class="tablinks top active" onclick="openTab(event, 'Account')" id="defaultOpen"><i
+            <button class="tablinks top" onclick="openTab(event, 'Account')" id="defaultOpen"><i
                     class="fas fa-user-cog tab-icon"></i>Account </button>
             <button class="tablinks" onclick="openTab(event, 'Profile')"><i
                     class="fas fa-user-circle tab-icon"></i>Profile </button>
@@ -167,8 +167,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
             $('#onetimepass').children().show();
         });
 
-        // Get the element with id="defaultOpen" and click on it 
-        $("#defaultOpen").click();
+        
 
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
@@ -183,6 +182,9 @@ include TEMPLATES_PATH . '/bootstrap.php';
             document.getElementById(tabName).style.display = "block";
             evt.currentTarget.className += " active";
         }
+
+        // Get the element with id="defaultOpen" and click on it 
+        $("#defaultOpen").click();
           
         </script>
 </body>
