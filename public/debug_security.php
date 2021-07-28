@@ -23,7 +23,7 @@ require_once SECURE_MOD. '/Security.php';
 
             $hash_password = $sec->hash($password);
             echo $text.'<br><br>';
-            $encrypted_text = $sec->encrypt($text);
+            $encrypted_text = $sec->hash_256($text);
             echo 'encrypted<br>';
             echo $encrypted_text;
 
