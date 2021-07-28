@@ -56,7 +56,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
 
     <div class="container-fluid mt-3">
         <div class="tab">
-            <button class="tablinks top active" onclick="openTab(event, 'Account')" id="defaultOpen"><i
+            <button class="tablinks top" onclick="openTab(event, 'Account')" id="defaultOpen"><i
                     class="fas fa-user-cog tab-icon"></i>Account </button>
             <button class="tablinks" onclick="openTab(event, 'Profile')"><i
                     class="fas fa-user-circle tab-icon"></i>Profile </button>
@@ -151,7 +151,6 @@ include TEMPLATES_PATH . '/bootstrap.php';
             </div>
         </div>
 
-       
 
         <script type="text/javascript">
         $('#onetimepass').children().hide();
@@ -168,24 +167,25 @@ include TEMPLATES_PATH . '/bootstrap.php';
             $('#onetimepass').children().show();
         });
 
+        
+
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tabcontent");
             for (i = 0; i < tabcontent.length; i++) {
                 tabcontent[i].style.display = "none";
-                console.log("going 1st")
             }
             tablinks = document.getElementsByClassName("tablinks");
             for (i = 0; i < tablinks.length; i++) {
                 tablinks[i].className = tablinks[i].className.replace(" active", "");
-                console.log("going 2nd")
             }
             document.getElementById(tabName).style.display = "block";
             evt.currentTarget.className += " active";
         }
-          // Get the element with id="defaultOpen" and click on it 
-          $("#defaultOpen").click();
-       
+
+        // Get the element with id="defaultOpen" and click on it 
+        $("#defaultOpen").click();
+          
         </script>
 </body>
 
