@@ -110,12 +110,12 @@ class Medical_Personnel extends Normal_User {
                 ->document($medical_personnel_data['profile']['nric'])
                 ->set($medical_personnel_data);
     }
-    
+
     // -- RETRIEVE MEDICAL PERSONNEL BY ID  
-    public static function retrieve_practitioner_by_id(string $user_doc_id): ?Medical_Personnel{
-        
+    public static function retrieve_practitioner_by_id(string $user_doc_id): ?Medical_Personnel {
+
         $db = new DbQuery();
-        $practitioner_data = $db->fetch_document_by_id(Database::ACCOUNT_USER,$user_doc_id);
+        $practitioner_data = $db->fetch_document_by_id(Database::ACCOUNT_USER, $user_doc_id);
         return self::initialise_medical_personnel($practitioner_data);
     }
 
@@ -160,7 +160,7 @@ class Medical_Personnel extends Normal_User {
     }
 
     // -- RETRIEVE MEDICAL PERSONNEL THAT BELONGS TO THE GIVEN FACILITY
-    public static function retrieve_personnel_by_facility(string $facilityid, bool $return_as_object = true): array {
+    public static function retrieve_personnel_by_facility_spec(string $facilityid, bool $return_as_object = true): array {
 
         # Create Empty Array To Store Personnel
         $personnel_arr = array();
@@ -177,6 +177,42 @@ class Medical_Personnel extends Normal_User {
                     $personnel_arr[$doc_data['practitionerinfo']['specialisation']][] = self:: initialise_medical_personnel($doc_data);
                 else:
                     $personnel_arr[$doc_data['practitionerinfo']['specialisation']][] = $doc_data;
+                endif;
+            }
+        }
+
+        return $personnel_arr;
+    }
+
+    // -- RETRIEVE MEDICAL PERSONNEL THAT BELONGS TO THE GIVEN FACILITY
+    public static function retrieve_personnel_by_facility(string $facilityid, bool $return_as_object = true,
+            array $startAfter = null): array {
+
+        # Create Empty Array To Store Personnel
+        $personnel_arr = array();
+
+        $db = new DbQuery();
+        $doc_ref = $db->get_db()->collection(Database::ACCOUNT_USER)
+                ->orderBy('profile.name.firstname')->orderBy('profile.name.lastname')->orderBy('credentials.email')
+                ->where("accountdetails.usertype", "=", User_Type::MEDICAL_PERSONNEL)
+                ->where("practitionerinfo.facilityids", "array-contains", $facilityid);
+
+        if ($startAfter == null):
+            # Beginning Query
+            $doc_arr = $doc_ref->limit(2)->documents();
+        else:
+            # Consecutive Query
+            $doc_arr = $doc_ref->startAfter($startAfter)->limit(2)->documents();
+        endif;
+
+        # Loop & Add To Container
+        foreach ($doc_arr as $doc) {
+            if ($doc->exists()) {
+                $doc_data = $doc->data();
+                if ($return_as_object):
+                    $personnel_arr[] = self:: initialise_medical_personnel($doc_data);
+                else:
+                    $personnel_arr[] = $doc_data;
                 endif;
             }
         }
