@@ -27,6 +27,6 @@ else:
 
         endif;
     endif;
-endif;
+endif; # -- END SESSION
 ?>
 
