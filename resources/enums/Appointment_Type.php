@@ -12,7 +12,7 @@ abstract class Appointment_Type {
 
     
     // -- GET ALL CLASS DEFINED CONSTANTS
-    private static function get_constants() {
+    public static function get_constants() {
         $appt_type_class = new ReflectionClass(__CLASS__);
         return $appt_type_class->getConstants();
     }
