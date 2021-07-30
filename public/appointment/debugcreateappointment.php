@@ -138,7 +138,7 @@ else:
             endforeach; # -- END LOOPING INFO TO ARRAY
 
 
-            if (Appointment_Type::validate_appointment_type($appt_info['appointmenttype'])):
+            if (Appointment_Type::validate_type($appt_info['appointmenttype'])):
                 $valid_arr['appointmenttype'] = True;
             else:
                 $valid_arr['appointmenttype'] = False;
