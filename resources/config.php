@@ -16,6 +16,8 @@ define("APPT_MOD", realpath(dirname(__FILE__) . '/modules/appointment'));
 define("TIME_MOD", realpath(dirname(__FILE__) . '/modules/time'));
 define("SECURE_MOD", realpath(dirname(__FILE__) . '/modules/security'));
 define("MEDDOC_MOD", realpath(dirname(__FILE__) . '/modules/medicaldocument'));
+define("HINFO_MOD", realpath(dirname(__FILE__) . '/modules/healthinfo'));
+
 
 ############## -- CONFIGURATIONS FOR PAGES -- ################
 define("LOGIN_WEB", '/login');
