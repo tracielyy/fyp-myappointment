@@ -156,6 +156,10 @@ class Time {
         return $date_arr;
     }
     
+    public static function check_datetime_format(string $datetime, string $format = self::DATE_FORMAT_DEFAULT): bool{
+        return DateTime::createFromFormat($format, $datetime);
+    }
+    
     public static function initialise_time(array $time_arr): Time{
         $time_obj = new Time($time_arr['date'], $time_arr['time']);
         return $time_obj;
