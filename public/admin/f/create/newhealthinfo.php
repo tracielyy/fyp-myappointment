@@ -99,6 +99,7 @@ else:
                               placeholder="Descriptions" ><?php echo $health_info_form['descriptions']; ?></textarea><br/><br/>
                     <!-- Type -->
                     <select name="type">
+                        <option style="display: none" value=" ">--Select Type--</option>
                         <?php
                         foreach ($health_info_types as $type):
                             ?>
