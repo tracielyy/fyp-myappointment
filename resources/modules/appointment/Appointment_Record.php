@@ -148,7 +148,6 @@ class Appointment_Record {
         $batch->set($db->get_db()->collection($appt_doc_path)->document($id), $appt_record_arr);
         $batch->commit();
 
-
         return self::initialise_appointment_record($appt_record_arr);
     }
 
@@ -212,8 +211,7 @@ class Appointment_Record {
             return $last_id[0] . "-" . $current_year . "-1000"; # -- There Is No Current Year Id
 
         endif;
-            return "appt-" . $current_year . "-1000"; # -- Totally No ID Present In Database
-        
+        return "appt-" . $current_year . "-1000"; # -- Totally No ID Present In Database
     }
 
     // -- Retrieve Of Appointment Records Of Certain Type -- //
