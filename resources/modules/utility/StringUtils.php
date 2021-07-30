@@ -8,9 +8,7 @@ class StringUtils {
 
     // -- String Cleaning -- //
     public static function clean_input(string $input, bool $toUpper = false): string {
-        $input = trim($input);  // Remove leading and trailing whitespace 
-        $input = stripslashes($input);  // Remove '\' (slashes)
-        $input = htmlspecialchars($input);  // Treat special chars as HTML entities
+        $input = self::trim_string($input);
         if ($toUpper):
             $input = strtoupper($input); // All chars to uppercase
         else:
@@ -18,6 +16,13 @@ class StringUtils {
         endif;
 
         return $input;
+    }
+    
+    public static function trim_string(string $input): string{
+        $input = trim($input); // Remove leading and trailing whitespace
+        $input = stripslashes($input); // Remove '\' (slashes)
+        $input = htmlspecialchars($input); // Treat special chars as HTML entities
+        return $input; 
     }
 
     // -- Private Function For String Comparison -- //
