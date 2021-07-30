@@ -9,12 +9,14 @@ require_once FACILITY_MOD . '/Operating_Hours.php';
 require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
 
+use Google\Cloud\Firestore\Transaction;
+
 class Health_Info {
 
     private string $id;
     private string $title;   /* Editable */
     private string $descriptions;  /* Editable */
-    private string $type; /* NON Editable */
+    private string $type; /* NON Editable (Doctor_Advice, World_Health_Notice, Health_Tips) */
     private Time $updatedon;
     private Time $createdon;
 
@@ -28,7 +30,7 @@ class Health_Info {
     }
 
     public function get_id(): string {
-        return $this->id();
+        return $this->id;
     }
 
     public function get_title(): string {
@@ -40,7 +42,7 @@ class Health_Info {
     }
 
     public function get_type(): string {
-        return $this->type();
+        return $this->type;
     }
 
     public function get_createdon(): Time {
@@ -51,24 +53,24 @@ class Health_Info {
         return $this->updatedon;
     }
 
-    public static function initialise_health_info(array $health_info): Health_Info {
+    public static function initialise_health_info(array $health_info): null | Health_Info {
+        try {
+            # Time Object
+            $createdon_obj = Time::initialise_time($health_info['createdon']);
+            $updatedon_obj = Time::initialise_time($health_info['updatedon']);
 
-        # Time Object
-        $createdon_obj =  Time::initialise_time($health_info['createdon']);
-        $updatedon_obj = Time::initialise_time($health_info['updatedon']);
-        
-        # Health Info Object
-        $health_info_obj = new Health_Info($createdon_obj, $updatedon_obj, $health_info['id'], $health_info['title'],
-                $health_info['descriptions'], $health_info['type']);
-        
-        return $health_info_obj;
+            # Health Info Object
+            $health_info_obj = new Health_Info($createdon_obj, $updatedon_obj, $health_info['id'], $health_info['title'],
+                    $health_info['descriptions'], $health_info['type']);
+
+            return $health_info_obj;
+        } catch (Exception $ex) {
+            return null;
+        }
     }
 
-    /*
-     * Database Access Function
-     */
-
-    # FETCH (RETRIEVE)
+    // ============ Database Access Functions ================= //
+    //  FETCH (RETRIEVE)  //
     public static function retrieve_all_healthinfo(string $startAfter = null): array {
 
         # Create Health Tips
@@ -77,54 +79,71 @@ class Health_Info {
         $db = new DbQuery();
         $ref = $db->get_db()->collection(Database::HEALTH_INFO)->orderBy('id');
 
+        $limit = 10;
+
         if ($startAfter == null):
             # Beginning Query 
-            $arr = $ref->limit(10)->documents();
+            $arr = $ref->limit($limit)->documents();
         else:
             # Consecutive Query
-            $arr = $ref->startAfter($startAfter)->limit(10)->documents();
+            $arr = $ref->startAfter($startAfter)->limit($limit)->documents();
         endif;
         # Loop & Add To Container
         foreach ($arr As $doc):
             if ($doc->exists()):
                 $doc_data = $doc->data();
-//               $health_info_arr[] 
+                $health_info_arr[] = self::initialise_health_info($doc_data);
             endif;
         endforeach;
+        return $health_info_arr;
     }
-    
-    public static function generate_id(): string {
-        
+
+    //  RETRIEVE HEALTH INFO BY ID  //
+    public static function retrieve_health_info_by_id(string $id): null|Health_Info {
+        $db = new DbQuery();
+        $health_info = $db->fetch_document_by_id(Database::HEALTH_INFO, $id);
+        if ($health_info !== null):
+            return self::initialise_health_info($health_info);
+        endif;
+        return $health_info;
+    }
+
+    private static function generate_id(): string {
+
         # To OrderBy The Id
         $orderBy = array('id');
-        
+
         # Find The Last ID & Increment
         $db = new DbQuery();
         $path = Database::HEALTH_INFO;
         $last_id = $db->get_first_id_ordered($path, $orderBy, false);
-        
+
         # If There Is Any Present ID In Database
-        if($last_id_arr != null):
+        if ($last_id != null):
             return ++$last_id;
         endif;
         return "hinfo-10001";
     }
-    
 
-    # INSERT (CREATE)
+    //  INSERT (CREATE)  //
     public static function create_healthinfo(array $health_info_data): void {
 
         $db = new DbQuery();
-        
+
         # SET The Timing
         $createdon = new Time();
-        
+        $createdon_arr = array('date' => $createdon->get_date(), 'time' => $createdon->get_time());
+        $health_info_data['createdon'] = $health_info_data['updatedon'] = $createdon_arr;
+
         # Get Id
         $id = self::generate_id();
-        
+        $health_info_data['id'] = $id;
+
+        $path = Database::HEALTH_INFO;
+        $db->insert_document($path, $health_info_data, false, $id);
     }
 
-    # MODIFY (UPDATE)
+    //  MODIFY (UPDATE)  //
     public static function update_healthinfo(string $id, string $title, string $descriptions): bool {
         $db = new DbQuery();
         $ref = $db->get_db()->collection(Database::HEALTH_INFO)->document($id);
@@ -147,7 +166,7 @@ class Health_Info {
         return $trnx_result;
     }
 
-    # DELETE
+    //  DELETE  //
     public static function delete_healthinfo(string $id): void {
         $db = new DbQuery();
         $db->get_db()->collection(Database::HEALTH_INFO)->document($id)->delete();
