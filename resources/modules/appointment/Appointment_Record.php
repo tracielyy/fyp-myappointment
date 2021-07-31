@@ -239,6 +239,8 @@ class Appointment_Record {
             $appointment_arr[] = self::initialise_appointment_record($record);
 
         endforeach;
+        usort($appointment_arr, array("Appointment_Record", "cmp_obj"));
+
         return $appointment_arr;
     }
 
@@ -262,6 +264,9 @@ class Appointment_Record {
                 $arr['missed'][] = $appt;
             endif;
         endforeach;
+//        usort($arr['upcoming'], array("Appointment_Record", "cmp_obj"));
+//        usort($arr['missed'], array("Appointment_Record", "cmp_obj"));
+
         return $arr;
     }
 
@@ -383,6 +388,22 @@ class Appointment_Record {
         $appt_record_obj = self::initialise_appointment_record($appt_record);
 
         return $appt_record_obj;
+    }
+
+    // -- Comparison Function 
+    protected static function cmp_obj(Appointment_Record $a, Appointment_Record $b) {
+        $format = Time::DATE_FORMAT_DEFAULT . ' ' . Time::TIME_FORMAT_DEFAULT_NOSECONDS;
+        $al = DateTime::createFromFormat($format,
+                        $a->get_appointmentslot()->get_appointmentschedule()->get_date() . ' ' .
+                        $a->get_appointmentslot()->get_appointmentschedule()->get_time());
+        $bl = DateTime::createFromFormat($format,
+                        $b->get_appointmentslot()->get_appointmentschedule()->get_date() . ' ' .
+                        $b->get_appointmentslot()->get_appointmentschedule()->get_time());
+
+        if ($al == $bl) {
+            return 0;
+        }
+        return ($al > $bl) ? +1 : -1;
     }
 
 }
