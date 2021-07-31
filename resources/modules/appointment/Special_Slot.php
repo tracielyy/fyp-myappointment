@@ -25,8 +25,8 @@ class Special_Slot extends Appointment_Slot {
     private string $patient;
     private bool $available;
 
-    public function __construct(string $slotid, Time $appointmentschedule, string $patient, bool $available) {
-        parent::__construct($slotid, $appointmentschedule);
+    public function __construct(string $slotid, Time $appointmentschedule, string $patient, bool $available, string $facilityid) {
+        parent::__construct($slotid, $appointmentschedule, $facilityid);
         $this->patient = $patient;
         $this->available = $available;
     }
@@ -39,6 +39,8 @@ class Special_Slot extends Appointment_Slot {
     public function get_available(): bool {
         return $this->available;
     }
+    
+
 
     // -- Initialise Appointment_Slot
     public static function initialise_special_slot(array $slot_data): Special_Slot {
@@ -48,13 +50,23 @@ class Special_Slot extends Appointment_Slot {
 
         # Time
         $appt_schedule = new Time($slot_date, $slot_data['time']);
-        $slot_obj = new Special_Slot($slot_data['slotid'], $appt_schedule, $slot_data['patient'], $slot_data['available']);
+        $slot_obj = new Special_Slot($slot_data['slotid'], $appt_schedule, $slot_data['patient'], $slot_data['available'], $slot_data['facilityid']);
         return $slot_obj;
     }
 
     //============================================
     //      Methods Accessing Firestore Database 
     //============================================
+    /* This is the static comparing function: */
+//    public static function cmp_obj(Special_Slot $a, Special_Slot $b) {
+//        $al = strtolower($a->get_appointmentschedule()->get_time());
+//        $bl = strtolower($b->get_appointmentschedule()->get_time());
+//        if ($al == $bl) {
+//            return 0;
+//        }
+//        return ($al > $bl) ? +1 : -1;
+//    }
+
     // -- CHANGE SLOT AVAILABILITY (whether the doctor wants to work anot)
     public static function set_availability(string $slotid, bool $availability): void {
 
@@ -114,7 +126,6 @@ class Special_Slot extends Appointment_Slot {
         # Path To Retrieve The Appointment Slot
         $slot_path = Database::ACCOUNT_USER . "/" . $doctor_doc_id . "/" . Database::APPOINTMENT_SLOTS . "/" . $date . "/" . Database::SLOTS;
 
-
         # Getting Array Of Document SnapShot
         $slot_snapshot_arr = $db->get_db()->collection($slot_path)
                 ->where("facilityid", "=", $facilityid)
@@ -136,6 +147,7 @@ class Special_Slot extends Appointment_Slot {
 
             endif;
         endforeach;
+        usort($slots_arr, array("Special_Slot", "cmp_obj"));
 
         # -- Return Array Of Appointment Slots
         return $slots_arr;
@@ -170,7 +182,7 @@ class Special_Slot extends Appointment_Slot {
     }
 
     // -- RETRIEVE APPOINTMENT SLOT (via slot id & appointment type)
-    public static function retrieve_apptslot_by_id(string $id): Appointment_Slot {
+    public static function retrieve_apptslot_by_id(string $id, string $facilityid): Appointment_Slot {
 
         # Split The ID <e.g 1001>~<date>~<doctor-doc-id>
         $id_data = explode("~", $id);
@@ -180,7 +192,7 @@ class Special_Slot extends Appointment_Slot {
         # Slot id <e.g 1001>~<date>~<doctor-doc-id>
         $doc_path = Database::ACCOUNT_USER . "/" . $id_data[2] . "/" . Database::APPOINTMENT_SLOTS . "/" . $id_data[1] . "/" . Database::SLOTS;
         $slot_data = $db->fetch_document_by_id($doc_path, $id);
-        return Special_Slot::initialise_appt_slot($slot_data, $id_data[1]);
+        return self::initialise_special_slot($slot_data, $facilityid);
     }
 
     // -- PATIENT COUNT OF ALL APPOINTMENT TYPES BY FACILITY
@@ -219,6 +231,99 @@ class Special_Slot extends Appointment_Slot {
         return $patient_counter;
     }
 
+    public static function edit_slot(string $doctor_email, string $date, string $slotid, string $new_time,
+            bool $available = true): bool {
+        # Get Doctor ID
+        $doctor_doc_id = Account_User::retrieve_user_doc_id($doctor_email);
+
+        # Edit The Slot Timing
+        $db = new DbQuery();
+        $path = Database::ACCOUNT_USER . '/' . $doctor_doc_id . '/' . Database::APPOINTMENT_SLOTS . '/' . $date . '/' . Database::SLOTS;
+        $doc_ref = $db->get_db()->collection($path)->document($slotid);
+        $trnx_result = $db->get_db()->runTransaction(function (Transaction $transaction)
+        use ($doc_ref, $new_time, $available) {
+
+            # Check The Time Before Updating
+            if (Time::check_datetime_format($new_time, Time::DATE_FORMAT_DEFAULT)):
+                $transaction->update($doc_ref, [
+                    ['path' => 'available', 'value' => $available],
+                    ['path' => 'time', 'value' => $new_time]
+                ]);
+                return true;
+            endif;
+            return false;
+        });
+        return $trnx_result;
+    }
+
+    private static function generate_id(string $doctor_doc_id, string $date): string {
+
+        # To OrderBy The Appointment ID
+        $orderBy = array('slotid');
+
+        # Find The Last ID & Increment
+        $db = new DbQuery();
+        $doc_path = Database::ACCOUNT_USER . "/" . $doctor_doc_id . "/" . Database::APPOINTMENT_SLOTS . "/" . $date . "/" . Database::SLOTS;
+        $last_id = $db->get_first_id_ordered($doc_path, $orderBy, false);
+
+        # If There Is Any Present ID In Database
+        $delimiter = "~";
+        if ($last_id != null):
+
+            # Slot ID (<dddd>~<date>~<medical_personnel_id>)
+            $last_id_arr = explode($delimiter, $last_id);
+            $new_id = ++$last_id_arr[0];
+
+            return $new_id . $delimiter . $last_id_arr[1] . $delimiter . $last_id_arr[2]; # -- Incremental Value
+
+        endif;
+        return "1001" . $delimiter . $date . $delimiter . $doctor_doc_id; # -- New  ID
+    }
+
+    private static function create_slot_date(string $doctor_doc_id, string $date): void {
+        $db = new DbQuery();
+        $path = Database::ACCOUNT_USER . '/' . $doctor_doc_id . '/' . Database::APPOINTMENT_SLOTS;
+        $date_data = $db->fetch_document_by_id($path, $date);
+        if ($date_data == null):
+            $db->get_db()->collection($path)->document($date)->set(['date' => $date]);
+        endif;
+    }
+
+    public static function create_slot(string $doctor_email, string $facilityid, string $date, string $time, bool $available = true): bool {
+
+
+        if (Time::check_datetime_format($date, Time::DATE_FORMAT_DEFAULT) && Time::check_datetime_format($time, Time::TIME_FORMAT_DEFAULT_NOSECONDS)):
+
+            # Get Doctor ID
+            $doctor_doc_id = Account_User::retrieve_user_doc_id($doctor_email);
+
+            # Check If The Doctor Exist
+            if ($doctor_doc_id !== null):
+
+                # Get Slot ID
+                $slotid = self::generate_id($doctor_doc_id, $date);
+
+                # Create A New Slot
+                $data = [
+                    'available' => $available,
+                    'slotid' => $slotid,
+                    'time' => $time,
+                    'patient' => '',
+                    'facilityid' => $facilityid
+                ];
+                $db = new DbQuery();
+                self::create_slot_date($doctor_doc_id, $date); # -- Create Parent Document If Not Exist
+                $path = Database::ACCOUNT_USER . '/' . $doctor_doc_id . '/' . Database::APPOINTMENT_SLOTS . '/' . $date . '/' . Database::SLOTS;
+                $db->get_db()->collection($path)->document($slotid)->set($data);
+                return true;
+
+            endif;
+            return false; # -- Doctor Not Found
+        endif;
+        return false; # -- Date Time Format Incorrect
+    }
+
+    // Unfinished
     public static function add_new_slots(string $doctor_email, array $date_range) {
         # Get Doctor ID
         $doctor_doc_id = Account_User::retrieve_user_doc_id($doctor_email);

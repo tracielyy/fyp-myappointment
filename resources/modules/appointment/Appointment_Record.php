@@ -367,7 +367,7 @@ class Appointment_Record {
                 $slots_arr = Normal_Slot::retrieve_apptslot_by_id($slotid, $facilityid);
                 break;
             case Appointment_Type::SPECIALIST_CONSULTATION:
-                $slots_arr = Special_Slot::retrieve_apptslot_by_id($slotid);
+                $slots_arr = Special_Slot::retrieve_apptslot_by_id($slotid, $facilityid);
                 break;
         endswitch;
 
