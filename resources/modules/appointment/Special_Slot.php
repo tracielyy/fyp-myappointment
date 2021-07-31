@@ -39,8 +39,6 @@ class Special_Slot extends Appointment_Slot {
     public function get_available(): bool {
         return $this->available;
     }
-    
-
 
     // -- Initialise Appointment_Slot
     public static function initialise_special_slot(array $slot_data): Special_Slot {
@@ -66,7 +64,6 @@ class Special_Slot extends Appointment_Slot {
 //        }
 //        return ($al > $bl) ? +1 : -1;
 //    }
-
     // -- CHANGE SLOT AVAILABILITY (whether the doctor wants to work anot)
     public static function set_availability(string $slotid, bool $availability): void {
 
@@ -113,7 +110,7 @@ class Special_Slot extends Appointment_Slot {
     }
 
     // -- RETRIEVE APPOINTMENT SLOTS BY DATE
-    public static function retrieve_free_slots_by_date(string $facilityid, string $doctor_email, string $date, bool $return_as_object = true): array {
+    public static function retrieve_free_slots_by_date(string $facilityid, string $doctor_email, string $date): array {
 
         $db = new DbQuery();
 
@@ -139,11 +136,7 @@ class Special_Slot extends Appointment_Slot {
                 $slot_data = $slot_snapshot->data();
 
                 # Add Special Slot To Array (Already Sorted In Ascending Slotid Order
-                if ($return_as_object):
-                    $slots_arr[] = self::initialise_special_slot($slot_data);
-                else:
-                    $slots_arr[] = $slot_data;
-                endif;
+                $slots_arr[] = self::initialise_special_slot($slot_data);
 
             endif;
         endforeach;
@@ -178,6 +171,7 @@ class Special_Slot extends Appointment_Slot {
                 $slots_arr[] = self::initialise_special_slot($slot_data);
             endif;
         endforeach;
+        usort($slots_arr, array("Special_Slot", "cmp_obj"));
         return $slots_arr;
     }
 
@@ -207,8 +201,8 @@ class Special_Slot extends Appointment_Slot {
         $mydb = $db->get_db();
         $query = $mydb->collection(Database::ACCOUNT_USER)
                 ->where("accountdetails.usertype", "=", User_Type::MEDICAL_PERSONNEL)
-                ->where("practionerinfo.specialisation", "!=", "General")
-                ->where("practionerinfo.facilityids", "array-contains", $facilityid);
+                ->where("practitionerinfo.specialisation", "!=", "General")
+                ->where("practitionerinfo.facilityids", "array-contains", $facilityid);
 
         # Container With All Queried Document ID
         $doc_id_arr = $db->retrieve_doc_id_arr($query);
@@ -230,9 +224,16 @@ class Special_Slot extends Appointment_Slot {
 
         return $patient_counter;
     }
+    
+    // check if there is any duplicate time in the same date
+    public static function check_slot_time_duplicate(){
+        
+    }
 
+    // EDIT: only `available` & `time`
     public static function edit_slot(string $doctor_email, string $date, string $slotid, string $new_time,
             bool $available = true): bool {
+
         # Get Doctor ID
         $doctor_doc_id = Account_User::retrieve_user_doc_id($doctor_email);
 
@@ -243,12 +244,16 @@ class Special_Slot extends Appointment_Slot {
         $trnx_result = $db->get_db()->runTransaction(function (Transaction $transaction)
         use ($doc_ref, $new_time, $available) {
 
+            $snapshot = $transaction->snaphot($doc_ref);
+
             # Check The Time Before Updating
             if (Time::check_datetime_format($new_time, Time::DATE_FORMAT_DEFAULT)):
-                $transaction->update($doc_ref, [
-                    ['path' => 'available', 'value' => $available],
-                    ['path' => 'time', 'value' => $new_time]
-                ]);
+                if ($snapshot['time'] != $new_time):
+                    $transaction->update($doc_ref, [
+                        ['path' => 'available', 'value' => $available],
+                        ['path' => 'time', 'value' => $new_time]
+                    ]);
+                endif;
                 return true;
             endif;
             return false;
