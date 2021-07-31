@@ -74,7 +74,7 @@ class Authentication {
 
         
         /*
-         * NANTA TO DO HASH COMPARISON
+         *  HASH COMPARISON
          */
         $secure = new Security();
         
