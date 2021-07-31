@@ -17,12 +17,12 @@ class StringUtils {
 
         return $input;
     }
-    
-    public static function trim_string(string $input): string{
+
+    public static function trim_string(string $input): string {
         $input = trim($input); // Remove leading and trailing whitespace
         $input = stripslashes($input); // Remove '\' (slashes)
         $input = htmlspecialchars($input); // Treat special chars as HTML entities
-        return $input; 
+        return $input;
     }
 
     // -- Private Function For String Comparison -- //

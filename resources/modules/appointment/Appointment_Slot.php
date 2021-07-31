@@ -122,8 +122,10 @@ class Appointment_Slot {
 
     // -- Comparison Function To Be Use By Sub Classes
     protected static function cmp_obj(Appointment_Slot $a, Appointment_Slot $b) {
-        $al = strtolower($a->get_appointmentschedule()->get_time());
-        $bl = strtolower($b->get_appointmentschedule()->get_time());
+        $format = Time::TIME_FORMAT_DEFAULT_NOSECONDS;
+        $al = DateTime::createFromFormat($format, $a->get_appointmentschedule()->get_time());
+        $bl = DateTime::createFromFormat($format, $b->get_appointmentschedule()->get_time());
+
         if ($al == $bl) {
             return 0;
         }
