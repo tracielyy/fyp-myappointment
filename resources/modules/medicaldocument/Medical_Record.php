@@ -153,8 +153,8 @@ class Medical_Record {
             'createdon' => ['date' => $createdon->get_date(), 'time' => $createdon->get_time()],
             'appointmenttype' => $medical_record_info['appointmenttype'],
             'practitioner' => $medical_record_info['practitioner'],
-            'diagnosisdesc' => $medical_record_info['diagnosisdesc'],
-            'prescriptions' => $medical_record_info['prescriptions']
+            'diagnosisdesc' => "",
+            'prescriptions' => []
         );
 
         $doc_ref->set($medical_record_arr);
