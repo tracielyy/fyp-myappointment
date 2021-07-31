@@ -258,7 +258,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
             } else {
                 echo "
                         <script>
-                            $('#email-error').html(\"Email Exist\");
+                            $('#email-error').html(\"Email already exist.\");
                              $('#email').removeClass('is-valid');
                         </script>
                     ";
@@ -311,7 +311,7 @@ endif; # END POST REQUEST
         <?php require TEMPLATES_PATH . '/navbar.php' ?>
         <!-- Registration -->
         <div class="row m-1 m-md-4">
-            <div class="container center col-md-11 col-lg-10 col-xl-6">
+            <div class="container center col-md-11 col-lg-10 col-xl-9">
                 <div class="col-auto">
                     <div class="shadow card p-2 rounded1">
                         <div class="card-body m-0 m-md-2">
@@ -542,6 +542,7 @@ endif; # END POST REQUEST
             function typedNRIC()
             {
                 nric_checksum_verified = true;
+                $("#nric-feedback").remove();
             }
 
             // DISABLE THE `VERIFY` BUTTON WHEN NEEDED
@@ -795,7 +796,7 @@ endif; # END POST REQUEST
              -----------------------------------------------------*/
             $.validator.addMethod("phoneRegex", function (value, element) {
                 return this.optional(element) || /^[689]{1}[0-9]{7}$/.test(value);
-            }, "Contact number format is incorrect.");
+            }, "Contact number format is incorrect");
 
 
             /*------------------------------------------------------
@@ -804,7 +805,7 @@ endif; # END POST REQUEST
             var nric_checksum_verified;
             $.validator.addMethod("nricVerify", function (value, element) {
                 return this.optional(element) || (nric_checksum_verified == true);
-            }), "";
+            }), " ";
 
             /*------------------------------------------------------
              CLIENT SIDE REGULAR EXPRESSION FOR EMAIL VERIFICATION
