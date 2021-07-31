@@ -444,6 +444,76 @@ class Account_User {
         return $db->udpate_field(Database::ACCOUNT_USER, $conditionArr, $changedArr);
     }
 
+        //Updates user email with parameter user email to search    
+        public static function update_address(string $user_email, string $address): bool {
+           # Get User Document ID
+        $user_doc_id = self::retrieve_user_doc_id($user_email);
+
+        if ($user_doc_id !== null):
+
+            # Modify The Patient Profile Based On The Given Array
+            $db = new DbQuery();
+            $user_path = Database::ACCOUNT_USER;
+
+            $db->get_db()->collection($user_path)
+                    ->document($user_doc_id)->update([
+                            ['path' => 'profile.address', 'value' => $address]
+            ]);
+
+            return True;
+        endif;
+        return false;
+
+    }
+
+     //Updates user email with parameter user email to search    
+     public static function update_contact_number(string $user_email, string $contactnumber): bool {
+        # Get User Document ID
+     $user_doc_id = self::retrieve_user_doc_id($user_email);
+
+     if ($user_doc_id !== null):
+
+         # Modify The Patient Profile Based On The Given Array
+         $db = new DbQuery();
+         $user_path = Database::ACCOUNT_USER;
+
+         $db->get_db()->collection($user_path)
+                 ->document($user_doc_id)->update([
+                         ['path' => 'profile.contactnumber', 'value' => $contactnumber]
+         ]);
+
+         return True;
+     endif;
+     return false;
+    }
+
+     // -- Update Password (ONLY USED IN PROFILE, HASHING DONE IN PAGE) 
+     public static function update_password(string $email, string $new_password): bool {
+
+        # Update The New Password
+        $user_doc_id = self::retrieve_user_doc_id($email);
+
+        # If Valid User
+        if ($user_doc_id !== NULL):
+            $db = new DbQuery();
+    
+            $db->get_db()->collection(Database::ACCOUNT_USER)->document($user_doc_id)
+                    ->update([
+                        ['path' => 'credentials.password', 'value' => $new_password]
+            ]);
+
+            # Check If Password Updated Correctly
+            $new_user_doc_id = self::retrieve_user_doc_id($email, $new_password);
+
+            if ($new_user_doc_id !== Null):
+
+                return true; # -- END OF PASSWORD CHANGE PROCESS
+            endif; # -- CHECK FOR NEW USER ID
+            return false; # -- HAVE ISSUES IN CHANGING PASSWORD
+        endif; # -- CHECK IF THE USER ENTERS A CORRECT PASSWORD
+        return false; # -- USER ENTER WRONG PASSWORD
+    }
+
 }
 
 ?>
