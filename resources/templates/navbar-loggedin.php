@@ -66,7 +66,7 @@
                         echo 'active';
                     }
                     ?>"
-                       href="#">Conditions and Treatements</a> <!-- HREF NEED TO BE CHANGED -->
+                       href="#">Conditions and Treatments</a> <!-- HREF NEED TO BE CHANGED -->
                 </li>
             </ul>
             <div style="display: inline-block;">
