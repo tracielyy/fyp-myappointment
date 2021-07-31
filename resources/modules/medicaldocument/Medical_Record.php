@@ -193,7 +193,7 @@ class Medical_Record {
             if ($db_practitioner === $practitioner_doc_id) {
                 $transaction->update($mr_doc_ref, [
                     ['path' => 'diagnosisdesc', 'value' => $diagnosisdesc],
-                    ['path' => 'prescription', 'value' => $prescriptions]
+                    ['path' => 'prescriptions', 'value' => $prescriptions]
                 ]);
                 return true;
             }
