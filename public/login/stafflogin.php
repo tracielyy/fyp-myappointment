@@ -65,8 +65,6 @@ require_once USER_MOD . '/Medical_Personnel.php';
             'usertype' => ''
         );
 
-        // -- Msg Variables
-        $msg = "";
 
         $validArr = array();
         $login_status = array(
@@ -174,10 +172,6 @@ require_once USER_MOD . '/Medical_Personnel.php';
             endif; # -- END VALIDATION
         endif; # -- END POST REQUEST
         ?>
-        <!-- Msg -->
-        <div>
-            <?php echo $msg; ?>
-        </div>
 
         <!-- HTML Page Design -->
         <div>
@@ -224,9 +218,6 @@ require_once USER_MOD . '/Medical_Personnel.php';
 
 
                                         <div class="row pb-2">
-                                            <!--                                        <div class="col d-none d-lg-block">
-                                                                                        Email:
-                                                                                    </div>-->
                                             <div class="col">
                                                 <!-- EMAIL -->
                                                 <input id="email" type="email" class="form-control" name="email" required
@@ -234,7 +225,6 @@ require_once USER_MOD . '/Medical_Personnel.php';
                                             </div>
                                         </div>
                                         <div class="row pb-2">
-                                            <!--                                        <div class="col d-none d-lg-block">Password: </div>-->
                                             <div class="col">
                                                 <!-- PASSWORD -->
                                                 <input id="password" type="password" class="form-control" name="password"

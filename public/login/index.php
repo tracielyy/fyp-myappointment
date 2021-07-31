@@ -164,9 +164,7 @@ else:
                                         <!-- Form -->
                                         <form id = "login-form" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                                             <div class="row pb-2">
-                                                <div class="col d-none d-lg-block">
-                                                    Email:
-                                                </div>
+
                                                 <div class="col">
                                                     <!-- EMAIL -->
                                                     <input id ="email" type="email" class="form-control" name="email" required
@@ -174,7 +172,6 @@ else:
                                                 </div>
                                             </div>
                                             <div class="row pb-2">
-                                                <div class="col d-none d-lg-block">Password: </div>
                                                 <div class="col">
                                                     <!-- PASSWORD -->
                                                     <input id="password" type="password" class="form-control" name="password"

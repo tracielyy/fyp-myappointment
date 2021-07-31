@@ -26,8 +26,8 @@ class Normal_Slot extends Appointment_Slot {
     private array $patientlist;
     private array $doctorlist;
 
-    public function __construct(string $slotid, Time $appointmentschedule, array $patientlist, array $doctorlist) {
-        parent::__construct($slotid, $appointmentschedule);
+    public function __construct(string $slotid, Time $appointmentschedule, array $patientlist, array $doctorlist, string $facilityid) {
+        parent::__construct($slotid, $appointmentschedule, $facilityid);
 
         $this->patientlist = $patientlist;
         $this->doctorlist = $doctorlist;
@@ -44,14 +44,14 @@ class Normal_Slot extends Appointment_Slot {
 
     // -- Setters
     // -- Initialise Appointment_Slot
-    public static function initialise_normal_slot(array $slot_data): Normal_Slot {
+    public static function initialise_normal_slot(array $slot_data, string $facilityid): Normal_Slot {
 
         # Extract Date From Slot Id <e.g 1001>~<date>~<appointmenttype>
         $slot_date = explode("~", $slot_data['slotid'])[1];
 
         # Time
         $appt_schedule = new Time($slot_date, $slot_data['time']);
-        $slot_obj = new Normal_Slot($slot_data['slotid'], $appt_schedule, $slot_data['patientlist'], $slot_data['doctorlist']);
+        $slot_obj = new Normal_Slot($slot_data['slotid'], $appt_schedule, $slot_data['patientlist'], $slot_data['doctorlist'], $facilityid);
         return $slot_obj;
     }
 
@@ -85,7 +85,6 @@ class Normal_Slot extends Appointment_Slot {
             ['path' => 'patientlist', 'value' => FieldValue::arrayUnion([$patient_doc_id])]
         ]);
     }
-    
 
     // -- REMOVE PATIENT FROM SLOT WHEN CANCELLING APPOINTMENT
     public static function remove_patient_from_slot(string $slotid, string $facilityid, string $patient_doc_id): bool {
@@ -104,7 +103,7 @@ class Normal_Slot extends Appointment_Slot {
     }
 
     // -- RETRIEVE APPOINTMENT SLOTS BY DATE
-    public static function retrieve_free_slots_by_date(string $facilityid, string $appointmenttype, string $date, bool $return_as_object = true): array {
+    public static function retrieve_free_slots_by_date(string $facilityid, string $appointmenttype, string $date): array {
 
         # Create Empty Array (Store Appointment Slots)
         $slots_arr = array();
@@ -131,17 +130,12 @@ class Normal_Slot extends Appointment_Slot {
             endif;
         endforeach;
 
-
         # Sorting The Array In Accordance To The Slot Id
         array_multisort(array_column($slots_arr, 'slotid'), $slots_arr);
 
         # Loop & Store As Normal Slot Object
         foreach ($slots_arr as $slot):
-            if ($return_as_object):
-                $slot_list[] = self::initialise_normal_slot($slot);
-            else:
-                $slot_list[] = $slot;
-            endif;
+            $slot_list[] = self::initialise_normal_slot($slot, $facilityid);
         endforeach;
 
         # -- Return Array Of Appointment Slots
@@ -174,7 +168,7 @@ class Normal_Slot extends Appointment_Slot {
         $doc_path = Database::MEDICAL_FACILITY . "/" . $facilityid . "/" . $id_data[2] . "/" . $id_data[1] . "/"
                 . Database::SLOTS;
         $slot_data = $db->fetch_document_by_id($doc_path, $slotid);
-        return Normal_Slot::initialise_appt_slot($slot_data, $id_data[1]);
+        return self::initialise_normal_slot($slot_data, $facilityid);
     }
 
     public static function generate_slot_id(string $facilityid, string $appointmenttype, string $date) {
@@ -199,7 +193,7 @@ class Normal_Slot extends Appointment_Slot {
             return "1001~" . $date . "~" . $appointmenttype;
         endif;
     }
-    
+
     // -- PATIENT COUNT OF ALL APPOINTMENT TYPES BY FACILITY
     public static function patient_count_per_date(string $facilityid, string $date): int {
         $patient_counter = 0;

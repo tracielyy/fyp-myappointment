@@ -17,19 +17,19 @@ class Time {
     private ?string $time;
 
     // -- Date Formats -- // 
-    private const DATE_FORMAT_DEFAULT = "d-m-Y";
-    private const DATE_FORMAT_SLASH = "d/m/Y";
+    public const DATE_FORMAT_DEFAULT = "d-m-Y";
+    public const DATE_FORMAT_SLASH = "d/m/Y";
 
     # Default 24 Hours Format #
-    private const TIME_FORMAT_DEFAULT = "H:i:s";
-    private const TIME_FORMAT_DEFAULT_NOSECONDS = "H:i";
+    public const TIME_FORMAT_DEFAULT = "H:i:s";
+    public const TIME_FORMAT_DEFAULT_NOSECONDS = "H:i";
 
     # 12 Hours Format #
-    private const TIME_FORMAT_AMPM = "h:i:s a";
-    private const TIME_FORMAT_AMPM_NOSECONDS = "h:i A";
+    public const TIME_FORMAT_AMPM = "h:i:s a";
+    public const TIME_FORMAT_AMPM_NOSECONDS = "h:i A";
 
     # Year Format Default #
-    private const YEAR_FORMAT_DEFAULT = "Y";
+    public const YEAR_FORMAT_DEFAULT = "Y";
 
     # -- Alternative Date Format -- #
     public const DATE_FORMAT_APPOINTMENT = "d M Y (D)";
@@ -154,6 +154,10 @@ class Time {
 
         // Return the array elements
         return $date_arr;
+    }
+    
+    public static function check_datetime_format(string $datetime, string $format = self::DATE_FORMAT_DEFAULT): bool{
+       return (!DateTime::createFromFormat($format, $datetime))? false: true;
     }
     
     public static function initialise_time(array $time_arr): Time{

@@ -25,18 +25,22 @@ class Appointment_Slot {
     // -- Properties
     private string $slotid;
     private Time $appointmentschedule;
-//    private string $facilityid;
+    private string $facilityid;
 
-    // Specialist: ONLY 1 Patient, Check Up & Dr Consult: max 10
     // -- Constructor
-    public function __construct(string $slotid, Time $appointmentschedule) {
+    public function __construct(string $slotid, Time $appointmentschedule, string $facilityid) {
         $this->slotid = $slotid;
         $this->appointmentschedule = $appointmentschedule;
+        $this->facilityid = $facilityid;
     }
 
     // -- Getters
     public function get_slotid(): string {
         return $this->slotid;
+    }
+
+    public function get_facilityid(): string {
+        return $this->facilityid;
     }
 
     // -- Print For Individual Appointment Slots
@@ -59,7 +63,6 @@ class Appointment_Slot {
     // ---------- ABSTRACT METHODS 
 //    public abstract function insert_patient_to_slot(string $slotid, string $patient_doc_id);
 //    public abstract function remove_patient_from_slot(string $slotid, string $patient_doc_id);
-
     // -- Use For Debugging/ Logging Purpose -- //
     public function __toString(): string {
         $str = nl2br('Slotid: ' . $this->slotid . PHP_EOL . 'Schedule' . $this->appointmentschedule . PHP_EOL);
@@ -69,7 +72,6 @@ class Appointment_Slot {
         foreach ($this->patientlist as $patient):
             $str .= $patient . " ";
         endforeach;
-
 
         # Loop & Display Doctors Available At The Time Slot
         $str .= nl2br(PHP_EOL . "Doctor List" . PHP_EOL);
@@ -90,7 +92,6 @@ class Appointment_Slot {
     }
 
     // ####################     Database Functions      ################### //
-
     // -- RETRIEVE APPOINTMENT SLOTS BY GIVEN DATE
     public static function retrieve_apptslots_by_date(string $facilityid, string $appointmenttype, string $date, int $max_patients = 20): array {
 
@@ -119,7 +120,15 @@ class Appointment_Slot {
         return $appointment_slots;
     }
 
-
+    // -- Comparison Function To Be Use By Sub Classes
+    protected static function cmp_obj(Appointment_Slot $a, Appointment_Slot $b) {
+        $al = strtolower($a->get_appointmentschedule()->get_time());
+        $bl = strtolower($b->get_appointmentschedule()->get_time());
+        if ($al == $bl) {
+            return 0;
+        }
+        return ($al > $bl) ? +1 : -1;
+    }
 
 }
 

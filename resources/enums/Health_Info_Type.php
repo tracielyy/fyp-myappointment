@@ -1,16 +1,15 @@
 <?php
 
 /*
- * @author yanying (Tracie)
+ *  @author: tracieqwynn
  */
 
-abstract class Appointment_Type {
+abstract class Health_Info_Type {
 
-    const SPECIALIST_CONSULTATION = "Specialist Consultation";
-    const DOCTOR_CONSULTATION = "Doctor Consultation";
-    const CHECK_UP = "Check Up";
+    const DOCTOR_ADVICE = "Doctor's Advice";
+    const WORLD_HEALTH_NOTICE = "World Health Notice";
+    const HEALTH_TIPS = "Health Tips";
 
-    
     // -- GET ALL CLASS DEFINED CONSTANTS
     public static function get_constants() {
         $appt_type_class = new ReflectionClass(__CLASS__);
@@ -19,23 +18,21 @@ abstract class Appointment_Type {
 
     // -- CHECK IF GIVEN IS ONE OF THE DEFINED CONSTANT
     public static function validate_type(string $type): bool {
-        
+
         # Get All The Class Defined Const
-        $appt_types = self::get_constants();
-        
+        $hinfo_type = self::get_constants();
+
         # Loop Through All Defined Const
-        foreach($appt_types as $atype):
-            
+        foreach ($hinfo_type as $htype):
+
             # Check If It Is One Of the Defined Const
-            if($type == $atype):
+            if ($type == $htype):
                 return True;
             endif;
-            
+
         endforeach;
-        
+
         return False;
     }
 
 }
-
-?>

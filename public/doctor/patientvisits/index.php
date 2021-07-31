@@ -26,16 +26,26 @@ require_once EMAIL_MOD . '/EmailVerify.php';
  */
 
 if (!isset($_SESSION['user'])):
-    header("Location:./../"); # -- REDIRECT USER TO THE INDEX PAGE
+    header("Location:/"); # -- REDIRECT USER TO THE INDEX PAGE
 else:
     $user = unserialize($_SESSION["user"]);
     $user_type = $user->get_usertype();
     $user_email = $user->get_email();
     if (!User_Type::check_user_type(User_Type::MEDICAL_PERSONNEL, $user_type)):
-        header("Location:./../"); # -- REDIRECT USER TO THE INDEX PAGE 
+        header("Location:/"); # -- REDIRECT USER TO THE INDEX PAGE 
     else:
         if ($_SERVER['REQUEST_METHOD'] == "GET"):
+
             // id will be generated when the doctor clicks (using user email and mrid)
+            // NEED TO VALIDATE THE GET TOKENS
+            function valid_get_vars(string $patientid, string $mrid): bool|Medical_Record {
+                $mr_object = Medical_Record::retrieve_medical_record($patientid, $mrid);
+                if ($mr_object == null):
+                    return false;
+                else:
+                    return $mr_object;
+                endif;
+            }
             ?><!DOCTYPE html>
             <html lang="en">
                 <head>
@@ -43,16 +53,6 @@ else:
                     <?php
                     include TEMPLATES_PATH . '/bootstrap.php';
                     include_once TEMPLATES_PATH . '/navbar.php';
-
-                    // NEED TO VALIDATE THE GET TOKENS
-                    function valid_get_vars(string $patientid, string $mrid): bool|Medical_Record {
-                        $mr_object = Medical_Record::retrieve_medical_record($patientid, $mrid);
-                        if ($mr_object == null):
-                            return false;
-                        else:
-                            return $mr_object;
-                        endif;
-                    }
                     ?>
                     <meta charset="UTF-8">
                     <meta http-equiv="X-UA-Compatible" content="IE=edge">

@@ -148,7 +148,6 @@ class Appointment_Record {
         $batch->set($db->get_db()->collection($appt_doc_path)->document($id), $appt_record_arr);
         $batch->commit();
 
-
         return self::initialise_appointment_record($appt_record_arr);
     }
 
@@ -212,8 +211,7 @@ class Appointment_Record {
             return $last_id[0] . "-" . $current_year . "-1000"; # -- There Is No Current Year Id
 
         endif;
-            return "appt-" . $current_year . "-1000"; # -- Totally No ID Present In Database
-        
+        return "appt-" . $current_year . "-1000"; # -- Totally No ID Present In Database
     }
 
     // -- Retrieve Of Appointment Records Of Certain Type -- //
@@ -241,6 +239,8 @@ class Appointment_Record {
             $appointment_arr[] = self::initialise_appointment_record($record);
 
         endforeach;
+        usort($appointment_arr, array("Appointment_Record", "cmp_obj"));
+
         return $appointment_arr;
     }
 
@@ -264,6 +264,9 @@ class Appointment_Record {
                 $arr['missed'][] = $appt;
             endif;
         endforeach;
+//        usort($arr['upcoming'], array("Appointment_Record", "cmp_obj"));
+//        usort($arr['missed'], array("Appointment_Record", "cmp_obj"));
+
         return $arr;
     }
 
@@ -364,7 +367,7 @@ class Appointment_Record {
                 $slots_arr = Normal_Slot::retrieve_apptslot_by_id($slotid, $facilityid);
                 break;
             case Appointment_Type::SPECIALIST_CONSULTATION:
-                $slots_arr = Special_Slot::retrieve_apptslot_by_id($slotid);
+                $slots_arr = Special_Slot::retrieve_apptslot_by_id($slotid, $facilityid);
                 break;
         endswitch;
 
@@ -385,6 +388,22 @@ class Appointment_Record {
         $appt_record_obj = self::initialise_appointment_record($appt_record);
 
         return $appt_record_obj;
+    }
+
+    // -- Comparison Function 
+    protected static function cmp_obj(Appointment_Record $a, Appointment_Record $b) {
+        $format = Time::DATE_FORMAT_DEFAULT . ' ' . Time::TIME_FORMAT_DEFAULT_NOSECONDS;
+        $al = DateTime::createFromFormat($format,
+                        $a->get_appointmentslot()->get_appointmentschedule()->get_date() . ' ' .
+                        $a->get_appointmentslot()->get_appointmentschedule()->get_time());
+        $bl = DateTime::createFromFormat($format,
+                        $b->get_appointmentslot()->get_appointmentschedule()->get_date() . ' ' .
+                        $b->get_appointmentslot()->get_appointmentschedule()->get_time());
+
+        if ($al == $bl) {
+            return 0;
+        }
+        return ($al > $bl) ? +1 : -1;
     }
 
 }

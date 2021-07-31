@@ -30,7 +30,7 @@ class Medical_Facility {
 
     # Medical Facility Operating Hours
     private Operating_Hours $operatinghours;
-    
+
     # Different Specialisation Categories
     private array $specialisations;
 
@@ -70,7 +70,7 @@ class Medical_Facility {
     public function get_operatinghours(): Operating_Hours {
         return $this->operatinghours;
     }
-    
+
     public function get_specialisations(): array {
         return $this->specialisations;
     }
@@ -95,7 +95,7 @@ class Medical_Facility {
     public function set_operatinghours(Operating_Hours $operatinghours): void {
         $this->operatinghour = $operatinghours;
     }
-    
+
     public function set_specialisations(array $specialisation): void {
         $this->specialisation = $specialisation;
     }
@@ -188,6 +188,34 @@ class Medical_Facility {
         return $facility_arr;
     }
 
+    public static function retrieve_paginate_facilities(string $startAfter = null): array {
+        # Create An Array 
+        $facility_arr = array();
+
+        # Query For All The Facilities In The Database
+        $db = new DbQuery();
+        $doc_ref = $db->get_db()->collection(Database::MEDICAL_FACILITY)->orderBy('facilityid');
+
+        if ($startAfter == null):
+            # Beginning Query
+            $arr = $doc_ref->limit(2)->documents();
+        else:
+            # Consecutive Query
+            $arr = $doc_ref->startAfter($startAfter)->limit(2)->documents();
+        endif;
+
+        # Loop & Add To Container
+        foreach ($arr as $doc) {
+            if ($doc->exists()) {
+                $doc_data = $doc->data();
+
+                $facility_arr[] = self:: initialise_medical_facility($doc_data);
+            }
+        }
+
+        return $facility_arr;
+    }
+
     // -- CHECK IF THE FACILITY EXIST
     public static function check_facility_exist(array $facility_info): bool {
 
@@ -206,8 +234,6 @@ class Medical_Facility {
         endif;
         return False;
     }
-
-
 
 }
 

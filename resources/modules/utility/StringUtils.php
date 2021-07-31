@@ -7,12 +7,22 @@
 class StringUtils {
 
     // -- String Cleaning -- //
-    public static function clean_input(string $input): string {
-        $input = trim($input);  // Remove leading and trailing whitespace 
-        $input = stripslashes($input);  // Remove '\' (slashes)
-        $input = htmlspecialchars($input);  // Treat special chars as HTML entities
-        $input = strtolower($input);    // All chars to lowercase
+    public static function clean_input(string $input, bool $toUpper = false): string {
+        $input = self::trim_string($input);
+        if ($toUpper):
+            $input = strtoupper($input); // All chars to uppercase
+        else:
+            $input = strtolower($input);    // All chars to lowercase
+        endif;
+
         return $input;
+    }
+    
+    public static function trim_string(string $input): string{
+        $input = trim($input); // Remove leading and trailing whitespace
+        $input = stripslashes($input); // Remove '\' (slashes)
+        $input = htmlspecialchars($input); // Treat special chars as HTML entities
+        return $input; 
     }
 
     // -- Private Function For String Comparison -- //
@@ -49,7 +59,7 @@ class StringUtils {
         for ($i = 0; $i < $length; $i++):
             $otp .= $otp_repo[random_int(0, $repo_size - 1)];
         endfor;
-        
+
         return $otp;
     }
 
@@ -72,7 +82,6 @@ class StringUtils {
     public static function dismount($object) {
         $reflectionClass = new ReflectionClass(get_class($object));
         $array = array();
-
 
         foreach ($reflectionClass->getProperties() as $property) {
 //            echo $property->getType();
