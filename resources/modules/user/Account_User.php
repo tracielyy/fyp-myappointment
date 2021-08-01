@@ -175,11 +175,11 @@ class Account_User {
     }
 
     // -- CHANGE EMAIL
-    public static function change_email(string $cur_email, string $new_email, string $password): bool {
+    public static function change_email(string $cur_email, string $new_email): bool {
 
         # Update User Email        
         $db = new DbQuery();
-        $user_doc_id = self::retrieve_user_doc_id($cur_email, $password);
+        $user_doc_id = self::retrieve_user_doc_id($cur_email);
 
         # If Valid User
         if ($user_doc_id !== NULL):
