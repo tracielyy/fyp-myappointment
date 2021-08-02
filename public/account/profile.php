@@ -104,6 +104,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
                         # Change Email 
                         if (Account_User::change_email($user_email, $new_email)):
                             $user->set_email($new_email);
+                            $_SESSION['user'] = serialize($user);
                         endif;
                     endif;
                 endif;
@@ -157,10 +158,10 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                         <div id="email-error" class="help-block mt-1">Email exist! Please use another email.</div>
                                     </div>
 
-                                    <!-- ONE TIME PASS FORM -->
+                                    <!-- ONE TIME PASS  -->
                                     <div class="row">
                                         <div id="onetimepass" class="onetimepass" style="display: hidden;">
-                                            <div class="input-group w-75">
+                                            <div class="input-group w-25">
                                                 <input class="form-control" type="otp" id="otp" style="display:inline;"
                                                        placeholder="Enter OTP" name="otp">
                                                 <button class="btn btn-primary" type="button" id="submitOTP">Submit
@@ -349,6 +350,8 @@ include TEMPLATES_PATH . '/bootstrap.php';
                     // DISABLE THE `VERIFY` BUTTON WHEN NEEDED
                     function typedEmail()
                     {
+                        $("#chgEmailBttn").prop('disabled', true);
+
                         $("#verifybutton").show();
                         document.cookie = 'email_verified=false';
                         $("#email").removeClass("is-valid");
@@ -437,7 +440,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
 
                     var resend_otp_req = false;
                     // RESEND OTP
-                    $('#resend-otp').on('click', function () {
+                    function clickedResendOTP() {
                         console.log("resend otp called");
                         if (resend_otp_req) {
                             verifyEmailReq.abort();
@@ -467,15 +470,6 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                     $('#onetimepass').show();
                                     $('#onetimepass').children().show();
 
-                                    // create resend otp element
-                                    if (!$('#resend-otp').length) {
-                                        console.log("creating resend otp element");
-
-                                        var resend_otp =
-                                                "<button type='button' id='resend-otp' class='btn btn-link link-danger'>Resend OTP</button>";
-                                        $('#inputgroupemail').append(resend_otp);
-                                    }
-
                                     console.log("Email is new");
                                 }
                             },
@@ -483,7 +477,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                 console.log("Email NOT SENT");
                             }
                         });
-                    });
+                    }
                     var verifyEmailReq = false;
                     $("#verifybutton").on('click', function clickedChangeEmail() {
 
@@ -539,7 +533,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                     if (!$('#resend-otp').length) {
                                         console.log("creating resend otp element");
                                         var resend_otp =
-                                                "<button type='button' id='resend-otp' class='btn btn-link link-danger'>Resend OTP</button>";
+                                                "<button type='button' id='resend-otp' onclick='clickedResendOTP()' class='btn btn-link link-danger shadow-none'>Resend OTP</button>";
                                         $('#inputgroupemail').append(resend_otp);
                                     }
 
@@ -607,6 +601,9 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                         console.log(strip_string(valid_otp));
                                         var valid_status = strip_string(valid_otp);
                                         if (valid_status === 'true') {
+
+                                            // remove the resent-otp button link
+                                            $('#resend-otp').remove();
 
                                             // enable the change button
                                             $("#chgEmailBttn").prop('disabled', false);
