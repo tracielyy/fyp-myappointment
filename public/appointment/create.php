@@ -228,7 +228,7 @@ else:
                             console.log("js triggered");
                             xhr = $.ajax({
                                 type: "POST",
-                                url: "loadslots.php",
+                                url: "func/loadslots.php",
                                 data: {
                                     ajax: 1,
                                     set_location: 1,
@@ -594,7 +594,7 @@ else:
 
                         spec = $.ajax({
                             type: "POST",
-                            url: "loadspecialist.php",
+                            url: "func/loadspecialist.php",
                             data: {
                                 load_specialist: true,
                                 facilityid: $('#hide_facilityid').val()
@@ -676,7 +676,7 @@ else:
                         $("#display_personnel").empty();
                         specAjax = $.ajax({
                             type: "POST",
-                            url: "loadspecialist.php",
+                            url: "func/loadspecialist.php",
                             data: {
                                 load_specialist: true,
                                 facilityid: $('#hide_facilityid').val()
@@ -805,7 +805,7 @@ else:
                         $('#display_slots').empty();
                         $.ajax({
                             type: "POST",
-                            url: "loadslots.php",
+                            url: "func/loadslots.php",
                             data: {
                                 ajax: 1,
                                 set_facilityid: facilityid,
