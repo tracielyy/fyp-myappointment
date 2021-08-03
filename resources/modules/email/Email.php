@@ -10,7 +10,6 @@
 use PHPMailer\PHPMailer\PHPMailer;
 
 //require '../vendor/autoload.php';
-
 // -- Import Other Util Classes -- //
 //require_once '../resources/config.php';
 
@@ -57,7 +56,20 @@ class Email extends PHPMailer {
         $mail->send();
     }
 
-   
+    public static function email_textsymbol(string $email, bool $text_to_symbol = true) {
+
+        if ($text_to_symbol):
+            // Text To Symbol
+            $email = urlencode($email);
+        else:
+            // Back To Normal Email (Symbol To Text)
+            $email = str_replace("%2B", "+", $email);
+            $email = str_replace("%40", "@", $email);
+
+        endif;
+        return $email;
+    }
+
 }
 ?>
 
