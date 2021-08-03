@@ -62,7 +62,7 @@ class Medical_Record {
     }
 
     public function get_diagnosisdesc(): string {
-        return $this->diagnosis;
+        return $this->diagnosisdesc;
     }
 
     public function get_prescriptions(): array {
