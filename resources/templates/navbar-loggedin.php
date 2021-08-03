@@ -58,7 +58,7 @@
                         echo 'active';
                     }
                     ?>"
-                       href="#">Search Medicine</a> <!-- HREF NEED TO BE CHANGED -->
+                       href="/medicinesearch.php">Search Medicine</a> <!-- HREF NEED TO BE CHANGED -->
                 </li>
                 <li class="nav-item">
                     <a class="nav-link navbutton<?php
@@ -66,7 +66,7 @@
                         echo 'active';
                     }
                     ?>"
-                       href="#">Conditions and Treatments</a> <!-- HREF NEED TO BE CHANGED -->
+                       href="/conditionsearch.php">Conditions and Treatments</a> <!-- HREF NEED TO BE CHANGED -->
                 </li>
             </ul>
             <div style="display: inline-block;">
