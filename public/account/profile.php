@@ -193,7 +193,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                                                         </div>
                                                                     </form>
                                                                 </div>
-                                
+              -->
                                 
                                 <!-- CHANGE PASSWORD FORM -->
                                 <div id="changepassword" class="mt-5 mb-2 profile-text"><strong>Change Password:</strong></div>
