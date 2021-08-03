@@ -38,7 +38,12 @@ else:
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
-
+            <!-- Prevent Form Submission -->
+            <script>
+                if (window.history.replaceState) {
+                    window.history.replaceState(null, null, window.location.href);
+                }
+            </script>
             <!-- Styling -->
             <?php include TEMPLATES_PATH . '/bootstrap.php'; ?>
             <link rel="stylesheet" href="./../css/loginRegister.css">
@@ -79,7 +84,6 @@ else:
                         $validArr[$key] = False; // Set All Field Validation Check As False
                     endif;
                 endforeach;
-
 
                 // Possible Validation of Email Before Firestore Query
                 /* ------------ Start Validation ------------ */
