@@ -77,7 +77,7 @@ class Health_Info {
         $health_info_arr = array();
 
         $db = new DbQuery();
-        $ref = $db->get_db()->collection(Database::HEALTH_INFO)->orderBy('id');
+        $ref = $db->get_db()->collection(Database::HEALTH_INFO)->orderBy('id', 'DESC');
 
         $limit = 10;
 
