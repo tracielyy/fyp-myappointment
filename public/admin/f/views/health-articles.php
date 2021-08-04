@@ -119,7 +119,7 @@ $all_health_articles = Health_Info::retrieve_all_healthinfo();
                             <div class="col-lg-12">
                                 <!-- ADD HEALTH ARTICLE -->
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                    <a href="<?php echo FADMIN_WEB . '/create/add-health-article.php'; ?>" class="btn btn-outline-light me-md-2 mr-2">
+                                    <a href="<?php echo FADMIN_WEB . '/create/new-health-article.php'; ?>" class="btn btn-outline-light me-md-2 mr-2">
                                         <span><i class="bi bi-plus-lg"></i></span>
                                     </a>
                                 </div>
