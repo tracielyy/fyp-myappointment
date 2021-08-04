@@ -12,6 +12,15 @@ require_once UTIL_MOD . '/StringUtils.php';
  *  DISPLAY ALL HEALTH INFO --- (Health Articles) 
  */
 
+if ($_SERVER['REQUEST_METHOD'] == "POST"):
+
+    // DELETE BUTTON    
+    if (isset($_POST["ajax_delete"]) && isset($_POST['mrid'])):
+        Health_Info::delete_healthinfo($_POST["mrid"]);
+    endif;
+
+endif;
+
 $all_health_articles = Health_Info::retrieve_all_healthinfo();
 ?><!DOCTYPE html>
 <html lang="en">
@@ -31,6 +40,9 @@ $all_health_articles = Health_Info::retrieve_all_healthinfo();
         <!-- bootstrap data table -->
         <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css"/>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+        <!-- jQuery -->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
         <!-- Prevent Form Resubmission -->
         <script>
             if (window.history.replaceState) {
@@ -98,6 +110,10 @@ $all_health_articles = Health_Info::retrieve_all_healthinfo();
                 }
             }
         </style>
+        <script>
+
+
+        </script>
     </head>
     <body>
         <!-- NavBar  (TOP) -->
@@ -127,22 +143,24 @@ $all_health_articles = Health_Info::retrieve_all_healthinfo();
                                 <?php
                                 foreach ($all_health_articles as $article):
                                     ?>
-                                    <div class="card my-2" id="healthArticle1">
+                                    <div class="card my-2" id="<?php echo $article->get_id(); ?>">
                                         <div class="card-body">
                                             <h3 id="title"><?php echo $article->get_title(); ?></h3>
                                             <h4 id="type" class="text-start small text-muted"><?php echo $article->get_type(); ?></h4>
                                             <h6 class="desc_header"></h6>
                                             <p><?php echo $article->get_descriptions(); ?></p>
                                             <!-- Buttons -->
-                                            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                            <div class="d-grid gap-2 d-md-flex justify-content-between">
                                                 <!-- edit button -->
                                                 <a href="#" class="btn btn-success me-md-2 mr-2">
+                                                    <span><i class="fa fa-edit"></i></span>
                                                     <span id="articleEdit">Edit</span>
                                                 </a>
-                                                <!-- delete button -->
-                                                <a href="#" class="btn btn-danger me-md-2 mr-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                                <!-- delete button (trigger modal) -->
+                                                <button value="<?php echo $article->get_id(); ?>" onclick="delete_article(this.value)" class="btn btn-danger me-md-2 mr-2" data-bs-toggle="modal" data-bs-target="#deleteArticle">
+                                                    <span><i class="bi bi-x-lg"></i></span>
                                                     <span id="articleDelete">Delete</span>
-                                                </a>
+                                                </button>
                                             </div><!-- end buttons -->
                                         </div>
                                     </div><!-- END DISPLAY ONE ARTICLE -->
@@ -159,35 +177,79 @@ $all_health_articles = Health_Info::retrieve_all_healthinfo();
             <br>
         </main>
         <!-- main section ends here -->
-        <!-- modal starts here -->
+        <!-- DELETE MODAL -->
         <section>
-            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal fade" id="deleteArticle" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" style="margin-left:30rem;">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="staticBackdropLabel">Delete Article</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body">
-                            <div class="alert alert-danger" role="alert">
+                        <div class="modal-body" id="delete-modal-content">
+                            <div class="alert alert-danger" role="alert" id="delete-alert">
                                 <span>
                                     <i class="fas fa-exclamation-circle mr-2"></i>
                                     This action is irrevocable.
                                 </span>
                             </div>
                         </div>
+                        <!-- Triggering Delete (Health Article) -->
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-danger"> <i class="fas fa-trash"></i> Delete</button>
+                            <button id="delete-article-btn" type="button" class="btn btn-danger" name="delete"><i class="fas fa-trash"></i> Delete</button>
                         </div>
+
                     </div>
                 </div>
             </div>
-        </section>
+        </section><!-- END DELETE MODAL -->
+        <script>
+            // -- Pass Information To Modal
+            function delete_article(article_id) {
+                // -- Testing
+                console.log(article_id);
+
+                // jQuery Calls To Set The Modal Information 
+                $("#delete-article-btn").val(article_id); // Set ID To Btn
+            }
+
+
+            $("#delete-article-btn").on("click", function () {
+                var mrid = $('#delete-article-btn').val();
+                $("#delete-alert").hide();
+                var spinner_container = '<div class="text-center" id="spinner-container"></div>';
+                var spinner = '<div class="spinner-border text-secondary" role="status" style="width: 10rem; height: 10em; border-width:2em;"></div>';
+                $('#delete-modal-content').append(spinner_container);
+                $('#spinner-container').append(spinner);
+
+                spec = $.ajax({
+                    type: "POST",
+                    url: "<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>",
+                    data: {
+                        ajax_delete: true,
+                        mrid: mrid
+                    },
+                    success: function () {
+                        $('#spinner-container').remove();
+                        $("#deleteArticle").modal('hide');
+                        $("#" + mrid).remove();
+                        $("#delete-alert").show();
+                        console.log("delete sucessfully");
+                    },
+                    error: function () {
+                        console.log("Error");
+                    }
+                });
+
+
+            });
+        </script>
         <!-- bootstrap js link -->
         <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"
         ></script>
+
     </body>
 </html>
