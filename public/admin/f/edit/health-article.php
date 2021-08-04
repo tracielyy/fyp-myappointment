@@ -115,9 +115,15 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" || $_SERVER['REQUEST_METHOD'] == "POST")
             if (!isset($_GET['id'])):
                 ?>
                 <!-- SHOW INVALID PAGE -->
-                <div>
-                    Invalid Page
-                </div>
+                <main class="mt-5 pt-1">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="alert alert-danger" role="alert">
+                                Invalid URL
+                            </div>
+                        </div>
+                    </div>
+                </main>
                 <?php
             else:
                 $id = $_GET['id'];
@@ -125,9 +131,15 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" || $_SERVER['REQUEST_METHOD'] == "POST")
                 $health_info = valid_vars($id);
                 if (!$health_info):
                     ?>
-                    <div>
-                        Invalid  VARS
-                    </div>
+                    <main class="mt-5 pt-1">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="alert alert-danger" role="alert">
+                                    The article you are looking for does not exist.
+                                </div>
+                            </div>
+                        </div>
+                    </main>
                     <?php
                 else: /* If The Variables Exists In The Database */
                     if ($_SERVER["REQUEST_METHOD"] == "GET"):
