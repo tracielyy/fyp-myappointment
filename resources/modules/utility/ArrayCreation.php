@@ -136,8 +136,12 @@ class ArrayCreation {
                 'time' => $time->get_current_time()
             )
         );
-        
+
         return $email_verify_arr;
+    }
+
+    public static function reset_form_arr(array $keys, array &$arr): void {
+        $arr = array_fill_keys($keys, "");
     }
 
 }

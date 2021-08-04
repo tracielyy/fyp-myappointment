@@ -21,6 +21,48 @@ $health_article = array(
     'type' => ''
 );
 $validArr = array();
+if ($_SERVER["REQUEST_METHOD"] == "POST"):
+
+    if (isset($_POST['submit_health_info'])):
+        /* Load Data to Array */
+        foreach ($_POST as $key => $value) :
+            if (isset($health_article[$key])) :
+                $health_article[$key] = htmlspecialchars($value);
+                $validArr[$key] = False; // Set All Field Validation Check As False
+                $err_msg[$key] = "";
+            endif;
+        endforeach;
+
+        ###### -- VALIDATION -- ######
+        foreach ($health_article as $key => $value):
+
+            # Step 1: Check Empty
+            $value = StringUtils::trim_string($value);
+            if (!empty($value)):
+
+                # Step 2: Other Validations
+                if ($key == 'type'):
+
+                    $validArr[$key] = Health_Info_Type::validate_type($value);
+
+                    # Check For Valid Type Selection
+                    if (!$validArr[$key]):
+                        $err_msg[$key] = "Invalid Input";
+                    endif;
+                else:
+                    $validArr[$key] = true;
+                endif;
+
+            else:
+                # Some Error Message
+                $err_msg[$key] = strtoupper($key) . " cannot be blank";
+            endif;
+
+        endforeach;
+    ###### -- END VALIDATION -- ######
+
+    endif;
+endif;
 ?><!DOCTYPE html>
 <html lang="en">
     <head>
@@ -221,13 +263,13 @@ $validArr = array();
             foreach ($validArr as $key => $value):
                 if (!$value):
                     echo "
-                    <script>
-                        $('#{$key}').addClass('is-invalid');
-                        var feedback = \"<div id='{$key}-feedback' class='invalid-feedback'>{$err_msg[$key]}</div>\";
-                        $('#{$key}-container').append(feedback);
+                                    <script>
+                                        $('#{$key}').addClass('is-invalid');
+                                        var feedback = \"<div id='{$key}-feedback' class='invalid-feedback'>{$err_msg[$key]}</div>\";
+                                        $('#{$key}-container').append(feedback);
 
-                    </script>
-                ";
+                                    </script>
+                                ";
                 endif;
             endforeach;
         }
@@ -235,52 +277,16 @@ $validArr = array();
         function remove_err_message(array $validArr): void {
             foreach ($validArr as $k => $v):
                 echo "
-                <script>
-                    $('#{$k}-feedback').remove();
-                </script>
-                ";
+                                <script>
+                                    $('#{$k}-feedback').remove();
+                                </script>
+                                ";
             endforeach;
         }
 
         if ($_SERVER["REQUEST_METHOD"] == "POST"):
 
             if (isset($_POST['submit_health_info'])):
-                /* Load Data to Array */
-                foreach ($_POST as $key => $value) :
-                    if (isset($health_article[$key])) :
-                        $health_article[$key] = htmlspecialchars($value);
-                        $validArr[$key] = False; // Set All Field Validation Check As False
-                        $err_msg[$key] = "";
-                    endif;
-                endforeach;
-
-                ###### -- VALIDATION -- ######
-                foreach ($health_article as $key => $value):
-
-                    # Step 1: Check Empty
-                    $value = StringUtils::trim_string($value);
-                    if (!empty($value)):
-
-                        # Step 2: Other Validations
-                        if ($key == 'type'):
-
-                            $validArr[$key] = Health_Info_Type::validate_type($value);
-
-                            # Check For Valid Type Selection
-                            if (!$validArr[$key]):
-                                $err_msg[$key] = "Invalid Input";
-                            endif;
-                        else:
-                            $validArr[$key] = true;
-                        endif;
-
-                    else:
-                        # Some Error Message
-                        $err_msg[$key] = strtoupper($key) . " cannot be blank";
-                    endif;
-
-                endforeach;
-                ###### -- END VALIDATION -- ######
                 // If There At Least 1 Failing Condition
                 if (in_array(FALSE, $validArr)) :
                     set_err_msg($validArr, $err_msg);

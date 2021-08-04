@@ -110,10 +110,6 @@ $all_health_articles = Health_Info::retrieve_all_healthinfo();
                 }
             }
         </style>
-        <script>
-
-
-        </script>
     </head>
     <body>
         <!-- NavBar  (TOP) -->
@@ -139,7 +135,7 @@ $all_health_articles = Health_Info::retrieve_all_healthinfo();
                                         <span><i class="bi bi-plus-lg"></i></span>
                                     </a>
                                 </div>
-                                <!-- DISPLAY HEALTH ARTICLES  (Loop) -->
+                                <!-- DISPLAY HEALTH ARTICLES (Loop) -->
                                 <?php
                                 foreach ($all_health_articles as $article):
                                     ?>
@@ -152,7 +148,7 @@ $all_health_articles = Health_Info::retrieve_all_healthinfo();
                                             <!-- Buttons -->
                                             <div class="d-grid gap-2 d-md-flex justify-content-between">
                                                 <!-- edit button -->
-                                                <a href="#" class="btn btn-success me-md-2 mr-2">
+                                                <a href="<?php echo FADMIN_WEB . "/edit/health-article.php?id=" . $article->get_id(); ?>" class="btn btn-success me-md-2 mr-2">
                                                     <span><i class="fa fa-edit"></i></span>
                                                     <span id="articleEdit">Edit</span>
                                                 </a>
@@ -222,7 +218,7 @@ $all_health_articles = Health_Info::retrieve_all_healthinfo();
                 $('#delete-modal-content').append(spinner_container);
                 $('#spinner-container').append(spinner);
 
-                spec = $.ajax({
+                req = $.ajax({
                     type: "POST",
                     url: "<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>",
                     data: {
