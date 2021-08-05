@@ -136,6 +136,7 @@ class Appointment_Record {
         $appt_doc_path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
         $batch = $db->get_db()->batch();
 
+
         $appt_record_arr = array(
             'appointmentid' => $id,
             'appointmenttype' => $booking_info['appointmenttype'],

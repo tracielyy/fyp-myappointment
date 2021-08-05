@@ -139,10 +139,10 @@ class Medical_Record {
     public static function create_medical_record(string $patient_doc_id, array $medical_record_info): ?Medical_Record {
         $db = new DbQuery();
 
-        # SET Appointment Creation Time
+        # SET Medical Creation Time
         $createdon = new Time();
 
-        # Get Appointment ID
+        # Get Medical ID
         /* $id = self::generate_medical_record_id($patient_doc_id); */
         $patient_mr_path = Database::ACCOUNT_USER . "/" . $patient_doc_id . "/" . Database::MEDICAL_RECORD;
         $doc_ref = $db->get_db()->collection($patient_mr_path)->newDocument();
