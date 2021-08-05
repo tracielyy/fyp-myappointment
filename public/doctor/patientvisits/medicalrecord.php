@@ -23,31 +23,72 @@ require_once USER_MOD . '/Medical_Personnel.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
     <style>
     body {
         font-size: 20px !important;
     }
     </style>
+
+    <!-- Prevent Form Resubmission -->
+    <script>
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+
+    function loopforpresc(value) {
+
+        $(function() {
+
+            $(window).bind('load', function() {
+
+                console.log("test");
+                inputpresc = '<div class="input-group mt-3"><input type="text" class="form-control" placeholder="" name="prescriptions[]" value="'+ value +'"><button class="btn btn-danger" id="removepresc"><i class="fas fa-minus"></i></button></div>';
+                $('.fieldwrapper').append(inputpresc);
+                console.log(inputpresc);
+
+            });
+        });
+
+    }
+    </script>
     <?php
+                $presciptionsArray = array();
+                $num_of_presc = 0;
                 include TEMPLATES_PATH . '/bootstrap.php';
                 //include_once TEMPLATES_PATH . '/navbar-loggedin.php';
                 $diagnosisdesc = "";
-                if (isset($_POST['submitdiagnosis'])) :
-                    $diagnosisdesc = $_POST['diagnosis'];
-                    
-                    
-                    //echo $diagnosisdesc;
-                    //echo htmlspecialchars($_POST['diagnosistxtarea']);;
+                foreach($presciptionsArray as $key => $value) :
+                    ?><script>
+                    loopforpresc(<?php echo "'".$value."'"?>)
+                    </script><?php
+                endforeach;
 
-                elseif (isset($_POST['submitpresc'])) :
-                
+                if($_SERVER["REQUEST_METHOD"] == "POST"):
+                    
+                        $presciptionsArray = $_POST['prescriptions'];
+                        $num_of_presc = count($presciptionsArray);
+                        echo  $num_of_presc;
+                  
+
+                    if (isset($_POST['diagnosis'])) :
+                        $diagnosisdesc = $_POST['diagnosis'];
+                        echo $diagnosisdesc;
+                        
+                    endif;
+
+                    foreach($presciptionsArray as $key => $value) :
+                        ?><script>
+                        loopforpresc(<?php echo "'".$value."'"?>)
+                        </script><?php
+                    endforeach;
+
                 endif;
                 ?>
 </head>
 
 <body>
     <div class="container mt-5">
-
         <div class="row">
             <div class="col">
                 <div class="card">
@@ -76,7 +117,7 @@ require_once USER_MOD . '/Medical_Personnel.php';
             </div>
 
         </div>
-
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
         <div class="row mt-2">
             <div class="col">
                 <div class="card">
@@ -84,24 +125,15 @@ require_once USER_MOD . '/Medical_Personnel.php';
                         Diagnosis
                     </div>
                     <div class="card-body">
-                        <form method="post">
-                            <textarea id="diagnosistext" class="form-control" name="diagnosis" rows="15"
-                                disabled="disabled"></textarea>
-                            <button type="button" class="btn btn-secondary mt-3" style="float:right"
-                                id="editbttn">Edit</button>
-                            <button name="submitdiagnosis" type="submit" class="btn btn-primary mt-3"
-                                style="float:right; display: none;" id="savechanges">Save Changes</button>
-                            <button type="button" class="btn btn-danger mt-3 me-2" style="float:right; display: none;"
-                                data-bs-toggle="modal" id="cancelconfirm" data-bs-target="#cancelModal">Cancel</button>
-                        </form>
+                        
+                            <textarea type="text" id="diagnosistext" class="form-control" name="diagnosis"
+                                rows="15"><?php echo htmlspecialchars($diagnosisdesc);?></textarea>
                     </div>
-
                 </div>
             </div>
-
         </div>
 
-        <div class="row mt-2 mb-5">
+        <div class="row mt-2 mb-2">
             <div class="col">
                 <div class="card">
                     <div class="card-header">
@@ -112,117 +144,60 @@ require_once USER_MOD . '/Medical_Personnel.php';
                             <div class="col-12">
                                 <button id="addprescription" type="button" class="btn btn-secondary mb-2"
                                     style="float:right">Add prescription</button>
-                                <button id="removeprescription" type="button" class="btn btn-secondary mb-2 me-2"
-                                    style="float:right">Remove prescription</button>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <form class="mt-1" id="prescriptionform">
-                                    <button name="submitpresc" id="submitprescription" type="button"
-                                        class="btn btn-secondary mt-2" style="float:right" disabled>Submit
-                                        prescription</button>
-                                </form>
+                                <div class="fieldwrapper">
+                               </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
-
-    </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="cancelModalLabel">Cancellation Confirmation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Cancellation will result in removing all the changes you just have made. <br>
-                    <small class="text-muted">If you have made no changes, you can just press the "Yes, I want to
-                        cancel" button</small>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" id="cancel" data-bs-dismiss="modal">Yes, I want to
-                        cancel</button>
-                </div>
-            </div>
+        <div class="d-grid gap-2">
+        <button name="submitdiagnosis" type="submit" class="btn btn-primary btn-lg"
+                                style="float:right;" id="savechanges">Save Changes</button>
         </div>
+        </form>
     </div>
 </body>
 <script>
-/*---------------------------
-            DIAGNOSIS
-----------------------------*/
-var txt;
-$("#editbttn").click(function() {
-    $("#editbttn").hide();
-    $("#savechanges").show();
-    $("#cancelconfirm").show();
-    $("#diagnosistext").prop("disabled", false);
-    txt = $("#diagnosistext").val();
-
-});
-
-$("#cancel").click(function() {
-    $("#editbttn").show();
-    $("#savechanges").hide();
-    $("#cancelconfirm").hide();
-    $("#diagnosistext").prop("disabled", true);
-    $("#diagnosistext").val(txt);
-
-});
-
-$("#savechanges").click(function() {
-    $("#editbttn").show();
-    $("#savechanges").hide();
-    $("#cancelconfirm").hide();
-    $("#diagnosistext").prop("disabled", true);
-});
 
 /*---------------------------
         PRESCRIPTIONS
 ----------------------------*/
-var inputpresc;
-var num = 0;
-$("#addprescription").click(function() {
-    if (num < 10) {
-        num++;
+$(document).ready(function() {
+    var maxField = 10; //Input fields increment limitation
+    var addButton = $('#addprescription'); //Add button selector
+    var wrapper = $('.fieldwrapper'); //Input field wrapper
+    var fieldHTML ='<div class="input-group mt-3"><input type="text" class="form-control" placeholder="" name="prescriptions[]" value=""><button class="btn btn-danger" id="removepresc"><i class="fas fa-minus"></i></button></div>'; //New input field html 
+    var x = <?php echo $num_of_presc; ?>; //Initial field counter is 1
 
-        inputpresc = '<div class="input-group mt-2" id="inputgrpID-' + num +
-            '"> <span class="input-group-text">' + num +
-            '</span> <input type="text" class="form-control" name="presc-' + num + '" id="prescID-' + num +
-            '"> </input> </div>';
-        $(inputpresc).insertBefore("#submitprescription");
-        if (num == 1) {
-            $("#submitprescription").prop("disabled", false);
+    //Once add button is clicked
+    $(addButton).click(function() {
+        //Check maximum number of input fields
+        console.log(x);
+        if (x < maxField) {
+            x++; //Increment field counter
+            $(wrapper).append(fieldHTML); //Add field html
+            if (x == maxField)
+            {
+            $(wrapper).append('<small class="text-muted" id="maxalert"> Maximum 10 prescriptions reached </small>'); //Add field html
+            }
         }
-        if (num == 10) {
-            $('<small class="text-muted" id="maxalert"> Maximum 10 prescriptions reached </small>')
-                .insertBefore("#submitprescription");
-        }
-    }
+       
+    });
 
+    //Once remove button is clicked
+    $(wrapper).on('click', '#removepresc', function(e) {
+        e.preventDefault();
+        $(this).parent('div').remove(); //Remove field html
+        x--; //Decrement field counter
+    });
 });
 
-$("#removeprescription").click(function() {
-    if (num > 0) {
-        $("#inputgrpID-" + num).remove();
-        num--;
-        if (num == 9) {
-            $("#maxalert").remove();
-        }
-        if (num == 0) {
-            $("#submitprescription").prop("disabled", true);
-        }
-    }
-
-});
 </script>
 
 
