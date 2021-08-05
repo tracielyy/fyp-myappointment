@@ -18,7 +18,7 @@
                     <div class="text-muted medium text-uppercase px-3 my-2">CORE</div>
                 </li>
                 <li>
-                    <a href="homepage.html" class="nav-link px-3">
+                    <a href="<?php echo FADMIN_WEB; ?>" class="nav-link px-3">
                         <span class="me-2"><i class="bi bi-speedometer2"></i></span>
                         <span>Dashboard</span>
                     </a>
@@ -29,14 +29,7 @@
                     <div class="text-muted medium text-uppercase px-3">MANAGE</div>
                 </li>
                 <li>
-                    <a
-                        class="nav-link px-3 my-2 sidebar-link"
-                        data-bs-toggle="collapse"
-                        href="#collapseExample"
-                        role="button"
-                        aria-expanded="false"
-                        aria-controls="collapseExample"
-                        >
+                    <a class="nav-link px-3 my-2 sidebar-link" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
                         <span class="me-2"><i class="fas fa-hospital"></i></span>
                         <span>Hospital</span>
                         <span class="right-icon ms-auto">
@@ -63,7 +56,7 @@
                     </div>
                 </li>
                 <li>
-                    <a href="manageDoctor.html" class="nav-link px-3 my-2">
+                    <a href="<?php echo FADMIN_WEB."/views/doctors.php"; ?>" class="nav-link px-3 my-2">
                         <span class="me-2"><i class="fas fa-user-md"></i></span>
                         <span>Doctors</span>
                     </a>
@@ -82,7 +75,7 @@
                 <li class="my-4"><hr class="dropdown-divider" /></li>
                 <li class="ms-2">
                     <h5 class="text-white text-muted small fw-700">
-                        &copy; MyAppointment 2021
+                        &copy; FYP-21-S2-24 (MyAppointment)
                     </h5>
                 </li>
             </ul>
