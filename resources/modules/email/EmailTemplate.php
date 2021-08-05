@@ -39,7 +39,7 @@ class EmailTemplate {
         # -- Token Expiry Date Needs To Be Set -- #
         // -- Password Reset Link With Token (To Be Added To The Email Message)
         // <link>?token=<passwordtoken>&email=<email>
-        $unique_password_url = "https://myappointment.tracieqwynn.tech/forgotpassword/password-reset.php?token={$token}&email={$to}";
+        $unique_password_url = "https://myappointment.tracieqwynn.tech/forgotpassword/password-reset.php?token={$token}&email=".Email::email_textsymbol($to, true);
         $request_another_url = "https://myappointment.tracieqwynn.tech/forgotpassword/";
 
 

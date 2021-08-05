@@ -269,8 +269,6 @@ class Account_User {
                 $duration = (int) Time::datetime_second_diff($currentDate, $requestedon);
                 $originaltoken = $mapData['passwordreset']["passwordtoken"];
 
-                echo $requestedon->get_current_date();
-
                 # Return bool On Validity
                 return self::verify_token($originaltoken, $passwordtoken, $duration, $mapData['passwordreset']['tokenused']);
 
