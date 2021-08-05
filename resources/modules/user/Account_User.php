@@ -122,8 +122,7 @@ class Account_User {
         # Query For User With The Given Email
         $db = new DbQuery();
         $snapshot = $db->get_db()->collection(Database::ACCOUNT_USER)
-
-                ->where('profile.nric', '=', $secure_nric)->documents();
+                ->document($secure_nric);
 
         # Check If There Are Any Value Returned
         foreach ($snapshot as $document) :
@@ -442,9 +441,9 @@ class Account_User {
         return $db->udpate_field(Database::ACCOUNT_USER, $conditionArr, $changedArr);
     }
 
-        //Updates user email with parameter user email to search    
-        public static function update_address(string $user_email, string $address): bool {
-           # Get User Document ID
+    //Updates user email with parameter user email to search    
+    public static function update_address(string $user_email, string $address): bool {
+        # Get User Document ID
         $user_doc_id = self::retrieve_user_doc_id($user_email);
 
         if ($user_doc_id !== null):
@@ -455,38 +454,37 @@ class Account_User {
 
             $db->get_db()->collection($user_path)
                     ->document($user_doc_id)->update([
-                            ['path' => 'profile.address', 'value' => $address]
+                ['path' => 'profile.address', 'value' => $address]
             ]);
 
             return True;
         endif;
         return false;
-
     }
 
-     //Updates user email with parameter user email to search    
-     public static function update_contact_number(string $user_email, string $contactnumber): bool {
+    //Updates user email with parameter user email to search    
+    public static function update_contact_number(string $user_email, string $contactnumber): bool {
         # Get User Document ID
-     $user_doc_id = self::retrieve_user_doc_id($user_email);
+        $user_doc_id = self::retrieve_user_doc_id($user_email);
 
-     if ($user_doc_id !== null):
+        if ($user_doc_id !== null):
 
-         # Modify The Patient Profile Based On The Given Array
-         $db = new DbQuery();
-         $user_path = Database::ACCOUNT_USER;
+            # Modify The Patient Profile Based On The Given Array
+            $db = new DbQuery();
+            $user_path = Database::ACCOUNT_USER;
 
-         $db->get_db()->collection($user_path)
-                 ->document($user_doc_id)->update([
-                         ['path' => 'profile.contactnumber', 'value' => $contactnumber]
-         ]);
+            $db->get_db()->collection($user_path)
+                    ->document($user_doc_id)->update([
+                ['path' => 'profile.contactnumber', 'value' => $contactnumber]
+            ]);
 
-         return True;
-     endif;
-     return false;
+            return True;
+        endif;
+        return false;
     }
 
-     // -- Update Password (ONLY USED IN PROFILE, HASHING DONE IN PAGE) 
-     public static function update_password(string $email, string $new_password): bool {
+    // -- Update Password (ONLY USED IN PROFILE, HASHING DONE IN PAGE) 
+    public static function update_password(string $email, string $new_password): bool {
 
         # Update The New Password
         $user_doc_id = self::retrieve_user_doc_id($email);
@@ -494,7 +492,7 @@ class Account_User {
         # If Valid User
         if ($user_doc_id !== NULL):
             $db = new DbQuery();
-    
+
             $db->get_db()->collection(Database::ACCOUNT_USER)->document($user_doc_id)
                     ->update([
                         ['path' => 'credentials.password', 'value' => $new_password]

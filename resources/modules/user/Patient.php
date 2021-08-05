@@ -120,9 +120,11 @@ class Patient extends Normal_User {
 
         //Create hash on the password (salt is already generated in the function)
         if (isset($patient_info['profile']['nric'])):
-            $patient_info['profile']['nric'] = $sec->hash_256($patient_info['profile']['nric']);
+            $temp = $patient_info['profile']['nric'];
+            $patient_info['profile']['nric'] = $sec->encrypt($temp);
+            $id = $sec->hash_256($temp);
         endif;
-        
+
         # Load Basic Account User Fields & Values To Array
         foreach ($account_user_arr as $field => $value) :
             $patient_info[$field] = $value;
@@ -132,7 +134,7 @@ class Patient extends Normal_User {
         # Add Patient Data To Database
         $db = new DbQuery();
         $db->get_db()->collection(Database::ACCOUNT_USER)
-                ->document($patient_info['profile']['nric'])
+                ->document($id)
                 ->set($patient_info);
     }
 
