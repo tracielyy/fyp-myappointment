@@ -40,15 +40,15 @@
                         <div>
                             <ul class="navbar-nav ps-3">
                                 <li>
-                                    <a href="manageHospital.html" class="nav-link px-3">
+                                    <a href="<?php echo FADMIN_WEB . "/views/myfacility.php";?>" class="nav-link px-3" id="view-myfacility">
                                         <span class="me-2"><i class="bi bi-pencil-square"></i></span>
                                         <span>Hospital Details</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="Specialization.html" class="nav-link px-3">
+                                    <a href="<?php echo FADMIN_WEB . "/views/specialisations.php";?>" class="nav-link px-3" id="view-specialisation">
                                         <span class="me-2"><i class="bi bi-plus-square"></i></span>
-                                        <span>Specialization</span>
+                                        <span>Specialisation</span>
                                     </a>
                                 </li>
                             </ul>
@@ -56,7 +56,7 @@
                     </div>
                 </li>
                 <li>
-                    <a href="<?php echo FADMIN_WEB."/views/doctors.php"; ?>" class="nav-link px-3 my-2">
+                    <a href="<?php echo FADMIN_WEB."/views/doctors.php"; ?>" class="nav-link px-3 my-2" id="view-doctors">
                         <span class="me-2"><i class="fas fa-user-md"></i></span>
                         <span>Doctors</span>
                     </a>
@@ -67,7 +67,7 @@
                     <div class="text-muted medium text-uppercase px-3">TOOLS</div>
                 </li>
                 <li>
-                    <a href="<?php echo FADMIN_WEB. '/views/health-articles.php';?>" class="nav-link px-3 my-2 active">
+                    <a href="<?php echo FADMIN_WEB. '/views/health-articles.php';?>" class="nav-link px-3 my-2" id="view-health-articles">
                         <span class="me-2"><i class="fas fa-newspaper"></i></span>
                         <span>Health Articles</span>
                     </a>
