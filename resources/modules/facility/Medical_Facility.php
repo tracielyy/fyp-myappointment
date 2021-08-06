@@ -13,6 +13,9 @@ require_once FACILITY_MOD . '/Operating_Hours.php';
 require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
 
+use Google\Cloud\Firestore\Transaction;
+use Google\Cloud\Firestore\FieldValue;
+
 class Medical_Facility {
 
     // Properties
@@ -233,6 +236,35 @@ class Medical_Facility {
             return True;
         endif;
         return False;
+    }
+
+    public static function insert_specialisation(string $facilityid, string $specialisation): bool {
+
+        $db = new DbQuery();
+        $spec_ref = $db->get_db()->collection(Database::MEDICAL_FACILITY)->document($facilityid);
+        $trnx_result = $db->get_db()->runTransaction(function (Transaction $transaction)
+        use ($spec_ref, $specialisation) {
+
+            $snapshot = $transaction->snapshot($spec_ref);
+            $specialisations = $snapshot['specialisations'];
+
+            // Check If The Specialisation Exist In The Database
+            if (!in_array($specialisation, $specialisations)) :
+                $transaction->update($spec_ref, [
+                    ['path' => 'specialisations', 'value' => FieldValue::arrayUnion([$specialisation])]
+                ]);
+                return true;
+            endif;
+            return false;
+        });
+        return $trnx_result;
+    }
+
+    public static function delete_specialisation(string $facilityid, string $specialisation): void {
+        $db = new DbQuery();
+        $db->get_db()->collection(Database::MEDICAL_FACILITY)->document($facilityid)->update([
+            ['path' => 'specialisations', 'value' => FieldValue::arrayRemove([$specialisation])]
+        ]);
     }
 
 }
