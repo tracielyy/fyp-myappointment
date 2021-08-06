@@ -39,11 +39,15 @@ class Medical_Personnel extends Normal_User {
     }
 
     // -- Getters
-    public function get_medical_facility() {
-        return $this->medicalfacility;
+    public function get_facilityids(): array {
+        return $this->facilityids;
     }
 
-    public function get_license_number() {
+    public function get_specialisation(): string {
+        return $this->specialisation;
+    }
+
+    public function get_licensenumber(): string {
         return $this->licensenumber;
     }
 
@@ -160,21 +164,26 @@ class Medical_Personnel extends Normal_User {
     }
 
     // -- RETRIEVE MEDICAL PERSONNEL THAT BELONGS TO THE GIVEN FACILITY (GENERAL NOT INCLUDED)
-    public static function retrieve_personnel_by_facility_spec(string $facilityid): array {
+    public static function retrieve_personnel_by_facility_spec(string $facilityid, bool $include_gp = true): array {
 
         # Create Empty Array To Store Personnel
         $personnel_arr = array();
 
         $db = new DbQuery();
-        $doc_arr = $db->get_db()->collection(Database::ACCOUNT_USER)
-                ->where("accountdetails.usertype", "=", User_Type::MEDICAL_PERSONNEL)
-                ->where("practitionerinfo.facilityids", "array-contains", $facilityid)
-                ->where("practitionerinfo.specialisation", "!=", "General")
-                ->documents();
+        if ($include_gp):
+            $doc_arr = $db->get_db()->collection(Database::ACCOUNT_USER)
+                            ->where("accountdetails.usertype", "=", User_Type::MEDICAL_PERSONNEL)
+                            ->where("practitionerinfo.facilityids", "array-contains", $facilityid)->documents();
+        else:
+            $doc_arr = $db->get_db()->collection(Database::ACCOUNT_USER)
+                            ->where("accountdetails.usertype", "=", User_Type::MEDICAL_PERSONNEL)
+                            ->where("practitionerinfo.facilityids", "array-contains", $facilityid)
+                            ->where("practitionerinfo.specialisation", "!=", "General")->documents();
+        endif;
+
         foreach ($doc_arr as $doc) {
             if ($doc->exists()) {
                 $doc_data = $doc->data();
-
                 $personnel_arr[$doc_data['practitionerinfo']['specialisation']][] = self:: initialise_medical_personnel($doc_data);
             }
         }
@@ -183,8 +192,7 @@ class Medical_Personnel extends Normal_User {
     }
 
     // -- RETRIEVE MEDICAL PERSONNEL THAT BELONGS TO THE GIVEN FACILITY
-    public static function retrieve_personnel_by_facility(string $facilityid, bool $return_as_object = true,
-            array $startAfter = null): array {
+    public static function retrieve_personnel_by_facility(string $facilityid, array $startAfter = null): array {
 
         # Create Empty Array To Store Personnel
         $personnel_arr = array();
@@ -207,15 +215,28 @@ class Medical_Personnel extends Normal_User {
         foreach ($doc_arr as $doc) {
             if ($doc->exists()) {
                 $doc_data = $doc->data();
-                if ($return_as_object):
-                    $personnel_arr[] = self:: initialise_medical_personnel($doc_data);
-                else:
-                    $personnel_arr[] = $doc_data;
-                endif;
+                $personnel_arr[] = self:: initialise_medical_personnel($doc_data);
             }
         }
 
         return $personnel_arr;
+    }
+
+    // -- Comparison Function 
+    public static function cmp_obj(Medical_Personnel $a, Medical_Personnel $b) {
+        $af = strtolower($a->get_firstname());
+        $bf = strtolower($b->get_firstname());
+
+        $al = strtolower($a->get_lastname());
+        $bl = strtolower($b->get_lastname());
+
+        if ($af == $bf) {
+            if ($al == $bl) {
+                return 0;
+            }
+            return ($al > $bl) ? +1 : -1;
+        }
+        return ($af > $bf) ? +1 : -1;
     }
 
 }
