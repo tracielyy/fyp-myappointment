@@ -172,7 +172,7 @@ else:
                                 Add Health Article
                             </div>
                             <div class="col-md-12 text-muted text-center fw-700">
-                                Facility admin @ <span id="facilityName">NUH</span>
+                                Facility admin @ <span id="facilityName"><?php echo StringUtils::get_acronym($facility->get_facilityname()); ?> </span>
                             </div>
                         </div>
                         <div class="row mt-4 ms-auto me-auto" id="new-health-article">
