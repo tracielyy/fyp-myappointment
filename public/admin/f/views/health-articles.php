@@ -33,8 +33,8 @@ else:
         if ($_SERVER['REQUEST_METHOD'] == "POST"):
 
             // DELETE BUTTON    
-            if (isset($_POST["ajax_delete"]) && isset($_POST['mrid'])):
-                Health_Info::delete_healthinfo($_POST["mrid"]);
+            if (isset($_POST["ajax_delete"]) && isset($_POST['id'])):
+                Health_Info::delete_healthinfo($_POST["id"]);
             endif;
 
         endif;
@@ -228,7 +228,7 @@ else:
 
 
                     $("#delete-article-btn").on("click", function () {
-                        var mrid = $('#delete-article-btn').val();
+                        var id = $('#delete-article-btn').val();
                         $("#delete-alert").hide();
                         var spinner_container = '<div class="text-center" id="spinner-container"></div>';
                         var spinner = '<div class="spinner-border text-secondary" role="status" style="width: 10rem; height: 10em; border-width:2em;"></div>';
@@ -240,12 +240,12 @@ else:
                             url: "<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>",
                             data: {
                                 ajax_delete: true,
-                                mrid: mrid
+                                id: id
                             },
                             success: function () {
                                 $('#spinner-container').remove();
                                 $("#deleteArticle").modal('hide');
-                                $("#" + mrid).remove();
+                                $("#" + id).remove();
                                 $("#delete-alert").show();
                                 console.log("delete sucessfully");
                             },

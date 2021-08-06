@@ -19,6 +19,7 @@ require_once FACILITY_MOD . '/Medical_Facility.php';
 /*
  *  EDIT HEALTH INFO --- (Health Articles) 
  */
+
 if (!isset($_SESSION['user'])):
     header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
 else:
