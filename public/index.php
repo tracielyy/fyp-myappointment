@@ -3,6 +3,10 @@ session_start();
 require_once '../resources/config.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Patient.php';
+require_once USER_MOD . '/Medical_Personnel.php';
+require_once USER_MOD . '/Facility_Admin.php';
+require_once USER_MOD . '/Super_Admin.php';
+
 require_once APPT_MOD . '/Appointment_Record.php';
 require_once ENUMS_PATH . '/User_Type.php';
 
