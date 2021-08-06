@@ -34,10 +34,10 @@ else:
     if (!User_Type::check_user_type(User_Type::FACIILITY_ADMIN, $user_type)):
         header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
     else:
-
+        $facility = $user->get_facility();
         $all_practitioners = Medical_Personnel::retrieve_personnel_by_facility_spec($user_facility->get_facilityid(), true);
 
-        $specialisations = $user->get_facility()->get_specialisations();
+        $specialisations = $facility->get_specialisations();
         sort($specialisations);
         ?><!DOCTYPE html>
         <html lang="en">
@@ -62,6 +62,15 @@ else:
                 <!-- bootstrap data table -->
                 <link rel="stylesheet"  href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css"  />
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"   />
+                <!-- Prevent Form Resubmission -->
+                <script>
+                    if (window.history.replaceState) {
+                        window.history.replaceState(null, null, window.location.href);
+                    }
+                </script>
+                <!-- jQuery -->
+                <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
                 <style>
                     body {
                         margin: 0;
@@ -137,7 +146,7 @@ else:
                                 Manage Doctors
                             </div>
                             <div class="col-md-12 text-muted text-center fw-700">
-                                Facility admin @ <span id="facilityName">NUH</span>
+                                Facility admin @ <span id="facilityName"><?php echo StringUtils::get_acronym($facility->get_facilityname());?></span>
                             </div>
                         </div>
                         <div class="row mt-4 mb-2 mb-lg-0">
@@ -152,77 +161,127 @@ else:
                                     <i class="fas fa-user-plus"></i><span class="AD">Add Doctor</span>
                                 </a>
                             </div>
-                
-                        <!-- add doctor button ends -->
 
-                        <!-- doctor profile card -->
-                        <?php
-                        $count = 0;
-                        $num = 4;
-                        ksort($all_practitioners); # -- Sort Specialisation ASC
-                        foreach ($all_practitioners as $spec => $practitioners):
-                            usort($practitioners, array("Medical_Personnel", "cmp_obj")); # -- Sort By firstname then lastname
-                            foreach ($practitioners as $p):
-                                $count++;
-                                if ($count % $num == 0):
-                                    ?>
-                                    <div class="row mt-4 mb-2 mb-lg-0">
-                                        <?php
-                                    endif;
-                                    ?>
-                                    <!-- ONE DOCTOR -->
-                                    <div class="col-lg-4">
-                                        <div class="shadow d-flex justify-content-center align-items-center p-3 bg-dark rounded-lg flex-column">
-                                            <div class="dr-name my-1">
-                                                <h3 class="text-white" id="drName">Dr. <?php echo $p->get_fullname(); ?></h3>
-                                            </div>
-                                            <div class="info mb-2">
-                                                <h6 class="dr-title text-white"><?php echo $p->get_specialisation(); ?></h6>
-                                            </div>
-                                            <div class="action">
-                                                <a href="#" class="btn btn-outline-danger btn-md" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Delete</a>
+                            <!-- add doctor button ends -->
+
+                            <!-- doctor profile card -->
+                            <?php
+                            $count = 0;
+                            $subcounter = 0;
+                            $num = 3;
+                            ksort($all_practitioners); # -- Sort Specialisation ASC
+                            foreach ($all_practitioners as $spec => $practitioners):
+                                usort($practitioners, array("Medical_Personnel", "cmp_obj")); # -- Sort By firstname then lastname
+                                foreach ($practitioners as $p):
+
+                                    if ($count % $num == 0):
+                                        $subcounter = 0;
+                                        ?>
+                                        <div class="row mt-4 mb-2 mb-lg-0">
+                                            <?php
+                                        endif;
+                                        $subcounter++;
+                                        $count++;
+                                        ?>
+                                        <!-- ONE DOCTOR -->
+                                        <div class="col-lg-4">
+                                            <div class="shadow d-flex justify-content-center align-items-center p-3 bg-dark rounded-lg flex-column">
+                                                <div class="dr-name my-1">
+                                                    <h3 class="text-white" id="drName">Dr. <?php echo $p->get_fullname(); ?></h3>
+                                                </div>
+                                                <div class="info mb-2">
+                                                    <h6 class="dr-title text-white"><?php echo $p->get_specialisation(); ?></h6>
+                                                </div>
+                                                <!-- Delete Button -->
+                                                <button value="<?php echo $p->get_nric(); ?>" onclick="delete_doctor(this.value, '<?php echo $p->get_fullname(); ?>')" class="btn btn-outline-danger btn-md" data-bs-toggle="modal" data-bs-target="#deleteDoctor">
+                                                    <span><i class="bi bi-x-lg"></i></span>
+                                                    <span id="articleDelete">Delete</span>
+                                                </button>
                                             </div>
                                         </div>
-                                    </div>
-                                    <!-- END OF ONE DOCTOR CARD -->
-                                    <?php
-                                    if ($count % $num == 0):
-                                        ?>
-                                    </div>
-                                    <?php
-                                endif;
+                                        <!-- END OF ONE DOCTOR CARD -->
+                                        <?php
+                                        if ($subcounter == $num):
+                                            ?>
+                                        </div>
+                                        <?php
+                                    endif;
+                                endforeach;
                             endforeach;
-                        endforeach;
-                        ?>
-                        <!-- doctor profile cards end -->
-                    </div>
+                            ?>
+                            <!-- doctor profile cards end -->
+                        </div>
                 </main>
                 <!-- modal starts here -->
                 <section>
-                    <!-- Modal  add doctor-->
-                    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <!-- DELETE MODAL -->
+                    <div class="modal fade" id="deleteDoctor" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                         <div class="modal-dialog modal-fullscreen-md" style="margin-left: 30rem;">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="staticBackdropLabel">Delete Doctor</h5>
+                                    <h5 class="modal-title" id="staticBackdropLabel">Delete Dr. <span id="doc-name"></span></h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <div class="modal-body">
-                                    <div class="alert alert-danger" role="alert">
+                                <div class="modal-body" id="delete-modal-content">
+                                    <div class="alert alert-danger" role="alert" id="delete-alert">
                                         <span>
                                             <i class="fas fa-exclamation-circle mr-2"></i>
                                             This action is irrevocable.
                                         </span>
                                     </div>
                                 </div>
+                                <!-- Triggering Delete (Doctor) -->
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger"> <i class="fas fa-trash"></i> Delete</button>
+                                    <button type="button" class="btn btn-danger" name="delete"> <i class="fas fa-trash"></i> Delete</button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </section>
+                </section><!-- END DELETE MODAL -->
                 <br>
+                <script>
+                    // -- Pass Information To Modal
+                    function delete_doctor(doctor_id, name) {
+                        // -- Testing
+                        console.log(doctor_id + " " + name);
+
+                        // jQuery Calls To Set The Modal Information 
+                        $("#delete-doctor-btn").val(doctor_id); // Set ID To Btn
+                        $("#doc-name").html(name); // Set IName
+
+                    }
+
+
+                    $("#delete-doctor-btn").on("click", function () {
+                        var id = $('#delete-doctor-btn').val();
+                        $("#delete-alert").hide();
+                        var spinner_container = '<div class="text-center" id="spinner-container"></div>';
+                        var spinner = '<div class="spinner-border text-secondary" role="status" style="width: 10rem; height: 10em; border-width:2em;"></div>';
+                        $('#delete-modal-content').append(spinner_container);
+                        $('#spinner-container').append(spinner);
+
+                        req = $.ajax({
+                            type: "POST",
+                            url: "<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>",
+                            data: {
+                                ajax_delete: true,
+                                id: id
+                            },
+                            success: function () {
+                                $('#spinner-container').remove();
+                                $("#deleteDoctor").modal('hide');
+                                $("#" + id).remove();
+                                $("#delete-alert").show();
+                                console.log("delete sucessfully");
+                            },
+                            error: function () {
+                                console.log("Error");
+                            }
+                        });
+
+
+                    });
+                </script>
                 <!-- bootstrap js link -->
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"  integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
             </body>
