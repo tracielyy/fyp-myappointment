@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <?php
+$pageName = 'conditionsearch';
 session_start();
 /* Load Config File */
 require_once '../resources/config.php';
@@ -19,7 +20,7 @@ if (isset($_SESSION["user"])):
 	
     include_once TEMPLATES_PATH . '/navbar-loggedin.php';
     include TEMPLATES_PATH . '/bootstrap.php';
-    if (User_Type::check_user_type(User_Type::PATIENT, $user_type)):
+    if (User_Type::check_user_type(User_Type::PATIENT, $user_type) || User_Type::check_user_type(User_Type::MEDICAL_PERSONNEL, $user_type) ):
 ?>
 
 <html>
