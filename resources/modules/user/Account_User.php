@@ -121,15 +121,13 @@ class Account_User {
 
         # Query For User With The Given Email
         $db = new DbQuery();
-        $snapshot = $db->get_db()->collection(Database::ACCOUNT_USER)
-                ->document($secure_nric);
+        $snapshot = $db->get_db()->collection(Database::ACCOUNT_USER)->document($secure_nric)->snapshot();
 
         # Check If There Are Any Value Returned
-        foreach ($snapshot as $document) :
-            if ($document->exists()) :
-                return true;
-            endif;
-        endforeach;
+
+        if ($snapshot->exists()):
+            return true;
+        endif;
         return false;
     }
 
@@ -511,5 +509,4 @@ class Account_User {
     }
 
 }
-
 ?>
