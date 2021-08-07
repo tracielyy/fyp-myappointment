@@ -40,7 +40,8 @@ else:
             return $specialisations;
         }
 
-        $facilityid = $user->get_facility()->get_facilityid();
+        $facility = $user->get_facility();
+        $facilityid = $facility->get_facilityid();
         $specialisations = retrieve_specialisations($facilityid);
 
         if ($_SERVER['REQUEST_METHOD'] == "POST"):
@@ -151,7 +152,7 @@ else:
                                 Add Specialization
                             </div>
                             <div class="col-md-12 text-muted text-center fw-700">
-                                Facility admin @ <span id="facilityName">NUH</span>
+                                Facility admin @ <span id="facilityName"><?php echo StringUtils::get_acronym($facility->get_facilityname()); ?></span>
                             </div>
                         </div>
                         <div class="row mt-4 mb-2 mb-lg-0">
@@ -163,24 +164,14 @@ else:
                                     <span>Add Specialisation</span>
                                 </a>
                             </div>
-
-                            <?php
-                            $count = 0;
-                            $subcounter = 0;
-                            $num = 3;
-                            foreach ($specialisations as $spec):
-
-                                if ($count % $num == 0):
-                                    $subcounter = 0;
-                                    ?>
-                                    <div class="row mt-4 mb-2 mb-lg-0">
-                                        <?php
-                                    endif;
-                                    $subcounter++;
+                            <div class="row mt-4 mb-2 mb-lg-0 ms-auto me-auto">
+                                <?php
+                                $count = 0;
+                                foreach ($specialisations as $spec):
                                     $count++;
                                     ?>
                                     <!-- ONE SPECIALISATION -->
-                                    <div class="col-lg-4" id="<?php echo $count; ?>">
+                                    <div class="col-md-4 mt-2"  id="<?php echo $count; ?>">
                                         <div class="shadow d-flex justify-content-center align-items-center p-3 bg-dark rounded-lg flex-column">
                                             <div class="info my-1">
                                                 <h6 class="text-white">
@@ -196,11 +187,6 @@ else:
                                     </div>
                                     <!-- END OF ONE SPECIALISATION CARD -->
                                     <?php
-                                    if ($subcounter == $num):
-                                        ?>
-                                    </div>
-                                    <?php
-                                endif;
                             endforeach;
                             ?>
 
