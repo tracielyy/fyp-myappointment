@@ -39,6 +39,20 @@ else:
 
         $specialisations = $facility->get_specialisations();
         sort($specialisations);
+
+        function delete_doctor(string $email): void {
+            $doc_id = Account_User::retrieve_user_doc_id($email);
+            Medical_Personnel::delete_medical_personnel($doc_id);
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == "POST"):
+
+            // DELETE BUTTON    
+            if (isset($_POST["ajax_delete"]) && isset($_POST['email'])):
+                delete_doctor($_POST['email']);
+            endif;
+
+        endif;
         ?><!DOCTYPE html>
         <html lang="en">
             <head>
@@ -146,7 +160,7 @@ else:
                                 Manage Doctors
                             </div>
                             <div class="col-md-12 text-muted text-center fw-700">
-                                Facility admin @ <span id="facilityName"><?php echo StringUtils::get_acronym($facility->get_facilityname());?></span>
+                                Facility admin @ <span id="facilityName"><?php echo StringUtils::get_acronym($facility->get_facilityname()); ?></span>
                             </div>
                         </div>
                         <div class="row mt-4 mb-2 mb-lg-0">
@@ -163,28 +177,18 @@ else:
                             </div>
 
                             <!-- add doctor button ends -->
-
-                            <!-- doctor profile card -->
-                            <?php
-                            $count = 0;
-                            $subcounter = 0;
-                            $num = 3;
-                            ksort($all_practitioners); # -- Sort Specialisation ASC
-                            foreach ($all_practitioners as $spec => $practitioners):
-                                usort($practitioners, array("Medical_Personnel", "cmp_obj")); # -- Sort By firstname then lastname
-                                foreach ($practitioners as $p):
-
-                                    if ($count % $num == 0):
-                                        $subcounter = 0;
-                                        ?>
-                                        <div class="row mt-4 mb-2 mb-lg-0">
-                                            <?php
-                                        endif;
-                                        $subcounter++;
+                            <div class="row mt-4 mb-2 mb-lg-0">
+                                <!-- doctor profile card -->
+                                <?php
+                                $count = 0;
+                                ksort($all_practitioners); # -- Sort Specialisation ASC
+                                foreach ($all_practitioners as $spec => $practitioners):
+                                    usort($practitioners, array("Medical_Personnel", "cmp_obj")); # -- Sort By firstname then lastname
+                                    foreach ($practitioners as $p):
                                         $count++;
                                         ?>
                                         <!-- ONE DOCTOR -->
-                                        <div class="col-lg-4">
+                                        <div class="col-md-4 mt-2" id="<?php echo $count; ?>">
                                             <div class="shadow d-flex justify-content-center align-items-center p-3 bg-dark rounded-lg flex-column">
                                                 <div class="dr-name my-1">
                                                     <h3 class="text-white" id="drName">Dr. <?php echo $p->get_fullname(); ?></h3>
@@ -193,7 +197,7 @@ else:
                                                     <h6 class="dr-title text-white"><?php echo $p->get_specialisation(); ?></h6>
                                                 </div>
                                                 <!-- Delete Button -->
-                                                <button value="<?php echo $p->get_nric(); ?>" onclick="delete_doctor(this.value, '<?php echo $p->get_fullname(); ?>')" class="btn btn-outline-danger btn-md" data-bs-toggle="modal" data-bs-target="#deleteDoctor">
+                                                <button value="<?php echo $p->get_email(); ?>" onclick="delete_doctor(this.value, '<?php echo $p->get_fullname(); ?>', '<?php echo $count; ?>')" class="btn btn-outline-danger btn-md" data-bs-toggle="modal" data-bs-target="#deleteDoctor">
                                                     <span><i class="bi bi-x-lg"></i></span>
                                                     <span id="articleDelete">Delete</span>
                                                 </button>
@@ -201,15 +205,11 @@ else:
                                         </div>
                                         <!-- END OF ONE DOCTOR CARD -->
                                         <?php
-                                        if ($subcounter == $num):
-                                            ?>
-                                        </div>
-                                        <?php
-                                    endif;
+                                    endforeach;
                                 endforeach;
-                            endforeach;
-                            ?>
-                            <!-- doctor profile cards end -->
+                                ?>
+                                <!-- doctor profile cards end -->
+                            </div>
                         </div>
                 </main>
                 <!-- modal starts here -->
@@ -232,7 +232,8 @@ else:
                                 </div>
                                 <!-- Triggering Delete (Doctor) -->
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" name="delete"> <i class="fas fa-trash"></i> Delete</button>
+                                    <input type="hidden" id="counter-identifier"/>
+                                    <button id="delete-doctor-btn" type="button" class="btn btn-danger" name="delete"> <i class="fas fa-trash"></i> Delete</button>
                                 </div>
                             </div>
                         </div>
@@ -240,37 +241,50 @@ else:
                 </section><!-- END DELETE MODAL -->
                 <br>
                 <script>
+                    var req = null;
+
                     // -- Pass Information To Modal
-                    function delete_doctor(doctor_id, name) {
+                    function delete_doctor(email, name, count_identifier) {
                         // -- Testing
-                        console.log(doctor_id + " " + name);
+                        console.log(email + " " + name);
 
                         // jQuery Calls To Set The Modal Information 
-                        $("#delete-doctor-btn").val(doctor_id); // Set ID To Btn
+                        $("#delete-doctor-btn").val(email); // Set ID To Btn
+                        $("#counter-identifier").val(count_identifier); // Set Val To Modal
+
                         $("#doc-name").html(name); // Set IName
 
                     }
 
 
                     $("#delete-doctor-btn").on("click", function () {
-                        var id = $('#delete-doctor-btn').val();
+                        var email = $('#delete-doctor-btn').val();
                         $("#delete-alert").hide();
+                        $("#delete-doctor-btn").show();
                         var spinner_container = '<div class="text-center" id="spinner-container"></div>';
                         var spinner = '<div class="spinner-border text-secondary" role="status" style="width: 10rem; height: 10em; border-width:2em;"></div>';
                         $('#delete-modal-content').append(spinner_container);
                         $('#spinner-container').append(spinner);
+                        if (req) {
+                            req.abort();
+                        }
+
 
                         req = $.ajax({
                             type: "POST",
                             url: "<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>",
                             data: {
                                 ajax_delete: true,
-                                id: id
+                                email: email
                             },
                             success: function () {
                                 $('#spinner-container').remove();
                                 $("#deleteDoctor").modal('hide');
-                                $("#" + id).remove();
+                                var identifier = $("#counter-identifier").val(); // Set Val To Modal
+
+                                $(`#${identifier.replaceAll(" ", "-")}`).remove();
+                                $("#delete-doctor-btn").show();
+
                                 $("#delete-alert").show();
                                 console.log("delete sucessfully");
                             },

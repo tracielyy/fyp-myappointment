@@ -67,6 +67,9 @@ else:
         $validArr = array();
         $err_msg = array();
         
+        $current_date = Time::get_current_date(Time::CALENDAR_FORMAT_DEFAULT);
+        $years = 18;
+        $max_date = Time::get_startdate_by_years($current_date, $years, Time::CALENDAR_FORMAT_DEFAULT);
 
         // loop and store all the information into an array
         function store_info(array &$post, array &$doc_info, array &$validArr, array &$err_msg): void {
@@ -242,8 +245,8 @@ else:
                                             <!-- dob -->
                                             <div class="col">
                                                 <div class="form-group" id="dob-container">
-                                                    <label for="dob">Date of birth</label>
-                                                    <input type="date" name="profile[dob]" id="dob" class="form-control" value='<?php echo $doc_info['profile']['dob']; ?>' max="">
+                                                    <label for="dob">Date of birth <span>(18 and above)</span></label>
+                                                    <input type="date" name="profile[dob]" id="dob" class="form-control" value='<?php echo $doc_info['profile']['dob']; ?>' max="<?php echo $max_date;?>">
                                                 </div>
                                             </div>
                                             <!-- gender -->
