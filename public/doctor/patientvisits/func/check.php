@@ -17,17 +17,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'):
 
     // On Click
     if (isset($_POST['ajax_check_mrid']) && isset($_POST['patientid']) && isset($POST['slotid']) && isset($_POST['practitionerid']) 
-    && isset($_POST['facilityid']) && isset($_POST['appointmenttype'])):
+    && isset($_POST['facilityid'])):
         $patientid = $_POST['patientid'];
         $slotid = $_POST['slotid'];
-        $practitionerid;
-        $medicalrecord_array = array();
+        $practitionerid =$_POST['practitionerid'];
+        $facilityid = $_POST['facilityid'];
+    
+        $medicalrecord_array = array(
+            'facilityid'=> $facilityid,
+            'practitioner' => $practitionerid,
+            'slotid' => $slotid,
+            'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientid,$slotid)
+        );
 
         if(!check_mrid_exist($patientid,$slotid)):
-            Medical_Record::create_medical_record($patientid);
+            $medical_record = Medical_Record::create_medical_record($patientid,$medicalrecord_array);
+            $mrid = $medical_record->get_medicalrecordid();
+        elseif (check_mrid_exist($patientid,$slotid)) :
             
         endif;
-      
+        
 
     else:
         header("Location:" . REGISTER_WEB); // NEED TO CHANGE

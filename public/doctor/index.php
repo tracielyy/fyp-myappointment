@@ -124,7 +124,7 @@ else:
                     $slotid = $slot->get_slotid();
                     $facilityid = $slot->get_facilityid();
                     $appointmenttype = 
-                    $mrid ="<button onclick='check('".$patientid."','".$slotid."','".$practitionerid."','".$facilityid."','".$appointmenttype."')' class='btn btn-primary'>Go to Medical Record</button>";
+                    $mrid ="<button onclick='check('".$patientid."','".$slotid."','".$practitionerid."','".$facilityid."')' class='btn btn-primary'>Go to Medical Record</button>";
                     $data = '{"name":"'.$patient->get_firstname().'","date":"'.$slot->get_appointmentschedule()->get_date().'","time":"'. $slot->get_appointmentschedule()->get_time() .'","mrid":"'.$mrid.'"},';
                 endforeach;
                 $data = "[".$data."]";
@@ -267,7 +267,7 @@ else:
         return str.replace(/(\r\n|\n|\r)/gm, "");
     }
 
-    function check(patientid, slotid, practitionerid, facilityid, appointmenttype) {
+    function check(patientid, slotid, practitionerid, facilityid) {
         $.ajax({
             type: "POST",
             url: "func/check.php",
@@ -275,8 +275,7 @@ else:
                 ajax_check_mrid: true,
                 patientid: patientid,
                 slotid: slotid,
-                facilityid : facilityid,
-                appointmenttype: appointmenttype
+                facilityid : facilityid
             },
             success: function(mrid_status) {
                 var mrid_exist = strip_string(mrid_status);
