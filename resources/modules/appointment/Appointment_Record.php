@@ -156,6 +156,31 @@ class Appointment_Record {
         return self::initialise_appointment_record($appt_record_arr);
     }
 
+    public static function set_mrid(string $patientid, string $slotid, string $mrid): bool {
+        $db = new DbQuery();
+        $doc_path = Database::ACCOUNT_USER . "/" . $patientid . "/" . Database::APPOINTMENT_RECORD;
+        $documents = $db->get_db()->collection($doc_path)->where('slotid', "=", $slotid)->where("mrid", "!=", "")->documents();
+        foreach ($documents as $doc):
+            if ($doc->exists()):
+                $appt_id = $doc->id(); // Finding The Appt ID
+                break;
+            endif;
+        endforeach;
+        
+        // Use The Appt ID & Set The mrid 
+        $doc_ref = $db->get_db()->collection($doc_path)->document($appt_id);
+        $trxn_result = $db->get_db()->runTransaction(function (Transaction $transaction) use ($doc_ref, $mrid) {
+            $snapshot = $transaction->snapshot($doc_ref);
+            $db_mrid = $snapshot['mrid'];
+            if ($db_mrid == ""):
+                $transaction->update($doc_ref, [['path', 'mrid', 'value', $mrid]]);
+                return true;
+            endif;
+            return false;
+        });
+        return $trxn_result;
+    }
+
     // -- Validate Appointment Booking  (Check If Patient Have Same Appointment) -- //
     public static function validate_appt_booking(string $user_doc_id, array $booking_info): bool {
 
@@ -424,7 +449,7 @@ class Appointment_Record {
         return null;
     }
 
-public static function check_mrid_exist(string $patientid, string $slotid): bool | string {
+    public static function check_mrid_exist(string $patientid, string $slotid): bool|string {
 
         $db = new DbQuery();
         $doc_path = Database::ACCOUNT_USER . "/" . $patientid . "/" . Database::APPOINTMENT_RECORD;
