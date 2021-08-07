@@ -16,17 +16,29 @@ require_once SECURE_MOD . '/Security.php';
  * 
  */
 
+function route_user(Account_User $user): void {
+    switch ($user->get_usertype()):
+        case User_Type::SUPER_ADMIN:
+            header("Location:" . SADMIN_WEB);
+            break;
+        case User_Type::FACIILITY_ADMIN:
+            header("Location:" . FADMIN_WEB);
+            break;
+        case User_Type::MEDICAL_PERSONNEL:
+            header("Location:" . DOC_WEB);
+            break;
+        case User_Type::PATIENT:
+            header("Location:" . APPT_WEB);
+            break;
+        default:
+            header("Location:/");
+    endswitch;
+}
+
 if (isset($_SESSION['user'])):
     $user = unserialize((string) $_SESSION['user']);
+    route_user($user);
 
-    // MAKE SURE OBJECT IS AN ACCOUNT_USER
-    if ($user instanceof Account_User):
-
-        if ($user instanceof Normal_User):
-            header("Location:./../");
-        else: # -- Some Other Landing Page
-        endif;
-    endif;
 else:
     ?><!DOCTYPE html>
     <html>
