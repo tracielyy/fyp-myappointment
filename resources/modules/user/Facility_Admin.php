@@ -29,6 +29,10 @@ class Facility_Admin extends Admin {
         return $this->facility;
     }
 
+    public function set_facility(Medical_Facility $facility): void {
+        $this->facility = $facility;
+    }
+
     // Use For Debugging/ Logging Purpose
     public function __toString(): string {
         $str = nl2br(PHP_EOL . "Facility: " . $this->facility . PHP_EOL);
@@ -71,10 +75,10 @@ class Facility_Admin extends Admin {
         # Add Patient Data To Database (use auto-id)
         $db = new DbQuery();
         $doc_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->newDocument();
-        
+
         # Add The Auto Id To One Of The Field
         $fadmin_info['profile']['adminid'] = $doc_ref->id();
-        
+
         return $doc_ref->set($fadmin_info);
     }
 
