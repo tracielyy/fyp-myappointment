@@ -9,260 +9,273 @@ require_once HINFO_MOD . '/Health_Info.php';
 require_once UTIL_MOD . '/StringUtils.php';
 require_once UTIL_MOD . '/ArrayCreation.php';
 
+require_once USER_MOD . '/Account_User.php';
+require_once USER_MOD . '/Medical_Personnel.php';
+require_once USER_MOD . '/Facility_Admin.php';
+require_once USER_MOD . '/Super_Admin.php';
+
+require_once FACILITY_MOD . '/Medical_Facility.php';
+
 /*
  *  ADD HEALTH INFO --- (Health Articles) 
  */
 
+if (!isset($_SESSION['user'])):
+    header("Location:/"); # -- REDIRECT BACK TO THE HOME PAGE
+else:
+    $user = unserialize($_SESSION["user"]);
+    if ($user->get_usertype() !== User_Type::FACIILITY_ADMIN):
+        header("Location:/"); # -- REDIRECT BACK TO THE HOME PAGE
+    else: # -- ONLY ALLOW FACILITY ADMIN
 
+        $health_article = array(
+            'title' => '',
+            'descriptions' => '',
+            'type' => ''
+        );
+        $validArr = array();
+        if ($_SERVER["REQUEST_METHOD"] == "POST"):
 
-$health_article = array(
-    'title' => '',
-    'descriptions' => '',
-    'type' => ''
-);
-$validArr = array();
-if ($_SERVER["REQUEST_METHOD"] == "POST"):
-
-    if (isset($_POST['submit_health_info'])):
-        /* Load Data to Array */
-        foreach ($_POST as $key => $value) :
-            if (isset($health_article[$key])) :
-                $health_article[$key] = htmlspecialchars($value);
-                $validArr[$key] = False; // Set All Field Validation Check As False
-                $err_msg[$key] = "";
-            endif;
-        endforeach;
-
-        ###### -- VALIDATION -- ######
-        foreach ($health_article as $key => $value):
-
-            # Step 1: Check Empty
-            $value = StringUtils::trim_string($value);
-            if (!empty($value)):
-
-                # Step 2: Other Validations
-                if ($key == 'type'):
-
-                    $validArr[$key] = Health_Info_Type::validate_type($value);
-
-                    # Check For Valid Type Selection
-                    if (!$validArr[$key]):
-                        $err_msg[$key] = "Invalid Input";
+            if (isset($_POST['submit_health_info'])):
+                /* Load Data to Array */
+                foreach ($_POST as $key => $value) :
+                    if (isset($health_article[$key])) :
+                        $health_article[$key] = htmlspecialchars($value);
+                        $validArr[$key] = False; // Set All Field Validation Check As False
+                        $err_msg[$key] = "";
                     endif;
-                else:
-                    $validArr[$key] = true;
-                endif;
+                endforeach;
 
-            else:
-                # Some Error Message
-                $err_msg[$key] = strtoupper($key) . " cannot be blank";
+                ###### -- VALIDATION -- ######
+                foreach ($health_article as $key => $value):
+
+                    # Step 1: Check Empty
+                    $value = StringUtils::trim_string($value);
+                    if (!empty($value)):
+
+                        # Step 2: Other Validations
+                        if ($key == 'type'):
+
+                            $validArr[$key] = Health_Info_Type::validate_type($value);
+
+                            # Check For Valid Type Selection
+                            if (!$validArr[$key]):
+                                $err_msg[$key] = "Invalid Input";
+                            endif;
+                        else:
+                            $validArr[$key] = true;
+                        endif;
+
+                    else:
+                        # Some Error Message
+                        $err_msg[$key] = strtoupper($key) . " cannot be blank";
+                    endif;
+
+                endforeach;
+            ###### -- END VALIDATION -- ######
+
             endif;
+        endif;
+        ?><!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <meta charset="UTF-8" />
+                <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <title>Add Health Article</title>
+                <!-- fontawesome -->
+                <script
+                    src="https://kit.fontawesome.com/dcfd5ba5e7.js"
+                    crossorigin="anonymous"
+                ></script>
+                <!-- google fonts -->
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;600;900&display=swap" rel="stylesheet"/>
+                <!-- bootstrap cdn link -->
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
+                <!-- bootstrap data table -->
+                <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css"/>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"/>
+                <!-- Prevent Form Resubmission -->
+                <script>
+                    if (window.history.replaceState) {
+                        window.history.replaceState(null, null, window.location.href);
+                    }
+                </script>
+                <!-- jQuery -->
+                <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+                <style>
+                    body {
+                        margin: 0;
+                        padding: 0;
+                        background-color: #eeeded;
+                        font-family: "Poppins", sans-serif;
+                    }
+                    /* defining some variables for the offcanvas */
+                    :root {
+                        --offcanvas-width: 270px;
+                        --topNavBarHeight: 56px;
+                    }
+                    .sidebar-nav {
+                        width: var(--offcanvas-width);
+                    }
+                    .sidebar-link {
+                        display: flex;
+                        align-items: center;
+                    }
+                    .sidebar-link .right-icon {
+                        display: inline-flex;
+                    }
+                    .sidebar-link[aria-expanded="true"] .right-icon {
+                        transform: rotate(180deg);
+                        transition: all ease 0.25s;
+                    }
+                    .card hr{
+                        border: 0; 
+                        height: 1px; 
+                        background-image: linear-gradient(to right, #f0f0f0, #00b9ff, #59d941, #f0f0f0);
+                    }
+                    /* make the offcanvas visible on the large screens */
+                    @media (min-width: 992px) {
+                        body {
+                            overflow: auto !important;
+                        }
 
-        endforeach;
-    ###### -- END VALIDATION -- ######
+                        .Offcanvas-backdrop::before {
+                            display: none;
+                        }
+                        .sidebar-nav {
+                            transform: none;
+                            visibility: visible !important;
+                            top: var(--topNavBarHeight);
+                            height: calc(100% - var(--topNavBarHeight));
+                        }
+                        main {
+                            margin-left: var(--offcanvas-width);
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <!-- NavBar  (TOP) -->
+                <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
+                <!-- Canvas (SIDE) -->
+                <?php require_once TEMPLATES_PATH . "/fadmin-canvas.php"; ?>
 
-    endif;
-endif;
-?><!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Add Health Article</title>
-        <!-- fontawesome -->
-        <script
-            src="https://kit.fontawesome.com/dcfd5ba5e7.js"
-            crossorigin="anonymous"
-        ></script>
-        <!-- google fonts -->
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;600;900&display=swap" rel="stylesheet"/>
-        <!-- bootstrap cdn link -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
-        <!-- bootstrap data table -->
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css"/>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"/>
-        <!-- Prevent Form Resubmission -->
-        <script>
-            if (window.history.replaceState) {
-                window.history.replaceState(null, null, window.location.href);
-            }
-        </script>
-        <!-- jQuery -->
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
-        <style>
-            body {
-                margin: 0;
-                padding: 0;
-                background-color: #eeeded;
-                font-family: "Poppins", sans-serif;
-            }
-            /* defining some variables for the offcanvas */
-            :root {
-                --offcanvas-width: 270px;
-                --topNavBarHeight: 56px;
-            }
-            .sidebar-nav {
-                width: var(--offcanvas-width);
-            }
-            .sidebar-link {
-                display: flex;
-                align-items: center;
-            }
-            .sidebar-link .right-icon {
-                display: inline-flex;
-            }
-            .sidebar-link[aria-expanded="true"] .right-icon {
-                transform: rotate(180deg);
-                transition: all ease 0.25s;
-            }
-            .card hr{
-                border: 0; 
-                height: 1px; 
-                background-image: linear-gradient(to right, #f0f0f0, #00b9ff, #59d941, #f0f0f0);
-            }
-            /* make the offcanvas visible on the large screens */
-            @media (min-width: 992px) {
-                body {
-                    overflow: auto !important;
-                }
-
-                .Offcanvas-backdrop::before {
-                    display: none;
-                }
-                .sidebar-nav {
-                    transform: none;
-                    visibility: visible !important;
-                    top: var(--topNavBarHeight);
-                    height: calc(100% - var(--topNavBarHeight));
-                }
-                main {
-                    margin-left: var(--offcanvas-width);
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <!-- NavBar  (TOP) -->
-        <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
-        <!-- Canvas (SIDE) -->
-        <?php require_once TEMPLATES_PATH . "/fadmin-canvas.php"; ?>
-
-        <!-- Current Page (Add Health Article) -->
-        <main class="mt-5 pt-3">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-12 text-center fw-700 fs-1">
-                        Add Health Article
-                    </div>
-                    <div class="col-md-12 text-muted text-center fw-700">
-                        Facility admin @ <span id="facilityName">NUH</span>
-                    </div>
-                </div>
-                <div class="row mt-4 ms-auto me-auto" id="new-health-article">
-                    <div class="col-lg-12">
-                        <!-- Black Card Body-->
-                        <div class="card text-start bg-dark" style="max-width: 60rem;">
-                            <div class="card-body text-white">
-
-                                <!-- FORM -->
-                                <form id="add_health_article" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-                                    <!-- Title -->
-                                    <div class="mb-3" id="title-container">
-                                        <label for="specialization" class="form-label">Title: </label>
-                                        <input name ="title" type="text" id="title" class="form-control" style="width: 60%;" value="<?php echo $health_article['title']; ?>"/>
-                                    </div>
-                                    <hr>
-                                    <!-- Descriptions -->
-                                    <div class="mb-3" id="descriptions-container">
-                                        <label for="descriptions" class="form-label">Descriptions: </label>
-                                        <textarea name="descriptions" id="descriptions" rows="5" class="form-control" style="resize:none;" ><?php echo $health_article['descriptions']; ?></textarea>
-                                    </div>
-                                    <hr>
-                                    <!-- Type -->
-                                    <div class="mb-3" id="type-container">
-                                        <label for="type" class="form-label">Type: </label>
-                                        <select name="type" id="type" class="form-select w-auto">
-                                            <option style="display: none" value=" ">--Select Type--</option>
-                                            <?php
-                                            $types = Health_Info_Type::get_constants();
-                                            sort($types);
-                                            foreach ($types as $type):
-                                                ?>
-                                                <!-- Each Type -->
-                                                <option value="<?php echo $type; ?>"<?php
-                                                if ($type == $health_article['type']) :
-                                                    echo "selected";
-                                                endif;
-                                                ?>><?php echo $type; ?>
-                                                </option>
-                                                <!-- End Each Type -->
-                                                <?php
-                                            endforeach;
-                                            ?>
-                                        </select>
-                                    </div>
-                                    <!-- Buttons -->
-                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                        <button type="submit" class="btn btn-outline-light me-md-2 mr-2" name="submit_health_info" > 
-                                            <span><i class="bi bi-plus-lg"></i></span>
-                                            <span>Add</span>
-                                        </button>
-                                        <button class="btn btn-outline-danger" id="resetBtn" type="reset">
-                                            <span><i class="bi bi-x-lg"></i></span>
-                                            <span>Reset</span>
-                                        </button>
-                                    </div>
-                                </form>
+                <!-- Current Page (Add Health Article) -->
+                <main class="mt-5 pt-3">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12 text-center fw-700 fs-1">
+                                Add Health Article
                             </div>
-                        </div><!-- Black Card Body -->
+                            <div class="col-md-12 text-muted text-center fw-700">
+                                Facility admin @ <span id="facilityName"><?php echo StringUtils::get_acronym($facility->get_facilityname()); ?> </span>
+                            </div>
+                        </div>
+                        <div class="row mt-4 ms-auto me-auto" id="new-health-article">
+                            <div class="col-lg-12">
+                                <!-- Black Card Body-->
+                                <div class="card text-start bg-dark" style="max-width: 60rem;">
+                                    <div class="card-body text-white">
+
+                                        <!-- FORM -->
+                                        <form id="add_health_article" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+                                            <!-- Title -->
+                                            <div class="mb-3" id="title-container">
+                                                <label for="specialization" class="form-label">Title: </label>
+                                                <input name ="title" type="text" id="title" class="form-control" style="width: 60%;" value="<?php echo $health_article['title']; ?>"/>
+                                            </div>
+                                            <hr>
+                                            <!-- Descriptions -->
+                                            <div class="mb-3" id="descriptions-container">
+                                                <label for="descriptions" class="form-label">Descriptions: </label>
+                                                <textarea name="descriptions" id="descriptions" rows="5" class="form-control" style="resize:none;" ><?php echo $health_article['descriptions']; ?></textarea>
+                                            </div>
+                                            <hr>
+                                            <!-- Type -->
+                                            <div class="mb-3" id="type-container">
+                                                <label for="type" class="form-label">Type: </label>
+                                                <select name="type" id="type" class="form-select w-auto">
+                                                    <option style="display: none" value=" ">--Select Type--</option>
+                                                    <?php
+                                                    $types = Health_Info_Type::get_constants();
+                                                    sort($types);
+                                                    foreach ($types as $type):
+                                                        ?>
+                                                        <!-- Each Type -->
+                                                        <option value="<?php echo $type; ?>"<?php
+                                                        if ($type == $health_article['type']) :
+                                                            echo "selected";
+                                                        endif;
+                                                        ?>><?php echo $type; ?>
+                                                        </option>
+                                                        <!-- End Each Type -->
+                                                        <?php
+                                                    endforeach;
+                                                    ?>
+                                                </select>
+                                            </div>
+                                            <!-- Buttons -->
+                                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                                <button type="submit" class="btn btn-outline-light me-md-2 mr-2" name="submit_health_info" > 
+                                                    <span><i class="bi bi-plus-lg"></i></span>
+                                                    <span>Add</span>
+                                                </button>
+                                                <button class="btn btn-outline-danger" id="resetBtn" type="reset">
+                                                    <span><i class="bi bi-x-lg"></i></span>
+                                                    <span>Reset</span>
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div><!-- Black Card Body -->
+                            </div>
+                        </div> 
                     </div>
-                </div> 
-            </div>
-        </main>
-        <br>
-        <br>
-        <!-- main ends here -->
-        <!-- bootstrap js link -->
-        <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-            crossorigin="anonymous"
-        ></script>
-        <!-- for testing the input boxes and the reset button -->
-        <script>
-            var checkBoxes = document.querySelectorAll("input[type = 'checkbox']");
-            var btnReset = document.getElementById('resetBtn');
-            var inputs = document.querySelectorAll('input');
-            var ta = document.querySelectorAll('textarea');
-            btnReset.addEventListener('click', () => {
-                inputs.forEach(input => input.value = '');
-                ta.forEach(textarea => textarea.value = '');
-                checkBoxes.forEach(checkbox => checkbox.checked = false);
-            });
-            function checkAll(myCheckBox) {
-                if (myCheckBox.checked === true) {
-                    checkBoxes.forEach(function (checkbox) {
-                        checkbox.checked = true;
+                </main>
+                <br>
+                <br>
+                <!-- main ends here -->
+                <!-- bootstrap js link -->
+                <script
+                    src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+                    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+                    crossorigin="anonymous"
+                ></script>
+                <!-- for testing the input boxes and the reset button -->
+                <script>
+                    var checkBoxes = document.querySelectorAll("input[type = 'checkbox']");
+                    var btnReset = document.getElementById('resetBtn');
+                    var inputs = document.querySelectorAll('input');
+                    var ta = document.querySelectorAll('textarea');
+                    btnReset.addEventListener('click', () => {
+                        inputs.forEach(input => input.value = '');
+                        ta.forEach(textarea => textarea.value = '');
+                        checkBoxes.forEach(checkbox => checkbox.checked = false);
                     });
-                } else {
-                    checkBoxes.forEach(function (checkbox) {
-                        checkbox.checked = false;
-                    });
-                }
-            }
+                    function checkAll(myCheckBox) {
+                        if (myCheckBox.checked === true) {
+                            checkBoxes.forEach(function (checkbox) {
+                                checkbox.checked = true;
+                            });
+                        } else {
+                            checkBoxes.forEach(function (checkbox) {
+                                checkbox.checked = false;
+                            });
+                        }
+                    }
 
-        </script>
-        <?php
-        /* ERROR MESSAGES */
+                </script>
+                <?php
+                /* ERROR MESSAGES */
 
-        function set_err_msg(array $validArr, array $err_msg): void {
-            foreach ($validArr as $key => $value):
-                if (!$value):
-                    echo "
+                function set_err_msg(array $validArr, array $err_msg): void {
+                    foreach ($validArr as $key => $value):
+                        if (!$value):
+                            echo "
                                     <script>
                                         $('#{$key}').addClass('is-invalid');
                                         var feedback = \"<div id='{$key}-feedback' class='invalid-feedback'>{$err_msg[$key]}</div>\";
@@ -270,50 +283,54 @@ endif;
 
                                     </script>
                                 ";
-                endif;
-            endforeach;
-        }
+                        endif;
+                    endforeach;
+                }
 
-        function remove_err_message(array $validArr): void {
-            foreach ($validArr as $k => $v):
-                echo "
+                function remove_err_message(array $validArr): void {
+                    foreach ($validArr as $k => $v):
+                        echo "
                                 <script>
                                     $('#{$k}-feedback').remove();
                                 </script>
                                 ";
-            endforeach;
-        }
+                    endforeach;
+                }
 
-        if ($_SERVER["REQUEST_METHOD"] == "POST"):
+                if ($_SERVER["REQUEST_METHOD"] == "POST"):
 
-            if (isset($_POST['submit_health_info'])):
-                // If There At Least 1 Failing Condition
-                if (in_array(FALSE, $validArr)) :
-                    set_err_msg($validArr, $err_msg);
-                else:
-                    ?>
-                    <script>
-                        $('#new-health-article').html("");
-                        var spinner_container = '<div class="text-center" id="spinner-container"></div>';
-                        var spinner = '<div class="spinner-border" role="status" style="width: 20rem; height: 20rem; border-width:4em;"></div>';
-                        $('#new-health-article').append(spinner_container);
-                        $('#spinner-container').append(spinner);
-                    </script>
-                    <?php
-                    # Add To Database
-                    Health_Info::create_healthinfo($health_article);
-                    # Reset The Form Values
-                    ArrayCreation::reset_form_arr(array_keys($health_article), $health_article);
-                    # Redirect User To Articles Page
-                    ?>
-                    <script>
-                        window.location.replace(window.location.origin + '<?php echo FADMIN_WEB . "/views/health-articles.php"; ?>');
-                    </script>
-                <?php
-                endif;
+                    if (isset($_POST['submit_health_info'])):
+                        // If There At Least 1 Failing Condition
+                        if (in_array(FALSE, $validArr)) :
+                            set_err_msg($validArr, $err_msg);
+                        else:
+                            ?>
+                            <script>
+                                $('#new-health-article').html("");
+                                var spinner_container = '<div class="text-center" id="spinner-container"></div>';
+                                var spinner = '<div class="spinner-border" role="status" style="width: 20rem; height: 20rem; border-width:4em;"></div>';
+                                $('#new-health-article').append(spinner_container);
+                                $('#spinner-container').append(spinner);
+                            </script>
+                            <?php
+                            # Add To Database
+                            Health_Info::create_healthinfo($health_article);
+                            # Reset The Form Values
+                            ArrayCreation::reset_form_arr(array_keys($health_article), $health_article);
+                            # Redirect User To Articles Page
+                            ?>
+                            <script>
+                                window.location.replace(window.location.origin + '<?php echo FADMIN_WEB . "/views/health-articles.php"; ?>');
+                            </script>
+                        <?php
+                        endif;
 
-            endif; # -- END CHECK FOR SUBMIT BTN TRIGGER
-        endif; # -- END POST REQUEST
-        ?>
-    </body>
-</html>
+                    endif; # -- END CHECK FOR SUBMIT BTN TRIGGER
+                endif; # -- END POST REQUEST
+                ?>
+            </body>
+        </html>
+    <?php
+    endif; # -- END USER TYPE CHECK
+endif; # -- END SESSION CHECK
+?>

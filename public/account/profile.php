@@ -53,6 +53,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
             $user_email = $user->get_email();
             $user_type = $user->get_usertype();
             $email['credentials']['email'] = $user_email;
+            $secure = new Security();
 
             if (User_Type::check_user_type(User_Type::PATIENT, $user_type) || User_Type::check_user_type(User_Type::MEDICAL_PERSONNEL, $user_type)):
                 include_once TEMPLATES_PATH . '/navbar-loggedin.php';
@@ -256,7 +257,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                                 <div class="profile-text"><strong>NRIC: </strong> </div>
                                             </div>
                                             <div class="col-auto">
-                                                <div class="profile-text">*****<?php echo substr($user->get_NRIC(), 5, 5); ?>
+                                                <div class="profile-text">*****<?php echo substr($secure->decrypt($user->get_NRIC()), 5, 5); ?>
                                                 </div>
                                             </div>
                                         </div>

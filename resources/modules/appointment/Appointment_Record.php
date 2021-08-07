@@ -36,9 +36,12 @@ class Appointment_Record {
     # Appointment Venue (The Location)
     private Medical_Facility $facility;
 
+    # Medical Record ID
+    private string $mrid;
+
     // Constructor
     function __construct(Time $createdon, string $appointmentid, string $appointmenttype, Appointment_Slot $appointmentslot,
-            Medical_Facility $facility, string $appointmentstatus = Appointment_Status::UPCOMING) {
+            Medical_Facility $facility, string $appointmentstatus = Appointment_Status::UPCOMING, string $mrid = "") {
 
         $this->createdon = $createdon;
         $this->appointmentslot = $appointmentslot;
@@ -46,6 +49,7 @@ class Appointment_Record {
         $this->appointmenttype = $appointmenttype;
         $this->appointmentstatus = $appointmentstatus;
         $this->facility = $facility; // -- Medical_Facility Object -- //
+        $this->mrid = $mrid;
     }
 
     // Getters
@@ -111,7 +115,7 @@ class Appointment_Record {
             # Medical Facility
             $facility = Medical_Facility::retrieve_facility_by_id($appt_record['facilityid']);
             $appt_record_obj = new Appointment_Record($createdon, $appt_record['appointmentid'], $appt_record['appointmenttype'],
-                    $appt_slot, $facility, $appt_record['appointmentstatus']);
+                    $appt_slot, $facility, $appt_record['appointmentstatus'], $appt_record['mrid']);
 
             # -- Return 
             return $appt_record_obj;
@@ -142,7 +146,8 @@ class Appointment_Record {
             'appointmentstatus' => Appointment_Status::UPCOMING,
             'facilityid' => $booking_info['facilityid'],
             'createdon' => ['date' => $createdon->get_date(), 'time' => $createdon->get_time()],
-            'slotid' => $booking_info['slotid']
+            'slotid' => $booking_info['slotid'],
+            'mrid' => ''
         );
 
         $batch->set($db->get_db()->collection($appt_doc_path)->document($id), $appt_record_arr);
@@ -404,6 +409,20 @@ class Appointment_Record {
             return 0;
         }
         return ($al > $bl) ? +1 : -1;
+    }
+
+    public static function check_mrid_exist(string $patientid, string $slotid): bool {
+        
+        $db = new DbQuery();
+        $doc_path = Database::ACCOUNT_USER . "/" . $patientid . "/" . Database::APPOINTMENT_RECORD;
+        $documents = $db->get_db()->collection($doc_path)->where('slotid', "=", $slotid)->documents();
+        
+        foreach($documents as $doc):
+            if($doc->exists()):
+                return true;
+            endif;
+        endforeach;
+        return false;
     }
 
 }

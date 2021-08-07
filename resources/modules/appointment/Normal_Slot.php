@@ -137,6 +137,7 @@ class Normal_Slot extends Appointment_Slot {
         foreach ($slots_arr as $slot):
             $slot_list[] = self::initialise_normal_slot($slot, $facilityid);
         endforeach;
+        usort($slot_list, array("Normal_Slot", "cmp_obj"));
 
         # -- Return Array Of Appointment Slots
         return $slot_list;

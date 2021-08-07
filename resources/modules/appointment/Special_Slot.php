@@ -175,6 +175,8 @@ class Special_Slot extends Appointment_Slot {
         return $slots_arr;
     }
 
+
+
     // -- RETRIEVE APPOINTMENT SLOT (via slot id & appointment type)
     public static function retrieve_apptslot_by_id(string $id, string $facilityid): Appointment_Slot {
 
@@ -224,9 +226,9 @@ class Special_Slot extends Appointment_Slot {
 
         return $patient_counter;
     }
-    
+
     // check if there is any duplicate time in the same date
-    public static function check_slot_time_duplicate(){
+    public static function check_slot_time_duplicate() {
         
     }
 

@@ -139,7 +139,7 @@ class Medical_Record {
     public static function create_medical_record(string $patient_doc_id, array $medical_record_info): ?Medical_Record {
         $db = new DbQuery();
 
-        # SET Appointment Creation Time
+        # SET Medical Creation Time
         $createdon = new Time();
 
         # Get Appointment ID

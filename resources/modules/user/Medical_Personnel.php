@@ -39,11 +39,15 @@ class Medical_Personnel extends Normal_User {
     }
 
     // -- Getters
-    public function get_medical_facility() {
-        return $this->medicalfacility;
+    public function get_facilityids(): array {
+        return $this->facilityids;
     }
 
-    public function get_license_number() {
+    public function get_specialisation(): string {
+        return $this->specialisation;
+    }
+
+    public function get_licensenumber(): string {
         return $this->licensenumber;
     }
 
@@ -94,7 +98,8 @@ class Medical_Personnel extends Normal_User {
     //      Methods Accessing Firestore Database 
     //============================================
     // -- CREATE MEDICAL PERSONNEL ACCOUNT
-    public static function create_medical_personnel(array $medical_personnel_data) {
+    public static function create_medical_personnel(array $medical_personnel_data): array {
+
 
         # Create Default Fields
         $account_user_arr = ArrayCreation::account_creation_array(User_Type::MEDICAL_PERSONNEL);
@@ -104,11 +109,30 @@ class Medical_Personnel extends Normal_User {
             $medical_personnel_data[$field] = $value;
         endforeach;
 
+        # Set Default Password 
+        $sec = new Security();
+        $default_pw = StringUtils::generate_token(12);
+        $medical_personnel_data['credentials']['password'] = $sec->hash($default_pw);
+
+        # Set NRIC
+        if (isset($medical_personnel_data['profile']['nric'])):
+            $temp = $medical_personnel_data['profile']['nric'];
+            // Encrypt NRIC As Field
+            $medical_personnel_data['profile']['nric'] = $sec->encrypt($temp);
+            // Hash NRIC For Document ID
+            $id = $sec->hash_256($temp);
+        endif;
+
         # Add Medical Personnel Data To Database
         $db = new DbQuery();
         $db->get_db()->collection(Database::ACCOUNT_USER)
-                ->document($medical_personnel_data['profile']['nric'])
+                ->document($id)
                 ->set($medical_personnel_data);
+
+        # Create Credentials Array
+        $credentials = array('email' => $medical_personnel_data['credentials']['email'], 'password' => $default_pw);
+
+        return $credentials;
     }
 
     // -- RETRIEVE MEDICAL PERSONNEL BY ID  
@@ -160,21 +184,26 @@ class Medical_Personnel extends Normal_User {
     }
 
     // -- RETRIEVE MEDICAL PERSONNEL THAT BELONGS TO THE GIVEN FACILITY (GENERAL NOT INCLUDED)
-    public static function retrieve_personnel_by_facility_spec(string $facilityid): array {
+    public static function retrieve_personnel_by_facility_spec(string $facilityid, bool $include_gp = true): array {
 
         # Create Empty Array To Store Personnel
         $personnel_arr = array();
 
         $db = new DbQuery();
-        $doc_arr = $db->get_db()->collection(Database::ACCOUNT_USER)
-                ->where("accountdetails.usertype", "=", User_Type::MEDICAL_PERSONNEL)
-                ->where("practitionerinfo.facilityids", "array-contains", $facilityid)
-                ->where("practitionerinfo.specialisation", "!=", "General")
-                ->documents();
+        if ($include_gp):
+            $doc_arr = $db->get_db()->collection(Database::ACCOUNT_USER)
+                            ->where("accountdetails.usertype", "=", User_Type::MEDICAL_PERSONNEL)
+                            ->where("practitionerinfo.facilityids", "array-contains", $facilityid)->documents();
+        else:
+            $doc_arr = $db->get_db()->collection(Database::ACCOUNT_USER)
+                            ->where("accountdetails.usertype", "=", User_Type::MEDICAL_PERSONNEL)
+                            ->where("practitionerinfo.facilityids", "array-contains", $facilityid)
+                            ->where("practitionerinfo.specialisation", "!=", "General")->documents();
+        endif;
+
         foreach ($doc_arr as $doc) {
             if ($doc->exists()) {
                 $doc_data = $doc->data();
-
                 $personnel_arr[$doc_data['practitionerinfo']['specialisation']][] = self:: initialise_medical_personnel($doc_data);
             }
         }
@@ -183,8 +212,7 @@ class Medical_Personnel extends Normal_User {
     }
 
     // -- RETRIEVE MEDICAL PERSONNEL THAT BELONGS TO THE GIVEN FACILITY
-    public static function retrieve_personnel_by_facility(string $facilityid, bool $return_as_object = true,
-            array $startAfter = null): array {
+    public static function retrieve_personnel_by_facility(string $facilityid, array $startAfter = null): array {
 
         # Create Empty Array To Store Personnel
         $personnel_arr = array();
@@ -207,15 +235,33 @@ class Medical_Personnel extends Normal_User {
         foreach ($doc_arr as $doc) {
             if ($doc->exists()) {
                 $doc_data = $doc->data();
-                if ($return_as_object):
-                    $personnel_arr[] = self:: initialise_medical_personnel($doc_data);
-                else:
-                    $personnel_arr[] = $doc_data;
-                endif;
+                $personnel_arr[] = self:: initialise_medical_personnel($doc_data);
             }
         }
 
         return $personnel_arr;
+    }
+
+    // -- Comparison Function 
+    public static function cmp_obj(Medical_Personnel $a, Medical_Personnel $b) {
+        $af = strtolower($a->get_firstname());
+        $bf = strtolower($b->get_firstname());
+
+        $al = strtolower($a->get_lastname());
+        $bl = strtolower($b->get_lastname());
+
+        if ($af == $bf) {
+            if ($al == $bl) {
+                return 0;
+            }
+            return ($al > $bl) ? +1 : -1;
+        }
+        return ($af > $bf) ? +1 : -1;
+    }
+
+    public static function delete_medical_personnel(string $id): void {
+        $db = new DbQuery();
+        $db->get_db()->collection(Database::ACCOUNT_USER)->document($id)->delete();
     }
 
 }

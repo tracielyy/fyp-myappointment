@@ -10,7 +10,6 @@
  *  This Class Does Not Have Setters (Manipulators)
  */
 
-
 class Regex {
 
     private const NAME_PATTERN = "/^(?![ .]+$)[a-zA-Z ,]*$/";
@@ -23,6 +22,7 @@ class Regex {
             "(?=.*[\*\.!@\$%^&\(\)\{\}\[\]:;<>,.\?\/\~_\+-=\|])" . // At Least 1 Special Chars
             ".{8,32}" . // 8 To 32 Chars In Total
             "$/";   // Pattern Match To End Of String
+    private const NRIC_PATTERN = "/^[STFG]\d{7}[A-Z]$/";
 
     // -- Utility Functions (Non-Manipulative) -- //
     public static function validate_email(string $email): bool {
@@ -48,6 +48,14 @@ class Regex {
 
     public static function validate_password(string $password): bool {
         if (preg_match(self::PASSWORD_PATTERN, $password)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static function validate_nric(string $nric): bool {
+
+        if (preg_match(self::NRIC_PATTERN, strtoupper($nric))) {
             return true;
         }
         return false;

@@ -6,6 +6,16 @@
 
 class StringUtils {
 
+    // Get Acronym From Given String
+    public static function get_acronym(string $input): string {
+        $word = explode(" ", $input);
+        $abrv = "";
+        foreach ($word as $w):
+            $abrv .= strtoupper($w[0]);
+        endforeach;
+        return $abrv;
+    }
+
     // -- String Cleaning -- //
     public static function clean_input(string $input, bool $toUpper = false): string {
         $input = self::trim_string($input);

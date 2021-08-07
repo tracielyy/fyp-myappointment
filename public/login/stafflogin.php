@@ -61,6 +61,11 @@ require_once USER_MOD . '/Medical_Personnel.php';
                 case User_Type::MEDICAL_PERSONNEL:
                     header("Location:" . DOC_WEB);
                     break;
+                case User_Type::PATIENT:
+                    header("Location:" . APPT_WEB);
+                    break;
+                default:
+                    header("Location:/");
             endswitch;
         }
 
@@ -80,7 +85,8 @@ require_once USER_MOD . '/Medical_Personnel.php';
         // -- When Redirect or Load The Page
         if ($_SERVER['REQUEST_METHOD'] == "GET") {
             if (isset($_SESSION["user"])) {
-                echo unserialize($_SESSION["user"]);
+                $user = unserialize($_SESSION["user"]);
+                route_user($user);
             }
         }
 

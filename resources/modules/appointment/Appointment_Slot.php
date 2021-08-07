@@ -132,6 +132,7 @@ class Appointment_Slot {
         return ($al > $bl) ? +1 : -1;
     }
 
+
 }
 
 ?>
