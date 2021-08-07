@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once '../resources/config.php';
+require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/config.php';
+require VENDOR_PATH . '/autoload.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Patient.php';
 require_once USER_MOD . '/Medical_Personnel.php';
@@ -10,12 +11,29 @@ require_once USER_MOD . '/Super_Admin.php';
 require_once APPT_MOD . '/Appointment_Record.php';
 require_once ENUMS_PATH . '/User_Type.php';
 
+require_once ENUMS_PATH . '/Health_Info_Type.php';
+require_once HINFO_MOD . '/Health_Info.php';
+require_once UTIL_MOD . '/StringUtils.php';
+
 /*
  * HOME PAGE (LANDING PAGE)
  */
 
 include TEMPLATES_PATH . '/bootstrap.php';
 $pageName = "homepage";
+$all_health_articles = Health_Info::retrieve_all_healthinfo();
+echo "<pre>";
+echo var_dump($all_health_articles);
+echo "</pre>";
+$healtharticles_count = count($all_health_articles);
+
+$healtharticles_count = $healtharticles_count % 6;
+
+if ($healtharticles_count > 3 && $healtharticles_count < 6)
+{
+    $index = 3;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

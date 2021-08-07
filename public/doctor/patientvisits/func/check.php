@@ -30,12 +30,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'):
             'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientid,$slotid)
         );
 
-        if(!check_mrid_exist($patientid,$slotid)):
+        $mrid = check_mrid_exist($patientid,$slotid); //checks MRID but also, if available will put the mrid here
+
+        if(!$mrid):
             $medical_record = Medical_Record::create_medical_record($patientid,$medicalrecord_array);
             $mrid = $medical_record->get_medicalrecordid();
-        elseif (check_mrid_exist($patientid,$slotid)) :
-            
         endif;
+
+        header("Location:" . DOC_WEB . "/patientvisit/index.php?id=".$mrid."&pt=".$patientid);
         
 
     else:
