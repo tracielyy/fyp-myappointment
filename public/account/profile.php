@@ -250,6 +250,17 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                             </div>
                                         </div>
 
+                                        <!-- NRIC -->
+                                        <div class="row my-3">
+                                            <div class="col-2">
+                                                <div class="profile-text"><strong>NRIC: </strong> </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="profile-text">*****<?php echo substr($user->get_NRIC(), 5, 5); ?>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <!-- Address -->
                                         <div class="row my-3">
                                             <div class="col-2">
