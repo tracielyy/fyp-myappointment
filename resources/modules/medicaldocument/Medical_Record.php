@@ -145,7 +145,7 @@ class Medical_Record {
         # Get Appointment ID
         $id = self::generate_medical_record_id($patient_doc_id);
         $patient_mr_path = Database::ACCOUNT_USER . "/" . $patient_doc_id . "/" . Database::MEDICAL_RECORD;
-        $doc_ref = $db->get_db()->collection($patient_mr_path)->newDocument();
+        $doc_ref = $db->get_db()->collection($patient_mr_path)->document($id);
         $medical_record_arr = array(
             'mrid' => $doc_ref->id(),
             'facilityid' => $medical_record_info['facilityid'],
