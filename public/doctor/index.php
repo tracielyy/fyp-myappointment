@@ -116,12 +116,15 @@ else:
                 // echo "</pre>";
                 //can use get_date_from_range -- make it to 7 days
                 //echo json_encode($slot_arr);
-
+                $userEmail = $user->get_email();
+                $practitionerid = Account_User::retrieve_user_doc_id($userEmail);
                 foreach ($slot_arr as $slot):
                     $patientid = $slot->get_patient();
                     $patient = Patient::retrieve_patient_by_id($patientid);
                     $slotid = $slot->get_slotid();
-                    $mrid ="<button onclick='check('".$patientid."','".$slotid."')' class='btn btn-primary'>Go to Medical Record</button>";
+                    $facilityid = $slot->get_facilityid();
+                    $appointmenttype = 
+                    $mrid ="<button onclick='check('".$patientid."','".$slotid."','".$practitionerid."','".$facilityid."','".$appointmenttype."')' class='btn btn-primary'>Go to Medical Record</button>";
                     $data = '{"name":"'.$patient->get_firstname().'","date":"'.$slot->get_appointmentschedule()->get_date().'","time":"'. $slot->get_appointmentschedule()->get_time() .'","mrid":"'.$mrid.'"},';
                 endforeach;
                 $data = "[".$data."]";
@@ -264,14 +267,16 @@ else:
         return str.replace(/(\r\n|\n|\r)/gm, "");
     }
 
-    function check(patientid, slotid) {
+    function check(patientid, slotid, practitionerid, facilityid, appointmenttype) {
         $.ajax({
             type: "POST",
             url: "func/check.php",
             data: {
                 ajax_check_mrid: true,
                 patientid: patientid,
-                slotid: slotid
+                slotid: slotid,
+                facilityid : facilityid,
+                appointmenttype: appointmenttype
             },
             success: function(mrid_status) {
                 var mrid_exist = strip_string(mrid_status);
