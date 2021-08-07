@@ -17,10 +17,6 @@
 .find-clinic-title{
     margin: 30px auto;
 }
-.container{
-    padding: 7% 15%;
-    background-color: bisque;
-}
 .clinicChoice{
     display: inline-block;
     margin: 20px;
@@ -43,6 +39,16 @@
 
 .opt-icon {
     margin:50px
+}
+
+.card-icon {
+    margin-top:35px;
+    margin-left:35px;
+    color:#0275d8;
+}
+
+a {
+    text-decoration: none;
 }
 
 .rounded1

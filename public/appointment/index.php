@@ -2,7 +2,7 @@
 session_start();
 require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/config.php';
 require VENDOR_PATH . '/autoload.php';
-
+require_once USER_MOD . '/Medical_Personnel.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Patient.php';
 
@@ -180,9 +180,9 @@ if (isset($_SESSION["user"])):
                 <div class="container">
                     <div class="row mt-3">
                         <div class="d-grid gap-2 col-6 mx-auto">
-                            <button type="button" class="btn btn-info btn-lg pb-2">
+                            <a type="button" href="./create.php" class="btn btn-info btn-lg pb-2">
                                 <p class="h4 text-light mt-1"> Create New Appointment </p>
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>

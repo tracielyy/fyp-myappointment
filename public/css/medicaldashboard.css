@@ -19,7 +19,7 @@ body {font-family: "Lato", sans-serif;}
 }
 
 /* Style the tab */
-.tab {
+.tabgroup {
   float: left;
   border: 0px solid #ccc;
   background-color: #0d6efd;
@@ -33,7 +33,7 @@ body {font-family: "Lato", sans-serif;}
 }
 
 /* Style the buttons inside the tab */
-.tab button {
+.tabgroup a {
   display: block;
   background-color: inherit;
   color:#ddd;
@@ -44,22 +44,25 @@ body {font-family: "Lato", sans-serif;}
   text-align: left;
   cursor: pointer;
   transition: 0.3s;
-  font-size: 17px;
+  font-size: 20px;
+  text-decoration:none;
   
 }
 
 /* Change background color of buttons on hover */
-.tab button:hover {
+.tabgroup a:hover {
+  text-decoration: none;
+  color:#ddd;
   background-color:rgb(67, 139, 221);
 }
 
 /* Create an active/current "tab button" class */
-.tab button.active {
+.tabgroup a.active {
   background-color: #0050c8;
 }
 
 /* Style the tab content */
-.tabcontent {
+.tab-pane {
   float: left;
   padding: 0px 12px;
   border: 1px solid #ccc;
@@ -68,6 +71,8 @@ body {font-family: "Lato", sans-serif;}
   height: var(--boxheight);
   margin-bottom: 35px;
   border-radius:15px;
+  margin-top:0px;
+  padding-top:0px;
 }
 
 .tab-icon
@@ -75,5 +80,4 @@ body {font-family: "Lato", sans-serif;}
     margin-left: 6px;
     margin-right: 6px;
 }
-
  /* -- END OF DYNAMIC TAB -- */

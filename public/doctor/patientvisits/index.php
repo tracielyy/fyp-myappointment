@@ -72,27 +72,6 @@ else:
         background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 50 50'%3E%3Cpath d='M28.43 6.378C18.27 4.586 8.58 11.37 6.788 21.533c-1.791 10.161 4.994 19.851 15.155 21.643l.707-4.006C14.7 37.768 9.392 30.189 10.794 22.24c1.401-7.95 8.981-13.258 16.93-11.856l.707-4.006z'%3E%3CanimateTransform attributeType='xml' attributeName='transform' type='rotate' from='0 25 25' to='360 25 25' dur='0.6s' repeatCount='indefinite'/%3E%3C/path%3E%3C/svg%3E") center / 100px no-repeat;
         display: none;
     }
-
-    #overlay {
-        position: fixed;
-        /* Sit on top of the page content */
-        display: none;
-        /* Hidden by default */
-        width: 100%;
-        /* Full width (cover the whole page) */
-        height: 100%;
-        /* Full height (cover the whole page) */
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5);
-        /* Black background with opacity */
-        z-index: 2;
-        /* Specify a stack order in case you're using a different order for other elements */
-        cursor: pointer;
-        /* Add a pointer on hover */
-    }
     </style>
 
     <script>
@@ -176,7 +155,7 @@ else:
             $presciptionsArray = array();
             $presciptionsArray = $valid_vars->get_prescriptions();
             $num_of_presc = count($presciptionsArray);
-            include TEMPLATES_PATH . '/bootstrap.php';
+         
             //include_once TEMPLATES_PATH . '/navbar-loggedin.php';
             $diagnosisdesc = $valid_vars->get_diagnosisdesc();
             $practitioner = $valid_vars->get_practitioner();

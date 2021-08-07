@@ -17,6 +17,11 @@
 
 </style>
 
+<?php $usertype = $user->get_usertype();
+
+if($usertype == "Medical Personnel"){};
+?>
+
 
 
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-primary py-3 shadow" style="border-radius:0px;">
@@ -37,32 +42,36 @@
                     ?>" aria-current="page"
                        href="/">Home</a>
                 </li>
+                <?php if($usertype == "Patient"): ?>
                 <li class="nav-item">
-                    <a class="nav-link navbutton<?php
+                    <a class="nav-link navbutton <?php
                     if ($pageName == 'createappointment') {
                         echo 'active';
                     }
                     ?>" href="<?php echo APPT_WEB; ?>/create.php">Create an Appointment</a>
                 </li>
+
                 <li class="nav-item">
-                    <a class="nav-link navbutton<?php
+                    <a class="nav-link navbutton <?php
                     if ($pageName == 'viewappointment') {
                         echo 'active';
                     }
                     ?>"
                        href="<?php echo APPT_WEB; ?>">View Appointment</a> <!-- HREF NEED TO BE CHANGED -->
                 </li>
+                <?php endif; ?>
                 <li class="nav-item">
-                    <a class="nav-link navbutton<?php
-                    if ($pageName == 'viewappointment') {
+                    <a class="nav-link navbutton <?php
+                    if ($pageName == 'medicinesearch') {
                         echo 'active';
                     }
                     ?>"
                        href="/medicinesearch.php">Search Medicine</a> <!-- HREF NEED TO BE CHANGED -->
                 </li>
+
                 <li class="nav-item">
-                    <a class="nav-link navbutton<?php
-                    if ($pageName == 'viewappointment') {
+                    <a class="nav-link navbutton <?php
+                    if ($pageName == 'conditionsearch') {
                         echo 'active';
                     }
                     ?>"
@@ -78,8 +87,9 @@
                             <label class="text-light mt-1"><?php echo $user->get_firstname(); ?></label>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-secondary dropdown-menu-end" aria-labelledby="navbarDarkDropdownMenuLink">
+                        <?php if($usertype == "Medical Personnel"){echo '<li><a class="dropdown-item" href="'.DOC_WEB.'">View Dashboard</a></li>';} ?>
                             <li><a class="dropdown-item" href="<?php echo ACC_WEB. '/profile.php';?>">Profile</a></li>
-                            <li><a class="dropdown-item" href="<?php echo APPT_WEB; ?>">View Appointments</a></li>
+                        <?php if($usertype == "Patient"){echo '<li><a class="dropdown-item" href="<?php echo APPT_WEB; ?>">View Appointments</a></li>';} ?>
                             <li><a class="dropdown-item" href="<?php echo LOGIN_WEB . "/logout.php"; ?>">Log out</a></li>
                         </ul>
                     </li>
