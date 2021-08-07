@@ -39,9 +39,8 @@ class EmailTemplate {
         # -- Token Expiry Date Needs To Be Set -- #
         // -- Password Reset Link With Token (To Be Added To The Email Message)
         // <link>?token=<passwordtoken>&email=<email>
-        $unique_password_url = "https://myappointment.tracieqwynn.tech/forgotpassword/password-reset.php?token={$token}&email=".Email::email_textsymbol($to, true);
+        $unique_password_url = "https://myappointment.tracieqwynn.tech/forgotpassword/password-reset.php?token={$token}&email=" . Email::email_textsymbol($to, true);
         $request_another_url = "https://myappointment.tracieqwynn.tech/forgotpassword/";
-
 
         // -- Clickable Links
         $user_email = "<a href=mailto:{$to}>{$to}</a>";
@@ -230,7 +229,6 @@ class EmailTemplate {
             $to_name = "";
         endif;
 
-
         // -- Miscellaneous
         $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
 
@@ -259,7 +257,6 @@ class EmailTemplate {
             $to_name = "";
         endif;
 
-
         // -- Miscellaneous
         $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
 
@@ -277,6 +274,38 @@ class EmailTemplate {
     // -- Sent When User Reschedule Their Appointment -- //
     public static function template_rescheduleappointment() {
         
+    }
+
+    public static function template_createmedicalpersonnel(string $to, string $default_pw) {
+        
+        // -- Check User Type &  Set Recipient
+        $recipient_usertype = Account_User::retrieve_user_type($to);
+
+        if ($recipient_usertype == User_Type::MEDICAL_PERSONNEL):
+            $to_name = Normal_User::retrieve_user_fullname($to);
+
+            // -- Email Subject
+            $subject = "FYP-21-S2-24: Account Creation";
+                                    
+            // -- Miscellaneous
+            $login_url = "https://myappointment.tracieqwynn.tech/login/stafflogin.php";
+            $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
+            $login_link = "<a href={$login_url} style='color:blue; text-decoration:none;'>{$login_url}</a>";
+
+            // -- Message
+            $message = "<span style='color:black;'>Hi Dr. {$to_name}, " . self::LINEBREAK;
+            $message .= "Your account for MyAppointment has just been created by your admin. " . self::LINEBREAK;
+            $message .= "The following is your credentials use for login. Please change your password after login. " . self::LINEBREAK;
+            $message .= "Email: {$to}" . self::LINEBREAK;
+            $message .= "Password:  {$default_pw}" . self::LINEBREAK;
+
+            $message .= "Please proceed to {$login_link} to login to your account." . self::LINEBREAK;
+
+            $message .= "{$sign_off}</span>";
+
+            Email::sendEmail($to, $subject, $message);
+
+        endif;
     }
 
     // -- Create Button For Email: VML Used For MSO -- //
