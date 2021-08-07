@@ -98,7 +98,8 @@ class Medical_Personnel extends Normal_User {
     //      Methods Accessing Firestore Database 
     //============================================
     // -- CREATE MEDICAL PERSONNEL ACCOUNT
-    public static function create_medical_personnel(array $medical_personnel_data) {
+    public static function create_medical_personnel(array $medical_personnel_data): array {
+
 
         # Create Default Fields
         $account_user_arr = ArrayCreation::account_creation_array(User_Type::MEDICAL_PERSONNEL);
@@ -108,11 +109,30 @@ class Medical_Personnel extends Normal_User {
             $medical_personnel_data[$field] = $value;
         endforeach;
 
+        # Set Default Password 
+        $sec = new Security();
+        $default_pw = StringUtils::generate_token(12);
+        $medical_personnel_data['credentials']['password'] = $sec->hash($default_pw);
+
+        # Set NRIC
+        if (isset($medical_personnel_data['profile']['nric'])):
+            $temp = $medical_personnel_data['profile']['nric'];
+            // Encrypt NRIC As Field
+            $medical_personnel_data['profile']['nric'] = $sec->encrypt($temp);
+            // Hash NRIC For Document ID
+            $id = $sec->hash_256($temp);
+        endif;
+
         # Add Medical Personnel Data To Database
         $db = new DbQuery();
         $db->get_db()->collection(Database::ACCOUNT_USER)
-                ->document($medical_personnel_data['profile']['nric'])
+                ->document($id)
                 ->set($medical_personnel_data);
+
+        # Create Credentials Array
+        $credentials = array('email' => $medical_personnel_data['credentials']['email'], 'password' => $default_pw);
+
+        return $credentials;
     }
 
     // -- RETRIEVE MEDICAL PERSONNEL BY ID  
@@ -237,6 +257,11 @@ class Medical_Personnel extends Normal_User {
             return ($al > $bl) ? +1 : -1;
         }
         return ($af > $bf) ? +1 : -1;
+    }
+
+    public static function delete_medical_personnel(string $id): void {
+        $db = new DbQuery();
+        $db->get_db()->collection(Database::ACCOUNT_USER)->document($id)->delete();
     }
 
 }
