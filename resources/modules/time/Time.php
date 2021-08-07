@@ -71,16 +71,16 @@ class Time {
     }
 
     // Some static methods
-    public static function get_current_date(): string {
-        return (string) date(self::DATE_FORMAT_DEFAULT);
+    public static function get_current_date(string $format = self::DATE_FORMAT_DEFAULT): string {
+        return (string) date($format);
     }
 
-    public static function get_current_time(): string {
-        return (string) date(self::TIME_FORMAT_DEFAULT);
+    public static function get_current_time(string $format = self::TIME_FORMAT_DEFAULT): string {
+        return (string) date($format);
     }
 
-    public static function get_current_year(): string {
-        return (string) date(self::YEAR_FORMAT_DEFAULT);
+    public static function get_current_year(string $format = self::YEAR_FORMAT_DEFAULT): string {
+        return (string) date($format);
     }
 
     // -- Find Difference In Date & Time -- //
@@ -121,8 +121,8 @@ class Time {
     public static function date_format_change(string $date, string $format = self::DATE_FORMAT_SLASH) {
         return (string) date($format, strtotime($date));
     }
-    
-    public static function date_format_default(string $date){
+
+    public static function date_format_default(string $date) {
         return (string) date(self::DATE_FORMAT_DEFAULT, strtotime($date));
     }
 
@@ -130,6 +130,11 @@ class Time {
     public static function get_enddate(string $start, int $interval, string $format = self::DATE_FORMAT_DEFAULT): string {
         $enddate = (string) date($format, strtotime($start . ' + ' . (string) $interval . ' days'));
         return $enddate;
+    }
+
+    public static function get_startdate_by_years(string $enddate, int $interval, string $format = self::DATE_FORMAT_DEFAULT): string {
+        $startdate = (string) date($format, strtotime($enddate . ' - ' . (string) $interval . ' years'));
+        return $startdate;
     }
 
     // -- Get All Dates From Given Range -- //
@@ -155,12 +160,12 @@ class Time {
         // Return the array elements
         return $date_arr;
     }
-    
-    public static function check_datetime_format(string $datetime, string $format = self::DATE_FORMAT_DEFAULT): bool{
-       return (!DateTime::createFromFormat($format, $datetime))? false: true;
+
+    public static function check_datetime_format(string $datetime, string $format = self::DATE_FORMAT_DEFAULT): bool {
+        return (!DateTime::createFromFormat($format, $datetime)) ? false : true;
     }
-    
-    public static function initialise_time(array $time_arr): Time{
+
+    public static function initialise_time(array $time_arr): Time {
         $time_obj = new Time($time_arr['date'], $time_arr['time']);
         return $time_obj;
     }
