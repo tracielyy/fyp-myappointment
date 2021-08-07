@@ -411,14 +411,27 @@ class Appointment_Record {
         return ($al > $bl) ? +1 : -1;
     }
 
-    public static function check_mrid_exist(string $patientid, string $slotid): bool {
-        
+    public static function retrieve_appointmenttype(string $patientid, string $slotid): ?string {
         $db = new DbQuery();
         $doc_path = Database::ACCOUNT_USER . "/" . $patientid . "/" . Database::APPOINTMENT_RECORD;
         $documents = $db->get_db()->collection($doc_path)->where('slotid', "=", $slotid)->documents();
-        
-        foreach($documents as $doc):
-            if($doc->exists()):
+
+        foreach ($documents as $doc):
+            if ($doc->exists()):
+                return $doc->data()['appointmenttype'];
+            endif;
+        endforeach;
+        return null;
+    }
+
+    public static function check_mrid_exist(string $patientid, string $slotid): bool {
+
+        $db = new DbQuery();
+        $doc_path = Database::ACCOUNT_USER . "/" . $patientid . "/" . Database::APPOINTMENT_RECORD;
+        $documents = $db->get_db()->collection($doc_path)->where('slotid', "=", $slotid)->documents();
+
+        foreach ($documents as $doc):
+            if ($doc->exists()):
                 return true;
             endif;
         endforeach;
