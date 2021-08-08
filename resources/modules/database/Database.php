@@ -11,7 +11,7 @@ class Database {
     const MEDICAL_FACILITY = "Medical_Facility";
     const EMAIL_VERIFY = "Email_Verify";
     const HEALTH_INFO = "Health_Info";
-    
+    const FAQ = "Faq";
     // Sub Collection
     const APPOINTMENT_RECORD = "Appointment_Record";
     const APPOINTMENT_SLOTS = "Appointment_Slots";
