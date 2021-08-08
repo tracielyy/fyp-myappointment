@@ -351,6 +351,7 @@ else:
 
                 <!-- js code for the bootstrap tooltip -->
                 <script>
+                    $('#nav-facility').addClass('active');
                     is24hour_check(); // Check Upon Loading Page
                     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
                     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
