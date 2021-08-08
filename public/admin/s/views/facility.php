@@ -209,13 +209,12 @@ else:
                                                                 <input type="text" readonly class="form-control-plaintext" id="staticAddress" placeholder="<?php echo $facility_info->get_address(); ?>">
                                                             </div>
                                                         </div>
-                                                        <div class="mb-2">
+                                                        <div class="mb-3 row">
                                                             <label for="contact" class="col-sm-2 col-form-label">Contact: </label>
                                                             <div class="col-sm-10">
                                                                 <input type="text" readonly class="form-control-plaintext" id="staticContact" placeholder="<?php echo $facility_info->get_contactnumber(); ?>">
                                                             </div>
                                                         </div>
-                                                        $facility_info
                                                         <?php
                                                         // Check The Operating Hours (If It Is 24 hours) // 
                                                         if (!$facility_info->get_operatinghours()->get_is24hours()):
@@ -253,20 +252,22 @@ else:
                                 </div>
                             </main>
                             <!-- main ends here -->
+                            <!-- js code for the bootstrap tooltip -->
+                            <script>
+                                $('#nav-facility').addClass('active');
 
+                                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                                });
+                            </script>
                             <!-- bootstrap js link -->
                             <script
                                 src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
                                 integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
                                 crossorigin="anonymous"
                             ></script>
-                            <!-- js code for the bootstrap tooltip -->
-                            <script>
-                                                                        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                                                                        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                                                                            return new bootstrap.Tooltip(tooltipTriggerEl);
-                                                                        });
-                            </script>
+
                         </body>
                     </html>
                 <?php
