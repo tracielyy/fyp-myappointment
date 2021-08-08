@@ -131,7 +131,8 @@ else:
             // END VALIDATION
             // Make Sure Valid (Add)
             if ($facility_details['operatinghours']['is24hours']):
-                $facility_details['operatinghours']['openinghour'] = $facility_details['operatinghours']['openinghour'] = "";
+                $facility_details['operatinghours']['openinghour'] = $facility_details['operatinghours']['closinghour'] = "";
+
             endif;
 
             facility_account_creation($icon, $facility_details, $admin_details);
