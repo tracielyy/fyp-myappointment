@@ -70,7 +70,7 @@ class Health_Info {
     }
 
     // ============ Database Access Functions ================= //
-    //  FETCH (RETRIEVE)  //
+    //  FETCH (RETRIEVE)  // 
     public static function retrieve_all_healthinfo(string $startAfter = null): array {
 
         # Create Health Tips
