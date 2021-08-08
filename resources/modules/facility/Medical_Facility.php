@@ -268,6 +268,11 @@ class Medical_Facility {
         ]);
     }
 
+    public static function delete_medical_facility(string $id): void {
+        $db = new DbQuery();
+        $db->get_db()->collection(Database::MEDICAL_FACILITY)->document($id)->delete();
+    }
+
 }
 
 ?>

@@ -102,6 +102,11 @@ class Facility_Admin extends Admin {
         return null;
     }
 
+    public static function delete_facility_admin(string $id): void {
+        $db = new DbQuery();
+        $db->get_db()->collection(Database::ACCOUNT_USER)->document($id)->delete();
+    }
+
 }
 
 ?>
