@@ -38,7 +38,7 @@ else:
             endif;
 
         endif;
-
+        $facility = $user->get_facility();
         $all_health_articles = Health_Info::retrieve_all_healthinfo();
         ?><!DOCTYPE html>
         <html lang="en">

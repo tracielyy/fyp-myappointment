@@ -27,7 +27,7 @@ else:
     if ($user->get_usertype() !== User_Type::FACIILITY_ADMIN):
         header("Location:/"); # -- REDIRECT BACK TO THE HOME PAGE
     else: # -- ONLY ALLOW FACILITY ADMIN
-
+        $facility = $user->get_facility();
         $health_article = array(
             'title' => '',
             'descriptions' => '',
