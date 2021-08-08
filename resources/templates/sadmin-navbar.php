@@ -40,13 +40,13 @@
                     <div class="text-muted medium text-uppercase px-3">MANAGE</div>
                 </li>
                 <li>
-                    <a href="<?php echo SADMIN_WEB; ?>" class="nav-link px-3 my-2 sidebar-link active">
+                    <a href="<?php echo SADMIN_WEB; ?>" class="nav-link px-3 my-2 sidebar-link" id="nav-facility">
                         <span class="me-2"><i class="fas fa-hospital"></i></span>
                         <span>Medical Facilites</span>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo SADMIN_WEB . "/views/faqs.php"; ?>" class="nav-link px-3 my-2">
+                    <a href="<?php echo SADMIN_WEB . "/views/faqs.php"; ?>" class="nav-link px-3 my-2" id="nav-faq">
                         <span class="me-2"><i class="fas fa-question-circle"></i></span>
                         <span>FAQ</span>
                     </a>
@@ -56,7 +56,7 @@
                     <div class="text-muted medium text-uppercase px-3">TOOLS</div>
                 </li>
                 <li>
-                    <a href="<?php echo SADMIN_WEB . "/views/super-admin.php"; ?>" class="nav-link px-3 my-2">
+                    <a href="<?php echo SADMIN_WEB . "/views/super-admin.php"; ?>" class="nav-link px-3 my-2" id="nav-edit-profile">
                         <span class="me-2"><i class="fas fa-user-edit"></i></span>
                         <span>Edit Profile</span>
                     </a>
