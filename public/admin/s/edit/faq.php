@@ -16,6 +16,7 @@ require_once USER_MOD . '/Facility_Admin.php';
 require_once USER_MOD . '/Super_Admin.php';
 
 require_once FACILITY_MOD . '/Medical_Facility.php';
+require_once FAQ_MOD . '/Faq.php';
 
 /*
  *  EDIT FAQ
@@ -32,7 +33,9 @@ else:
     if (!User_Type::check_user_type(User_Type::SUPER_ADMIN, $user_type)):
         header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
     else:
-        ?><!DOCTYPE html><html lang="en">
+        $faq = Faq:: retrieve_faq_by_id($_GET['id']);
+        ?><!DOCTYPE html>
+        <html lang="en">
             <head>
                 <meta charset="UTF-8" />
                 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -147,7 +150,7 @@ else:
                                             <div class="mb-3 row">
                                                 <label for="Question" class="col-sm-2 col-form-label">Query Title: </label>
                                                 <div class="col-sm-10">
-                                                    <input type="text" class="form-control" style="max-width:90%">
+                                                    <input type="text" class="form-control" style="max-width:90%" value="<?php echo $faq->get_question();?>">
                                                 </div>
                                             </div>
                                         </div>
@@ -156,14 +159,14 @@ else:
                                             <div class="mb-3 row">
                                                 <label for="answer" class="col-sm-2 col-form-label">Answer: </label>
                                                 <div class="col-sm-10">
-                                                    <textarea name="answer" class="form-control" cols="30" rows="8"">Enter the answer here</textarea>
+                                                    <textarea name="answer" class="form-control" cols="30" rows="8""><?php echo $faq->get_answer();?></textarea>
                                                 </div>
                                             </div>
                                             <div class="d-grid gap-2 d-md-flex justify-content-md-end" style=" margin-top: 10px;">
-                                                <a href="viewFaq.html" class="btn btn-dark me-md-2 mr-2">
+                                                <button class="btn btn-dark me-md-2 mr-2" name="save_faq">
                                                     <span><i class="fas fa-save"></i></span>
                                                     <span>Save</span>
-                                                </a>
+                                                </button>
                                                 <a href="viewFAQ.html" class="btn btn-danger" id="delBtn">
                                                     <span><i class="fas fa-times"></i></span>
                                                     <span>Cancel</span>

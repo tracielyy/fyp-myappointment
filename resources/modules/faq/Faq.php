@@ -23,6 +23,10 @@ class Faq {
         $this->question = $question;
         $this->answer = $answer;
     }
+    
+    public function get_id(): string {
+        return $this->id;
+    }
 
     public function get_question(): string {
         return $this->question;
@@ -96,7 +100,7 @@ class Faq {
     public static function retrieve_faq_by_id(string $id): null|Faq {
         $db = new DbQuery();
         $faq_info = $db->fetch_document_by_id(Database::FAQ, $id);
-        if ($health_info !== null):
+        if ($faq_info !== null):
             return self::initialise_faq($faq_info);
         endif;
         return $faq_info;

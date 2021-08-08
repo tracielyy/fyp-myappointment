@@ -162,7 +162,7 @@ else:
                                     ?>
                                     <div class="card text-dark innerCard mb-3">
                                         <div class="card-title ms-2 mt-2">
-                                            <h4 style="font-weight: 600; font-size: 1.5rem;">How to book an Appointment?</h4>
+                                            <h4 style="font-weight: 600; font-size: 1.5rem;"><?php echo $faq->get_question();?></h4>
                                         </div>
                                         <hr class="ms-2" style="max-width: 60%;">
                                         <div class="card-body">
@@ -173,7 +173,7 @@ else:
                                                 </div>
                                             </div>
                                             <div class="d-grid gap-2 d-md-flex justify-content-md-end" style=" margin-top: 10px;">
-                                                <a href="<?php echo SADMIN_WEB . "/edit/faq.php"; ?>" class="btn btn-success me-md-2 mr-2">
+                                                <a href="<?php echo SADMIN_WEB . "/edit/faq.php?id=". $faq->get_id(); ?>" class="btn btn-success me-md-2 mr-2">
                                                     <span><i class="fas fa-edit"></i></span>
                                                     <span>Edit</span>
                                                 </a>
