@@ -33,6 +33,15 @@ $all_facilities = Medical_Facility::retrieve_all_facilities();
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
             />
+        <!-- Prevent Form Resubmission -->
+        <script>
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+        </script>
+        <!-- jQuery -->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
         <style>
             body {
                 margin: 0;
@@ -141,7 +150,7 @@ $all_facilities = Medical_Facility::retrieve_all_facilities();
                                             </div>
                                         </div>
                                         <div class="d-grid gap-2 d-md-flex justify-content-md-end" style=" margin-top: 10px;">
-                                            <a href="<?php echo SADMIN_WEB . "/views/facility.php?fid=". $facility->get_facilityid(); ?>" class="btn btn-dark me-md-2 mr-2">
+                                            <a href="<?php echo SADMIN_WEB . "/views/facility.php?fid=" . $facility->get_facilityid(); ?>" class="btn btn-dark me-md-2 mr-2">
                                                 <span><i class="fas fa-eye"></i></span>
                                                 <span>View Details</span>
                                             </a>
@@ -184,24 +193,26 @@ $all_facilities = Medical_Facility::retrieve_all_facilities();
         </div>
         <!-- modal ends here -->
 
+        <!-- js for the modal to work -->
+        <script>
+                    $('#nav-facility').addClass('active');
+                    var myModal = document.getElementById('myModal');
+                    var myInput = document.getElementById('myInput');
+
+                    myModal.addEventListener('shown.bs.modal', function () {
+                        myInput.focus();
+                    });
+                    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                        return new bootstrap.Tooltip(tooltipTriggerEl);
+                    });
+        </script>
+
         <!-- bootstrap js link -->
         <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"
         ></script>
-        <!-- js for the modal to work -->
-        <script>
-            var myModal = document.getElementById('myModal')
-            var myInput = document.getElementById('myInput')
-
-            myModal.addEventListener('shown.bs.modal', function () {
-                myInput.focus()
-            })
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
-            })
-        </script>
     </body>
 </html>
