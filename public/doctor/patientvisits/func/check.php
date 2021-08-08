@@ -15,9 +15,8 @@ require_once MEDDOC_MOD . '/Medical_Record.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST'):
 
-    // On Click
-    if (isset($_POST['ajax_check_mrid']) && isset($_POST['patientid']) && isset($POST['slotid']) && isset($_POST['practitionerid']) 
-    && isset($_POST['facilityid'])):
+    if (isset($_POST['patientid']) && isset($POST['slotid']) && isset($_POST['practitionerid']) && isset($_POST['facilityid'])):
+        ?> <script>console.log("going isset")</script><?php
         $patientid = $_POST['patientid'];
         $slotid = $_POST['slotid'];
         $practitionerid =$_POST['practitionerid'];
@@ -35,13 +34,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'):
         if(!$mrid):
             $medical_record = Medical_Record::create_medical_record($patientid,$medicalrecord_array);
             $mrid = $medical_record->get_medicalrecordid();
+            Appointment_Record::set_mrid($patientid,$slotid,$mrid);
         endif;
 
         header("Location:" . DOC_WEB . "/patientvisit/index.php?id=".$mrid."&pt=".$patientid);
         
-
     else:
-        header("Location:" . REGISTER_WEB); // NEED TO CHANGE
+        echo "test";
+        // header("Location:" . "/");
     endif;
 
 endif;
@@ -49,6 +49,6 @@ endif;
  * Make Sure User Will Be Redirected Away If Accessing This File Directly
  */
 if ($_SERVER["REQUEST_METHOD"] == "GET"):
-    header("Location:" . REGISTER_WEB); //// NEED TO CHANGE
+    header("Location:" . "/");
 endif;
 ?>

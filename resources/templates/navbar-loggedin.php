@@ -6,13 +6,10 @@
 
 <!-- The navigation is added at server level  (PHP File Need To Contain PHP Code) -->
 <!-- Will Need To Add Logic To Make Sure User Is Logged In Before Displaying Logout Button. -->
-
-<link href="/docs/5.0/dist/css/bootstrap.min.css" rel="stylesheet"
-      integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+<script src="https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
 <style>
     body {
-        padding-top: 80px;
+        padding-top: 70px;
     }
 
 </style>
@@ -83,7 +80,7 @@ if($usertype == "Medical Personnel"){};
                     <li class="nav-item dropdown pe-5">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">
-                            <img class="mx-2"style="border-radius: 50%;" src="https://via.placeholder.com/30" />
+                           <i class="fas fa-user fa-lg me-2"></i>
                             <label class="text-light mt-1"><?php echo $user->get_firstname(); ?></label>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-secondary dropdown-menu-end" aria-labelledby="navbarDarkDropdownMenuLink">
@@ -100,8 +97,4 @@ if($usertype == "Medical Personnel"){};
 </div>
 </nav>
 
-
-<script src="/docs/5.0/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous">
-</script>
 <!-- JavaScript code -->

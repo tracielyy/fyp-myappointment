@@ -21,10 +21,11 @@ require_once UTIL_MOD . '/StringUtils.php';
 
 include TEMPLATES_PATH . '/bootstrap.php';
 $pageName = "homepage";
+$usertype = "Guest";
 $all_health_articles = Health_Info::retrieve_all_healthinfo();
-echo "<pre>";
-echo var_dump($all_health_articles);
-echo "</pre>";
+// echo "<pre>";
+// echo var_dump($all_health_articles);
+// echo "</pre>";
 $healtharticles_count = count($all_health_articles);
 
 $healtharticles_count = $healtharticles_count % 6;
@@ -32,6 +33,12 @@ $healtharticles_count = $healtharticles_count % 6;
 if ($healtharticles_count > 3 && $healtharticles_count < 6)
 {
     $index = 3;
+} else if($healtharticles_count >= 6)
+{
+    $index = 6;
+} else 
+{
+    $index = $healtharticles_count;
 }
 
 ?>
@@ -46,6 +53,8 @@ if ($healtharticles_count > 3 && $healtharticles_count < 6)
     <!-- BOOTSTRAP CDN -->
     <link rel="stylesheet" href="./css/homepage.css">
 
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
     <title>MyAppointment HomePage</title>
 </head>
 
@@ -53,6 +62,7 @@ if ($healtharticles_count > 3 && $healtharticles_count < 6)
     <?php
         if (isset($_SESSION["user"])):
             $user = unserialize($_SESSION["user"]);
+            $usertype = $user->get_usertype();
             include TEMPLATES_PATH . '/navbar-loggedin.php';
         else:
             include TEMPLATES_PATH . '/navbar.php';
@@ -63,153 +73,52 @@ if ($healtharticles_count > 3 && $healtharticles_count < 6)
     <section id="Find-Clinic">
         <h2 class="find-clinic-title display-5"><b>Your one stop solution <br> for your medical appointment.</b></h2>
         <h3 class="find-clinic-title display-6" style="margin-top: 0px;">Book an appointment now.</h3>
-        <?php if (($user->get_usertype() == "Patient")) : ?>
+        <?php if ($usertype == "Patient"): ?>
         <a href="appointment/create.php" class="btn btn-secondary" type="button"> Create an appointment </a>
+        <?php endif;?>
+        <?php if ($usertype == "Guest"): ?>
+        <a href="login" class="btn btn-secondary" type="button"> Create an appointment </a>
         <?php endif;?>
     </section>
     <section id="health-snippets">
         <div class="row">
             <div class="row row-cols-1 row-cols-md-3 g-4">
-                <div class="col">
-                    <!-- CARD START -->
-                    <div class="card  mb-3 h-30" style="max-width: 540px;">
-                        <div class="row g-0">
-                            <div class="col-md-4">
-                            <i class="fas fa-plus-square fa-7x card-icon"></i>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card-body ms-2">
-                                    <h5 class="card-title">Why You Should Take Care of Your Body and Health</h5>
-                                    <span
-                                            class="badge bg-primary">Doctor's Advice</span>
-                                    <p class="card-text line-clamp">Health problems, even minor ones, can interfere with
-                                        or even
-                                        overshadow other aspects of your life. Even relatively minor health issues such
-                                        as aches, pains, lethargy, and indigestion take a toll on your happiness and
-                                        stress levels. One way to improve your ability to cope with stress and feel
-                                        better is</p>
-
-                                    <a href="./HealthPromotionDemo.php" class="stretched-link"><small
-                                            class="text-muted">Click here to read more...</small>
-
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- CARD END -->
-
-                <div class="col">
-                    <!-- CARD START -->
-                    <div class="card mb-3 h-30 " style="max-width: 540px;">
-                        <div class="row g-0">
-                            <div class="col-md-4">
-                                <img src="https://via.placeholder.com/175" class="img-fluid" alt="...">
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card-body ms-2">
-                                    <h5 class="card-title">Fast Remedies When Having Headache</h5>
-                                    <p class="card-text line-clamp">Even relatively minor health issues such
-                                        as aches, pains, lethargy, and indigestion take a toll on your happiness and
-                                        stress levels. One way to improve your ability to cope with stress and feel
-                                        better is</p>
-                                    <p class="card-text"><small class="text-muted">Click here to read more...</small>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- CARD END -->
-
-                <div class="col">
-                    <!-- CARD START -->
-                    <div class="card mb-3 h-30 " style="max-width: 540px;">
-                        <div class="row g-0">
-                            <div class="col-md-4">
-                                <img src="https://via.placeholder.com/175" class="img-fluid" alt="...">
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card-body ms-2">
-                                    <h5 class="card-title">Reasons Why Sleep is the Most Important Part of the Day</h5>
-                                    <p class="card-text line-clamp">Sleep can have a serious impact on your overall
-                                        health and well-being. Make a commitment to get enough sleep at night. If you
-                                        haven't gotten adequate sleep, you may be less productive, less mentally sharp,
-                                        and otherwise more prone to the effects of stress.</p>
-                                    <p class="card-text"><small class="text-muted">Click here to read more...</small>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- CARD END -->
-
-                <div class="col">
-                    <!-- CARD START -->
-                    <div class="card mb-3 h-30 " style="max-width: 540px;">
-                        <div class="row g-0">
-                            <div class="col-md-4">
-                                <img src="https://via.placeholder.com/175" class="img-fluid" alt="...">
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card-body ms-2">
-                                    <h5 class="card-title">Your Posture is Affecting Your Health</h5>
-                                    <p class="card-text line-clamp">We've all heard the advice to eat right and
-                                        exercise, but it can be difficult to fit in workouts around a busy schedule,
-                                        particularly when you're feeling exhausted from stress. One effective strategy
-                                        for making fitness a regular part of your life is to build an exercise habit
-                                        around your other habits—either attach a workout to your morning routine, your
-                                        lunchtime habits, or make it a regular part of your evening—you get the idea</p>
-                                    <p class="card-text"><small class="text-muted">Click here to read more...</small>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- CARD END -->
-
-                <div class="col">
-                    <!-- CARD START -->
-                    <div class="card mb-3 h-30 " style="max-width: 540px;">
-                        <div class="row g-0">
-                            <div class="col-md-4">
-                                <img src="https://via.placeholder.com/175" class="img-fluid" alt="...">
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card-body ms-2">
-                                    <h5 class="card-title">Eat This Everyday, and You Will Feel Better</h5>
-                                    <p class="card-text line-clamp">Indigestion take a toll on your happiness and
-                                        stress levels. One way to improve your ability to cope with stress and feel
-                                        better is</p>
-                                    <p class="card-text"><small class="text-muted">Click here to read more...</small>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- CARD END -->
-
-                <div class="col">
-                    <!-- CARD START -->
-                    <div class="card mb-3 h-30 " style="max-width: 540px;">
-                        <div class="row g-0">
-                            <div class="col-md-4">
-                                <img src="https://via.placeholder.com/175" class="img-fluid" alt="...">
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card-body ms-2">
-                                    <h5 class="card-title">What To do When You are Bloated</h5>
-                                    <p class="card-text line-clamp">Rather than eating right solely for the promise of
-                                        looking better in your jeans, you should also make a commitment to eating foods
-                                        that will boost your energy levels and keep your system running smoothly. This
-                                        is because what you eat can not only impact your short-term and long-term
-                                        health, it can affect your stress levels.</p>
-                                    <p class="card-text"><small class="text-muted">Click here to read more...</small>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- CARD END -->
+               <?php 
+               
+               for($i = 0; $i < $index; $i++)
+               {
+                $desc = substr($all_health_articles[$i]->get_descriptions(),0,100);
+                $desc = trim(preg_replace('/\s+/', ' ', $desc));
+                $type = $all_health_articles[$i]->get_type();
+                if ($type == 'World Health Notice')
+                {
+                    $badge = '<span class="badge bg-warning">World Health Notice</span>';
+                    $icon = '<i class="fas fa-shield-virus fa-7x card-icon"></i>';
+                } else if ($type == "Doctor's Advice")
+                {
+                    $badge = '<span class="badge bg-primary">Doctor\'s Advice</span>';
+                    $icon = '<i class="fas fa-user-md fa-7x card-icon"></i>';
+                }   
+                else if($type == 'Health Tips')
+                {
+                    $badge = '<span class="badge bg-success">Health Tips</span>';
+                    $icon = '<i class="fas fa-plus-square fa-7x card-icon"></i>';
+                }
+                echo '<div class="col">';
+                echo '<div class="card shadow rounded1 mb-3 h-30" style="max-width: 540px; ">';
+                echo '<div class="row g-0">';
+                echo '<div class="col-xl-4 col-lg-12 col-md-12 col-xs-12">';
+                echo $icon.'</div>';
+                echo '<div class="col-xl-8 col-lg-0 col-md-0 col-xs-0">';
+                echo '<div id="#cardcontainer" class="card-body ms-2" style="min-height:153px;">';
+                echo '<h5 class="card-title">'.$all_health_articles[$i]->get_title().'</h5>';
+                echo $badge;
+                echo '<p class="card-text line-clamp mt-3">'.$desc.'</p>';
+                echo '</div>';
+                echo '<div class="card-body ms-2">';
+                echo '<a href="./healthlist.php" class="card-link stretched-link"><small class="text-muted">Click here to read more...</small></a>'; //NEED TO CHANGE TO REAL URL
+                echo '</div></div></div></div></div>';
+               };?>
 
             </div>
         </div>
@@ -220,11 +129,11 @@ if ($healtharticles_count > 3 && $healtharticles_count < 6)
     </section>
     <section id="footer">
         <hr class="mb-4">
-        <div class="container">
+        <div class="container-fluid">
 
-            <div class="card-group mb-5 shadow">
+            <div class="card-group mb-3 shadow" >
 
-                <div class="card">
+                <div class="card" style="min-height:205px">
                     <div class="row g-0">
 
                         <div class="col-md-4">
@@ -243,7 +152,7 @@ if ($healtharticles_count > 3 && $healtharticles_count < 6)
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card" style="min-height:205px">
                     <div class="row g-0">
                         <div class="col-md-4">
                             <i class="fas fa-phone-alt fa-4x opt-icon"></i>
@@ -260,7 +169,7 @@ if ($healtharticles_count > 3 && $healtharticles_count < 6)
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card" style="min-height:205px">
                     <div class="row g-0">
                         <div class="col-md-4">
                             <i class="fas fa-clock fa-4x opt-icon"></i>
