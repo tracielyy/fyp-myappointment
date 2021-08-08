@@ -150,7 +150,7 @@ else:
                             <div class="card-title text-center mt-4">
                                 <h4 class="text-dark medium fw-700">Hospital Details</h4>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body mx-5">
                                 <form action="#">
                                     <!-- Facility Name -->
                                     <div class="mb-3" style="max-width: 70%;">

@@ -146,14 +146,15 @@ else:
                     <div class="container-fluid">
 
                         <div class="card">
-                            <a href="<?php echo FADMIN_WEB . "/views/myfacility.php"; ?>" class="btn btn-secondary float-left" style="width:10%">
-                                <i class="fas fa-angle-left"></i>   
-                            </a>
 
-                            <div class="card-title text-center mt-2">      
-                                <h4 class="text-dark medium fw-700">Hospital Details</h4>
+
+                            <div class="row card-title text-center mx-5 mt-4">      
+                                <h4 class="col-md-12 text-dark medium fw-800">Hospital Details</h4>
+                                <a href="<?php echo FADMIN_WEB . "/views/myfacility.php"; ?>" class="col-md-1 btn btn-link  shadow-none"> 
+                                    <i class="fas fa-angle-left " style="font-size:40px;color:grey;"></i>   
+                                </a>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body mx-5">
 
                                 <form id="edit_facility" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
                                     <div class="mb-3" style="max-width: 70%;">
@@ -162,12 +163,29 @@ else:
                                     </div>
                                     <div class="mb-3" style="max-width: 70%;">
                                         <label for="address" class="form-label">Address</label>
-                                        <input type="text" class="form-control" id="address" placeholder="5 Lower Kent Ridge Rd, Singapore 119074" value="<?php echo $facility_info['facilityname']; ?>">
+                                        <input type="text" class="form-control" id="address" placeholder="<?php echo $facility_info['facilityname']; ?>" value="<?php echo $facility_info['facilityname']; ?>">
                                     </div>
                                     <div class="mb-3" style="max-width: 70%;">
                                         <label for="contactnumber" class="form-label">Contact Number</label>
-                                        <input type="text" class="form-control" id="contactnumber" placeholder="67795555" value="<?php echo $facility_info['contactnumber']; ?>">
+                                        <input type="text" class="form-control" id="contactnumber" placeholder="<?php echo $facility_info['contactnumber']; ?>" value="<?php echo $facility_info['contactnumber']; ?>">
                                     </div>
+
+                                    <div class="mb-3" style="max-width: 70%;">
+                                        <div class="input-group">
+                                            <label name="is24hrs" class="label m-2">Is 24 Hours:</label>
+                                            <label class="radio-container m-2">
+                                                <input type="radio" name="is24hrs" value="True" onclick="text(0)">
+                                                <span class="checkmark"></span>
+                                                <span>True</span>
+                                            </label>
+                                            <label class="radio-container m-2">
+                                                <input type="radio" name="is24hrs" value="False" onclick="text(1)">
+                                                <span class="checkmark"></span>
+                                                <span>False</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
                                     <div class="mb-3" style="max-width: 70%;">
                                         <div class="row">
                                             <div class="col">

@@ -66,10 +66,6 @@ class Medical_Facility {
         return $this->contactnumber;
     }
 
-    public function get_is24hours(): bool {
-        return $this->is24hour;
-    }
-
     public function get_operatinghours(): Operating_Hours {
         return $this->operatinghours;
     }
@@ -111,13 +107,16 @@ class Medical_Facility {
     }
 
     // -- Initialise Medical Facility
-    public static function initialise_medical_facility(array $facility): Medical_Facility {
-
-        # Operating Hour
-        $operatinghour = Operating_Hours::initialise_operating_hours($facility['operatinghours']);
-        $facility_object = new Medical_Facility($facility['facilityname'], $facility['address'],
-                $facility['contactnumber'], $operatinghour, $facility['facilityid'], $facility['specialisations']);
-        return $facility_object;
+    public static function initialise_medical_facility(array $facility): null|Medical_Facility {
+        try {
+            # Operating Hour
+            $operatinghour = Operating_Hours::initialise_operating_hours($facility['operatinghours']);
+            $facility_object = new Medical_Facility($facility['facilityname'], $facility['address'],
+                    $facility['contactnumber'], $operatinghour, $facility['facilityid'], $facility['specialisations']);
+            return $facility_object;
+        } catch (Exeception $e) {
+            return null;
+        }
     }
 
     // ####################     Database Functions      ################### //
@@ -144,33 +143,34 @@ class Medical_Facility {
     }
 
     // -- CREATE NEW MEDICAL FACILTY
-    public static function create_medical_facility(array $facility_info): bool {
+    public static function create_medical_facility(array $facility_info): bool|Medical_Facility {
 
         # Check If There Is Existing Record Of The Facility
-        if (!RetrieveFacility::check_facility_exist($facility_info)):
+        if (!self::check_facility_exist($facility_info)):
 
             # Generate User Defined Facility ID
             $facility_id = self::generated_facility_id();
+            $facility_info['specialisations'] = array();
+            $facility_info['facilityid'] = $facility_id;
 
             $doc_path = Database::MEDICAL_FACILITY;
             $db = new DbQuery();
-            return $db->insert_document($doc_path, $facility_info, False, $facility_id);
+            $db->insert_document($doc_path, $facility_info, False, $facility_id);
+            return self::initialise_medical_facility($facility_info);
         endif;
         return False;
     }
 
     // -- RETRIEVE FACILITY BY ID
-    public static function retrieve_facility_by_id(string $facilityid): ?Medical_Facility {
-
-        # Create Facility Array
-        $arr['facilityid'] = $facilityid;
+    public static function retrieve_facility_by_id(string $facilityid): null|Medical_Facility {
 
         # Query For Facility
         $db = new DbQuery();
-        $facility = $db->fetch_one_document(Database::MEDICAL_FACILITY, $arr);
-        if ($facility != NULL):
+        $facility = $db->fetch_document_by_id(Database::MEDICAL_FACILITY, $facilityid);
+        if ($facility !== NULL):
             return self::initialise_medical_facility($facility);
         endif;
+        return null;
     }
 
     // -- RETRIEVE ALL FACILITIES
@@ -261,6 +261,7 @@ class Medical_Facility {
     }
 
     public static function delete_specialisation(string $facilityid, string $specialisation): void {
+        # Need Check If There Is Doctor Tied To This Particular Specialisation
         $db = new DbQuery();
         $db->get_db()->collection(Database::MEDICAL_FACILITY)->document($facilityid)->update([
             ['path' => 'specialisations', 'value' => FieldValue::arrayRemove([$specialisation])]

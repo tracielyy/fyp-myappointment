@@ -93,6 +93,13 @@ class Account_User {
         return $db->get_document_id(Database::ACCOUNT_USER, $credentials);
     }
 
+    public static function retrieve_id_by_nric(string $nric): ?string {
+        $db = new DbQuery();
+        $ic['profile'] = array("nric" => $nric);
+        # Get The Document ID 
+        return $db->get_document_id(Database::ACCOUNT_USER, $ic);
+    }
+
     // -- RETRIEVE ACCOUNT USER DATA
     public static function retrieve_account_data(string $user_email): ?array {
 

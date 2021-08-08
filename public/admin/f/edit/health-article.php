@@ -374,7 +374,7 @@ else:
                 <?php
                 endif; # -- END FOR VALID VARS
             endif; # -- END GET ID CHECK ISSET
-        endif; # -- END GET REQUEST
+        endif; # -- END GET & POST REQUEST
     endif; # -- END USER TYPE CHECK
 endif; # -- END SESSION CHECK
 ?>

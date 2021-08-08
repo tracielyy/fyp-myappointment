@@ -29,6 +29,10 @@ class Facility_Admin extends Admin {
         return $this->facility;
     }
 
+    public function set_facility(Medical_Facility $facility): void {
+        $this->facility = $facility;
+    }
+
     // Use For Debugging/ Logging Purpose
     public function __toString(): string {
         $str = nl2br(PHP_EOL . "Facility: " . $this->facility . PHP_EOL);
@@ -58,7 +62,7 @@ class Facility_Admin extends Admin {
     //      Methods Accessing Firestore Database 
     //============================================
     // -- CREATE FACILITY ADMIN ACCOUNT
-    public static function create_facility_admin(array $fadmin_info): ?Facility_Admin {
+    public static function create_facility_admin(array $fadmin_info): null|array {
 
         # Basic Account Information To Be Added
         $account_user_arr = ArrayCreation::account_creation_array(User_Type::FACIILITY_ADMIN);
@@ -71,10 +75,10 @@ class Facility_Admin extends Admin {
         # Add Patient Data To Database (use auto-id)
         $db = new DbQuery();
         $doc_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->newDocument();
-        
+
         # Add The Auto Id To One Of The Field
         $fadmin_info['profile']['adminid'] = $doc_ref->id();
-        
+
         return $doc_ref->set($fadmin_info);
     }
 
@@ -83,6 +87,19 @@ class Facility_Admin extends Admin {
 
         $facility_admin_data = Account_User::retrieve_account_data($user_email);
         return self::initialise_facility_admin($facility_admin_data);
+    }
+
+    public static function retrieve_admin_by_facilityid(string $facilityid): null|Facility_Admin {
+        $db = new DbQuery();
+        $documents = $db->get_db()->collection(Database::ACCOUNT_USER)
+                        ->where('accountdetails.usertype', '=', User_Type::FACIILITY_ADMIN)
+                        ->where('profile.facilityid', '=', $facilityid)->documents();
+        foreach ($documents as $document):
+            if ($document->exists()):
+                return self::initialise_facility_admin($document->data());
+            endif;
+        endforeach;
+        return null;
     }
 
 }

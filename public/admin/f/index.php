@@ -28,6 +28,7 @@ else:
     if (!User_Type::check_user_type(User_Type::FACIILITY_ADMIN, $user_type)):
         header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
     else:
+        $facility = $user->get_facility();
         ?><!DOCTYPE html>
         <html lang="en">
             <head>
@@ -119,7 +120,7 @@ else:
                         <div class="row">
                             <div class="col-md-12 text-center fw-700 fs-1">Dashboard</div>
                             <div class="col-md-12 text-muted text-center fw-700">
-                                Facility admin @ <span id="facilityName">NUH</span>
+                                Facility admin @ <span id="facilityName"><?php echo StringUtils::get_acronym($facility->get_facilityname()); ?></span>
                             </div>
                         </div>
                         <div class="row mt-4">
@@ -139,7 +140,7 @@ else:
                                         <span><i class="fas fa-hospital-user fa-3x my-2"></i></span>
                                         <p class="card-title fw-900 large">Active Doctors</p>
                                         <h6 class="card-text large fw-900 fs-1">6</h6>
-                                        <a href="manageDoctor.html" class="btn btn-outline-dark">View Doctors</a>
+                                        <a href="<?php echo FADMIN_WEB . "/views/doctors.php" ?>" class="btn btn-outline-dark">View Doctors</a>
                                     </div>
                                 </div>
                             </div>
