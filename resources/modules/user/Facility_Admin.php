@@ -62,7 +62,7 @@ class Facility_Admin extends Admin {
     //      Methods Accessing Firestore Database 
     //============================================
     // -- CREATE FACILITY ADMIN ACCOUNT
-    public static function create_facility_admin(array $fadmin_info): ?Facility_Admin {
+    public static function create_facility_admin(array $fadmin_info): null|array {
 
         # Basic Account Information To Be Added
         $account_user_arr = ArrayCreation::account_creation_array(User_Type::FACIILITY_ADMIN);
@@ -87,6 +87,19 @@ class Facility_Admin extends Admin {
 
         $facility_admin_data = Account_User::retrieve_account_data($user_email);
         return self::initialise_facility_admin($facility_admin_data);
+    }
+
+    public static function retrieve_admin_by_facilityid(string $facilityid): null|Facility_Admin {
+        $db = new DbQuery();
+        $documents = $db->get_db()->collection(Database::ACCOUNT_USER)
+                        ->where('accountdetails.usertype', '=', User_Type::FACIILITY_ADMIN)
+                        ->where('profile.facilityid', '=', $facilityid)->documents();
+        foreach ($documents as $document):
+            if ($document->exists()):
+                return self::initialise_facility_admin($document->data());
+            endif;
+        endforeach;
+        return null;
     }
 
 }

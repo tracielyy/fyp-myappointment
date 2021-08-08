@@ -141,7 +141,7 @@ $all_facilities = Medical_Facility::retrieve_all_facilities();
                                             </div>
                                         </div>
                                         <div class="d-grid gap-2 d-md-flex justify-content-md-end" style=" margin-top: 10px;">
-                                            <a href="<?php echo SADMIN_WEB . "/views/facility.php"; ?>" class="btn btn-dark me-md-2 mr-2">
+                                            <a href="<?php echo SADMIN_WEB . "/views/facility.php?fid=". $facility->get_facilityid(); ?>" class="btn btn-dark me-md-2 mr-2">
                                                 <span><i class="fas fa-eye"></i></span>
                                                 <span>View Details</span>
                                             </a>

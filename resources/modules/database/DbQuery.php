@@ -205,7 +205,7 @@ class DbQuery {
         $doc_ref = $this->document_query($collection_ref, $conditionArr);
 
         # If The `DocumentRefence` Is Retrieved Then Return It's Data
-        if ($doc_ref !== NULL) :
+        if ($doc_ref !== NULL && $doc_ref->data() !== NULL) :
             return $doc_ref->data();
         endif;
 

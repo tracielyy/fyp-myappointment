@@ -169,6 +169,23 @@ else:
                                         <label for="contactnumber" class="form-label">Contact Number</label>
                                         <input type="text" class="form-control" id="contactnumber" placeholder="<?php echo $facility_info['contactnumber']; ?>" value="<?php echo $facility_info['contactnumber']; ?>">
                                     </div>
+
+                                    <div class="mb-3" style="max-width: 70%;">
+                                        <div class="input-group">
+                                            <label name="is24hrs" class="label m-2">Is 24 Hours:</label>
+                                            <label class="radio-container m-2">
+                                                <input type="radio" name="is24hrs" value="True" onclick="text(0)">
+                                                <span class="checkmark"></span>
+                                                <span>True</span>
+                                            </label>
+                                            <label class="radio-container m-2">
+                                                <input type="radio" name="is24hrs" value="False" onclick="text(1)">
+                                                <span class="checkmark"></span>
+                                                <span>False</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
                                     <div class="mb-3" style="max-width: 70%;">
                                         <div class="row">
                                             <div class="col">
