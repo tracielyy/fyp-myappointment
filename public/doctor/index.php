@@ -24,6 +24,40 @@ else:
     if (!User_Type::check_user_type(User_Type::MEDICAL_PERSONNEL, $user_type)):
         header("Location:./../"); # -- REDIRECT USER TO THE INDEX PAGE
     else:
+        
+        
+        if ($_SERVER['REQUEST_METHOD'] == 'POST'):
+            ?> <script>console.log("going thru post")</script><?php
+            echo 'going thru post';
+            if (isset($_POST['postmedical'])):
+                ?> <script>console.log("going isset")</script><?php
+
+                $patientid = $_POST['patientid'];
+                $slotid = $_POST['slotid'];
+                $practitionerid =$_POST['practitionerid'];
+                $facilityid = $_POST['facilityid'];
+            
+                $medicalrecord_array = array(
+                    'facilityid'=> $facilityid,
+                    'practitioner' => $practitionerid,
+                    'slotid' => $slotid,
+                    'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientid,$slotid)
+                );
+        
+                $mrid = check_mrid_exist($patientid,$slotid); //checks MRID but also, if available will put the mrid here
+        
+                if(!$mrid):
+                    $medical_record = Medical_Record::create_medical_record($patientid,$medicalrecord_array);
+                    $mrid = $medical_record->get_medicalrecordid();
+                    Appointment_Record::set_mrid($patientid,$slotid,$mrid);
+                endif;
+        
+                header("Location:" . DOC_WEB . "/patientvisit/index.php?id=".$mrid."&pt=".$patientid);
+            endif;
+        
+        endif;
+        
+        
         ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -66,8 +100,6 @@ else:
     }
     </script>
 
-
-
     <!-- CHART JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js"
         integrity="sha512-VCHVc5miKoln972iJPvkQrUYYq7XpxXzvqNfiul1H4aZDwGBGC0lq373KNleaB2LpnC2a/iNfE5zoRYmB4TRDQ=="
@@ -94,8 +126,9 @@ else:
 
 <body onload="startTime()">
 
-    <?php
+    <?php   
 //         include COMPONENTS_PATH . '/navbar-loggedin.php';
+                $data="";
                 $dateToday = Time::get_current_date(); //Date today NEED TO CHANGE ONLY FOR DEBUG
                 $dates = Time::get_date_from_range($dateToday, Time::get_enddate($dateToday, 6));
 
@@ -116,27 +149,32 @@ else:
                 // echo "</pre>";
                 //can use get_date_from_range -- make it to 7 days
                 //echo json_encode($slot_arr);
-
+                $userEmail = $user->get_email();
+                $practitionerid = Account_User::retrieve_user_doc_id($userEmail);
                 foreach ($slot_arr as $slot):
                     $patientid = $slot->get_patient();
                     $patient = Patient::retrieve_patient_by_id($patientid);
                     $slotid = $slot->get_slotid();
-                    $mrid ="<button onclick='check('".$patientid."','".$slotid."')' class='btn btn-primary'>Go to Medical Record</button>";
-                    $data = '{"name":"'.$patient->get_firstname().'","date":"'.$slot->get_appointmentschedule()->get_date().'","time":"'. $slot->get_appointmentschedule()->get_time() .'","mrid":"'.$mrid.'"},';
+                    $facilityid = $slot->get_facilityid();
+                    //$mrid ='<button onclick="check("'.$patientid.'","'.$slotid.'","'.$practitionerid.'","'.$facilityid.')" class="btn btn-primary">Go to Medical Record</button>';
+                    $mrid ='<button id="#listbuttons" data-patient="'.$patientid.'" data-slot="'.$slotid.'" data-prac="'.$practitionerid.'" data-facility="'.$facilityid.'" class="btn btn-primary listbttns">Go to Medical Record</button>';
+                    $data = "{'name':'".$patient->get_firstname()."','date':'".$slot->get_appointmentschedule()->get_date()."','time':'". $slot->get_appointmentschedule()->get_time() ."','mrid':'".$mrid."'},";
                 endforeach;
                 $data = "[".$data."]";
                 // echo $data ;
                 ?>
     <script>
-    var apptlist = <?php echo $data ?>
+    var apptlist = <?php echo $data ?>;
     </script>
+
+    <?php ?>
 
     <div class="row bg-light py-4">
 
         <div class="col">
             <div class="container-fluid ms-3">
                 <h1 class="display-6"><?php echo $user->get_fullname(); ?> </h1>
-                <h1 class="lead"><?php echo $user->get_gender(); ?> </h1>
+                <h1 class="lead"><?php echo $user->get_specialisation(); ?> </h1>
             </div>
 
         </div>
@@ -258,30 +296,78 @@ else:
 
 
     </div><!-- END OF SIDE NAVIGATION TAB -->
+    <form id="mrpost" method="post" name="postmedical" action="patientvisits/func/check.php">
+
+    <input type="hidden" name="practitionerid" id="practinput" value="">
+    <input type="hidden" name="slotid" id="slotinput" value="">
+    <input type="hidden" name="facilityid" id="facilityinput" value="">
+    <input type="hidden" name="patientid" id="patientinput" value="">
+    </form>
 
     <script>
     function strip_string(str) {
         return str.replace(/(\r\n|\n|\r)/gm, "");
     }
 
-    function check(patientid, slotid) {
-        $.ajax({
-            type: "POST",
-            url: "func/check.php",
-            data: {
-                ajax_check_mrid: true,
-                patientid: patientid,
-                slotid: slotid
-            },
-            success: function(mrid_status) {
-                var mrid_exist = strip_string(mrid_status);
-                console.log("success");
-            },
-            error: function() {
 
-            }
-        });
-    }
+    $(document).on('click', 'button.listbttns', function(e) {
+        var patient_id = $(this).attr("data-patient");
+        var slot_id = $(this).attr("data-slot");
+        var practitioner_id = $(this).attr("data-prac");
+        var facility_id = $(this).attr("data-facility");
+
+        console.log(patient_id);
+        console.log(slot_id);
+        console.log(practitioner_id);
+        console.log(facility_id);
+
+        $('input#practinput').val(practitioner_id);
+        $('input#slotinput').val(slot_id);
+        $('input#facilityinput').val(facility_id);
+        $('input#patientinput').val(patient_id);
+
+        $( "form#mrpost" ).submit();
+
+
+        // $.ajax({
+        //     type: "POST",
+        //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']); ?>",
+        //     dataType: "text",
+        //     data: {
+        //         'ajax_check_mrid': true,
+        //         'patientid': patient_id,
+        //         'slotid': slot_id,
+        //         'facilityid': facility_id,
+        //         'practitionerid': practitioner_id
+        //     },
+        //     success: function() {
+        //         console.log(patient_id);
+        //         console.log(slot_id);
+        //     },
+        //     error: function() {
+        //         console.log("smthg wrong");
+        //     }
+        // });
+
+        // $.ajax({
+        //     type: "POST",
+        //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']); ?>",
+        //     dataType: "text",
+        //     data: {
+                
+        //     },
+        //     success: function() {
+        //         console.log("just posting");
+        //     },
+        //     error: function() {
+        //         console.log("smthg wrong");
+        //     }
+        // });
+
+    });
+
+
+
 
 
     /*THIS ONE ON THE BOTTOM IS ON THE DASHBOARD!!!!! 
@@ -379,7 +465,10 @@ else:
                 {
                     data: 'mrid'
                 }
-            ]
+            ],
+            "language": {
+      "emptyTable": "No appointment booked for you at the moment"
+        }
         });
 
     });
@@ -407,7 +496,10 @@ else:
                 {
                     data: 'mrid'
                 }
-            ]
+            ],
+            "language": {
+        "emptyTable": "No appointment booked for you at the moment"
+        }
         });
 
     });

@@ -164,7 +164,7 @@ else:
                 </script>
                 <!-- jQuery -->
                 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
                 <style>
                     body {
                         margin: 0;
@@ -276,9 +276,10 @@ else:
                                                 <div class="mb-3 row">
                                                     <label for="facility-icon" class="col-sm-2 col-form-label">Facility Icon: </label>
                                                     <div class="col-sm-10">
-                                                        <input type="hidden" id="hide-facility-icon"/>
                                                         <input class="form-control form-control-sm" id="facility-icon" type="file" name="facility_icon" accept=".png" value="<?php echo $icon; ?>"/>
+                                                        <small class="text-muted">Only .png images are allowed.</small>
                                                     </div>
+                                                    
                                                 </div>
                                                 <!-- Facility Name -->
                                                 <div class="mb-3 row">
@@ -317,19 +318,19 @@ else:
                                                         <!-- Opening Hour -->
                                                         <div class="col-md-12">
                                                             <label for="openinghour" class="col-sm-2 col-form-label">Opening Hour: </label>
-                                                            <input type="time" style="margin-top: 5px; border: 1px solid #eeeded;" class="rounded p-1" name='operatinghours[openinghour]' value="<?php echo $facility_details['operatinghours']['openinghour']; ?>">
+                                                            <input id="starthour" type="time" style="margin-top: 5px; border: 1px solid #eeeded;" class="rounded p-1" name='operatinghours[openinghour]' value="<?php echo $facility_details['operatinghours']['openinghour']; ?>">
                                                         </div>
                                                         <!-- Closing Hour -->
                                                         <div class="col-md-12">
                                                             <label for="closinghour" class="col-sm-2 col-form-label">Closing Hour: </label>
-                                                            <input type="time" style="margin-top: 5px; border: 1px solid #eeeded;" class="rounded p-1" name="operatinghours[closinghour]" value="<?php echo $facility_details['operatinghours']['closinghour']; ?>">
+                                                            <input id="endhour" type="time" style="margin-top: 5px; border: 1px solid #eeeded;" class="rounded p-1" name="operatinghours[closinghour]" value="<?php echo $facility_details['operatinghours']['closinghour']; ?>">
                                                         </div>
                                                     </div>
                                                 </div>
 
                                                 <!-- Buttons -->
                                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end" style=" margin-top: 10px;">
-                                                    <button type="submit" class="btn btn-success me-md-2 mr-2" name="add_facility" id="add-facility" 
+                                                    <button type="submit" class="btn btn-success me-md-2 mr-2" name="add_facility" id="add-facility">
                                                             <span><i class="fas fa-save"></i></span>
                                                         <span>Save</span>
                                                     </button>
@@ -368,6 +369,109 @@ else:
                         }
                         return;
                     }
+
+            /*------------------------------------------------
+                    CLIENT SIDE VALIDATION FOR EMAIL
+            -------------------------------------------------*/
+
+                     $(document).ready(function () {
+                        $("#facility_form").validate({
+                            rules: {
+                                "profile[adminname]": {
+                                    required: true
+                                },
+                                "credentials[email]": {
+                                    required: true,
+                                    emailRegex: true
+                                },
+                                "facility_icon": {
+                                    required: true,
+                                    extensionRegex: true
+                                },
+                                "facilityname": {
+                                    required: true
+                                },
+                                "address": {
+                                    required: true
+                                },
+                                "contactnumber": {
+                                    required: true,
+                                    phoneRegex: true
+                                },
+                                "operatinghours[openinghour]": {
+                                    required: true
+                                },
+                                "operatinghours[closinghour]": {
+                                    required: true
+                                },
+                            },
+                            messages: {
+                                "profile[adminname]": {
+                                    required: "Required"
+                                },
+                                "credentials[email]": {
+                                    required: "Required",
+                                    emailRegex: "Email format is incorrect."
+                                },
+                                "facility_icon": {
+                                    required: "Required",
+                                    extensionRegex: "Wrong file format, only .png extension."
+                                },
+                                "facilityname": {
+                                    required: "Required"
+                                },
+                                "address": {
+                                    required: "Required"
+                                },
+                                "contactnumber": {
+                                    required: "Required",
+                                    phoneRegex: "Contact number format is incorrect"
+                                },
+                                "operatinghours[openinghour]": {
+                                    required: "Required"
+                                },
+                                "operatinghours[closinghour]": {
+                                    required: "Required"
+                                },
+                            },
+                            errorElement: "em",
+                            errorPlacement: function (error, element) {
+                                // This is the default behavior 
+                               
+                                error.insertAfter(element);
+                                error.addClass("help-block invalid-feedback");
+                            },
+                            success: function (label, element) {
+
+                            $(element).addClass("is-valid");
+                                
+                            },
+                            highlight: function (element, errorClass, validClass) {
+                                $(element).addClass("is-invalid").removeClass("is-valid");
+                            },
+                            unhighlight: function (element, errorClass, validClass) {
+                            $(element).addClass("is-valid").removeClass("is-invalid");
+
+                            }
+                        });
+                    });
+
+                    $.validator.addMethod("extensionRegex", function (value, element) {
+                        return this.optional(element) ||
+                                /^.*\.(png|PNG)$/
+                                .test(value);
+                    }, "Wrong file format, only .png extension.");
+
+
+                    $.validator.addMethod("phoneRegex", function (value, element) {
+                        return this.optional(element) || /^[689]{1}[0-9]{7}$/.test(value);
+                    }, "Contact number format is incorrect");
+
+                    $.validator.addMethod("emailRegex", function (value, element) {
+                        return this.optional(element) ||
+                        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                                .test(value);
+                    }, "Email format is incorrect.");
 
                 </script>
                 <!-- bootstrap js link -->

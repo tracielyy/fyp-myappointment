@@ -112,11 +112,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
                 ?>
                 <div class="row bg-light py-4">
                     <div class="row bg-light">
-                        <div class="col-xs-3 col-md-2 mx-md-1 mx-lg-0" style="padding-left: 140px;">
-                            <img src="https://via.placeholder.com/100" class="rounded shadow float-start" alt="...">
-                        </div> <!-- col -->
-
-                        <div class="col-xs-8 col-md-6">
+                        <div class="col-xs-8 col-md-6 ms-5">
                             <h1 class="display-6"> <?php echo $user->get_fullname(); ?> </h1>
                             <h1 class="lead"> Gender: <?php echo $user->get_gender(); ?> </h1>
                             <h1 class="lead"> Date of Birth: <?php echo $user->get_dob(); ?> </h1>
