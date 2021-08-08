@@ -17,6 +17,7 @@ define("TIME_MOD", realpath(dirname(__FILE__) . '/modules/time'));
 define("SECURE_MOD", realpath(dirname(__FILE__) . '/modules/security'));
 define("MEDDOC_MOD", realpath(dirname(__FILE__) . '/modules/medicaldocument'));
 define("HINFO_MOD", realpath(dirname(__FILE__) . '/modules/healthinfo'));
+define("FAQ_MOD", realpath(dirname(__FILE__) . '/modules/faq'));
 
 
 ############## -- CONFIGURATIONS FOR PAGES -- ################
