@@ -17,6 +17,8 @@ require_once USER_MOD . '/Facility_Admin.php';
 require_once USER_MOD . '/Super_Admin.php';
 require_once DB_MOD . '/DbStorage.php';
 
+require_once EMAIL_MOD . '/EmailTemplate.php';
+
 require_once FACILITY_MOD . '/Medical_Facility.php';
 /*
  * CREATE FACILITY
@@ -28,7 +30,7 @@ else:
     $user_type = $user->get_usertype();
     $user_email = $user->get_email();
 
-// Check If User Is Super Admin
+    // Check If User Is Super Admin
     if (!User_Type::check_user_type(User_Type::SUPER_ADMIN, $user_type)):
         header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
     else:
@@ -54,6 +56,8 @@ else:
             'error' => ''
         );
         $validArr = array();
+        $fadmin_exist = null;
+        $facility_exist = null;
 
         function save_facility_icon(array $icon_info, string $file_name) {
             $file_ext = explode(".", $icon_info["name"]);
@@ -61,21 +65,23 @@ else:
             $type = $icon_info["type"];
             $tmp_path = $icon_info["tmp_name"];
 
-//            echo "Upload: " . $file_name . "<br />";
-//            echo "Type: " . $type . "<br />";
-//            echo "Size: " . $size . " Kb<br />";
-//            echo "Stored in: " . $tmp_path;
-//            echo "<img src='{$_FILES["facility_icon"]["tmp_name"]}' />";
+            //            echo "Upload: " . $file_name . "<br />";
+            //            echo "Type: " . $type . "<br />";
+            //            echo "Size: " . $size . " Kb<br />";
+            //            echo "Stored in: " . $tmp_path;
+            //            echo "<img src='{$_FILES["facility_icon"]["tmp_name"]}' />";
             $db_storage = new DbStorage();
             $db_storage->store_data($type, (int) $size, $tmp_path, 'facility/facilityicon/' . $file_name . "." . $file_ext[1]);
         }
 
-        function facility_account_creation(array $icon_info, array $facility_info, array $fadmin_info) {
+        function facility_account_creation(array $icon_info, array $facility_info, array $fadmin_info, bool|null &$fadmin_exist, bool|null &$facility_exist): bool {
+            $fadmin_exist = Account_User::check_email_exist($fadmin_info['credentials']['email']);
+            $facility_exist = Medical_Facility::check_facility_exist($facility_info);
 
-            # STEP 1: Get The Facility From The Database After Insert (Medical_Facility Creation)
-            $mf = Medical_Facility::create_medical_facility($facility_info);
+            if (!($fadmin_exist) && !($facility_exist)) {
 
-            if ($mf instanceof Medical_Facility /* If Medical Facility Is Created */) {
+                # STEP 1: Get The Facility From The Database After Insert (Medical_Facility Creation)
+                $mf = Medical_Facility::create_medical_facility($facility_info);
 
                 # STEP 2 Insert Facility (save image & create new facility record in database)
                 save_facility_icon($icon_info, $mf->get_facilityid());
@@ -84,8 +90,13 @@ else:
                 $fadmin_info['profile']['facilityid'] = $mf->get_facilityid();
 
                 # STEP 3: Insert Facility Admin (Facility_Admin Creation)
-                Facility_Admin::create_facility_admin($fadmin_info);
+                $admin_pw = Facility_Admin::create_facility_admin($fadmin_info);
+
+                # STEP 4: Send Email To Facility Admin
+                EmailTemplate::template_createfacility($fadmin_info['credentials']['email'], $mf->get_facilityname(), $admin_pw);
+                return true;
             }
+            return false;
         }
 
         // loop and store all the information into an array
@@ -95,7 +106,7 @@ else:
 
                     // calls itself if it is an array
                     if (is_array($value)):
-                        $err_msg[$key] = array();
+
                         store_info($post[$key], $facility_details[$key], $validArr);
                     else:
                         $facility_details[$key] = htmlspecialchars($value);
@@ -134,8 +145,6 @@ else:
                 $facility_details['operatinghours']['openinghour'] = $facility_details['operatinghours']['closinghour'] = "";
 
             endif;
-
-            facility_account_creation($icon, $facility_details, $admin_details);
 
         endif;
         ?><!DOCTYPE html>
@@ -245,12 +254,16 @@ else:
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="card ms-auto me-auto outerCard" style="max-width: 55rem;">
-                                <div class="card-body">
+                                <div class="card-body" id="new-facility-card">
+                                    <!-- Spinner -->
+                                    <div class="text-center" id="spinner-container">
+                                        <div class="spinner-border text-secondary" role="status" style="width: 10rem; height: 10em; border-width:2em;"></div>
+                                    </div>
                                     <form id="facility_form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
 
                                         <div class="card text-dark innerCard">
                                             <!-- Facility Admin Section -->
-                                            <div class="card-title ms-3 mt-3">
+                                            <div class="card-title ms-3 mt-3" id="admin-section">
                                                 <h5 class="text-muted small">Admin Details</h5>
                                                 <!-- Admin Name -->
                                                 <div class="mb-3 row">
@@ -266,11 +279,10 @@ else:
                                                         <input type="email" class="form-control" style="max-width:20rem;" id="email" name="credentials[email]" value="<?php echo $admin_details['credentials']['email']; ?>">
                                                     </div>
                                                 </div>
-                                                <!-- Password (Might Not Need as we can randomly generate password -->
                                             </div>
                                             <!-- Facility Section -->
                                             <hr class="ms-3" style="max-width: 90%;">
-                                            <div class="card-body">
+                                            <div class="card-body" id="facility-section">
                                                 <h5 class="text-muted small mb-3">Facility Details</h5>
                                                 <!-- Facility Icon -->
                                                 <div class="mb-3 row">
@@ -279,7 +291,7 @@ else:
                                                         <input class="form-control form-control-sm" id="facility-icon" type="file" name="facility_icon" accept=".png" value="<?php echo $icon; ?>"/>
                                                         <small class="text-muted">Only .png images are allowed.</small>
                                                     </div>
-                                                    
+
                                                 </div>
                                                 <!-- Facility Name -->
                                                 <div class="mb-3 row">
@@ -331,7 +343,7 @@ else:
                                                 <!-- Buttons -->
                                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end" style=" margin-top: 10px;">
                                                     <button type="submit" class="btn btn-success me-md-2 mr-2" name="add_facility" id="add-facility">
-                                                            <span><i class="fas fa-save"></i></span>
+                                                        <span><i class="fas fa-save"></i></span>
                                                         <span>Save</span>
                                                     </button>
                                                     <a href="<?php echo SADMIN_WEB; ?>"  class="btn btn-danger" id="delBtn">
@@ -352,6 +364,7 @@ else:
 
                 <!-- js code for the bootstrap tooltip -->
                 <script>
+                    $('#spinner-container').hide();
                     $('#nav-facility').addClass('active');
                     is24hour_check(); // Check Upon Loading Page
                     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -370,11 +383,11 @@ else:
                         return;
                     }
 
-            /*------------------------------------------------
-                    CLIENT SIDE VALIDATION FOR EMAIL
-            -------------------------------------------------*/
+                    /*------------------------------------------------
+                     CLIENT SIDE VALIDATION FOR EMAIL
+                     -------------------------------------------------*/
 
-                     $(document).ready(function () {
+                    $(document).ready(function () {
                         $("#facility_form").validate({
                             rules: {
                                 "profile[adminname]": {
@@ -437,20 +450,21 @@ else:
                             errorElement: "em",
                             errorPlacement: function (error, element) {
                                 // This is the default behavior 
-                               
+
                                 error.insertAfter(element);
                                 error.addClass("help-block invalid-feedback");
                             },
                             success: function (label, element) {
 
-                            $(element).addClass("is-valid");
-                                
+                                $(element).addClass("is-valid");
+
+
                             },
                             highlight: function (element, errorClass, validClass) {
                                 $(element).addClass("is-invalid").removeClass("is-valid");
                             },
                             unhighlight: function (element, errorClass, validClass) {
-                            $(element).addClass("is-valid").removeClass("is-invalid");
+                                $(element).addClass("is-valid").removeClass("is-invalid");
 
                             }
                         });
@@ -469,7 +483,7 @@ else:
 
                     $.validator.addMethod("emailRegex", function (value, element) {
                         return this.optional(element) ||
-                        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
                                 .test(value);
                     }, "Email format is incorrect.");
 
@@ -482,7 +496,51 @@ else:
                 ></script>
             </body>
         </html>
-    <?php
+        <?php
+        // When The Button Is Triggered
+        if (isset($_POST['add_facility'])):
+            ?>
+            <script>
+                        console.log("succes call");
+                        $('#facility_form').hide();
+                        $('#spinner-container').show();
+            </script>
+            <?php
+            $facility_creation = facility_account_creation($icon, $facility_details, $admin_details, $fadmin_exist, $facility_exist);
+            if ($facility_creation):
+                ?>
+                <script>
+                    window.location.replace(window.location.origin + '<?php echo SADMIN_WEB; ?>');
+                </script>
+                <?php
+            endif;
+        endif;
+        if ($facility_exist === true):
+            ?>
+            <script>
+                console.log('facility exist');
+                $('#facility_form').show();
+                $('#spinner-container').hide();
+                var facility_exist = "<div id='facility-feedback' class='alert alert-danger'>Facility Already Exist In System</div>";
+                $('#facility-section').prepend(facility_exist);
+            </script>
+            <?php
+            $facility_exist = null;
+        endif;
+        if ($fadmin_exist === true):
+            ?>
+            <script>
+                console.log("user exist");
+                $('#facility_form').show();
+                $('#spinner-container').hide();
+                var admin_exist = "<div id='admin-feedback' class='alert alert-danger'>Email Already Exist</div>";
+                $('#admin-section').prepend(admin_exist);
+            </script>
+            <?php
+            // Reset Bool
+            $fadmin_exist = null;
+        endif;
+
     endif; # -- END USER TYPE CHECK
 endif; # -- END SESSION CHECK
 ?>

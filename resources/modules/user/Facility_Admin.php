@@ -8,6 +8,7 @@
 require_once USER_MOD . '/Admin.php';
 require_once USER_MOD . '/Account_User.php';
 require_once ENUMS_PATH . '/User_Type.php';
+require_once SECURE_MOD . '/Security.php';
 
 // -- Admin That Belongs To Certain Facility That Oversee Their Operations -- //
 class Facility_Admin extends Admin {
@@ -40,8 +41,9 @@ class Facility_Admin extends Admin {
     }
 
     // -- Initialise Facility Admin
-    public static function initialise_facility_admin(array $facility_admin_info): Facility_Admin {
+    public static function initialise_facility_admin(array $facility_admin_info): null|Facility_Admin {
 
+        try{
         # Session Object
         $session_obj = Session::intialise_session($facility_admin_info['session']);
 
@@ -56,30 +58,43 @@ class Facility_Admin extends Admin {
                 $facility_admin_info['profile']['adminname'], $facility_obj, $facility_admin_info['credentials']['email']);
 
         return $facility_admin;
+        } catch(Exception $ex){
+            return null;
+        }
     }
 
     //============================================
     //      Methods Accessing Firestore Database 
     //============================================
     // -- CREATE FACILITY ADMIN ACCOUNT
-    public static function create_facility_admin(array $fadmin_info): null|array {
+    public static function create_facility_admin(array $fadmin_info): bool|string {
 
-        # Basic Account Information To Be Added
-        $account_user_arr = ArrayCreation::account_creation_array(User_Type::FACIILITY_ADMIN);
+        # Check If Email Already Exist In Database
+        if (!Account_User::check_email_exist($fadmin_info['credentials']['email'])):
 
-        # Load Basic Account User Fields & Values To Array
-        foreach ($account_user_arr as $field => $value) :
-            $fadmin_info[$field] = $value;
-        endforeach;
+            # Basic Account Information To Be Added
+            $account_user_arr = ArrayCreation::account_creation_array(User_Type::FACIILITY_ADMIN);
 
-        # Add Patient Data To Database (use auto-id)
-        $db = new DbQuery();
-        $doc_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->newDocument();
+            # Load Basic Account User Fields & Values To Array
+            foreach ($account_user_arr as $field => $value) :
+                $fadmin_info[$field] = $value;
+            endforeach;
 
-        # Add The Auto Id To One Of The Field
-        $fadmin_info['profile']['adminid'] = $doc_ref->id();
+            # Set Default Password  (Auto-generated)
+            $sec = new Security();
+            $default_pw = StringUtils::generate_token(12);
+            $fadmin_info['credentials']['password'] = $sec->hash($default_pw);
 
-        return $doc_ref->set($fadmin_info);
+            # Add Patient Data To Database (use auto-id)
+            $db = new DbQuery();
+            $doc_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->newDocument();
+
+            # Add The Auto Id To One Of The Field
+            $fadmin_info['profile']['adminid'] = $doc_ref->id();
+            $doc_ref->set($fadmin_info);
+            return $default_pw;
+        endif;
+        return false;
     }
 
     // -- RETRIEVE  FACILITY ADMIN DATA

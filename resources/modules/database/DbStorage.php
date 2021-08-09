@@ -40,7 +40,6 @@ class DbStorage {
                 break;
         endswitch;
 
-
         imagejpeg($img, $src_url, $quality);
     }
 
@@ -70,6 +69,12 @@ class DbStorage {
         }
 
         return $payload === false ? null : $url . "?alt=media&token=" . $token; # -- Return URL link With Token, Else Return NULL
+    }
+
+    // -- DELETE DATA 
+    public function delete_data(string $filename) {
+        $object = $this->bucket->object($filename);
+        $object->delete();
     }
 
 }

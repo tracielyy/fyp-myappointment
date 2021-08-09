@@ -232,7 +232,7 @@ class Medical_Facility {
         $path = Database::MEDICAL_FACILITY;
         $db = new DbQuery();
         $found_facility = $db->fetch_one_document($path, $checking_arr);
-        if ($found_facility):
+        if ($found_facility !== null):
             return True;
         endif;
         return False;

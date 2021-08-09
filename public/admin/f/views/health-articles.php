@@ -211,7 +211,6 @@ else:
                                 <div class="modal-footer">
                                     <button id="delete-article-btn" type="button" class="btn btn-danger" name="delete"><i class="fas fa-trash"></i> Delete</button>
                                 </div>
-
                             </div>
                         </div>
                     </div>
