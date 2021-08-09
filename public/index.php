@@ -116,7 +116,7 @@ if ($healtharticles_count > 3 && $healtharticles_count < 6)
                 echo '<p class="card-text line-clamp mt-3">'.$desc.'</p>';
                 echo '</div>';
                 echo '<div class="card-body ms-2">';
-                echo '<a href="./healthlist.php" class="card-link stretched-link"><small class="text-muted">Click here to read more...</small></a>'; //NEED TO CHANGE TO REAL URL
+                echo '<a href="article.php?id='.$all_health_articles[$i]->get_id().'" class="card-link stretched-link"><small class="text-muted">Click here to read more...</small></a>'; //NEED TO CHANGE TO REAL URL
                 echo '</div></div></div></div></div>';
                };?>
 
