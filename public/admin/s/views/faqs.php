@@ -32,6 +32,14 @@ else:
     if (!User_Type::check_user_type(User_Type::SUPER_ADMIN, $user_type)):
         header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
     else:
+        if ($_SERVER['REQUEST_METHOD'] == "POST"):
+
+            // DELETE BUTTON    
+            if (isset($_POST["ajax_delete"]) && isset($_POST['id'])):
+                Faq::delete_faq($_POST["id"]);
+            endif;
+
+        endif;
         $all_faqs = Faq::retrieve_all_faqs();
         ?><!DOCTYPE html>
         <html lang="en">
@@ -158,33 +166,35 @@ else:
                                         </a>
                                     </div>
                                     <?php
-                                    foreach($all_faqs as $faq):
-                                    ?>
-                                    <div class="card text-dark innerCard mb-3">
-                                        <div class="card-title ms-2 mt-2">
-                                            <h4 style="font-weight: 600; font-size: 1.5rem;"><?php echo $faq->get_question();?></h4>
-                                        </div>
-                                        <hr class="ms-2" style="max-width: 60%;">
-                                        <div class="card-body">
-                                            <div class="mb-3 row">
-                                                <label for="answer" class="col-sm-2 col-form-label">Answer: </label>
-                                                <div class="col-sm-10">
-                                                    <textarea name="answer" readonly class="form-control" cols="30" rows="8" style="background-color: #eeeded;"><?php echo $faq->get_answer();?></textarea>
+                                    foreach ($all_faqs as $faq):
+                                        ?>
+                                        <div class="card text-dark innerCard mb-3" id="<?php echo $faq->get_id(); ?>">
+                                            <div class="card-title ms-2 mt-2">
+                                                <h4 style="font-weight: 600; font-size: 1.5rem;"><?php echo $faq->get_question(); ?></h4>
+                                            </div>
+                                            <hr class="ms-2" style="max-width: 60%;">
+                                            <div class="card-body">
+                                                <div class="mb-3 row">
+                                                    <label for="answer" class="col-sm-2 col-form-label">Answer: </label>
+                                                    <div class="col-sm-10">
+                                                        <textarea name="answer" readonly class="form-control" cols="30" rows="8" style="background-color: #eeeded;"><?php echo $faq->get_answer(); ?></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="d-grid gap-2 d-md-flex justify-content-md-end" style=" margin-top: 10px;">
+                                                    <!-- edit button -->
+                                                    <a href="<?php echo SADMIN_WEB . "/edit/faq.php?id=" . $faq->get_id(); ?>" class="btn btn-success me-md-2 mr-2">
+                                                        <span><i class="fas fa-edit"></i></span>
+                                                        <span>Edit</span>
+                                                    </a>
+                                                    <!-- end button -->
+                                                    <button value="<?php echo $faq->get_id(); ?>" onclick="delete_faq(this.value, '<?php echo $faq->get_question(); ?>')" class="btn btn-danger"  type="button" data-bs-toggle="modal" data-bs-target="#delete-faq">
+                                                        <span><i class="fas fa-trash"></i></span>
+                                                        <span>Delete</span>
+                                                    </button>
                                                 </div>
                                             </div>
-                                            <div class="d-grid gap-2 d-md-flex justify-content-md-end" style=" margin-top: 10px;">
-                                                <a href="<?php echo SADMIN_WEB . "/edit/faq.php?id=". $faq->get_id(); ?>" class="btn btn-success me-md-2 mr-2">
-                                                    <span><i class="fas fa-edit"></i></span>
-                                                    <span>Edit</span>
-                                                </a>
-                                                <button class="btn btn-danger" id="delBtn" type="button" data-bs-toggle="modal" data-bs-target="#delModal">
-                                                    <span><i class="fas fa-trash"></i></span>
-                                                    <span>Delete</span>
-                                                </button>
-                                            </div>
                                         </div>
-                                    </div>
-                                    <?php
+                                        <?php
                                     endforeach;
                                     ?>
                                 </div>
@@ -193,37 +203,75 @@ else:
                     </div>
                 </main>
                 <!-- main ends here -->
-                <!-- modal starts here -->
-                <div class="modal fade" id="delModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <!-- DELETE MODAL -->
+                <div class="modal fade" id="delete-faq" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered" style="margin-left: 35%;">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="exampleModalLabel">Delete FAQ</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
-                                <div class="alert alert-danger" role="alert">
+                            <div class="modal-body" id="delete-modal-content">
+                                <div>Delete FAQ Question: </div>
+                                <div  class="fst-italic p-2">- <span id="ques-display"></span></div>
+
+
+                                <div class="alert alert-danger" role="alert" id="delete-alert">
                                     <i class="fas fa-exclamation-circle"></i>
                                     Warning this action is irrevocable
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Confirm</button>
+                                <button id="delete-faq-btn" type="button" class="btn btn-primary" data-bs-dismiss="modal">Confirm</button>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- modal ends here -->
-
                 <!-- bootstrap js link -->
-                <script
-                    src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-                    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-                    crossorigin="anonymous"
-                ></script>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous" ></script>
                 <!-- js for the modal to work -->
                 <script>
                     $('#nav-faq').addClass('active');
+                    // -- Pass Information To Modal
+                    function delete_faq(id, ques) {
+                        // -- Testing
+                        console.log(id);
+
+                        // jQuery Calls To Set The Modal Information 
+                        $("#delete-faq-btn").val(id); // Set ID To Btn
+                        $("#ques-display").html(ques); // Set ID To Btn
+
+                    }
+
+
+                    $("#delete-faq-btn").on("click", function () {
+                        var id = $('#delete-faq-btn').val();
+                        $("#delete-alert").hide();
+                        var spinner_container = '<div class="text-center" id="spinner-container"></div>';
+                        var spinner = '<div class="spinner-border text-secondary" role="status" style="width: 10rem; height: 10em; border-width:2em;"></div>';
+                        $('#delete-modal-content').append(spinner_container);
+                        $('#spinner-container').append(spinner);
+
+                        req = $.ajax({
+                            type: "POST",
+                            url: "<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>",
+                            data: {
+                                ajax_delete: true,
+                                id: id
+                            },
+                            success: function () {
+                                $('#spinner-container').remove();
+                                $("#delete-faq").modal('hide');
+                                $("#" + id).remove();
+                                $("#delete-alert").show();
+                                console.log("delete sucessfully");
+                            },
+                            error: function () {
+                                console.log("Error");
+                            }
+                        });
+                    });
                     var myModal = document.getElementById('myModal');
                     var myInput = document.getElementById('myInput');
 
