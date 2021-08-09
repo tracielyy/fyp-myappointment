@@ -232,7 +232,7 @@ class Medical_Facility {
         $path = Database::MEDICAL_FACILITY;
         $db = new DbQuery();
         $found_facility = $db->fetch_one_document($path, $checking_arr);
-        if ($found_facility):
+        if ($found_facility !== null):
             return True;
         endif;
         return False;
@@ -266,6 +266,11 @@ class Medical_Facility {
         $db->get_db()->collection(Database::MEDICAL_FACILITY)->document($facilityid)->update([
             ['path' => 'specialisations', 'value' => FieldValue::arrayRemove([$specialisation])]
         ]);
+    }
+
+    public static function delete_medical_facility(string $id): void {
+        $db = new DbQuery();
+        $db->get_db()->collection(Database::MEDICAL_FACILITY)->document($id)->delete();
     }
 
 }

@@ -46,7 +46,7 @@ class Account_User {
     }
 
     public function get_password(): string {
-        return $this->password;  // Security Measures Not Implemented
+        return $this->password;
     }
 
     public function get_usertype(): string {
@@ -98,6 +98,12 @@ class Account_User {
         $ic['profile'] = array("nric" => $nric);
         # Get The Document ID 
         return $db->get_document_id(Database::ACCOUNT_USER, $ic);
+    }
+
+    public static function retrieve_password_by_id(string $id): ?string {
+        $db = new DbQuery();
+        $data = $db->fetch_document_by_id(Database::ACCOUNT_USER, $id);
+        return $data['credentials']['password'];
     }
 
     // -- RETRIEVE ACCOUNT USER DATA
@@ -516,4 +522,5 @@ class Account_User {
     }
 
 }
+
 ?>

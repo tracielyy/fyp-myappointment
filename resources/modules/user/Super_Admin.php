@@ -73,6 +73,12 @@ class Super_Admin extends Admin {
         return self::initialise_super_admin($super_admin_data);
     }
 
+    public static function retrieve_pin_by_id(string $id): ?string {
+        $db = new DbQuery();
+        $data = $db->fetch_document_by_id(Database::ACCOUNT_USER, $id);
+        return $data['credentials']['secretpin'];
+    }
+
 }
 
 ?>

@@ -70,7 +70,7 @@ class Health_Info {
     }
 
     // ============ Database Access Functions ================= //
-    //  FETCH (RETRIEVE)  //
+    //  FETCH (RETRIEVE)  // 
     public static function retrieve_all_healthinfo(string $startAfter = null): array {
 
         # Create Health Tips
@@ -86,7 +86,7 @@ class Health_Info {
             $arr = $ref->limit($limit)->documents();
         else:
             # Consecutive Query
-            $arr = $ref->startAfter($startAfter)->limit($limit)->documents();
+            $arr = $ref->startAfter([$startAfter])->limit($limit)->documents();
         endif;
         # Loop & Add To Container
         foreach ($arr As $doc):
