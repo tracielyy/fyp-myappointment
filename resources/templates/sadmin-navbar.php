@@ -61,6 +61,12 @@
                         <span>Edit Profile</span>
                     </a>
                 </li>
+                <li>
+                    <a href="<?php echo SADMIN_WEB . "/views/users.php"; ?>" class="nav-link px-3 my-2" id="nav-users">
+                        <span class="me-2"><i class="fas fa-user"></i></span>
+                        <span>View Users</span>
+                    </a>
+                </li>
                 <li class="my-3"><hr class="dropdown-divider" /></li>
                 <li>
                     <a class="nav-link px-3 mb-2 mt-1"  href="<?php echo LOGIN_WEB . '/logout.php'; ?>">

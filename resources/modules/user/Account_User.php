@@ -127,6 +127,30 @@ class Account_User {
         return NULL;
     }
 
+    public static function retrieve_user_by_type(string $type, int $limit, string $startAfter = null): array {
+        # Create User Arr
+        $user_arr = array();
+
+        $db = new DbQuery();
+        $ref = $db->get_db()->collection(Database::ACCOUNT_USER)->where('accountdetails.usertype', '=', $type);
+        
+        if ($startAfter == null):
+            # Beginning Query
+            $arr = $ref->limit($limit)->documents();
+        else:
+            # Consecutive Query
+            $arr = $ref->startAfter([$startAfter])->limit($limit)->documents();
+        endif;
+
+        # Loop & Add To Container
+        foreach ($arr as $doc):
+            if ($doc->exists()):
+                $user_arr[] = $doc->data();
+            endif;
+        endforeach;
+        return $user_arr;
+    }
+
     public static function check_nric_exist(string $nric): bool {
 
         $secure = new Security();
