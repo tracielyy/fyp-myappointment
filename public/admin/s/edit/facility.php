@@ -298,9 +298,9 @@ else:
                                                                     <input style="font-weight: 600; font-size: 1.4rem;" type="text" class="form-control" id="facilityname" name="facilityname" value="<?php echo $facility_details['facilityname']; ?>">
                                                                 </div>
                                                             </div>
-                                                            <div class="d-grid gap-1 d-md-flex justify-content-md-start" style=" margin-top: 10px;">
+                                                            <div class="d-grid gap-1 d-md-flex justify-content-md-start ps-2" style=" margin-top: 10px;">
                                                                 <input type="text" readonly class="form-control-plaintext text-muted"  id="adminName" value="<?php echo ($facility_admin !== null) ? $facility_admin->get_adminname() : "  -"; ?>" style="font-weight: 600; max-width: 10rem;">
-                                                                <a href="<?php echo SADMIN_WEB . "/edit/admin.php"; ?>" class="me-md-2 mr-2 editAdm" data-bs-toggle="tooltip" data-bs-placement="right" title="Edit Admin">
+                                                                <a href="<?php echo SADMIN_WEB . "/edit/admin.php?fid=" . $facility_info->get_facilityid(); ?>" class="me-md-2 mr-2 editAdm" data-bs-toggle="tooltip" data-bs-placement="right" title="Edit Admin">
                                                                     <span><i class="fas fa-pen-square fa-2x"></i></span>
                                                                 </a>
                                                             </div>
@@ -358,7 +358,7 @@ else:
                                                                     <span><i class="fas fa-save"></i></span>
                                                                     <span>Save</span>
                                                                 </button>
-                                                                <a href="<?php echo SADMIN_WEB."/views/facility.php?fid=".$facility_info->get_facilityid();?>" class="btn btn-danger" id="delBtn">
+                                                                <a href="<?php echo SADMIN_WEB . "/views/facility.php?fid=" . $facility_info->get_facilityid(); ?>" class="btn btn-danger" id="delBtn">
                                                                     <span><i class="fas fa-times"></i></span>
                                                                     <span>Cancel</span>
                                                                 </a>
@@ -381,124 +381,124 @@ else:
 
                             <!-- js code for the bootstrap tooltip -->
                             <script>
-                                $('#nav-facility').addClass('active');
-                                is24hour_check(); // Check Upon Loading Page
-                                function is24hour_check() {
+                        $('#nav-facility').addClass('active');
+                        is24hour_check(); // Check Upon Loading Page
+                        function is24hour_check() {
 
-                                    if ($('#is24hours').is(":checked")) {
-                                        $('#time-start-end').hide();
-                                        console.log("Checked");
-                                    } else {
-                                        $('#time-start-end').show();
-                                        console.log("not checked");
+                            if ($('#is24hours').is(":checked")) {
+                                $('#time-start-end').hide();
+                                console.log("Checked");
+                            } else {
+                                $('#time-start-end').show();
+                                console.log("not checked");
+                            }
+                            return;
+                        }
+                        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                            return new bootstrap.Tooltip(tooltipTriggerEl);
+                        });
+                        /*------------------------------------------------
+                         CLIENT SIDE VALIDATION FOR EMAIL
+                         -------------------------------------------------*/
+
+                        $(document).ready(function () {
+                            $("#facility_form").validate({
+                                rules: {
+                                    "profile[adminname]": {
+                                        required: true
+                                    },
+                                    "credentials[email]": {
+                                        required: true,
+                                        emailRegex: true
+                                    },
+                                    "facility_icon": {
+                                        required: false
+                                    },
+                                    "facilityname": {
+                                        required: true
+                                    },
+                                    "address": {
+                                        required: true
+                                    },
+                                    "contactnumber": {
+                                        required: true,
+                                        phoneRegex: true
+                                    },
+                                    "operatinghours[openinghour]": {
+                                        required: true
+                                    },
+                                    "operatinghours[closinghour]": {
+                                        required: true
+                                    },
+                                },
+                                messages: {
+                                    "profile[adminname]": {
+                                        required: "Required"
+                                    },
+                                    "credentials[email]": {
+                                        required: "Required",
+                                        emailRegex: "Email format is incorrect."
+                                    },
+                                    "facility_icon": {
+                                        required: "Required",
+                                        extensionRegex: "Wrong file format, only .png extension."
+                                    },
+                                    "facilityname": {
+                                        required: "Required"
+                                    },
+                                    "address": {
+                                        required: "Required"
+                                    },
+                                    "contactnumber": {
+                                        required: "Required",
+                                        phoneRegex: "Contact number format is incorrect"
+                                    },
+                                    "operatinghours[openinghour]": {
+                                        required: "Required"
+                                    },
+                                    "operatinghours[closinghour]": {
+                                        required: "Required"
                                     }
-                                    return;
+                                },
+                                errorElement: "em",
+                                errorPlacement: function (error, element) {
+                                    // This is the default behavior 
+
+                                    error.insertAfter(element);
+                                    error.addClass("help-block invalid-feedback");
+                                },
+                                success: function (label, element) {
+
+                                    $(element).addClass("is-valid");
+
+                                },
+                                highlight: function (element, errorClass, validClass) {
+                                    $(element).addClass("is-invalid").removeClass("is-valid");
+                                },
+                                unhighlight: function (element, errorClass, validClass) {
+                                    $(element).addClass("is-valid").removeClass("is-invalid");
+
                                 }
-                                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                                    return new bootstrap.Tooltip(tooltipTriggerEl);
-                                });
-                                /*------------------------------------------------
-                                 CLIENT SIDE VALIDATION FOR EMAIL
-                                 -------------------------------------------------*/
+                            });
+                        });
 
-                                $(document).ready(function () {
-                                    $("#facility_form").validate({
-                                        rules: {
-                                            "profile[adminname]": {
-                                                required: true
-                                            },
-                                            "credentials[email]": {
-                                                required: true,
-                                                emailRegex: true
-                                            },
-                                            "facility_icon": {
-                                                required: false
-                                            },
-                                            "facilityname": {
-                                                required: true
-                                            },
-                                            "address": {
-                                                required: true
-                                            },
-                                            "contactnumber": {
-                                                required: true,
-                                                phoneRegex: true
-                                            },
-                                            "operatinghours[openinghour]": {
-                                                required: true
-                                            },
-                                            "operatinghours[closinghour]": {
-                                                required: true
-                                            },
-                                        },
-                                        messages: {
-                                            "profile[adminname]": {
-                                                required: "Required"
-                                            },
-                                            "credentials[email]": {
-                                                required: "Required",
-                                                emailRegex: "Email format is incorrect."
-                                            },
-                                            "facility_icon": {
-                                                required: "Required",
-                                                extensionRegex: "Wrong file format, only .png extension."
-                                            },
-                                            "facilityname": {
-                                                required: "Required"
-                                            },
-                                            "address": {
-                                                required: "Required"
-                                            },
-                                            "contactnumber": {
-                                                required: "Required",
-                                                phoneRegex: "Contact number format is incorrect"
-                                            },
-                                            "operatinghours[openinghour]": {
-                                                required: "Required"
-                                            },
-                                            "operatinghours[closinghour]": {
-                                                required: "Required"
-                                            }
-                                        },
-                                        errorElement: "em",
-                                        errorPlacement: function (error, element) {
-                                            // This is the default behavior 
-
-                                            error.insertAfter(element);
-                                            error.addClass("help-block invalid-feedback");
-                                        },
-                                        success: function (label, element) {
-
-                                            $(element).addClass("is-valid");
-
-                                        },
-                                        highlight: function (element, errorClass, validClass) {
-                                            $(element).addClass("is-invalid").removeClass("is-valid");
-                                        },
-                                        unhighlight: function (element, errorClass, validClass) {
-                                            $(element).addClass("is-valid").removeClass("is-invalid");
-
-                                        }
-                                    });
-                                });
-
-                                $.validator.addMethod("extensionRegex", function (value, element) {
-                                    return this.optional(element) ||
-                                            /^.*\.(png|PNG)$/
-                                            .test(value);
-                                }, "Wrong file format, only .png extension.");
+                        $.validator.addMethod("extensionRegex", function (value, element) {
+                            return this.optional(element) ||
+                                    /^.*\.(png|PNG)$/
+                                    .test(value);
+                        }, "Wrong file format, only .png extension.");
 
 
-                                $.validator.addMethod("phoneRegex", function (value, element) {
-                                    return this.optional(element) || /^[689]{1}[0-9]{7}$/.test(value);
-                                }, "Contact number format is incorrect");
+                        $.validator.addMethod("phoneRegex", function (value, element) {
+                            return this.optional(element) || /^[689]{1}[0-9]{7}$/.test(value);
+                        }, "Contact number format is incorrect");
 
-                                $.validator.addMethod("emailRegex", function (value, element) {
-                                    return this.optional(element) ||
-                                            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-                                            .test(value);
-                                }, "Email format is incorrect.");
+                        $.validator.addMethod("emailRegex", function (value, element) {
+                            return this.optional(element) ||
+                                    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                                    .test(value);
+                        }, "Email format is incorrect.");
 
                             </script>
 

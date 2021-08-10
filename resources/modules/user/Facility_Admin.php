@@ -10,6 +10,8 @@ require_once USER_MOD . '/Account_User.php';
 require_once ENUMS_PATH . '/User_Type.php';
 require_once SECURE_MOD . '/Security.php';
 
+use Google\Cloud\Firestore\Transaction;
+
 // -- Admin That Belongs To Certain Facility That Oversee Their Operations -- //
 class Facility_Admin extends Admin {
 
@@ -43,22 +45,22 @@ class Facility_Admin extends Admin {
     // -- Initialise Facility Admin
     public static function initialise_facility_admin(array $facility_admin_info): null|Facility_Admin {
 
-        try{
-        # Session Object
-        $session_obj = Session::intialise_session($facility_admin_info['session']);
+        try {
+            # Session Object
+            $session_obj = Session::intialise_session($facility_admin_info['session']);
 
-        # Time Object
-        $time_obj = Time::initialise_time($facility_admin_info['accountdetails']['createdon']);
+            # Time Object
+            $time_obj = Time::initialise_time($facility_admin_info['accountdetails']['createdon']);
 
-        # Facility Object
-        $facility_obj = Medical_Facility::retrieve_facility_by_id($facility_admin_info['profile']['facilityid']);
+            # Facility Object
+            $facility_obj = Medical_Facility::retrieve_facility_by_id($facility_admin_info['profile']['facilityid']);
 
-        # Facility Admin Object
-        $facility_admin = new Facility_Admin($session_obj, $facility_admin_info['accountdetails']['usertype'], $time_obj, $facility_admin_info['profile']['adminid'],
-                $facility_admin_info['profile']['adminname'], $facility_obj, $facility_admin_info['credentials']['email']);
+            # Facility Admin Object
+            $facility_admin = new Facility_Admin($session_obj, $facility_admin_info['accountdetails']['usertype'], $time_obj, $facility_admin_info['profile']['adminid'],
+                    $facility_admin_info['profile']['adminname'], $facility_obj, $facility_admin_info['credentials']['email']);
 
-        return $facility_admin;
-        } catch(Exception $ex){
+            return $facility_admin;
+        } catch (Exception $ex) {
             return null;
         }
     }
@@ -97,6 +99,40 @@ class Facility_Admin extends Admin {
         return false;
     }
 
+    // UPDATE 
+    public static function update_facility_admin(string $admin_id, string $adminname, string $email): bool|string {
+
+        $db = new DbQuery();
+
+        # Set Default Password  (Auto-generated)
+        $sec = new Security();
+        $default_pw = StringUtils::generate_token(12);
+        $hashed_pw = $sec->hash($default_pw);
+
+        $doc_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->document($admin_id);
+        $trnx_result = $db->get_db()->runTransaction(function (Transaction $transaction) use ($doc_ref, $adminname, $email, $default_pw, $hashed_pw) {
+
+            $snapshot = $transaction->snapshot($doc_ref);
+            $db_email = $snapshot['credentials']['email'];
+
+            if ($db_email == $email):
+                # Update Admin Details
+                $transaction->update($doc_ref, [['path' => 'profile.adminname', 'value' => $adminname]]);
+                return true;
+            else:
+                # Update Admin Details
+                $transaction->update($doc_ref, [
+                    ['path' => 'credentials.email', 'value' => $email],
+                    ['path' => 'credentials.password', 'value' => $hashed_pw],
+                    ['path' => 'profile.adminname', 'value' => $adminname]
+                ]);
+                return $default_pw; # -- Return The Pw If Manage To Change The Pw 
+            endif;
+        });
+
+        return $trnx_result;
+    }
+
     // -- RETRIEVE  FACILITY ADMIN DATA
     public static function retrieve_facility_admin(string $user_email): Facility_Admin {
 
@@ -120,6 +156,12 @@ class Facility_Admin extends Admin {
     public static function delete_facility_admin(string $id): void {
         $db = new DbQuery();
         $db->get_db()->collection(Database::ACCOUNT_USER)->document($id)->delete();
+    }
+
+    public static function check_facility_admin_exist(string $email): bool {
+
+//        $db = new DbQuery();
+//        $db->get_db()->collection(Database::ACCOUNT_USER)->where('profile.facilityid' , '!=', )
     }
 
 }

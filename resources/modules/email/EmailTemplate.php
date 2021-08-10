@@ -13,7 +13,6 @@ require_once USER_MOD . '/Normal_User.php';
 require_once USER_MOD . '/Admin.php';
 require_once USER_MOD . '/Facility_Admin.php';
 
-
 require_once APPT_MOD . '/Appointment_Record.php';
 
 class EmailTemplate {
@@ -362,6 +361,37 @@ class EmailTemplate {
 
             Email::sendEmail($facility_admin->get_email(), $subject, $message);
 
+        endif;
+    }
+
+    public static function template_fadmin_mail_change(string $to, string $facilityname, string $default_pw): void {
+
+        /// -- Check User Type &  Set Recipient
+        $recipient_usertype = Account_User::retrieve_user_type($to);
+
+        if ($recipient_usertype == User_Type::FACIILITY_ADMIN):
+            $to_name = Admin::retrieve_admin_name($to);
+
+            // -- Email Subject
+            $subject = "FYP-21-S2-24: Email Change";
+
+            // -- Miscellaneous
+            $login_url = "https://myappointment.tracieqwynn.tech/login/stafflogin.php";
+            $sign_off = "Sincerely, <br/>FYP-21-S2-24 Team";
+            $login_link = "<a href={$login_url} style='color:blue; text-decoration:none;'>{$login_url}</a>";
+
+            // -- Message
+            $message = "<span style='color:black;'>Hi {$to_name} (Administrator of {$facilityname}), " . self::LINEBREAK;
+            $message .= "This email has just been assigned as the administrator of {$facilityname} in MyAppointment website. " . self::LINEBREAK;
+            $message .= "The following is your credentials use for login. Please change your password after login. " . self::LINEBREAK;
+            $message .= "Email: {$to}" . self::LINEBREAK;
+            $message .= "Password:  {$default_pw}" . self::LINEBREAK;
+
+            $message .= "Please proceed to {$login_link} to login to your account." . self::LINEBREAK;
+
+            $message .= "{$sign_off}</span>";
+
+            Email::sendEmail($to, $subject, $message);
         endif;
     }
 
