@@ -140,10 +140,8 @@ else:
                 </style>
             </head>
             <body>
-                <!-- NavBar  (TOP) -->
+                <!-- NavBar  -->
                 <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
-                <!-- Canvas (SIDE) -->
-                <?php require_once TEMPLATES_PATH . "/fadmin-canvas.php"; ?>
                 <!-- Current Page (View Facility Specialisations) -->
                 <main class="mt-5 pt-3">
                     <div class="container-fluid">
@@ -187,11 +185,11 @@ else:
                                     </div>
                                     <!-- END OF ONE SPECIALISATION CARD -->
                                     <?php
-                            endforeach;
-                            ?>
+                                endforeach;
+                                ?>
 
+                            </div>
                         </div>
-                    </div>
 
                 </main>
                 <br />
@@ -224,6 +222,8 @@ else:
                 </section>
 
                 <script>
+                    $('#nav-facility').addClass('active');
+                    $('#nav-specialisation').addClass('active');
                     var req = null;
                     // -- Pass Information To Modal
                     function delete_specialisation(specialisation, count_identifier) {

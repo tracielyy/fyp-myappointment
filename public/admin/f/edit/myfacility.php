@@ -127,10 +127,8 @@ else:
                 </style>
             </head>
             <body>
-                <!-- NavBar  (TOP) -->
+                <!-- NavBar  -->
                 <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
-                <!-- Canvas (SIDE) -->
-                <?php require_once TEMPLATES_PATH . "/fadmin-canvas.php"; ?>
                 <!-- Current Page (Edit Medical Facility) -->
                 <main class="mt-5 p-3">
                     <!-- page title -->
@@ -215,6 +213,7 @@ else:
                 </div>
             </main>
             <!-- main body ends here -->
+
         </body>
         </html>
     <?php

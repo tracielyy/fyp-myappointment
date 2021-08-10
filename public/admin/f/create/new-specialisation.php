@@ -117,10 +117,8 @@ else:
 
             </head>
             <body>
-                <!-- NavBar  (TOP) -->
+                <!-- NavBar  -->
                 <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
-                <!-- Canvas (SIDE) -->
-                <?php require_once TEMPLATES_PATH . "/fadmin-canvas.php"; ?>
 
                 <!-- Current Page (Add New Specialisation -->
                 <main class="mt-5 pt-3">
@@ -170,6 +168,10 @@ else:
                 <!-- main ends here -->
                 <!-- for testing the input boxes and the reset button -->
                 <script>
+                    $('#nav-facility').addClass('active');
+                    $('#nav-specialisation').addClass('active');
+
+
                     var checkBoxes = document.querySelectorAll("input[type = 'checkbox']");
                     var btnReset = document.getElementById('resetBtn');
                     var inputs = document.querySelectorAll('input');

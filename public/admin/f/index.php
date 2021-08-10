@@ -52,6 +52,15 @@ else:
                 <!-- bootstrap data table -->
                 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css"/>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+                <!-- Prevent Form Resubmission -->
+                <script>
+                    if (window.history.replaceState) {
+                        window.history.replaceState(null, null, window.location.href);
+                    }
+                </script>
+                <!-- jQuery -->
+                <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
                 <style>
                     body {
                         margin: 0;
@@ -110,10 +119,8 @@ else:
                 </style>
             </head>
             <body>
-                <!-- NavBar  (TOP) -->
-        <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
-                <!-- Canvas (SIDE) -->
-                <?php require_once TEMPLATES_PATH . "/fadmin-canvas.php"; ?>
+                <!-- NavBar  -->
+                <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
                 <!-- Current Page Contents -->
                 <main class="mt-5 pt-3">
                     <div class="container-fluid">
@@ -197,18 +204,9 @@ else:
                     </div>
                 </main>
                 <!-- main ends here -->
-
-                <!-- bootstrap js link -->
-                <script
-                    src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-                    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-                    crossorigin="anonymous"
-                ></script>
-                <!-- bootstrap data tables cdn -->
-                <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/chart.js@3.4.1/dist/chart.min.js"></script>
-                <script src="script.js"></script>
-
+                <script>
+                    $('#nav-dashboard').addClass('active');
+                </script>
             </body>
         </html>
     <?php

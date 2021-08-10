@@ -129,10 +129,8 @@ else:
                 </style>
             </head>
             <body>
-                <!-- NavBar  (TOP) -->
+                <!-- NavBar  -->
                 <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
-                <!-- Canvas (SIDE) -->
-                <?php require_once TEMPLATES_PATH . "/fadmin-canvas.php"; ?>
                 <!-- Current Page (View Medical Facility) -->
                 <main class="mt-5 p-3">
                     <!-- page title -->
@@ -191,7 +189,10 @@ else:
                 </div>
             </main>
             <!-- main body ends here -->
-
+            <script>
+                $('#nav-facility').addClass('active');
+                $('#nav-facility-details').addClass('active');
+            </script>
         </body>
         </html>
     <?php
