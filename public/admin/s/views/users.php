@@ -31,6 +31,31 @@ else:
     if (!User_Type::check_user_type(User_Type::SUPER_ADMIN, $user_type)):
         header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
     else:
+
+        // Functions
+        function retrieve_user(string $type): array {
+            $user_arr = array();
+            $arr = Account_User::retrieve_user_by_type($type, 10);
+            foreach ($arr as $a):
+                $user_arr[] = initialise_user($a, $type);
+            endforeach;
+            return $user_arr;
+        }
+
+        function initialise_user(array $user, string $type): Account_User {
+            switch ($type):
+                case User_Type::PATIENT:
+                    return Patient::initialise_patient($user);
+                case User_Type::MEDICAL_PERSONNEL:
+                    return Medical_Personnel::initialise_medical_personnel($user);
+                case User_Type::FACIILITY_ADMIN:
+                    return Facility_Admin::initialise_facility_admin($user);
+            endswitch;
+        }
+        
+        // Retrieve Users (DEFAULT) 
+        $user_list = retrieve_user(User_Type::FACIILITY_ADMIN);
+        
         ?><!DOCTYPE html>
         <html lang="en">
             <head>
@@ -39,10 +64,7 @@ else:
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <title>View Facility</title>
                 <!-- fontawesome -->
-                <script
-                    src="https://kit.fontawesome.com/dcfd5ba5e7.js"
-                    crossorigin="anonymous"
-                ></script>
+                <script src="https://kit.fontawesome.com/dcfd5ba5e7.js" crossorigin="anonymous" ></script>
                 <!-- google fonts -->
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -132,17 +154,21 @@ else:
                 </style>
             </head>
             <body>
-                <?php require_once TEMPLATES_PATH . "/sadmin-navbar.php"; ?>
+        <?php require_once TEMPLATES_PATH . "/sadmin-navbar.php"; ?>
+                <!-- Current Page: Display Users By User_Type -->
+                <main class="mt-5 pt-3">
+                    <!-- INSERT CODE HERE -->
 
-
+                </main>
+                <!-- End of user display -->
                 <!-- js code for the bootstrap tooltip -->
                 <script>
-            $('#nav-users').addClass('active');
+                    $('#nav-users').addClass('active');
 
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
+                    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                        return new bootstrap.Tooltip(tooltipTriggerEl);
+                    });
                 </script>
                 <!-- bootstrap js link -->
                 <script
