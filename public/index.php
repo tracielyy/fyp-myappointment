@@ -28,8 +28,6 @@ $all_health_articles = Health_Info::retrieve_all_healthinfo();
 // echo "</pre>";
 $healtharticles_count = count($all_health_articles);
 
-$healtharticles_count = $healtharticles_count % 6;
-
 if ($healtharticles_count > 3 && $healtharticles_count < 6)
 {
     $index = 3;
@@ -82,14 +80,20 @@ if ($healtharticles_count > 3 && $healtharticles_count < 6)
     </section>
     <section id="health-snippets">
         <div class="row">
-            <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="row row-cols-1 row-cols-md-3 gx-4">
                <?php 
-               
                for($i = 0; $i < $index; $i++)
                {
                 $desc = substr($all_health_articles[$i]->get_descriptions(),0,100);
                 $desc = trim(preg_replace('/\s+/', ' ', $desc));
                 $type = $all_health_articles[$i]->get_type();
+                $title = $all_health_articles[$i]->get_title();
+                $title_length = strlen($title);
+                // if ($title_length > 20)
+                // {
+                //     $title = substr($all_health_articles[$i]->get_descriptions(),0,20);
+                //     $title = $title."...";
+                // }
                 if ($type == 'World Health Notice')
                 {
                     $badge = '<span class="badge bg-warning">World Health Notice</span>';
@@ -105,13 +109,13 @@ if ($healtharticles_count > 3 && $healtharticles_count < 6)
                     $icon = '<i class="fas fa-plus-square fa-7x card-icon"></i>';
                 }
                 echo '<div class="col">';
-                echo '<div class="card shadow rounded1 mb-3 h-30" style="max-width: 540px; ">';
+                echo '<div class="card shadow rounded1 mb-3 h-30" style="max-width: 540px; min-height:223px;">';
                 echo '<div class="row g-0">';
                 echo '<div class="col-xl-4 col-lg-12 col-md-12 col-xs-12">';
                 echo $icon.'</div>';
                 echo '<div class="col-xl-8 col-lg-0 col-md-0 col-xs-0">';
                 echo '<div id="#cardcontainer" class="card-body ms-2" style="min-height:153px;">';
-                echo '<h5 class="card-title">'.$all_health_articles[$i]->get_title().'</h5>';
+                echo '<h5 class="card-title title-clamp">'.$title.'</h5>';
                 echo $badge;
                 echo '<p class="card-text line-clamp mt-3">'.$desc.'</p>';
                 echo '</div>';
@@ -122,6 +126,7 @@ if ($healtharticles_count > 3 && $healtharticles_count < 6)
 
             </div>
         </div>
+        
         <div class="text-center mt-3">
             <a class="btn btn-outline-primary btn-lg" href="healthlist.php" type="button">More Health Information and Tips </a>
         </div>
