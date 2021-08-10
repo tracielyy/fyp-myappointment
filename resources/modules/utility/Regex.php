@@ -13,6 +13,7 @@
 class Regex {
 
     private const NAME_PATTERN = "/^(?![ .]+$)[a-zA-Z ,]*$/";
+    private const ADMIN_NAME_PATTERN = "/^([a-z0-9]+-)*[a-z0-9]+$/i";
     private const EMAIL_PATTERN = '/^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})$/';
     private const PHONE_PATTERN = "/^[689]{1}[0-9]{7}$/"; // Singapore phone number length
     private const PASSWORD_PATTERN = "/^" . // Pattern Match From Start Of String
@@ -41,6 +42,13 @@ class Regex {
 
     public static function validate_phone(string $contactnumber): bool {
         if (preg_match(self::PHONE_PATTERN, $contactnumber)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static function validate_adminname(string $adminname): bool {
+        if (preg_match(self::ADMIN_NAME_PATTERN, $adminname)) {
             return true;
         }
         return false;

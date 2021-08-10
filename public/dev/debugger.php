@@ -3,10 +3,17 @@ session_start();
 /* Load Config File */
 require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/config.php';
 require VENDOR_PATH . '/autoload.php';
+
+require_once ENUMS_PATH . '/Health_Info_Type.php';
+require_once ENUMS_PATH . '/User_Type.php';
+
 require_once TIME_MOD . '/Time.php';
 require_once FACILITY_MOD . '/Operating_Hours.php';
 require_once USER_MOD . '/Account_User.php';
+require_once USER_MOD . '/Patient.php';
+
 require_once MEDDOC_MOD . '/Medical_Record.php';
+require_once HINFO_MOD . '/Health_Info.php';
 
 require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
@@ -16,6 +23,7 @@ require_once APPT_MOD . '/Normal_Slot.php';
 require_once APPT_MOD . '/Special_Slot.php';
 
 require_once SECURE_MOD . '/ValidateIC.php';
+require_once SECURE_MOD . '/Security.php';
 
 require_once USER_MOD . '/Medical_Personnel.php';
 require_once EMAIL_MOD . '/EmailTemplate.php';
@@ -117,7 +125,7 @@ function retrieve_slots(string $facilityid, string $appointmenttype, string $dat
 //$patient_per_day += Special_Slot::patient_count_per_date("mf001", "15-07-2021");
 # -- Get Slots
 $doctor_doc_id = "Medical_Personnel-iBnhkCP6HAhM0MvxeI4O";
-$slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com", "15-07-2021");
+//$slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com", "15-07-2021");
 ?><!DOCTYPE html>
 <html lang="en">
     <head>
@@ -128,15 +136,15 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
         <?php require TEMPLATES_PATH . '/bootstrap.php' ?>
     </head>
     <body>
-        <?php // echo $patient_per_day;         ?>
+        <?php // echo $patient_per_day;          ?>
         <?php // echo var_dump($slot_arr);          ?>
 
         <?php
 //       $slots_arr = Normal_Slot::retrieve_free_slots_by_date("mf001", Appointment_Type::DOCTOR_CONSULTATION, "15-07-2021");
 //        $slots_arr = Special_Slot::retrieve_free_slots_by_date("mf001", "wynterz2525@gmail.com", "15-07-2021");
-        foreach ($slot_arr as $slot):
-            echo nl2br($slot->get_slotid() . PHP_EOL);
-        endforeach;
+//        foreach ($slot_arr as $slot):
+//            echo nl2br($slot->get_slotid() . PHP_EOL);
+//        endforeach;
         // -- Testing Of Appt Booking Via HardCode
         echo nl2br(PHP_EOL . "Testing Book Specialist -- HARDCODE --" . PHP_EOL);
         $booking_array = array(
@@ -250,7 +258,7 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
         function user_change_password(string $user_email, string $current_password, string $new_password): bool {
             $success = Account_User::change_password($user_email, $current_password, $new_password);
             if ($success):
-                EmailTemplate::template_passwordchanged("yanying25@outlook.com");
+//                EmailTemplate::template_passwordchanged("yanying25@outlook.com");
                 return true;
             endif;
             return false;
@@ -425,8 +433,8 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
         </form>
         <?php
         echo nl2br(PHP_EOL . "Testing Medical Record ID Generation -- HARDCODE --" . PHP_EOL);
-        $user_doc_id = Account_User::retrieve_user_doc_id("yanying25@outlook.com");
-        echo Medical_Record::generate_medical_record_id($user_doc_id);
+//        $user_doc_id = Account_User::retrieve_user_doc_id("yanying25@outlook.com");
+//        echo Medical_Record::generate_medical_record_id($user_doc_id);
 
         echo nl2br(PHP_EOL . "Testing Login Redirect Lcoation -- HARDCODE --" . PHP_EOL);
 //        echo LOGIN_WEB;
@@ -484,16 +492,208 @@ $slot_arr = Special_Slot::retrieve_booked_slots_by_date("wynterz2525@gmail.com",
 //        }
 //        echo multi_return_type("omg");
         echo nl2br(PHP_EOL . "Testing Update Medical Record-- HARDCODE --" . PHP_EOL);
-        $mrid = '035f05cbf562436d8f30';
-        $pt_id = 'S1499902G';
-//        $dr_id = 'S1990250A';
-        $dr_id = 'S1990250D'; // Fake id
+//        $mrid = '035f05cbf562436d8f30';
+//        $pt_id = 'S1499902G';
+////        $dr_id = 'S1990250A';
+//        $dr_id = 'S1990250D'; // Fake id
+//
+//        $diagnosisdesc = "This is a flu. Fever for 4 days straight";
+//        $prescriptions = array('Fever Med', 'Flu Med');
+//
+//        $medical_record_update = Medical_Record::update_medical_record($dr_id, $pt_id, $mrid, $diagnosisdesc, $prescriptions);
+//        echo ($medical_record_update) ? "true" : "false";
 
-        $diagnosisdesc = "This is a flu. Fever for 4 days straight";
-        $prescriptions = array('Fever Med', 'Flu Med');
+        echo nl2br(PHP_EOL . "Testing HASH-- HARDCODE --" . PHP_EOL);
+//        $password = "Line@123";
+//        $sec = new Security();
+//        $hash_password = $sec->hash($password);
+//
+//        echo 'hashed password: ' . $hash_password . "<br/>";
+//
+//        $input_password = "Line@123";
+////        $input_hash = $sec->hash($input_password);
+//        echo "input_hashed: " . $input_hash;
+//
+//        echo $password_verify = $sec->compareHash($input_password, $hash_password);
+        echo nl2br(PHP_EOL . "Testing Change Password -- HARDCODE --" . PHP_EOL);
+//        $c_password = "Admin@123";
+//        $n_password = "Admin@888";
+//        $my_email = "tracieqwynn@gmail.com";
+//        $change_pw_result = Account_User::change_password($my_email, $n_password, $c_password);
+//        echo ($change_pw_result) ? "change success" : "change unsucessful";
 
-        $medical_record_update = Medical_Record::update_medical_record($dr_id, $pt_id, $mrid, $diagnosisdesc, $prescriptions);
-        echo ($medical_record_update) ? "true" : "false";
+        echo nl2br(PHP_EOL . "Testing Nric Exist -- HARDCODE --" . PHP_EOL);
+        $nric_plaintext = "S9603505E";
+        $nric_plaintext2 = "S9173333A";
+
+        $secure = new Security();
+        $en_nric = "SWQ1NkNlMTVyMFg5MnFUZklleERHZz09OjogrYEevxerJdoF34CcQumd";
+//        $de_nric = $secure->decrypt($en_nric);
+//        echo $de_nric;
+//        echo "<br/>" . $e_plainnric = $secure->encrypt($nric_plaintext);
+//        echo "<br/>" . $e_plainnric = $secure->encrypt($nric_plaintext);
+//        echo "<br/>" .  $secure->encrypt($nric_plaintext2);
+//
+//        echo "<br/>" . $secure->decrypt($secure->encrypt($nric_plaintext));
+//        echo "<br/>" . $secure->decrypt($secure->encrypt($nric_plaintext));
+
+        if ($_SERVER["REQUEST_METHOD"] == "POST"):
+            if (isset($_POST['check_nric'])):
+                $nric_exist = Account_User::check_nric_exist($_POST['cnric']);
+                echo $nric_exist ? "nric exist" : "nric does not exist";
+            endif;
+        endif;
+        ?>
+
+        <form id="check_nric" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <input type="text" name="cnric" placeholder="NRIC" />
+            <button type="submit" name="check_nric" class="action back btn btn-sm btn-outline-primary">Check NRIC</button>
+        </form>
+
+        <?php
+        echo nl2br(PHP_EOL . "Testing Pagination -- HARDCODE --" . PHP_EOL);
+//
+//        $doctor_by_fid = Medical_Personnel::retrieve_personnel_by_facility('mf001');
+////        echo "<pre>";
+////        var_dump($doctor_by_fid);
+////        echo "</pre>";
+//        $last_doc = array();
+//        echo "First Page Query <br/>";
+//        foreach ($doctor_by_fid as $doctor):
+//            echo $doctor->get_firstname() . " " . $doctor->get_lastname();
+//            echo "<br/>";
+//            $last_doc = array($doctor->get_firstname(), $doctor->get_lastname(), $doctor->get_email());
+//        endforeach;
+//        echo "The last doctor email is " . $last_doc[2];
+//        $doctor_by_id2 = Medical_Personnel::retrieve_personnel_by_facility('mf001', true, $last_doc);
+//        echo "<br/><br/>Second Page Query<br/>";
+//
+//        foreach ($doctor_by_id2 as $doctor):
+//            echo $doctor->get_firstname() . " " . $doctor->get_lastname();
+//            echo "<br/>";
+//            $last_doc = array($doctor->get_firstname(), $doctor->get_lastname(), $doctor->get_email());
+//        endforeach;
+//        echo "<br/>Third Page Query <br/>";
+//        $doctor_by_id2 = Medical_Personnel::retrieve_personnel_by_facility('mf001', true, $last_doc);
+//
+//        foreach ($doctor_by_id2 as $doctor):
+//            echo $doctor->get_firstname() . " " . $doctor->get_lastname();
+//            echo "<br/>";
+//            $last_doc = $doctor->get_email();
+//        endforeach;
+//        $fac_arr = Medical_Facility::retrieve_paginate_facilities();
+//        foreach ($fac_arr as $doc):
+//            echo $fid = $doc->get_facilityid();
+//        endforeach;
+
+        echo nl2br(PHP_EOL . "Testing Health Info -- HARDCODE --" . PHP_EOL);
+        $health_info_types = Health_Info_Type::get_constants();
+        $all_health_info = Health_Info::retrieve_all_healthinfo(); # Page One
+        if (empty($all_health_info) || $all_health_info == null):
+            echo "There Are No Health Info Records Available";
+        else:
+        endif;
+        $health_info_form = array(
+            'title' => '',
+            'descriptions' => '',
+            'type' => ''
+        );
+        if ($_SERVER["REQUEST_METHOD"] == "POST"):
+
+            if (isset($_POST['submit_health_info'])):
+                /* Load Data to Array */
+                foreach ($_POST as $key => $value) :
+                    if (isset($health_info_form[$key])) :
+                        $health_info_form[$key] = htmlspecialchars($value);
+                        $validArr[$key] = False; // Set All Field Validation Check As False
+
+                    endif;
+                endforeach;
+            endif;
+        endif;
+        ?>
+        <form id="health_info_form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <input type="text" name="title" placeholder="Title" value="<?php echo $health_info_form['title']; ?>" /><br/><br/>
+            <textarea style="resize:none;" rows="10" cols='50' name="descriptions" 
+                      placeholder="Descriptions" ><?php echo $health_info_form['descriptions']; ?></textarea><br/><br/>
+            <select>
+                <?php
+                foreach ($health_info_types as $type):
+                    ?>
+                    <option value="<?php echo $type; ?>"><?php echo $type; ?></option>
+                    <?php
+                endforeach;
+                ?>
+            </select><br/><br/>
+            <button type="submit" name="submit_health_info" class="action back btn btn-sm btn-outline-primary">
+                Add Health Info
+            </button>
+        </form>
+        <?php
+//        $update_status = Health_Info::update_healthinfo("hinfo-10003", "Change", "New Description");
+//        echo ($update_status) ? "updated health info" : "not updated";
+//        Health_Info::delete_healthinfo("hinfo-10007");
+        ?>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <form id="edit_form" method="get" action="<?php echo FADMIN_WEB . "/edit/healthinfo.php"; ?>">
+            <input type="hidden" id ="id"  name="id" value="hinfo-10003"/>
+            <button type="submit" name="edit_health_info" id="edit_health_info"  class="action back btn btn-sm btn-outline-primary">
+                Edit Health Info
+            </button>
+        </form>
+        <?php
+        echo nl2br(PHP_EOL . "Testing Create Special Slot -- HARDCODE --" . PHP_EOL);
+//        $slot = Special_Slot::retrieve_apptslot_by_id('1001~03-09-2021~S8967399B', 'mf001');
+//        echo var_dump($slot);
+//        $spec_slot_arr = Special_Slot::retrieve_free_slots_by_date("mf001", "testdoc001@gmail.com", "03-09-2021");
+//        foreach ($spec_slot_arr as $slot):
+//            echo nl2br($slot->get_appointmentschedule()->get_time() . PHP_EOL);
+//        endforeach;
+//        $test = Medical_Personnel::retrieve_personnel_by_facility_spec("mf001");
+//        echo var_dump($test);
+
+        if (isset($_POST['create_special_slot'])):
+            $test_doctor_email = 'testdoc001@gmail.com';
+            $date = "03-09-2021";
+            $time = "14:40";
+            $facilityid = 'mf001';
+            $status = Special_Slot::create_slot($test_doctor_email, $facilityid, $date, $time);
+            echo ($status) ? "true" : "false";
+        endif;
+        ?>
+        <form id="health_info_form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <button type="submit" name="create_special_slot" class="action back btn btn-sm btn-outline-primary">
+                Create A Special Slot
+            </button>
+        </form>
+        <?php
+
+        function retrieve_user(string $type): array {
+            $user_arr = array();
+            $arr = Account_User::retrieve_user_by_type($type, 10);
+            foreach ($arr as $a):
+                $user_arr[] = initialise_user($a, $type);
+            endforeach;
+            return $user_arr;
+        }
+
+        function initialise_user(array $user, string $type): Account_User {
+            switch ($type):
+                case User_Type::PATIENT:
+                    return Patient::initialise_patient($user);
+                case User_Type::MEDICAL_PERSONNEL:
+                    return Medical_Personnel::initialise_medical_personnel($user);
+                case User_Type::FACIILITY_ADMIN:
+                    return Facility_Admin::initialise_facility_admin($user);
+            endswitch;
+        }
+        
+        $user_list = retrieve_user(User_Type::FACIILITY_ADMIN);
+        echo var_dump($user_list);
+        foreach($user_list as $user):
+            echo $user->get_email() . "<br/>";
+        endforeach;
+        
         ?>
 
     </body>

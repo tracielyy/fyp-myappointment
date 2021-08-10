@@ -204,7 +204,7 @@ class Medical_Facility {
             $arr = $doc_ref->limit(2)->documents();
         else:
             # Consecutive Query
-            $arr = $doc_ref->startAfter($startAfter)->limit(2)->documents();
+            $arr = $doc_ref->startAfter([$startAfter])->limit(2)->documents();
         endif;
 
         # Loop & Add To Container
@@ -217,6 +217,26 @@ class Medical_Facility {
         }
 
         return $facility_arr;
+    }
+
+    // UDPATE // 
+    public static function update_facility(string $id, array $facility_info): bool {
+        $db = new DbQuery();
+        $ref = $db->get_db()->collection(Database::MEDICAL_FACILITY)->document($id);
+        $trnx_result = $db->get_db()->runTransaction(function (Transaction $transaction)
+        use ($ref, $facility_info) {
+            
+            $transaction->update($ref, [
+                ['path'=> 'address', 'value'=> $facility_info['address']],
+                ['path'=> 'contactnumber', 'value'=> $facility_info['contactnumber']],
+                ['path'=> 'facilityname', 'value' => $facility_info['facilityname']],
+                ['path'=> 'operatinghours.is24hours', 'value' => $facility_info['operatinghours']['is24hours']],
+                ['path'=> 'operatinghours.openinghour', 'value' => $facility_info['operatinghours']['openinghour']],
+                ['path'=> 'operatinghours.closinghour', 'value'=> $facility_info['operatinghours']['closinghour']]
+            ]);
+            return true;
+        });
+        return $trnx_result;
     }
 
     // -- CHECK IF THE FACILITY EXIST
