@@ -44,10 +44,7 @@
     <script src="https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
-    <style>
-    <?php include './css/healthlist.css';
-    ?>
-    </style>
+    <link rel="stylesheet" href="/css/healthlist.css">
 
 </head>
 

@@ -26,7 +26,7 @@ include_once TEMPLATES_PATH . '/navbar.php';
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Why You Should Take Care of Your Body and Health</title>
+    <title>Article</title>
     <style>
     h4 {
         margin-bottom: 0px;
@@ -76,7 +76,7 @@ if (isset($_SESSION["user"])):
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item"><a href="healthlist.php">Article List</a></li>
+                        <li class="breadcrumb-item"><a href="./">Article List</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Article:
                             <?php echo $article->get_title(); ?></li>
                     </ol>

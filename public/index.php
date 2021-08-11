@@ -128,7 +128,7 @@ if ($healtharticles_count > 3 && $healtharticles_count < 6)
         </div>
         
         <div class="text-center mt-3">
-            <a class="btn btn-outline-primary btn-lg" href="healthlist.php" type="button">More Health Information and Tips </a>
+            <a class="btn btn-outline-primary btn-lg" href="healthtips/" type="button">More Health Information and Tips </a>
         </div>
 
     </section>

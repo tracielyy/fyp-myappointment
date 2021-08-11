@@ -86,7 +86,7 @@ if($usertype == "Medical Personnel"){};
                         <ul class="dropdown-menu dropdown-menu-secondary dropdown-menu-end" aria-labelledby="navbarDarkDropdownMenuLink">
                         <?php if($usertype == "Medical Personnel"){echo '<li><a class="dropdown-item" href="'.DOC_WEB.'">View Dashboard</a></li>';} ?>
                             <li><a class="dropdown-item" href="<?php echo ACC_WEB. '/profile.php';?>">Profile</a></li>
-                        <?php if($usertype == "Patient"){echo '<li><a class="dropdown-item" href="<?php echo APPT_WEB; ?>">View Appointments</a></li>';} ?>
+                        <?php if($usertype == "Patient"){echo '<li><a class="dropdown-item" href="'.APPT_WEB.'">View Appointments</a></li>';} ?>
                             <li><a class="dropdown-item" href="<?php echo LOGIN_WEB . "/logout.php"; ?>">Log out</a></li>
                         </ul>
                     </li>
