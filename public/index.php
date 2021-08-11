@@ -89,11 +89,7 @@ if ($healtharticles_count > 3 && $healtharticles_count < 6)
                 $type = $all_health_articles[$i]->get_type();
                 $title = $all_health_articles[$i]->get_title();
                 $title_length = strlen($title);
-                // if ($title_length > 20)
-                // {
-                //     $title = substr($all_health_articles[$i]->get_descriptions(),0,20);
-                //     $title = $title."...";
-                // }
+
                 if ($type == 'World Health Notice')
                 {
                     $badge = '<span class="badge bg-warning">World Health Notice</span>';
@@ -150,7 +146,8 @@ if ($healtharticles_count > 3 && $healtharticles_count < 6)
                                 <h5 class="card-title">About Us</h5>
                                 <p class="card-text">We are an appointment booking service, to help you book appointment
                                     the easiest and fastest possible to your desired registered clinic! </p>
-                                <a href="">FAQ</a> <br />
+                                <a href="faqs.php">FAQ</a> <br />
+                                <a href="clinics.php">Registered Clinics</a> <br />
                             </div>
                         </div>
 

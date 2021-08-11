@@ -19,8 +19,6 @@
 if($usertype == "Medical Personnel"){};
 ?>
 
-
-
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-primary py-3 shadow" style="border-radius:0px;">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">FYP-21-S2-24</a>
@@ -81,13 +79,34 @@ if($usertype == "Medical Personnel"){};
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">
                            <i class="fas fa-user fa-lg me-2"></i>
-                            <label class="text-light mt-1"><?php echo $user->get_firstname(); ?></label>
+                            <?php 
+                            if (($usertype=='Medical Personnel') || ($usertype == 'Patient'))
+                            {
+                               echo '<label class="text-light mt-1">'.$user->get_firstname().'</label>';
+                            } else
+                            {
+                                echo '<label class="text-light mt-1">'.$user->get_adminname().'</label>';
+                            }
+                            ?>
+                            
                         </a>
                         <ul class="dropdown-menu dropdown-menu-secondary dropdown-menu-end" aria-labelledby="navbarDarkDropdownMenuLink">
-                        <?php if($usertype == "Medical Personnel"){echo '<li><a class="dropdown-item" href="'.DOC_WEB.'">View Dashboard</a></li>';} ?>
+                        <?php if (($usertype=='Medical Personnel') || ($usertype == 'Patient')):
+                        if($usertype == "Medical Personnel"){echo '<li><a class="dropdown-item" href="'.DOC_WEB.'">View Dashboard</a></li>';} ?>
                             <li><a class="dropdown-item" href="<?php echo ACC_WEB. '/profile.php';?>">Profile</a></li>
                         <?php if($usertype == "Patient"){echo '<li><a class="dropdown-item" href="'.APPT_WEB.'">View Appointments</a></li>';} ?>
                             <li><a class="dropdown-item" href="<?php echo LOGIN_WEB . "/logout.php"; ?>">Log out</a></li>
+                        <?php 
+                        else:
+                            if($usertype == "Super Admin")
+                            {
+                                echo '<li><a class="dropdown-item" href="admin/s/">Admin Panel</a></li>';
+                            }else
+                            {
+                                echo '<li><a class="dropdown-item" href="admin/f/">Admin Panel</a></li>';
+                            }
+                        endif;
+                        ?>
                         </ul>
                     </li>
                 </ul>
