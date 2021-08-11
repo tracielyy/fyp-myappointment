@@ -122,6 +122,8 @@ else:
                                 margin-left: var(--offcanvas-width);
                             }
                         }
+
+                    
                     </style>
                 </head>
                 <body>

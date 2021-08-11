@@ -79,7 +79,7 @@ class Health_Info {
         $db = new DbQuery();
         $ref = $db->get_db()->collection(Database::HEALTH_INFO)->orderBy('id', 'DESC');
 
-        $limit = 10;
+        $limit = 6;
 
         if ($startAfter == null):
             # Beginning Query 

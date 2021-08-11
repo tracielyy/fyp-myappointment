@@ -108,6 +108,13 @@ else:
                     #ArticleUrl{
                         margin-bottom: 10px;
                     }
+
+                    .line-clamp {
+                        display: -webkit-box;
+                        -webkit-line-clamp: 3;
+                        -webkit-box-orient: vertical;  
+                        overflow: hidden;
+                         }
                     /* make the offcanvas visible on the large screens */
                     @media (min-width: 992px) {
                         body {
@@ -160,7 +167,7 @@ else:
                                                     <h3 id="title"><?php echo $article->get_title(); ?></h3>
                                                     <h4 id="type" class="text-start small text-muted"><?php echo $article->get_type(); ?></h4>
                                                     <h6 class="desc_header"></h6>
-                                                    <p><?php echo $article->get_descriptions(); ?></p>
+                                                    <p class="line-clamp"><?php echo $article->get_descriptions(); ?></p>
                                                     <!-- Buttons -->
                                                     <div class="d-grid gap-2 d-md-flex justify-content-between">
                                                         <!-- edit button -->

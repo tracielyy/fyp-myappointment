@@ -1,8 +1,11 @@
 body{
     margin-top:20px;
     color: #1a202c;
-    text-align: left;
-    background-color: #ececec;    
+    text-align: left; 
+}
+
+a {
+    text-decoration: none;
 }
 
 .headercard
