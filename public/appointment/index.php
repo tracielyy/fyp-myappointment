@@ -62,14 +62,12 @@ if (isset($_SESSION["user"])):
     $user_type = $user->get_usertype();
     $email['credentials']['email'] = $user_email;
 
-
     // -- UPDATE APPOINTMENT RECORD IN PATIENT OBJECT -- //
     # Get Appt Record
     $updated_appt_records = Appointment_Record::retrieve_patient_all_appointments($email);
 
     # Update Appt Record
     $user->set_appointmentrecords($updated_appt_records);
-
 
     // -- When User Click On The Buttons -- //
     if ($_SERVER['REQUEST_METHOD'] == "POST"):
@@ -82,7 +80,6 @@ if (isset($_SESSION["user"])):
 //            $appt_event->debug_print();
             $appt_event->show();
 
-
         // -- CANCEL APPOINTMENT
         elseif (isset($_POST['cancel'])):
 
@@ -94,7 +91,7 @@ if (isset($_SESSION["user"])):
 
             # -- Alert User Of Cancelled Appointment
             EmailTemplate::template_cancelappointment($user_email, $appt_record);
-            header("Location:./debugviewappointments.php");
+            header("Location:./");
 
         // -- RESCHEDULE APPOINTMENT
         elseif (isset($_POST['reschedule'])):
@@ -131,7 +128,15 @@ if (isset($_SESSION["user"])):
                 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
 
                 <title>View Appointments</title>
+                <!-- Prevent Form Resubmission -->
+                <script>
+                    if (window.history.replaceState) {
+                        window.history.replaceState(null, null, window.location.href);
+                    }
+                </script>
+                <!-- jQuery -->
                 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
                 <script>
                     // -- Pass Information To Modal
                     function upcoming_cancel_appt(appt_info) {
@@ -212,7 +217,7 @@ if (isset($_SESSION["user"])):
                                             <div class="col">
                                                 <div class="card shadow" style="border-radius: 10px;">
                                                     <div class="card-header">
-                                                        <?php echo $record->get_appointmenttype(); // Return String           ?>
+                                                        <?php echo $record->get_appointmenttype(); // Return String            ?>
                                                     </div> <!-- CARD HEADER -->
                                                     <div class="card-body">
                                                         <!-- Add Event To Calendar (ICS FILE) -->
@@ -223,13 +228,13 @@ if (isset($_SESSION["user"])):
                                                         <button id="<?php echo $calendar_event_data; ?>" type="submit" value="<?php echo $calendar_event_data; ?>" name="calendar-invite" href="#" class="btn btn-outline-secondary" style="float: right;" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to calendar">
                                                             <i class="fas fa-calendar-alt"></i></button><br>
                                                         Appointment ID:
-                                                        <?php echo $record->get_appointmentid(); // Return Appointment ID            ?>
+                                                        <?php echo $record->get_appointmentid(); // Return Appointment ID             ?>
                                                         <br>Appointment Status:
-                                                        <?php echo $record->get_appointmentstatus(); // Return Appointment status           ?>
+                                                        <?php echo $record->get_appointmentstatus(); // Return Appointment status            ?>
                                                         <br>
-                                                        <br>Date: <?php echo Time::date_format_change($date, Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                           ?>
-                                                        <br>Time: <?php echo Time::to_12hours($time, false); // Returns Time                                                                                                                                              ?>
-                                                        <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                                ?>
+                                                        <br>Date: <?php echo Time::date_format_change($date, Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                             ?>
+                                                        <br>Time: <?php echo Time::to_12hours($time, false); // Returns Time                                                                                                                                               ?>
+                                                        <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                                  ?>
 
                                                         <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                                         <br>Address: <?php echo $record->get_facility()->get_address(); ?>
@@ -303,18 +308,18 @@ if (isset($_SESSION["user"])):
                                         <div class="col">
                                             <div class="card shadow" style="border-radius: 10px;">
                                                 <div class="card-header">
-                                                    <?php echo $record->get_appointmenttype(); // Return String                    ?>
+                                                    <?php echo $record->get_appointmenttype(); // Return String                     ?>
                                                 </div> <!-- CARD HEADER -->
                                                 <div class="card-body">
                                                     Appointment ID:
-                                                    <?php echo $record->get_appointmentid(); // Return Appointment ID                    ?>
+                                                    <?php echo $record->get_appointmentid(); // Return Appointment ID                     ?>
                                                     <br>Appointment Status:
-                                                    <?php echo $record->get_appointmentstatus(); // Return Appointment status                   ?>
+                                                    <?php echo $record->get_appointmentstatus(); // Return Appointment status                    ?>
                                                     <br>
                                                     <?php $appt_schedule = $record->get_appointmentslot()->get_appointmentschedule(); ?>
-                                                    <br>Date: <?php echo Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                        ?>
-                                                    <br>Time: <?php echo Time::to_12hours($appt_schedule->get_time(), false); // Returns Time                                                                                                                                              ?>
-                                                    <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                               ?>
+                                                    <br>Date: <?php echo Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                         ?>
+                                                    <br>Time: <?php echo Time::to_12hours($appt_schedule->get_time(), false); // Returns Time                                                                                                                                                ?>
+                                                    <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                                ?>
 
                                                     <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                                     <br>Address: <?php echo $record->get_facility()->get_address(); ?>

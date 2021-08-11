@@ -192,15 +192,10 @@ class Appointment_Record {
                         ->where("appointmentstatus", "=", Appointment_Status::UPCOMING)
                         ->where("appointmenttype", "=", $booking_info['appointmenttype'])->documents();
 
-        echo nl2br(PHP_EOL . "Get Called" . PHP_EOL);
-
         # Loop & Check If There Is Any Match
         foreach ($snapshot as $doc):
             if ($doc->exists()):
                 $comparison_date = explode("~", $doc->data()['slotid'])[1];
-
-                echo "Comparison Date: " . $comparison_date . "<br/>";
-                echo "Booking Date: " . $booking_date . "<br/>";
                 # Check If Have Same Appointment Type In The Same Day
                 if ($comparison_date == $booking_date):
                     return False;
