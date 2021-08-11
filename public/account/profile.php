@@ -18,10 +18,17 @@ include TEMPLATES_PATH . '/bootstrap.php';
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>
+        <title>Profile</title>
         <link rel="stylesheet" href="./../css/profile.css">
         <!-- font awesome cdn -->
         <script src="https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
+        <!-- Prevent Form Resubmission -->
+        <script>
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+        </script>
+        <!-- jQuery -->
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
         <style>
@@ -58,29 +65,40 @@ include TEMPLATES_PATH . '/bootstrap.php';
             if (User_Type::check_user_type(User_Type::PATIENT, $user_type) || User_Type::check_user_type(User_Type::MEDICAL_PERSONNEL, $user_type)):
                 include_once TEMPLATES_PATH . '/navbar-loggedin.php';
 
-                if (isset($_POST['submitpassword'])) :
+                if ($_SERVER["REQUEST_METHOD"] == "POST" || $_SERVER["REQUEST_METHOD"] == "GET"):
 
-                    $oldpass = $_POST['oldpassword'];
-                    $newpass = $_POST['password'];
-                    $confirmpass = $_POST['confirmpassword'];
-                    $secure = new Security();
+                    $details = array(
+                        'credentials' => array(
+                            'password' => '',
+                        ),
+                        'confirmpassword' => '',
+                        'currentpassword' => ''
+                    );
 
-                    if (Authentication::authenticate_user($user->get_email(), $user->get_usertype(), $oldpass)) :
-                        if ($confirmpass == $newpass) :
-                            $new_hashed_pw = $secure->hash($newpass);
-                            Account_User::update_password($user->get_email(), $new_hashed_pw);
-                        //$user->set_password($new_hashed_pw);
-                        //  -- NEED ALERT TO SHOW PASSWORD HAS CHANGED
-                        //echo "new password set";
-                        else :
-                        //confirm pass and new pass are not the same
+                    $validArr = array();
+                endif;
+
+                // loop and store all the information into an array
+                function store_info(array &$post, array &$info_arr, array &$validArr): void {
+                    foreach ($post as $key => $value) :
+                        if (isset($info_arr[$key])) :
+
+                            // calls itself if it is an array
+                            if (is_array($value)):
+                                store_info($post[$key], $info_arr[$key], $validArr);
+                            else:
+                                $info_arr[$key] = htmlspecialchars($value);
+                                $validArr[$key] = False; // Set All Field Validation Check As False
+                            endif;
                         endif;
-                    else :
-                    //echo "Current Password is wrong";
-                    //  -- NEED ALERT TO SHOW PASSWORD ENTERED WRONG
-                    endif;
+                    endforeach;
+                }
 
-                elseif (isset($_POST['updateaddress'])) :
+                if (isset($_POST['submitpassword'])) :
+                    store_info($_POST, $details, $validArr);
+                endif;
+
+                if (isset($_POST['updateaddress'])) :
 
                     $newaddress = $_POST['address'];
                     if (Account_User::update_address($user->get_email(), $newaddress)) :
@@ -176,32 +194,21 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                             </button>
                                         </div>
                                     </div>
-                                </form><!-- END CHANGE EMAIL FORM
+                                </form><!-- END CHANGE EMAIL FORM -->
 
-                                -->                                <!-- ONE TIME PASS FORM 
-                                                                <div id="onetimepass" class="onetimepass" style="display: hidden;">
-                                                                    <form class="form-group form-inline mt-1" style="display: hidden;" method="post">
-                                                                        <div class="input-group w-75">
-                                                                            <input class="form-control" type="otp" id="otp" style="display:inline;"
-                                                                                   placeholder="Enter OTP" name="otp">
-                                                                            <button class="btn btn-primary" type="submit">Submit
-                                                                                OTP
-                                                                            </button>
-                                                                        </div>
-                                                                    </form>
-                                                                </div>
-              -->
-                                
                                 <!-- CHANGE PASSWORD FORM -->
                                 <div id="changepassword" class="mt-5 mb-2 profile-text"><strong>Change Password:</strong></div>
                                 <form id="changepass" class="form-group" action="" method="post">
 
-                                    <input type="password" class="form-control w-75" id="oldPasswordID" name="oldpassword"
-                                           placeholder="Current Password">
-                                    <input type="password" class="form-control w-75 mt-3" name="password" id="newpasswordID"
-                                           placeholder="New Password">
-                                    <input type="password" class="form-control w-75 mt-3" name="confirmpassword"
-                                           id="confirmpasswordID" placeholder="Confirm New Password">
+                                    <!-- Current Password -->
+                                    <input type="password" class="form-control w-75" id="oldPasswordID" name="currentpassword" placeholder="Current Password" value="<?php echo $details['currentpassword']; ?>">
+                                    <span id="error-currentpassword" class="invalid-feedback"></span>
+
+                                    <!-- New Password -->
+                                    <input type="password" class="form-control w-75 mt-3" name="credentials[password]" id="newpasswordID" placeholder="New Password" value="<?php echo $details['credentials']['password']; ?>">
+
+                                    <!-- Confirm New Password -->
+                                    <input type="password" class="form-control w-75 mt-3" name="confirmpassword" id="confirmpasswordID" placeholder="Confirm New Password" value="<?php echo $details['confirmpassword']; ?>">
 
                                     <button name="submitpassword" class="btn btn-primary" style="margin-top:10px"
                                             type="submit">Change
@@ -340,9 +347,43 @@ include TEMPLATES_PATH . '/bootstrap.php';
                     </div>
                 </div>
 
+                <?php
+                if (isset($_POST['submitpassword'])) :
 
 
-                <script type="text/javascript">
+                    if ($details['credentials']['password'] == $details['confirmpassword']) :
+
+                        $change_status = Account_User::change_password($user->get_email(), $details['credentials']['password'], $details['currentpassword']); // Will Return If Password Same 
+
+                        if ($change_status === false): # Password Change Fail
+                            ?>
+                            <script>
+                                console.log("current password is incorrect");
+                                $('#oldPasswordID').addClass("is-invalid");
+                                $('#error-currentpassword').html("Incorrect Password Entered");
+                            </script>
+                            <?php
+                        else:
+                            ?>
+                            <script>
+                                var pw_change_success = '<div class="alert alert-success" role="alert" id="password-success">Password Successfully Changed</div>';
+                                $('#changepass').prepend(pw_change_success);
+                                $('#newpasswordID').val('');
+                                $('#oldPasswordID').val('');
+                                $('#confirmpasswordID').val('');
+
+                            </script>
+                        <?php
+                        endif;
+                    endif;
+                    ?>
+                    <script>
+                        window.location.hash = 'changepassword';
+                    </script>
+                <?php endif;
+                ?>
+
+                <script type = "text/javascript">
 
                     // DISABLE THE `VERIFY` BUTTON WHEN NEEDED
                     function typedEmail()
@@ -369,9 +410,9 @@ include TEMPLATES_PATH . '/bootstrap.php';
                         return str.replace(/(\r\n|\n|\r)/gm, "");
                     }
 
-                    /*===========================
+                    /* ===========================
                      Dynamic Tabs
-                     =============================*/
+                     ============================= */
 
                     $(window).on("popstate", function () {
                         var scrollHeight = $(document).scrollTop();
@@ -419,7 +460,6 @@ include TEMPLATES_PATH . '/bootstrap.php';
                         $('#formchangeCN').toggle();
                     });
 
-
                     //hides one time pass
                     $('#onetimepass').children().hide();
 
@@ -431,9 +471,9 @@ include TEMPLATES_PATH . '/bootstrap.php';
                     //     }
                     // }
 
-                    /*------------------------------------------------
+                    /* ------------------------------------------------
                      ONE TIME PASS
-                     -------------------------------------------------*/
+                     ------------------------------------------------- */
 
                     var resend_otp_req = false;
                     // RESEND OTP
@@ -529,8 +569,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                     // create resend otp element
                                     if (!$('#resend-otp').length) {
                                         console.log("creating resend otp element");
-                                        var resend_otp =
-                                                "<button type='button' id='resend-otp' onclick='clickedResendOTP()' class='btn btn-link link-danger shadow-none'>Resend OTP</button>";
+                                        var resend_otp = "<button type='button' id='resend-otp' onclick='clickedResendOTP()' class='btn btn-link link-danger shadow-none'>Resend OTP</button>";
                                         $('#inputgroupemail').append(resend_otp);
                                     }
 
@@ -546,17 +585,11 @@ include TEMPLATES_PATH . '/bootstrap.php';
 
                     });
 
-
-
-
-
-
                     function invalid_otp_msg(msg) {
                         // WHEN THE OTP IS INVALID
                         $("#otp").addClass("is-invalid");
                         if (!$("#otp-feedback").length) {
-                            var otp_feedback =
-                                    `<div id='otp-feedback' class='invalid-feedback'>${msg}</div>`;
+                            var otp_feedback = `<div id='otp-feedback' class='invalid-feedback'>${msg}</div>`;
                             $('#onetimepass').append(otp_feedback);
                         }
                         $('#onetimepass').children().show();
@@ -638,10 +671,9 @@ include TEMPLATES_PATH . '/bootstrap.php';
                     }
                     );
 
-
-                    /*------------------------------------------------
+                    /* ------------------------------------------------
                      CLIENT SIDE VALIDATION FOR EMAIL
-                     -------------------------------------------------*/
+                     ------------------------------------------------- */
 
                     $(document).ready(function () {
                         $("#changeEmail").validate({
@@ -666,7 +698,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
                             },
                             success: function (label, element) {
 
-        //                                $(element).addClass("is-valid");
+                                //                                $(element).addClass("is-valid");
                                 document.getElementById('verifybutton').disabled = false;
 
                             },
@@ -674,16 +706,15 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                 $(element).addClass("is-invalid").removeClass("is-valid");
                             },
                             unhighlight: function (element, errorClass, validClass) {
-        //                                $(element).addClass("is-valid").removeClass("is-invalid");
+                                //                                $(element).addClass("is-valid").removeClass("is-invalid");
 
                             }
                         });
                     });
 
-
                     $.validator.addMethod("emailRegex", function (value, element) {
                         return this.optional(element) ||
-                                /^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})/
+                                /^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\, \'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})/
                                 .test(value);
                     }, "Email format is incorrect.");
 
