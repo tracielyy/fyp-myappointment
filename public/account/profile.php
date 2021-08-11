@@ -903,6 +903,13 @@ include TEMPLATES_PATH . '/bootstrap.php';
 
             <?php
         endif; # -- END USER TYPE CHECK
+    else:
+        ?>
+            <!-- Redirect User To Login Page -->
+        <script>
+            window.location.replace(window.location.origin + '<?php echo LOGIN_WEB; ?>');
+        </script>
+    <?php
     endif; # -- END SESSION CHECK
     ?>
 
