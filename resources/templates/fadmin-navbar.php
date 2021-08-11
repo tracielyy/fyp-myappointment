@@ -55,9 +55,9 @@
                     <div class="text-muted medium text-uppercase px-3 my-2">CORE</div>
                 </li>
                 <li>
-                    <a href="<?php echo FADMIN_WEB; ?>" class="nav-link px-3" id="nav-dashboard">
+                    <a href="<?php echo FADMIN_WEB; ?>" class="nav-link px-3" id="nav-home">
                         <span class="me-2"><i class="bi bi-speedometer2"></i></span>
-                        <span>Dashboard</span>
+                        <span>Home</span>
                     </a>
                 </li>
                 <li class="my-4"><hr class="dropdown-divider" /></li>
@@ -77,13 +77,13 @@
                         <div>
                             <ul class="navbar-nav ps-3">
                                 <li>
-                                    <a href="<?php echo FADMIN_WEB . "/views/myfacility.php";?>" class="nav-link px-3" id="nav-facility-details">
+                                    <a href="<?php echo FADMIN_WEB . "/views/myfacility.php"; ?>" class="nav-link px-3" id="nav-facility-details">
                                         <span class="me-2"><i class="bi bi-pencil-square"></i></span>
                                         <span>Hospital Details</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="<?php echo FADMIN_WEB . "/views/specialisations.php";?>" class="nav-link px-3" id="nav-specialisation">
+                                    <a href="<?php echo FADMIN_WEB . "/views/specialisations.php"; ?>" class="nav-link px-3" id="nav-specialisation">
                                         <span class="me-2"><i class="bi bi-plus-square"></i></span>
                                         <span>Specialisation</span>
                                     </a>
@@ -93,7 +93,7 @@
                     </div>
                 </li>
                 <li>
-                    <a href="<?php echo FADMIN_WEB."/views/doctors.php"; ?>" class="nav-link px-3 my-2" id="nav-doctors">
+                    <a href="<?php echo FADMIN_WEB . "/views/doctors.php"; ?>" class="nav-link px-3 my-2" id="nav-doctors">
                         <span class="me-2"><i class="fas fa-user-md"></i></span>
                         <span>Doctors</span>
                     </a>
@@ -104,9 +104,19 @@
                     <div class="text-muted medium text-uppercase px-3">TOOLS</div>
                 </li>
                 <li>
-                    <a href="<?php echo FADMIN_WEB. '/views/health-articles.php';?>" class="nav-link px-3 my-2" id="nav-health-articles">
+                    <a href="<?php echo FADMIN_WEB . '/views/health-articles.php'; ?>" class="nav-link px-3 my-2" id="nav-health-articles">
                         <span class="me-2"><i class="fas fa-newspaper"></i></span>
                         <span>Health Articles</span>
+                    </a>
+                </li>
+                <li class="my-4"><hr class="dropdown-divider" /></li>
+                <li>
+                    <div class="text-muted medium text-uppercase px-3">ACCOUNT</div>
+                </li>
+                <li>
+                    <a href="<?php echo FADMIN_WEB . "/views/admin.php"; ?>" class="nav-link px-3 my-2" id="nav-edit-profile">
+                        <span class="me-2"><i class="fas fa-user-edit"></i></span>
+                        <span>Edit Profile</span>
                     </a>
                 </li>
                 <li class="my-4"><hr class="dropdown-divider" /></li>
