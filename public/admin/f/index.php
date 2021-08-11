@@ -29,6 +29,7 @@ else:
         header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
     else:
         $facility = $user->get_facility();
+        $count_doctor = count(Medical_Personnel::retrieve_personnel_by_facility($facility->get_facilityid()));
         ?><!DOCTYPE html>
         <html lang="en">
             <head>
@@ -125,89 +126,35 @@ else:
                 <main class="mt-5 pt-3">
                     <div class="container-fluid">
                         <div class="row">
-                            <div class="col-md-12 text-center fw-700 fs-1">Dashboard</div>
+                            <div class="col-md-12 text-center fw-700 fs-1"><?php echo $facility->get_facilityname(); ?></div>
                             <div class="col-md-12 text-muted text-center fw-700">
                                 Facility admin @ <span id="facilityName"><?php echo StringUtils::get_acronym($facility->get_facilityname()); ?></span>
                             </div>
                         </div>
-                        <div class="row mt-4">
-                            <div class="col-lg-6 mb-2 ms-auto me-auto AP" style="max-width: 60%; max-height: fit-content">
-                                <div class="card text-center">
-                                    <div class="card-body">
-                                        <span><i class="fas fa-procedures fa-3x my-2"></i></span>
-                                        <p class="card-title fw-900 large">Active Patients</p>
-                                        <h6 class="card-text large fw-900 fs-1">2</h6>
-                                        <a href="#PatientList" class="btn btn-outline-dark">View Patients</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 mb-2 ml-3 me-auto AD"  style="max-width: 60%; max-height: fit-content">
+                        <div class="row">
+                            <div class="col-lg-6 mx-auto my-5"  style="max-width: 60%; max-height: fit-content">
                                 <div class="card text-center">
                                     <div class="card-body">
                                         <span><i class="fas fa-hospital-user fa-3x my-2"></i></span>
                                         <p class="card-title fw-900 large">Active Doctors</p>
-                                        <h6 class="card-text large fw-900 fs-1">6</h6>
+                                        <h6 class="card-text large fw-900 fs-1"><?php echo $count_doctor; ?></h6>
                                         <a href="<?php echo FADMIN_WEB . "/views/doctors.php" ?>" class="btn btn-outline-dark">View Doctors</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-lg-6 mb-2 ml-3 ms-auto">
-                                <div class="card text-center">
-                                    <div class="card-header"><span id="patientChart">Patients</span></div>
-                                    <div class="card-body">
-                                        <canvas id="myChart" width="200" height="200"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 mb-2 ml-3 me-auto">
-                                <div class="card text-center">
-                                    <div class="card-header"><span id="docChart">Doctors</span></div>
-                                    <div class="card-body">
-                                        <canvas id="myChart1" width="200" height="200"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row" id="PatientList">
-                            <div class="col-md-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        Patient List
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped" style="width: 100%;">
-                                                <thead>
-                                                    <tr>
-                                                        <td>First Name</td>
-                                                        <td>Last Name</td>
-                                                        <td>NRIC</td>
-                                                        <td>DOB</td>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>Leo</td>
-                                                        <td>Jones</td>
-                                                        <td>S9497618I</td>
-                                                        <td>09-02-2005</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
-                </main>
-                <!-- main ends here -->
-                <script>
-                    $('#nav-dashboard').addClass('active');
-                </script>
-            </body>
+
+                </div>
+            </main>
+            <!-- main ends here -->
+            <script>
+                    $('#nav-home').addClass('active');
+            </script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"  integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+        </body>
         </html>
     <?php
     endif; # -- END USER TYPE CHECK
