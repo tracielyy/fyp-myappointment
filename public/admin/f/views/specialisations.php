@@ -197,7 +197,7 @@ else:
                 <!-- main ends here -->
                 <section>
                     <div class="modal fade" id="deleteSpec" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" style="margin-left: 30rem;">
+                        <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="staticBackdropLabel">Delete Specialisation: <br/><b><span id="spec"></span></b></h5>
