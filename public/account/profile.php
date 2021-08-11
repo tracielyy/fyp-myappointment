@@ -103,6 +103,8 @@ include TEMPLATES_PATH . '/bootstrap.php';
                     $newaddress = $_POST['address'];
                     if (Account_User::update_address($user->get_email(), $newaddress)) :
                         $user->set_address($newaddress);
+                        $_SESSION['user'] = serialize($user);
+
                     else :
                     //echo "failed change";
                     endif;
@@ -113,6 +115,8 @@ include TEMPLATES_PATH . '/bootstrap.php';
                     if (!empty($contactnum)):
                         if (Account_User::update_contact_number($user->get_email(), $contactnum)):
                             $user->set_contactnumber($contactnum);
+                            $_SESSION['user'] = serialize($user);
+
                         else:
                         //echo "failed change";
                         endif;
@@ -905,7 +909,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
         endif; # -- END USER TYPE CHECK
     else:
         ?>
-            <!-- Redirect User To Login Page -->
+        <!-- Redirect User To Login Page -->
         <script>
             window.location.replace(window.location.origin + '<?php echo LOGIN_WEB; ?>');
         </script>
