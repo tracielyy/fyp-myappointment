@@ -216,7 +216,7 @@ else:
                                                 <br/>
                                                 <!-- Admin Password -->
                                                 <div class="mb-3 row">
-                                                    <label for="password" class="col-sm-3 col-form-label">Password: </label>
+                                                    <label for="password" class="col-sm-3 col-form-label">New Password: </label>
                                                     <div class="mb-3 col-sm-7">
                                                         <div class="input-group"  id="password-container">
                                                             <input type="password" name="credentials[password]" id="password" class="form-control" value="<?php echo $admin['credentials']['password']; ?>">
@@ -391,7 +391,7 @@ else:
                 if ($change_status):
                     ?>
                     <script>
-                        window.location.replace(window.location.origin + '<?php echo SADMIN_WEB . "/views/super-admin.php"; ?>');
+                    window.location.replace(window.location.origin + '<?php echo SADMIN_WEB . "/views/super-admin.php"; ?>');
                     </script>
                     <?php
                 else:
