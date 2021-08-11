@@ -134,7 +134,7 @@
         <div class="row mt-4">
             <div class="col text-center">
                 <button id="loadmorebttn" name="loadmore" type="submit" class="btn btn-primary btn-lg text-center"
-                    value="<?php echo $loadmore?>">
+                    value="">
                     Load More Articles
                 </button>
             </div>
@@ -146,6 +146,10 @@
             $("#loadmorebttn").remove();
 
         }
+
+        row = $('.content:last').attr("data-id");
+        $("#loadmorebttn").val(row);
+        
         $("#loadmorebttn").on("click", function() {
             console.log("test");
             row = $('.content:last').attr("data-id");
@@ -164,12 +168,14 @@
                 },
                 success: function(response) {
                     $("#loadmorebttn").text("Load More Articles");
+                    
                     $('.content:last').after(response).show().fadeIn("slow");
                     if ($("#endOfContent").length) {
 
                         $("#loadmorebttn").remove();
-
                     }
+                    row = $('.content:last').attr("data-id");
+                    $("#loadmorebttn").val(row);
                     $("#loadmorebttn").prop('disabled', false); 
                 },
                 error: function() {

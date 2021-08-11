@@ -45,7 +45,7 @@
                 $badge = '<span class="badge bg-success">Health Tips</span>';
                 $icon = '<i class="fas fa-plus-square fa-3x opt-icon"></i>';
             }
-            echo '<div class="card mh-100">';
+            echo '<div class="card mh-100 content" data-id="'.$article->get_id().'">';
             echo '<div class="card-body">';
             echo '<div class="row">';
             echo '<div class="col-xs-2 col-sm-2 col-lg-1 min-vw-1000">';
@@ -65,7 +65,9 @@
         endforeach;
 
             $loadmore = Health_Info::retrieve_all_healthinfo($nextid);
+            //echo $nextid;
             $count_loadmore = count($loadmore);
+            //echo $count_loadmore;
             if ($count_loadmore == 0)
             {
                 echo '<div id="endOfContent"></div>';
