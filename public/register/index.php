@@ -380,7 +380,7 @@ endif; # END POST REQUEST
                                     <div class="row">
                                         <div class="col-md-6 col-sm-12">
                                             <!-- Email -->
-                                            <div onkeyup="typedEmail()" id="email_container" class="input-group">
+                                            <div onchange="typedEmail()" id="email_container" class="input-group">
                                                 <input id="email" name="email" type="text" class="form-control"
                                                        placeholder="Email" aria-label="Email"
                                                        value="<?php echo htmlspecialchars($registerArr['email']); ?>">
