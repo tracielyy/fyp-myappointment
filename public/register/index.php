@@ -387,7 +387,7 @@ endif; # END POST REQUEST
                                                 <button class="btn btn-outline-secondary" type="button"
                                                         id="vrfyEmailBttn">Verify</button></input>
                                                         <?php
-// THIS SET OF PHP CODE MUST BE AFTER THE EMAIL HTML
+                                                        // THIS SET OF PHP CODE MUST BE AFTER THE EMAIL HTML
                                                         if (isset($_COOKIE['email_verified']) && $_COOKIE['email_verified'] === true):
                                                             echo "  
                                                                 <script>

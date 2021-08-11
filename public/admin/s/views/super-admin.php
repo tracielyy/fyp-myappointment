@@ -157,7 +157,7 @@ else:
                                             <div class="mb-3 row">
                                                 <label for="SuperadminID" class="col-sm-2 col-form-label">Admin ID: </label>
                                                 <div class="col-sm-10">
-                                                    <input type="text" readonly class="form-control-plaintext" value="<?php echo $user->get_adminid(); ?>">
+                                                    <div class="form-control-plaintext" ><?php echo $user->get_adminid(); ?></div>
                                                 </div>
                                             </div>
                                             <!-- Admin Name -->
@@ -176,12 +176,7 @@ else:
                                             <div class="mb-3 row">
                                                 <label for="email" class="col-sm-2 col-form-label">Email: </label>
                                                 <div class="col-sm-10">
-                                                    <div class="d-grid gap-1 d-md-flex justify-content" >
-                                                        <div id="email" class="py-1 me-1"><?php echo $user->get_email(); ?></div>
-                                                        <a href="<?php echo SADMIN_WEB . "/edit/super-admin-email.php"; ?>" class="me-md-2 mr-2 editAdm" data-bs-toggle="tooltip" data-bs-placement="right" title="Edit Admin">
-                                                            <span><i class="fas fa-pen-square fa-2x"></i></span>
-                                                        </a>
-                                                    </div>
+                                                    <div class="form-control-plaintext" ><?php echo $user->get_email(); ?></div>
                                                 </div>
                                             </div>
                                             <div class="mb-3 row">
