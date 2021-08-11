@@ -598,6 +598,7 @@ else:
         });
 
     });
+
     </script>
 </body>
 

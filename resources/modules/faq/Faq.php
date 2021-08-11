@@ -3,6 +3,7 @@
 /*
  *  @author: tracieqwynn
  */
+require_once TIME_MOD . '/Time.php';
 require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
 
@@ -121,7 +122,7 @@ class Faq {
             $arr = $ref->limit($limit)->documents();
         else:
             # Consecutive Query
-            $arr = $ref->startAfter($startAfter)->limit($limit)->documents();
+            $arr = $ref->startAfter([$startAfter])->limit($limit)->documents();
         endif;
         # Loop & Add To Container
         foreach ($arr As $doc):

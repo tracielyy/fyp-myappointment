@@ -157,27 +157,18 @@ if (isset($_SESSION["user"])):
 
                 <div class="row bg-light py-4">
                     <div class="row bg-light">
-                        <div class="col-xs-3 col-md-2 px-5 mx-md-1 mx-lg-0">
-                            <img src="https://via.placeholder.com/100" class="rounded shadow float-start" alt="...">
-                        </div> <!-- col -->
 
-                        <div class="col-xs-8 col-md-6">
+                        <div class="ms-5 col-xs-8 col-md-6">
                             <h1 class="display-6"> <?php echo $user->get_fullname(); ?> </h1>
                             <h1 class="lead"> Gender: <?php echo $user->get_gender(); ?> </h1>
                             <h1 class="lead"> Date of Birth: <?php echo $user->get_dob(); ?> </h1>
                         </div> <!-- col -->
 
-                        <div class="col-md-2">
-                            <!-- col -->
-                            <div class="row py-1 col-lg-12 mx-auto">
-                                <a href="./debugeditprofile.php" type="button" class="btn btn-secondary float-end">Edit Profile</a>
-                            </div> <!-- col -->
-                        </div> <!-- col -->
                     </div>
                 </div>
 
 
-                <div class="container">
+                <div class="container mb-3">
                     <div class="row mt-3">
                         <div class="d-grid gap-2 col-6 mx-auto">
                             <a type="button" href="./create.php" class="btn btn-info btn-lg pb-2">
