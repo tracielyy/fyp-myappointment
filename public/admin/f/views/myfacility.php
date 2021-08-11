@@ -136,7 +136,7 @@ else:
                     <!-- page title -->
                     <div class="container-fluid mb-4">
                         <div class="row">
-                            <div class="col-md-12 text-center fw-700 fs-1">Manage Hospital</div>
+                            <div class="col-md-12 text-center fw-700 fs-1">View Facility Details</div>
                             <div class="col-md-12 text-muted text-center fw-700">
                                 Facility admin @ <span id="facilityName"><?php echo StringUtils::get_acronym($facility->get_facilityname()); ?> </span>
                             </div>
@@ -145,44 +145,48 @@ else:
                     <!-- page title ends here -->
                     <div class="container-fluid">
                         <div class="card">
-                            <div class="card-title text-center mt-4">
-                                <h4 class="text-dark medium fw-700">Hospital Details</h4>
-                            </div>
-                            <div class="card-body mx-5">
-                                <form action="#">
-                                    <!-- Facility Name -->
-                                    <div class="mb-3" style="max-width: 70%;">
-                                        <label for="facilityName" class="form-label">Facility Name</label>
-                                        <input type="text" class="form-control" placeholder="<?php echo $facility->get_facilityname(); ?>" disabled>
+                            <div class="card-body mx-5 my-2">
+                                <!-- Facility Name -->
+                                <h4 style="font-weight: 600; font-size: 1.5rem;">
+                                    <span class="align-middle">
+                                        <?php echo $facility->get_facilityname(); ?>
+                                    </span>
+                                    <?php if ($facility->get_operatinghours()->get_is24hours()): ?>
+                                        <span class="badge bg-success fw-normal">24 Hours</span>
+                                    <?php endif; ?>
+                                </h4>
+                                <hr class="ms-2" style="max-width: 60%;">
+                                <div class="mb-3 row">
+                                    <label for="address" class="col-sm-2 col-form-label">Address: </label>
+                                    <div class="col-sm-10">
+                                        <input type="text" readonly class="form-control-plaintext" placeholder="<?php echo $facility->get_address(); ?>">
                                     </div>
-                                    <!-- Facility Address -->
-                                    <div class="mb-3" style="max-width: 70%;">
-                                        <label for="facilityName" class="form-label">Address</label>
-                                        <input type="text" class="form-control" placeholder="<?php echo $facility->get_address(); ?>" disabled>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label for="contact" class="col-sm-2 col-form-label">Contact: </label>
+                                    <div class="col-sm-10">
+                                        <input type="text" readonly class="form-control-plaintext"  placeholder="<?php echo $facility->get_contactnumber(); ?>">
                                     </div>
-                                    <!-- Contact Number -->
-                                    <div class="mb-3" style="max-width: 70%;">
-                                        <label for="facilityName" class="form-label">Contact Number</label>
-                                        <input type="text" class="form-control" placeholder="<?php echo $facility->get_contactnumber(); ?>" disabled>
-                                    </div>
-                                    <!-- Opening Hours -->
-                                    <div class="mb-3" style="max-width: 70%;">
-                                        <div class="row">
-                                            <div class="col">
-                                                <label for="openingHour">Opening Hour</label>
-                                                <input type="text" class="form-control" placeholder="<?php echo $facility->get_operatinghours()->get_openinghour(); ?>" onfocus="(this.type = 'time')" onblur="(this.type = 'text')" aria-label="OpeningHour" disabled>
-                                            </div>
-                                            <div class="col">
-                                                <label for="closingHour">Closing Hour</label>
-                                                <input type="text" class="form-control" placeholder="<?php echo $facility->get_operatinghours()->get_closinghour(); ?>" onfocus="(this.type = 'time')" onblur="(this.type = 'text')" aria-label="ClosingHour" disabled>
-                                            </div>
+                                </div>
+                                <?php
+                                // Check The Operating Hours (If It Is 24 hours) // 
+                                if (!$facility->get_operatinghours()->get_is24hours()):
+                                    ?>
+                                    <div class="mb-3 row">
+                                        <label for="openinghour" class="col-sm-2 col-form-label">Opening Hour: </label>
+                                        <div class="col-sm-10">
+                                            <input type="text" placeholder="<?php echo $facility->get_operatinghours()->get_openinghour(); ?>" onfocus="(this.type = 'time')" style="margin-top: 5px; border: 1px solid #eeeded; background-color: #eeeded;">
                                         </div>
                                     </div>
-                                </form>
-                                <a href="<?php echo FADMIN_WEB . "/edit/myfacility.php"; ?>" class="btn btn-outline-success btn-lg">
-                                    <i class="fas fa-edit"></i> 
-                                    <span> Edit</span>
-                                </a>
+                                    <div class="mb-3 row">
+                                        <label for="closinghour" class="col-sm-2 col-form-label">Closing Hour: </label>
+                                        <div class="col-sm-10">
+                                            <input type="text" placeholder="<?php echo $facility->get_operatinghours()->get_closinghour(); ?>" onfocus="(this.type = 'time')" style="margin-top: 5px; border: 1px solid #eeeded; background-color: #eeeded;">
+                                        </div>
+                                    </div>
+                                    <?php
+                                endif;
+                                ?>
                             </div>
                         </div>
                     </div>
