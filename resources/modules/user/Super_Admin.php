@@ -9,6 +9,9 @@ require_once USER_MOD . '/Admin.php';
 require_once USER_MOD . '/Account_User.php';
 require_once ENUMS_PATH . '/User_Type.php';
 
+use Google\Cloud\Firestore\Transaction;
+
+
 // -- The Top Admin Privilege -- //
 class Super_Admin extends Admin {
 
@@ -77,6 +80,36 @@ class Super_Admin extends Admin {
         $db = new DbQuery();
         $data = $db->fetch_document_by_id(Database::ACCOUNT_USER, $id);
         return $data['credentials']['secretpin'];
+    }
+
+    // -- PASSWORD CHANGE
+    public static function change_secretpin(string $email, string $new_secretpin): bool {
+
+        # Update The New Password
+        $user_doc_id = self::retrieve_user_doc_id($email);
+
+        # If Valid User
+        if ($user_doc_id !== NULL):
+            $db = new DbQuery();
+
+            # Update To New Password
+            $secure = new Security();
+            $new_hashed_pin= $secure->hash($new_secretpin);
+            $user_doc_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->document($user_doc_id);
+            $trnx_result = $db->get_db()->runTransaction(function (Transaction $transaction)
+            use ($user_doc_ref, $new_hashed_pin, $new_secretpin) {
+
+                if (!empty($new_secretpin)):
+                    $transaction->update($user_doc_ref, [
+                        ['path' => 'credentials.secretpin', 'value' => $new_hashed_pin]
+                    ]);
+                    return true;
+                endif;
+
+                return false; # -- HAVE ISSUES IN CHANGING PASSWORD
+            });
+        endif; # -- CHECK IF THE USER ENTERS A CORRECT PASSWORD
+        return $trnx_result;
     }
 
 }

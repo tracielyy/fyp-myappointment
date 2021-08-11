@@ -133,26 +133,7 @@ class Facility_Admin extends Admin {
         return $trnx_result;
     }
 
-    // UPDATE NAME //
-    public static function update_adminname(string $admin_id, string $adminname): bool {
-        $db = new DbQuery();
-        $doc_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->document($admin_id);
-        $trnx_result = $db->get_db()->runTransaction(function (Transaction $transaction) use ($doc_ref, $adminname) {
 
-            $snapshot = $transaction->snapshot($doc_ref);
-            $db_adminname = $snapshot['profile']['adminname'];
-
-            if ($db_adminname !== $adminname):
-                # Update Admin Details
-                $transaction->update($doc_ref, [
-                    ['path' => 'profile.adminname', 'value' => $adminname]
-                ]);
-                return true;  # -- Name Not The Same As The One In The DB
-            endif;
-            return false; 
-        });
-        return $trnx_result;
-    }
 
     // -- RETRIEVE  FACILITY ADMIN DATA
     public static function retrieve_facility_admin(string $user_email): Facility_Admin {

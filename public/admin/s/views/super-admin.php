@@ -157,38 +157,50 @@ else:
                                             <div class="mb-3 row">
                                                 <label for="SuperadminID" class="col-sm-2 col-form-label">Admin ID: </label>
                                                 <div class="col-sm-10">
-                                                    <input type="text" readonly class="form-control-plaintext" value="<?php echo $user->get_adminid();?>">
+                                                    <input type="text" readonly class="form-control-plaintext" value="<?php echo $user->get_adminid(); ?>">
                                                 </div>
                                             </div>
+                                            <!-- Admin Name -->
                                             <div class="mb-3 row">
-                                                <label for="SuperadminName" class="col-sm-2 col-form-label">Admin Name: </label>
+                                                <label for="adminname" class="col-sm-2 col-form-label">Admin Name: </label>
                                                 <div class="col-sm-10">
-                                                    <input type="text" class="form-control-plaintext" value="<?php echo $user->get_adminname();?>">
+                                                    <div class="d-grid gap-1 d-md-flex justify-content" >
+                                                        <div id="adminName" class="py-1 me-1"><?php echo $user->get_adminname(); ?></div>
+                                                        <a href="<?php echo SADMIN_WEB . "/edit/super-admin-name.php"; ?>" class="me-md-2 mr-2 editAdm" data-bs-toggle="tooltip" data-bs-placement="right" title="Edit Admin">
+                                                            <span><i class="fas fa-pen-square fa-2x"></i></span>
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <!-- Email -->
                                             <div class="mb-3 row">
                                                 <label for="email" class="col-sm-2 col-form-label">Email: </label>
                                                 <div class="col-sm-10">
-                                                    <input type="email" class="form-control-plaintext" value="<?php echo $user->get_email();?>">
+                                                    <div class="d-grid gap-1 d-md-flex justify-content" >
+                                                        <div id="email" class="py-1 me-1"><?php echo $user->get_email(); ?></div>
+                                                        <a href="<?php echo SADMIN_WEB . "/edit/super-admin-email.php"; ?>" class="me-md-2 mr-2 editAdm" data-bs-toggle="tooltip" data-bs-placement="right" title="Edit Admin">
+                                                            <span><i class="fas fa-pen-square fa-2x"></i></span>
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="mb-3 row">
-                                                <label for="Adminpassword" class="col-sm-2 col-form-label">Password: </label>
+                                                <label for="password" class="col-sm-2 col-form-label">Password: </label>
                                                 <div class="col-sm-10">
-                                                    <input type="password" name="Adminpassword" class="form-control-plaintext" value="***">
+                                                    <a href="<?php echo SADMIN_WEB . "/edit/super-admin-password.php"; ?>"  class="btn btn-dark me-md-2 mr-2">
+                                                        <span><i class="fas fa-lock"></i></span>
+                                                        <span>Change Password</span>
+                                                    </a>
                                                 </div>
                                             </div>
                                             <div class="mb-3 row">
                                                 <label for="SecretPin" class="col-sm-2 col-form-label">Secret Pin: </label>
                                                 <div class="col-sm-10">
-                                                    <input type="password" readonly name="AdminPin" class="form-control-plaintext" value="***">
+                                                    <a href="<?php echo SADMIN_WEB . "/edit/super-admin-pin.php"; ?>"  class="btn btn-dark me-md-2 mr-2">
+                                                        <span><i class="fas fa-key"></i></span>
+                                                        <span>Change Secret Pin</span>
+                                                    </a>
                                                 </div>
-                                            </div>
-                                            <div class="d-grid gap-2 d-md-flex justify-content-md-center" style=" margin-top: 10px;">
-                                                <a href="<?php echo SADMIN_WEB . "/edit/super-admin.php"; ?>"  class="btn btn-dark me-md-2 mr-2">
-                                                    <span><i class="fas fa-user-edit"></i></span>
-                                                    <span>Edit</span>
-                                                </a>
                                             </div>
                                         </div>
                                     </div>

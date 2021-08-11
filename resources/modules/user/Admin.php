@@ -10,6 +10,9 @@ require_once USER_MOD . '/Account_User.php';
 require_once AUTH_MOD . '/Session.php';
 require_once TIME_MOD . '/Time.php';
 
+use Google\Cloud\Firestore\Transaction;
+
+
 class Admin extends Account_User {
 
     private string $adminid;
@@ -66,6 +69,27 @@ class Admin extends Account_User {
         endif;
 
         return "";
+    }
+
+    // UPDATE NAME //
+    public static function update_adminname(string $admin_id, string $adminname): bool {
+        $db = new DbQuery();
+        $doc_ref = $db->get_db()->collection(Database::ACCOUNT_USER)->document($admin_id);
+        $trnx_result = $db->get_db()->runTransaction(function (Transaction $transaction) use ($doc_ref, $adminname) {
+
+            $snapshot = $transaction->snapshot($doc_ref);
+            $db_adminname = $snapshot['profile']['adminname'];
+
+            if ($db_adminname !== $adminname):
+                # Update Admin Details
+                $transaction->update($doc_ref, [
+                    ['path' => 'profile.adminname', 'value' => $adminname]
+                ]);
+                return true;  # -- Name Not The Same As The One In The DB
+            endif;
+            return false;
+        });
+        return $trnx_result;
     }
 
 }

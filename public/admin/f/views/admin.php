@@ -183,7 +183,7 @@ else:
                                                 <label for="password" class="col-sm-2 col-form-label">Password: </label>
                                                 <div class="col-sm-10">
                                                     <a href="<?php echo FADMIN_WEB . "/edit/admin-password.php"; ?>"  class="btn btn-dark me-md-2 mr-2">
-                                                        <span><i class="fas fa-user-edit"></i></span>
+                                                        <span><i class="fas fa-lock"></i></span>
                                                         <span>Change Password</span>
                                                     </a>
                                                 </div>

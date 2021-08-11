@@ -16,7 +16,7 @@ require_once UTIL_MOD . '/Regex.php';
 require_once FACILITY_MOD . '/Medical_Facility.php';
 
 /*
- *  EDIT FACILITY ADMIN  -- NAME CHANGE
+ *  EDIT SUPER ADMIN  -- NAME CHANGE
  */
 
 if (!isset($_SESSION['user'])):
@@ -27,7 +27,7 @@ else:
     $user_email = $user->get_email();
 
 // Check If User Is Super Admin
-    if (!User_Type::check_user_type(User_Type::FACIILITY_ADMIN, $user_type)):
+    if (!User_Type::check_user_type(User_Type::SUPER_ADMIN, $user_type)):
         header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
     else:
 
@@ -172,7 +172,7 @@ else:
                 </style>
             </head>
             <body>
-                <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
+                <?php require_once TEMPLATES_PATH . "/sadmin-navbar.php"; ?>
                 <!-- main section starts here -->
                 <main class="mt-5 pt-3">
                     <div class="row">
@@ -195,29 +195,28 @@ else:
                                             <form id="edit_admin_form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
                                                 <!-- Admin ID -->
                                                 <div class="mb-3 row">
-                                                    <label for="adminid" class="col-sm-3 col-form-label">Admin ID: </label>
+                                                    <label for="adminid" class="col-sm-2 col-form-label">Admin ID: </label>
                                                     <div class="col-sm-9">
                                                         <div class="form-control-plaintext px-2" id="adminid"><?php echo $user->get_adminid(); ?></div>
                                                     </div>
                                                 </div>
                                                 <!-- Admin Name -->
                                                 <div class="mb-3 row">
-                                                    <label for="SuperadminName" class="col-sm-3 col-form-label">Admin Name: </label>
+                                                    <label for="SuperadminName" class="col-sm-2 col-form-label">Admin Name: </label>
                                                     <div class="col-sm-9" id="adminname-container">
                                                         <input type="text" name="profile[adminname]" class="form-control" value="<?php echo $admin['profile']['adminname']; ?>" id="adminname">
-                                                        <span id="error-adminname" class="invalid-feedback"></span>
                                                     </div>
                                                 </div>
-
-                                                <div class="d-grid gap-2 d-md-flex justify-content-md-center" style=" margin-top: 10px;">
-                                                    <button type="submit" name="edit_name" class="btn btn-dark me-md-2 mr-2" if="edit-adminname">
-                                                        <span><i class="fas fa-save"></i></span>
-                                                        <span>Save</span>
-                                                    </button>
-                                                    <a href="<?php echo FADMIN_WEB . "/views/admin.php"; ?>" class="btn btn-danger me-md-2 mr-2">
+                                                <!-- Buttons -->
+                                                <div class="d-grid gap-2 d-md-flex justify-content-md-between" style=" margin-top: 10px;">
+                                                    <a href="<?php echo SADMIN_WEB . "/views/super-admin.php"; ?>" class="btn btn-danger me-md-2 mr-2">
                                                         <span><i class="fas fa-window-close"></i></span>
                                                         <span>Cancel</span>
                                                     </a>
+                                                    <button type="submit" name="edit_name" class="btn btn-dark mr-2">
+                                                        <span><i class="fas fa-save"></i></span>
+                                                        <span>Save</span>
+                                                    </button>
                                                 </div>
                                             </form><!-- END FORM -->
                                         </div><!-- END CARD BODY --> 
@@ -231,13 +230,13 @@ else:
                 <script>
                     $('#spinner-container').hide();
                     $('#nav-edit-profile').addClass('active');
-
                     $(document).ready(function () {
                         $("#edit_admin_form").validate({
                             rules: {
                                 "profile[adminname]": {
                                     required: true,
                                     adminnameRegex: true
+
                                 }
 
                             },
@@ -245,6 +244,7 @@ else:
                                 "profile[adminname]": {
                                     required: "Required",
                                     adminnameRegex: "Invalid Admin Name"
+
                                 }
 
                             },
@@ -256,6 +256,7 @@ else:
                                 error.addClass("help-block invalid-feedback");
                             },
                             success: function (label, element) {
+
                                 $(element).addClass("is-valid");
 
 
@@ -268,10 +269,7 @@ else:
 
                             }
                         });
-
-
                     });
-
                     /*----------------------------------------------
                      CLIENT SIDE REGULAR EXPRESSION FOR PASSWORD
                      -----------------------------------------------*/
@@ -280,6 +278,8 @@ else:
                         return this.optional(element) ||
                                 /^([a-z0-9]+-)*[a-z0-9]+$/i.test(value);
                     }, "Invalid Admin Name");
+
+
 
 
                 </script>
@@ -294,7 +294,6 @@ else:
         <?php
         if (isset($_POST['edit_name'])):
             // Validation
-
             if (empty($admin['profile']['adminname'])):
                 $validArr['adminname'] = false;
             elseif (!empty($admin['profile']['adminname']) && !Regex::validate_adminname($admin['profile']['adminname'])):
@@ -307,8 +306,8 @@ else:
             if (!in_array(false, $validArr)):
                 ?>
                 <script>
-                    $('#spinner-container').show();
-                    $('#edit_admin_form').hide();
+                        $('#spinner-container').show();
+                        $('#edit_admin_form').hide();
                 </script>
                 <?php
                 if ($admin['profile']['adminname'] !== $user->get_adminname()):
@@ -318,12 +317,12 @@ else:
                 endif;
                 ?>
                 <script>
-                    window.location.replace(window.location.origin + '<?php echo FADMIN_WEB . "/views/admin.php"; ?>');
+                    window.location.replace(window.location.origin + '<?php echo SADMIN_WEB . "/views/super-admin.php"; ?>');
                 </script>
                 <?php
             endif;
         endif;
 
-    endif; # -- END USER TYPE CHECK
+endif; # -- END USER TYPE CHECK
 endif; # -- END SESSION CHECK
 ?>
