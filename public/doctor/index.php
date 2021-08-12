@@ -170,11 +170,21 @@ else:
                                             $dateArray = Time::get_date_from_range($startTime_converted, $endDate_converted);
                                         }
                                         
-                                        //Tracie TODO function
-                                        $timeArray = Time::get_time_range_intervals($startTime_converted,$endTime_converted,$interval);
+                                        
+                                        if($startTime_converted == $endTime_converted)
+                                        {
+                                            $timeArray = array($startTime_converted);
+                                        }else
+                                        {
+                                            $timeArray = Time::get_time_range_intervals($startTime_converted,$endTime_converted,$interval);
+                                        }
+
+                                        ///Tracie TODO function (array are timeArray and dateArray)
+                                        
+                                        
 
 
-                                        $success .= '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+                                    $success .= '<div class="alert alert-success alert-dismissible fade show" role="alert">';
                                     $success .= '<strong>Slots are successfuly added!</strong>';
                                     $success .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
                                     echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$success.'\');});</script>';
