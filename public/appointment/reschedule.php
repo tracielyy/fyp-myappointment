@@ -252,7 +252,11 @@ else:
                             <!-- If Specialist Then Show A Possible Selection Of  Other Doctors (???) -->
                             <div class="container mt-5 d-flex justify-content-center" style="min-width:720px!important" id="appt-booking">
                                 <div class="col-11 col-offset-2">
-                                    <div class="display-6">Reschedule Appointment</div>
+                                    <div class="display-6 mb-3">Reschedule Appointment</div>
+                                    <span class="lead">Rescheduling for the <strong><?php echo $appt_obj->get_appointmenttype()?></strong> appointment on </span>
+                                    <span class="lead"><strong><?php echo $appt_obj->get_appointmentslot()->get_appointmentschedule()->get_date(); ?></strong> at </span>
+                                    <span class="lead"><strong><?php echo $appt_obj->get_appointmentslot()->get_appointmentschedule()->get_time(); ?></strong></span>
+                                    <p class="lead">at <strong><?php echo $appt_obj->get_facility()->get_facilityname(); ?></strong></p>
                                     <form id="reschedule-form" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
 
                                         <div class="card mt-3">
