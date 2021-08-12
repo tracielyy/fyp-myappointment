@@ -271,7 +271,6 @@ if (isset($_SESSION["user"])):
                                                                             <br> <br> <b> Warning: Action cannot be revoked </b>
                                                                         </div>
                                                                         <div class="modal-footer">
-
                                                                             <button type = "button" class = "btn btn-secondary" data-bs-dismiss = "modal">Close</button>
                                                                             <button id="upcoming_cancel_btn" type = "submit" class = "btn btn-danger"  name="cancel" >Cancel</button>
                                                                         </div>

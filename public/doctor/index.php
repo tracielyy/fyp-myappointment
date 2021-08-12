@@ -24,115 +24,112 @@ else:
     if (!User_Type::check_user_type(User_Type::MEDICAL_PERSONNEL, $user_type)):
         header("Location:./../"); # -- REDIRECT USER TO THE INDEX PAGE
     else:
-        
-        
-        if ($_SERVER['REQUEST_METHOD'] == 'POST'):
-            ?> <script>
-console.log("going thru post")
-</script><?php
-            echo 'going thru post';
-            if (isset($_POST['postmedical'])):
-                ?> <script>
-console.log("going isset")
-</script><?php
 
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST'):
+            ?> 
+            <script>
+                console.log("going thru post");
+            </script>
+            <?php if (isset($_POST['postmedical'])): ?> 
+                <script>
+                    console.log("going isset");
+                </script><?php
                 $patientid = $_POST['patientid'];
                 $slotid = $_POST['slotid'];
-                $practitionerid =$_POST['practitionerid'];
+                $practitionerid = $_POST['practitionerid'];
                 $facilityid = $_POST['facilityid'];
-            
+
                 $medicalrecord_array = array(
-                    'facilityid'=> $facilityid,
+                    'facilityid' => $facilityid,
                     'practitioner' => $practitionerid,
                     'slotid' => $slotid,
-                    'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientid,$slotid)
+                    'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientid, $slotid)
                 );
-        
-                $mrid = check_mrid_exist($patientid,$slotid); //checks MRID but also, if available will put the mrid here
-        
-                if(!$mrid):
-                    $medical_record = Medical_Record::create_medical_record($patientid,$medicalrecord_array);
+
+                $mrid = check_mrid_exist($patientid, $slotid); //checks MRID but also, if available will put the mrid here
+
+                if (!$mrid):
+                    $medical_record = Medical_Record::create_medical_record($patientid, $medicalrecord_array);
                     $mrid = $medical_record->get_medicalrecordid();
-                    Appointment_Record::set_mrid($patientid,$slotid,$mrid);
+                    Appointment_Record::set_mrid($patientid, $slotid, $mrid);
                 endif;
-        
-                header("Location:" . DOC_WEB . "/patientvisit/index.php?id=".$mrid."&pt=".$patientid);
+
+                header("Location:" . DOC_WEB . "/patientvisit/index.php?id=" . $mrid . "&pt=" . $patientid);
             endif;
-        
+
         endif;
-        
-        
         ?>
-<!DOCTYPE html>
-<html lang="en">
+        <!DOCTYPE html>
+        <html lang="en">
 
-<head>
+            <head>
 
 
-    <!-- Styling -->
-    <link rel="stylesheet" href="./../css/medicaldashboard.css">
+                <!-- Styling -->
+                <link rel="stylesheet" href="./../css/medicaldashboard.css">
 
-    <?php
+                <?php
                 include TEMPLATES_PATH . '/bootstrap.php';
                 include_once TEMPLATES_PATH . '/navbar-loggedin.php';
                 ?>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Dashboard</title>
-    <!-- font awesome cdn -->
-    <script src="https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script>
-    function startTime() {
-        const today = new Date();
-        let h = today.getHours();
-        let m = today.getMinutes();
-        let s = today.getSeconds();
-        m = checkTime(m);
-        s = checkTime(s);
-        document.getElementById('time').innerHTML = h + ":" + m + ":" + s;
-        setTimeout(startTime, 1000);
-    }
+                <meta charset="UTF-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Medical Dashboard</title>
+                <!-- font awesome cdn -->
+                <script src="https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
+                <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+                <script>
+                    function startTime() {
+                        const today = new Date();
+                        let h = today.getHours();
+                        let m = today.getMinutes();
+                        let s = today.getSeconds();
+                        m = checkTime(m);
+                        s = checkTime(s);
+                        document.getElementById('time').innerHTML = h + ":" + m + ":" + s;
+                        setTimeout(startTime, 1000);
+                    }
 
-    function checkTime(i) {
-        if (i < 10) {
-            i = "0" + i;
-        }
-        // add zero in front of numbers < 10
-        return i;
-    }
-    </script>
+                    function checkTime(i) {
+                        if (i < 10) {
+                            i = "0" + i;
+                        }
+                        // add zero in front of numbers < 10
+                        return i;
+                    }
+                </script>
 
-    <!-- CHART JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js"
-        integrity="sha512-VCHVc5miKoln972iJPvkQrUYYq7XpxXzvqNfiul1H4aZDwGBGC0lq373KNleaB2LpnC2a/iNfE5zoRYmB4TRDQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                <!-- CHART JS -->
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js"
+                        integrity="sha512-VCHVc5miKoln972iJPvkQrUYYq7XpxXzvqNfiul1H4aZDwGBGC0lq373KNleaB2LpnC2a/iNfE5zoRYmB4TRDQ=="
+                crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <!-- GRID JS -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" /> -->
+                <!-- GRID JS -->
+                <!-- <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
+                <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" /> -->
 
-    <!-- DATATABLE JS -->
+                <!-- DATATABLE JS -->
 
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js">
-    </script>
-    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
-    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script> -->
+                <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
+                <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js">
+                </script>
+                <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
+                <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+                <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script> -->
 
-    <!-- DATATABLE JS RESPONSIVE-->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
-    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+                <!-- DATATABLE JS RESPONSIVE-->
+                <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
+                <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
 
-</head>
+            </head>
 
-<body onload="startTime()">
+            <body onload="startTime()">
 
-    <?php   
+                <?php
 //         include COMPONENTS_PATH . '/navbar-loggedin.php';
-                $data="";
+                $data = "";
                 $dateToday = Time::get_current_date(); //Date today NEED TO CHANGE ONLY FOR DEBUG
                 $dates = Time::get_date_from_range($dateToday, Time::get_enddate($dateToday, 6));
 
@@ -161,592 +158,599 @@ console.log("going isset")
                     $slotid = $slot->get_slotid();
                     $facilityid = $slot->get_facilityid();
                     //$mrid ='<button onclick="check("'.$patientid.'","'.$slotid.'","'.$practitionerid.'","'.$facilityid.')" class="btn btn-primary">Go to Medical Record</button>';
-                    $mrid ='<button id="#listbuttons" data-patient="'.$patientid.'" data-slot="'.$slotid.'" data-prac="'.$practitionerid.'" data-facility="'.$facilityid.'" class="btn btn-primary listbttns">Go to Medical Record</button>';
-                    $data = "{'name':'".$patient->get_firstname()."','date':'".$slot->get_appointmentschedule()->get_date()."','time':'". $slot->get_appointmentschedule()->get_time() ."','mrid':'".$mrid."'},";
+                    $mrid = '<button id="#listbuttons" data-patient="' . $patientid . '" data-slot="' . $slotid . '" data-prac="' . $practitionerid . '" data-facility="' . $facilityid . '" class="btn btn-primary listbttns">Go to Medical Record</button>';
+                    $data = "{'name':'" . $patient->get_firstname() . "','date':'" . $slot->get_appointmentschedule()->get_date() . "','time':'" . $slot->get_appointmentschedule()->get_time() . "','mrid':'" . $mrid . "'},";
                 endforeach;
-                $data = "[".$data."]";
-                 //echo $data ;
+                $data = "[" . $data . "]";
+                //echo $data ;
                 ?>
-    <script>
-    var apptlist = <?php echo $data ?>;
-    </script>
+                <script>
+                    var apptlist = <?php echo $data ?>;
+                </script>
 
-    <?php ?>
+                <?php ?>
 
-    <div class="row bg-light py-4">
+                <div class="row bg-light py-4">
 
-        <div class="col">
-            <div class="container-fluid ms-3">
-                <h1 class="display-6"><?php echo $user->get_fullname(); ?> </h1>
-                <h1 class="lead"><?php echo $user->get_specialisation(); ?> </h1>
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- SIDE NAVIGATION TAB -->
-    <div class="container-fluid mt-3">
-        <ul class="nav nav-tabs flex-column tabgroup" id="tabsID">
-            <li><a class="tablinks top active" href="#dashboard" data-toggle='tab' id="default">
-                    <i class="far fa-window-maximize tab-icon"></i>Dashboard</a>
-            </li>
-
-            <li><a class="tablinks" href="#appointments" data-toggle='tab' id="appts">
-                    <i class="far fa-calendar-alt tab-icon"></i>Appointments</a>
-            </li>
-
-            <li><a class="tablinks" href="#settings" data-toggle='tab'>
-                    <i class="far fa-clock tab-icon"></i>Shift Settings</a>
-            </li>
-        </ul>
-
-        <div class="tab-content">
-            <div id="dashboard" class="tab-pane shadow rounded active">
-                <div class="container chart-container mt-5">
-
-                    <h3 class="text-center mb-4">Dashboard</h3>
-                    <div class="row">
-
-                        <div class="col">
-                            <h3 class="text-center">Date Today:</h3>
-                            <div class="border mb-3 shadow-sm" style="border-radius: 15px">
-                                <div class="display-6 text-center mb-1"><?php echo $dateToday ?></div>
-                            </div>
+                    <div class="col">
+                        <div class="container-fluid ms-3">
+                            <h1 class="display-6"><?php echo $user->get_fullname(); ?> </h1>
+                            <h1 class="lead"><?php echo $user->get_specialisation(); ?> </h1>
                         </div>
-                        <div class="col">
-                            <h3 class="text-center">Time:</h3>
-                            <div class="border mb-3 shadow-sm" style="border-radius: 15px">
-                                <div id="time" class="display-6 text-center mb-1"></div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col">
-                            <div class="p-4 shadow" style="border-radius: 25px">
-                                <canvas id="chart2" height="250px"></canvas>
-
-                            </div>
-                            <small class="text-muted mt-1" style="float:right">Last updated at
-                                <?php echo date("d/m/y"); echo " ".date("H:i:s"); ?></small>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col">
-                            <table style="width: 100% !important" id="apptdashboard" class="display">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Date</th>
-                                        <th>Time</th>
-                                        <th>Medical Record</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>name</td>
-                                        <td>date</td>
-                                        <td>time</td>
-                                        <td>mrid</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <small class="text-muted" style="float:right">Last updated at
-                                <?php echo date("d/m/y"); echo " ".date("H:i:s"); ?></small>
-                        </div>
                     </div>
 
                 </div>
-            </div>
 
-            <div id="appointments" class="tab-pane shadow rounded">
-                <div class="container mt-5">
-                    <h3 class="text-center">Appointments</h3>
 
-                    <table style="width: 100% !important" id="apptontab" class="display">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Medical Record</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>name</td>
-                                <td>date</td>
-                                <td>time</td>
-                                <td>mrid</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
 
-            </div>
+                <!-- SIDE NAVIGATION TAB -->
+                <div class="container-fluid mt-3">
+                    <ul class="nav nav-tabs flex-column tabgroup" id="tabsID">
+                        <li><a class="tablinks top active" href="#dashboard" data-toggle='tab' id="default">
+                                <i class="far fa-window-maximize tab-icon"></i>Dashboard</a>
+                        </li>
 
-            <div id="settings" class="tab-pane shadow rounded">
-                <div class="container mt-5">
-                    <h3 class="text-center mb-5">Shift</h3>
-                    <div class="container">
+                        <li><a class="tablinks" href="#appointments" data-toggle='tab' id="appts">
+                                <i class="far fa-calendar-alt tab-icon"></i>Appointments</a>
+                        </li>
 
-                        <div class="row">
-                            <div class="col">
+                        <li><a class="tablinks" href="#settings" data-toggle='tab'>
+                                <i class="far fa-clock tab-icon"></i>Shift Settings</a>
+                        </li>
+                    </ul>
 
-                                <table style="width: 100% !important" id="shifttable" class="display">
+                    <div class="tab-content">
+                        <div id="dashboard" class="tab-pane shadow rounded active">
+                            <div class="container chart-container mt-5">
+
+                                <h3 class="text-center mb-4">Dashboard</h3>
+                                <div class="row">
+
+                                    <div class="col">
+                                        <h3 class="text-center">Date Today:</h3>
+                                        <div class="border mb-3 shadow-sm" style="border-radius: 15px">
+                                            <div class="display-6 text-center mb-1"><?php echo $dateToday ?></div>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <h3 class="text-center">Time:</h3>
+                                        <div class="border mb-3 shadow-sm" style="border-radius: 15px">
+                                            <div id="time" class="display-6 text-center mb-1"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="p-4 shadow" style="border-radius: 25px">
+                                            <canvas id="chart2" height="250px"></canvas>
+
+                                        </div>
+                                        <small class="text-muted mt-1" style="float:right">Last updated at
+                                            <?php
+                                            echo date("d/m/y");
+                                            echo " " . date("H:i:s");
+                                            ?></small>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col">
+                                        <table style="width: 100% !important" id="apptdashboard" class="display">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Date</th>
+                                                    <th>Time</th>
+                                                    <th>Medical Record</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>name</td>
+                                                    <td>date</td>
+                                                    <td>time</td>
+                                                    <td>mrid</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <small class="text-muted" style="float:right">Last updated at
+                                            <?php
+                                            echo date("d/m/y");
+                                            echo " " . date("H:i:s");
+                                            ?></small>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div id="appointments" class="tab-pane shadow rounded">
+                            <div class="container mt-5">
+                                <h3 class="text-center">Appointments</h3>
+
+                                <table style="width: 100% !important" id="apptontab" class="display">
                                     <thead>
                                         <tr>
+                                            <th>Name</th>
                                             <th>Date</th>
                                             <th>Time</th>
+                                            <th>Medical Record</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
+                                            <td>name</td>
                                             <td>date</td>
                                             <td>time</td>
+                                            <td>mrid</td>
                                         </tr>
                                     </tbody>
                                 </table>
-
                             </div>
+
                         </div>
 
-                        <form method="post" action="">
-                            <div class="row my-3">
-                                <div class="col">
-                                    <input type="date" class="form-control" name="startDate"
-                                        value="<?php echo date('Y-m-d'); ?>">
-                                </div>
-                                <div class="col">
-                                    <input type="date" class="form-control" name="endDate"
-                                        value="<?php echo date('Y-m-d'); ?>">
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col">
+                        <div id="settings" class="tab-pane shadow rounded">
+                            <div class="container mt-5">
+                                <h3 class="text-center mb-5">Shift</h3>
+                                <div class="container">
+
                                     <div class="row">
                                         <div class="col">
-                                            <!-- Reason why use select is because only per hour, date input has minutes which we dont want -->
-                                            <div class="row">
-                                                <div class="col">
-                                                    <select name="startTime" class="form-select"
-                                                        aria-label="Default select example">
-                                                        <option selected hidden>Start Time</option>
-                                                        <option value="1">1</option>
-                                                        <option value="2">2</option>
-                                                        <option value="3">3</option>
-                                                        <option value="4">4</option>
-                                                        <option value="5">5</option>
-                                                        <option value="6">6</option>
-                                                        <option value="7">7</option>
-                                                        <option value="8">8</option>
-                                                        <option value="9">9</option>
-                                                        <option value="10">10</option>
-                                                        <option value="11">11</option>
-                                                        <option value="12">12</option>
-                                                    </select>
+
+                                            <table style="width: 100% !important" id="shifttable" class="display">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>Time</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>date</td>
+                                                        <td>time</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+
+                                    <form method="post" action="">
+                                        <div class="row my-3">
+                                            <div class="col">
+                                                <input type="date" class="form-control" name="startDate"
+                                                       value="<?php echo date('Y-m-d'); ?>">
+                                            </div>
+                                            <div class="col">
+                                                <input type="date" class="form-control" name="endDate"
+                                                       value="<?php echo date('Y-m-d'); ?>">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col">
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <!-- Reason why use select is because only per hour, date input has minutes which we dont want -->
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <select name="startTime" class="form-select"
+                                                                        aria-label="Default select example">
+                                                                    <option selected hidden>Start Time</option>
+                                                                    <option value="1">1</option>
+                                                                    <option value="2">2</option>
+                                                                    <option value="3">3</option>
+                                                                    <option value="4">4</option>
+                                                                    <option value="5">5</option>
+                                                                    <option value="6">6</option>
+                                                                    <option value="7">7</option>
+                                                                    <option value="8">8</option>
+                                                                    <option value="9">9</option>
+                                                                    <option value="10">10</option>
+                                                                    <option value="11">11</option>
+                                                                    <option value="12">12</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col">
+                                                                <select name="startMeridiem" class="form-select"
+                                                                        aria-label="Default select example">
+                                                                    <option selected>AM</option>
+                                                                    <option >PM</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div class="col">
-                                                    <select name="startMeridiem" class="form-select"
-                                                        aria-label="Default select example">
-                                                        <option selected>AM</option>
-                                                        <option >PM</option>
-                                                    </select>
+                                            </div>
+                                            <div class="col">
+
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <select name="endTime" class="form-select"
+                                                                aria-label="Default select example">
+                                                            <option selected hidden>End Time</option>
+                                                            <option value="1">1</option>
+                                                            <option value="2">2</option>
+                                                            <option value="3">3</option>
+                                                            <option value="4">4</option>
+                                                            <option value="5">5</option>
+                                                            <option value="6">6</option>
+                                                            <option value="7">7</option>
+                                                            <option value="8">8</option>
+                                                            <option value="9">9</option>
+                                                            <option value="10">10</option>
+                                                            <option value="11">11</option>
+                                                            <option value="12">12</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col">
+                                                        <select name="endMeridiem" class="form-select"
+                                                                aria-label="Default select example">
+                                                            <option >AM</option>
+                                                            <option selected>PM</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="col">
-
-                                    <div class="row">
-                                        <div class="col">
-                                            <select name="endTime" class="form-select"
-                                                aria-label="Default select example">
-                                                <option selected hidden>End Time</option>
-                                                <option value="1">1</option>
-                                                <option value="2">2</option>
-                                                <option value="3">3</option>
-                                                <option value="4">4</option>
-                                                <option value="5">5</option>
-                                                <option value="6">6</option>
-                                                <option value="7">7</option>
-                                                <option value="8">8</option>
-                                                <option value="9">9</option>
-                                                <option value="10">10</option>
-                                                <option value="11">11</option>
-                                                <option value="12">12</option>
-                                            </select>
+                                        <div class="row">
+                                            <div class="col">
+                                                <select name="intervals" class="form-select" aria-label="Default select example">
+                                                    <option selected>Intervals</option>
+                                                    <option value="30">30 minutes</option>
+                                                    <option value="60">1 hour</option>
+                                                    <option value="90">1 hour 30 minutes</option>
+                                                    <option value="120">2 hours</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                        <div class="col">
-                                            <select name="endMeridiem" class="form-select"
-                                                aria-label="Default select example">
-                                                <option >AM</option>
-                                                <option selected>PM</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                                        <button type="submit" class="btn btn-primary text-center mt-3" style="float:right">
+                                            Submit Time Slots
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col">
-                                    <select name="intervals" class="form-select" aria-label="Default select example">
-                                        <option selected>Intervals</option>
-                                        <option value="30">30 minutes</option>
-                                        <option value="60">1 hour</option>
-                                        <option value="90">1 hour 30 minutes</option>
-                                        <option value="120">2 hours</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary text-center mt-3" style="float:right">
-                                Submit Time Slots
-                            </button>
-                        </form>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
 
 
 
-    </div><!-- END OF SIDE NAVIGATION TAB -->
-    <form id="mrpost" method="post" name="postmedical" action="patientvisits/func/check.php">
+                </div><!-- END OF SIDE NAVIGATION TAB -->
+                <form id="mrpost" method="post" name="postmedical" action="patientvisits/func/check.php">
 
-        <input type="hidden" name="practitionerid" id="practinput" value="">
-        <input type="hidden" name="slotid" id="slotinput" value="">
-        <input type="hidden" name="facilityid" id="facilityinput" value="">
-        <input type="hidden" name="patientid" id="patientinput" value="">
-    </form>
+                    <input type="hidden" name="practitionerid" id="practinput" value="">
+                    <input type="hidden" name="slotid" id="slotinput" value="">
+                    <input type="hidden" name="facilityid" id="facilityinput" value="">
+                    <input type="hidden" name="patientid" id="patientinput" value="">
+                </form>
 
-    <script>
-    function strip_string(str) {
-        return str.replace(/(\r\n|\n|\r)/gm, "");
-    }
-
-
-    $(document).on('click', 'button.listbttns', function(e) {
-        var patient_id = $(this).attr("data-patient");
-        var slot_id = $(this).attr("data-slot");
-        var practitioner_id = $(this).attr("data-prac");
-        var facility_id = $(this).attr("data-facility");
-
-        console.log(patient_id);
-        console.log(slot_id);
-        console.log(practitioner_id);
-        console.log(facility_id);
-
-        $('input#practinput').val(practitioner_id);
-        $('input#slotinput').val(slot_id);
-        $('input#facilityinput').val(facility_id);
-        $('input#patientinput').val(patient_id);
-
-        $("form#mrpost").submit();
-
-
-        // $.ajax({
-        //     type: "POST",
-        //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']); ?>",
-        //     dataType: "text",
-        //     data: {
-        //         'ajax_check_mrid': true,
-        //         'patientid': patient_id,
-        //         'slotid': slot_id,
-        //         'facilityid': facility_id,
-        //         'practitionerid': practitioner_id
-        //     },
-        //     success: function() {
-        //         console.log(patient_id);
-        //         console.log(slot_id);
-        //     },
-        //     error: function() {
-        //         console.log("smthg wrong");
-        //     }
-        // });
-
-        // $.ajax({
-        //     type: "POST",
-        //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']); ?>",
-        //     dataType: "text",
-        //     data: {
-
-        //     },
-        //     success: function() {
-        //         console.log("just posting");
-        //     },
-        //     error: function() {
-        //         console.log("smthg wrong");
-        //     }
-        // });
-
-    });
-
-
-
-
-
-    /*THIS ONE ON THE BOTTOM IS ON THE DASHBOARD!!!!! 
-     */
-
-    var ctx2 = document.getElementById("chart2").getContext("2d");
-    var myChart1 = new Chart(ctx2, {
-        type: 'bar',
-        data: {
-            labels: [<?php
-        foreach ($dates as $date):
-            echo "'" . $date . "',";
-        endforeach;
-        ?>],
-            datasets: [{
-                label: 'Num of patients',
-                data: [<?php
-        foreach ($numofPatientsWeek as $date => $count): echo $count . ",";
-        endforeach;
-        ?>],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)',
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)',
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 10,
-                    min: 0,
-                    ticks: {
-                        stepSize: 1
+                <script>
+                    function strip_string(str) {
+                        return str.replace(/(\r\n|\n|\r)/gm, "");
                     }
 
-                }
-            }
-        }
-    });
-    </script>
 
-    <!-- END OF CHARTJS -->
+                    $(document).on('click', 'button.listbttns', function (e) {
+                        var patient_id = $(this).attr("data-patient");
+                        var slot_id = $(this).attr("data-slot");
+                        var practitioner_id = $(this).attr("data-prac");
+                        var facility_id = $(this).attr("data-facility");
 
-    <!-- GRIDJS -->
+                        console.log(patient_id);
+                        console.log(slot_id);
+                        console.log(practitioner_id);
+                        console.log(facility_id);
 
-    <script type="text/javascript">
-    // function Patient(name, date, time, mrid) {
-    //     this.name = name;
-    //     this.date = date;
-    //     this.time = time;
-    //     this.mrid = mrid;
-    // };
-    console.log(apptlist);
+                        $('input#practinput').val(practitioner_id);
+                        $('input#slotinput').val(slot_id);
+                        $('input#facilityinput').val(facility_id);
+                        $('input#patientinput').val(patient_id);
 
-    $(document).ready(function() {
-        <?php $shift='[]' ?>
-        var shiftdata = <?php echo $shift ?>;
-        var shifttables = $('#shifttable').DataTable({
-            responsive: true,
-            pageLength: 3,
-            "lengthChange": false,
-            data: shiftdata,
-            columns: [{
-                    data: 'date'
-                },
-                {
-                    data: 'time'
-                }
-            ],
-            "language": {
-                "emptyTable": "No slots opened"
-            }
-        });
-
-    });
+                        $("form#mrpost").submit();
 
 
-    $(document).ready(function() {
-        var appttable = $('#apptdashboard').DataTable({
-            responsive: true,
-            pageLength: 3,
-            "lengthChange": false,
-            "order": [
-                [1, "asc"],
-                [2, "asc"]
-            ],
-            columnDefs: [{
-                width: '20%',
-                targets: 3
-            }],
-            data: apptlist,
-            columns: [{
-                    data: 'name'
-                },
-                {
-                    data: 'date'
-                },
-                {
-                    data: 'time'
-                },
-                {
-                    data: 'mrid'
-                }
-            ],
-            "language": {
-                "emptyTable": "No appointment booked for you at the moment"
-            }
-        });
+                        // $.ajax({
+                        //     type: "POST",
+                        //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);       ?>",
+                        //     dataType: "text",
+                        //     data: {
+                        //         'ajax_check_mrid': true,
+                        //         'patientid': patient_id,
+                        //         'slotid': slot_id,
+                        //         'facilityid': facility_id,
+                        //         'practitionerid': practitioner_id
+                        //     },
+                        //     success: function() {
+                        //         console.log(patient_id);
+                        //         console.log(slot_id);
+                        //     },
+                        //     error: function() {
+                        //         console.log("smthg wrong");
+                        //     }
+                        // });
 
-    });
+                        // $.ajax({
+                        //     type: "POST",
+                        //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);       ?>",
+                        //     dataType: "text",
+                        //     data: {
 
+                        //     },
+                        //     success: function() {
+                        //         console.log("just posting");
+                        //     },
+                        //     error: function() {
+                        //         console.log("smthg wrong");
+                        //     }
+                        // });
 
-    $(document).ready(function() {
-        var appttable = $('#apptontab').DataTable({
-            responsive: true,
-            pageLength: 12,
-            "lengthChange": false,
-            "order": [
-                [1, "asc"],
-                [2, "asc"]
-            ],
-            data: apptlist,
-            columns: [{
-                    data: 'name'
-                },
-                {
-                    data: 'date'
-                },
-                {
-                    data: 'time'
-                },
-                {
-                    data: 'mrid'
-                }
-            ],
-            "language": {
-                "emptyTable": "No appointment booked for you at the moment"
-            }
-        });
-
-    });
-
-
-    // $(document).ready(function() {
-    //     new gridjs.Grid({
-    //         columns: ["Name", "Email", "Date", "Time"],
-    //         data: [
-    //             <?php
-    //     $pnum = 0;
-    //     $p_perday = 3; //Special_Slot::patient_count_per_date("mf001", "21-07-2021");
-    //     foreach ($slot_arr as $slot):
-    //         $patientid = $slot->get_patient();
-    //         $patient = Patient::retrieve_patient_by_id($patientid);
-    //         $str = "[\"" . $patient->get_firstname() . "\",\"" . $patient->get_email() . "\",\"" . $slot->get_appointmentschedule()->get_date() . "\",\"" . $slot->get_appointmentschedule()->get_time() . "\"],";
-    //         echo $str;
-    //     endforeach;
-    //     ?>
-    //         ],
-
-    //         pagination: {
-    //             enabled: true,
-    //             limit: 3,
-    //             summary: false
-    //         }
-    //     }).render(document.getElementById("wrapper2"));
-
-    //     new gridjs.Grid({
-    //         columns: ["Name", "Email", "Date", "Time",{
-    //     name: "Medical Records",
-    //     formatter: (cell) => {
-    //         return gridjs.html(`<a href="./patientvisits/index.php?id=035f05cbf562436d8f30&pt=S1499902G">Go to Medical Record</a>`)
-    //         // return `Update button`
-    //     }
-    // }],
-    //         data: [
-    //             ["John", "john@example.com", "24-June-2021", "14:00"],
-    //             ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
-    //             ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
-    //             ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
-    //             ["Afshin", "afshin@mail.com", "24-June-2021", "14:00"],
-    //             ["John", "john@example.com", "24-June-2021", "14:00"],
-    //             ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
-    //             ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
-    //             ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
-    //             ["John", "john@example.com", "24-June-2021", "14:00"],
-    //             ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
-    //             ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
-    //             ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
-    //         ],
-
-    //         pagination: {
-    //             enabled: true,
-    //             limit: 6,
-    //             summary: false
-    //         },
-
-    //         sort: true,
-    //         search: true,
-    //     }).render(document.getElementById("wrapper"));
-
-    // });
+                    });
 
 
 
-    /*===========================
-             Dynamic Tabs
-     =============================*/
 
-    $(window).on("popstate", function() {
-        var scrollHeight = $(document).scrollTop();
-        var anchor = location.hash || $("a[data-toggle='tab']").first().attr("href");
-        $("a[href='" + anchor + "']").tab("show");
-        console.log("a[href='" + anchor + "']");
-        setTimeout(function() {
-            $(window).scrollTop(scrollHeight);
-        }, 5);
-    });
 
-    $(document).ready(function() {
+                    /*THIS ONE ON THE BOTTOM IS ON THE DASHBOARD!!!!! 
+                     */
 
-        if (location.hash) {
-            $("a[href='" + location.hash + "']").tab("show");
-        }
-        $(document.body).on("click", "a[data-toggle='tab']", function(ev) {
-            if (ev.target.hash == '#appointments') {
-                appttable.columns.adjust().draw();
-            }
-            var scrollHeight = $(document).scrollTop();
-            location.hash = this.getAttribute("href");
-            setTimeout(function() {
-                $(window).scrollTop(scrollHeight);
-            }, 5);
-            console.log("going thru false");
-        });
+                    var ctx2 = document.getElementById("chart2").getContext("2d");
+                    var myChart1 = new Chart(ctx2, {
+                        type: 'bar',
+                        data: {
+                            labels: [<?php
+                                    foreach ($dates as $date):
+                                        echo "'" . $date . "',";
+                                    endforeach;
+                                    ?>],
+                            datasets: [{
+                                    label: 'Num of patients',
+                                    data: [<?php
+                                    foreach ($numofPatientsWeek as $date => $count): echo $count . ",";
+                                    endforeach;
+                                    ?>],
+                                    backgroundColor: [
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)',
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)'
+                                    ],
+                                    borderColor: [
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)',
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 10,
+                                    min: 0,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
 
-    });
-    </script>
-</body>
+                                }
+                            }
+                        }
+                    });
+                </script>
 
-</html>
-<?php
+                <!-- END OF CHARTJS -->
+
+                <!-- GRIDJS -->
+
+                <script type="text/javascript">
+                    // function Patient(name, date, time, mrid) {
+                    //     this.name = name;
+                    //     this.date = date;
+                    //     this.time = time;
+                    //     this.mrid = mrid;
+                    // };
+                    console.log(apptlist);
+
+                    $(document).ready(function () {
+        <?php $shift = '[]' ?>
+                        var shiftdata = <?php echo $shift ?>;
+                        var shifttables = $('#shifttable').DataTable({
+                            responsive: true,
+                            pageLength: 3,
+                            "lengthChange": false,
+                            data: shiftdata,
+                            columns: [{
+                                    data: 'date'
+                                },
+                                {
+                                    data: 'time'
+                                }
+                            ],
+                            "language": {
+                                "emptyTable": "No slots opened"
+                            }
+                        });
+
+                    });
+
+
+                    $(document).ready(function () {
+                        var appttable = $('#apptdashboard').DataTable({
+                            responsive: true,
+                            pageLength: 3,
+                            "lengthChange": false,
+                            "order": [
+                                [1, "asc"],
+                                [2, "asc"]
+                            ],
+                            columnDefs: [{
+                                    width: '20%',
+                                    targets: 3
+                                }],
+                            data: apptlist,
+                            columns: [{
+                                    data: 'name'
+                                },
+                                {
+                                    data: 'date'
+                                },
+                                {
+                                    data: 'time'
+                                },
+                                {
+                                    data: 'mrid'
+                                }
+                            ],
+                            "language": {
+                                "emptyTable": "No appointment booked for you at the moment"
+                            }
+                        });
+
+                    });
+
+
+                    $(document).ready(function () {
+                        var appttable = $('#apptontab').DataTable({
+                            responsive: true,
+                            pageLength: 12,
+                            "lengthChange": false,
+                            "order": [
+                                [1, "asc"],
+                                [2, "asc"]
+                            ],
+                            data: apptlist,
+                            columns: [{
+                                    data: 'name'
+                                },
+                                {
+                                    data: 'date'
+                                },
+                                {
+                                    data: 'time'
+                                },
+                                {
+                                    data: 'mrid'
+                                }
+                            ],
+                            "language": {
+                                "emptyTable": "No appointment booked for you at the moment"
+                            }
+                        });
+
+                    });
+
+
+                    // $(document).ready(function() {
+                    //     new gridjs.Grid({
+                    //         columns: ["Name", "Email", "Date", "Time"],
+                    //         data: [
+                    //             <?php
+//     $pnum = 0;
+//     $p_perday = 3; //Special_Slot::patient_count_per_date("mf001", "21-07-2021");
+//     foreach ($slot_arr as $slot):
+//         $patientid = $slot->get_patient();
+//         $patient = Patient::retrieve_patient_by_id($patientid);
+//         $str = "[\"" . $patient->get_firstname() . "\",\"" . $patient->get_email() . "\",\"" . $slot->get_appointmentschedule()->get_date() . "\",\"" . $slot->get_appointmentschedule()->get_time() . "\"],";
+//         echo $str;
+//     endforeach;
+//     
+        ?>
+                    //         ],
+
+                    //         pagination: {
+                    //             enabled: true,
+                    //             limit: 3,
+                    //             summary: false
+                    //         }
+                    //     }).render(document.getElementById("wrapper2"));
+
+                    //     new gridjs.Grid({
+                    //         columns: ["Name", "Email", "Date", "Time",{
+                    //     name: "Medical Records",
+                    //     formatter: (cell) => {
+                    //         return gridjs.html(`<a href="./patientvisits/index.php?id=035f05cbf562436d8f30&pt=S1499902G">Go to Medical Record</a>`)
+                    //         // return `Update button`
+                    //     }
+                    // }],
+                    //         data: [
+                    //             ["John", "john@example.com", "24-June-2021", "14:00"],
+                    //             ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
+                    //             ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
+                    //             ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
+                    //             ["Afshin", "afshin@mail.com", "24-June-2021", "14:00"],
+                    //             ["John", "john@example.com", "24-June-2021", "14:00"],
+                    //             ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
+                    //             ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
+                    //             ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
+                    //             ["John", "john@example.com", "24-June-2021", "14:00"],
+                    //             ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
+                    //             ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
+                    //             ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
+                    //         ],
+
+                    //         pagination: {
+                    //             enabled: true,
+                    //             limit: 6,
+                    //             summary: false
+                    //         },
+
+                    //         sort: true,
+                    //         search: true,
+                    //     }).render(document.getElementById("wrapper"));
+
+                    // });
+
+
+
+                    /*===========================
+                     Dynamic Tabs
+                     =============================*/
+
+                    $(window).on("popstate", function () {
+                        var scrollHeight = $(document).scrollTop();
+                        var anchor = location.hash || $("a[data-toggle='tab']").first().attr("href");
+                        $("a[href='" + anchor + "']").tab("show");
+                        console.log("a[href='" + anchor + "']");
+                        setTimeout(function () {
+                            $(window).scrollTop(scrollHeight);
+                        }, 5);
+                    });
+
+                    $(document).ready(function () {
+
+                        if (location.hash) {
+                            $("a[href='" + location.hash + "']").tab("show");
+                        }
+                        $(document.body).on("click", "a[data-toggle='tab']", function (ev) {
+                            if (ev.target.hash == '#appointments') {
+                                appttable.columns.adjust().draw();
+                            }
+                            var scrollHeight = $(document).scrollTop();
+                            location.hash = this.getAttribute("href");
+                            setTimeout(function () {
+                                $(window).scrollTop(scrollHeight);
+                            }, 5);
+                            console.log("going thru false");
+                        });
+
+                    });
+                </script>
+            </body>
+
+        </html>
+    <?php
     endif; # -- END OF USER TYPE CHECK
 
 endif; # -- END OF SESSION CHECK
