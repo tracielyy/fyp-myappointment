@@ -87,24 +87,24 @@ else:
                 <script src="https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
                 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
                 <script>
-                    function startTime() {
-                        const today = new Date();
-                        let h = today.getHours();
-                        let m = today.getMinutes();
-                        let s = today.getSeconds();
-                        m = checkTime(m);
-                        s = checkTime(s);
-                        document.getElementById('time').innerHTML = h + ":" + m + ":" + s;
-                        setTimeout(startTime, 1000);
-                    }
+                                function startTime() {
+                                    const today = new Date();
+                                    let h = today.getHours();
+                                    let m = today.getMinutes();
+                                    let s = today.getSeconds();
+                                    m = checkTime(m);
+                                    s = checkTime(s);
+                                    document.getElementById('time').innerHTML = h + ":" + m + ":" + s;
+                                    setTimeout(startTime, 1000);
+                                }
 
-                    function checkTime(i) {
-                        if (i < 10) {
-                            i = "0" + i;
-                        }
-                        // add zero in front of numbers < 10
-                        return i;
-                    }
+                                function checkTime(i) {
+                                    if (i < 10) {
+                                        i = "0" + i;
+                                    }
+                                    // add zero in front of numbers < 10
+                                    return i;
+                                }
                 </script>
 
                 <!-- CHART JS -->
@@ -134,6 +134,106 @@ else:
             <body onload="startTime()">
 
                 <?php
+                if ($_SERVER['REQUEST_METHOD'] == 'POST'):
+
+                    $error = "";
+                    $success = "";
+                    //echo 'going thru post';
+
+                    if (isset($_POST['submittimeslots'])) {
+                        //Date
+                        $startDate = $_POST['startDate'];
+                        $endDate = $_POST['endDate'];
+
+                        if ($startDate > $endDate) {
+                            $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                            $error .= '<strong>Your Start date must be earlier than the End date!</strong> Slots have not been submitted.';
+                            $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                            echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
+                        } else {
+
+                            if ($_POST['startTime'] == 'Start Time' || $_POST['endTime'] == 'End Time') {
+                                $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                                $error .= '<strong>You have entered incorrect time range!</strong> Slots have not been submitted.';
+                                $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                                echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
+                            } else {
+
+                                if ($_POST['intervals'] == 'Intervals') {
+                                    $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                                    $error .= '<strong>You have not entered the intervals!</strong> Slots have not been submitted.';
+                                    $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                                    echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
+                                } else {
+                                    $startDate_converted = Time::date_format_default($startDate);
+                                    $endDate_converted = Time::date_format_default($endDate);
+                                    $dateArray = array();
+
+                                    //Time
+                                    $startTime = $_POST['startTime'];
+                                    $startMeridiem = $_POST['startMeridiem'];
+                                    $startTimeMeridiem = $startTime . ":00 " . $startMeridiem;
+                                    $startTime_converted = Time::to_24hours($startTimeMeridiem);
+
+                                    $endTime = $_POST['endTime'];
+                                    $endMeridiem = $_POST['endMeridiem'];
+                                    $endTimeMeridiem = $endTime . ":00 " . $endMeridiem;
+                                    $endTime_converted = Time::to_24hours($endTimeMeridiem);
+                                    $timeArray = array();
+
+                                    //Interval
+                                    $interval = $_POST['intervals'];
+
+                                    if ($startDate_converted == $endDate_converted) {
+                                        $dateArray = array($startDate_converted);
+                                    } else {
+                                        $dateArray = Time::get_date_from_range($startTime_converted, $endDate_converted);
+                                    }
+
+                                    //Tracie TODO function
+                                    $timeArray = Time::get_time_range_intervals($startTime_converted, $endTime_converted, $interval);
+
+                                    $success .= '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+                                    $success .= '<strong>Slots are successfuly added!</strong>';
+                                    $success .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                                    echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $success . '\');});</script>';
+                                }
+                            }
+                        }
+                    }
+
+
+
+
+                    if (isset($_POST['postmedical'])):
+                        ?> <script>
+                            console.log("going isset")
+                        </script><?php
+                        $patientid = $_POST['patientid'];
+                        $slotid = $_POST['slotid'];
+                        $practitionerid = $_POST['practitionerid'];
+                        $facilityid = $_POST['facilityid'];
+
+                        $medicalrecord_array = array(
+                            'facilityid' => $facilityid,
+                            'practitioner' => $practitionerid,
+                            'slotid' => $slotid,
+                            'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientid, $slotid)
+                        );
+
+                        $mrid = check_mrid_exist($patientid, $slotid); //checks MRID but also, if available will put the mrid here
+
+                        if (!$mrid):
+                            $medical_record = Medical_Record::create_medical_record($patientid, $medicalrecord_array);
+                            $mrid = $medical_record->get_medicalrecordid();
+                            Appointment_Record::set_mrid($patientid, $slotid, $mrid);
+                        endif;
+
+                        header("Location:" . DOC_WEB . "/patientvisit/index.php?id=" . $mrid . "&pt=" . $patientid);
+                    endif;
+
+                endif;
+
 //         include COMPONENTS_PATH . '/navbar-loggedin.php';
                 $data = "";
                 $dateToday = Time::get_current_date(); //Date today NEED TO CHANGE ONLY FOR DEBUG
@@ -234,10 +334,10 @@ else:
 
                                         </div>
                                         <small class="text-muted mt-1" style="float:right">Last updated at
-                                            <?php
-                                            echo date("d/m/y");
-                                            echo " " . date("H:i:s");
-                                            ?></small>
+        <?php
+        echo date("d/m/y");
+        echo " " . date("H:i:s");
+        ?></small>
                                     </div>
                                 </div>
 
@@ -262,10 +362,10 @@ else:
                                             </tbody>
                                         </table>
                                         <small class="text-muted" style="float:right">Last updated at
-                                            <?php
-                                            echo date("d/m/y");
-                                            echo " " . date("H:i:s");
-                                            ?></small>
+        <?php
+        echo date("d/m/y");
+        echo " " . date("H:i:s");
+        ?></small>
                                     </div>
                                 </div>
 
@@ -459,7 +559,7 @@ else:
 
                         // $.ajax({
                         //     type: "POST",
-                        //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);         ?>",
+                        //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);          ?>",
                         //     dataType: "text",
                         //     data: {
                         //         'ajax_check_mrid': true,
@@ -479,7 +579,7 @@ else:
 
                         // $.ajax({
                         //     type: "POST",
-                        //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);         ?>",
+                        //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);          ?>",
                         //     dataType: "text",
                         //     data: {
 
@@ -506,16 +606,16 @@ else:
                         type: 'bar',
                         data: {
                             labels: [<?php
-                                    foreach ($dates as $date):
-                                        echo "'" . $date . "',";
-                                    endforeach;
-                                    ?>],
+        foreach ($dates as $date):
+            echo "'" . $date . "',";
+        endforeach;
+        ?>],
                             datasets: [{
                                     label: 'Num of patients',
                                     data: [<?php
-                                    foreach ($numofPatientsWeek as $date => $count): echo $count . ",";
-                                    endforeach;
-                                    ?>],
+        foreach ($numofPatientsWeek as $date => $count): echo $count . ",";
+        endforeach;
+        ?>],
                                     backgroundColor: [
                                         'rgba(255, 99, 132, 1)',
                                         'rgba(54, 162, 235, 1)',
