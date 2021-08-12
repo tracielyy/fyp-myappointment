@@ -23,7 +23,7 @@ require_once APPT_MOD . '/Special_Slot.php';
 require_once APPT_MOD . '/Appointment_Record.php';
 
 if (!isset($_SESSION['user'])):
-    header("Location:./debuglogin.php"); # -- REDIRECT USER TO THE LOGIN PAGE
+    header("Location:./login.php"); # -- REDIRECT USER TO THE LOGIN PAGE
 else:
     $user = unserialize($_SESSION["user"]);
 
@@ -63,6 +63,8 @@ else:
             "specialist" => ""
         );
         $appt_record = "";
+        $patient_doc_id = Account_User::retrieve_user_doc_id($user->get_email());
+
         /* Load Appointment Slots */
         if ($_SERVER["REQUEST_METHOD"] == "POST"):
 
@@ -71,11 +73,11 @@ else:
                 /* ---------  FUNCTIONS FOR CREATING APPOINTMENT ---------  */
 
                 // -- DISPLAY AVAILABLE SLOTS ($doctor_email is optional -- Only when user select specialist)
-                function retrieve_slots(string $facilityid, string $appointmenttype, string $date, ?string $doctor_email = NULL): array {
+                function retrieve_slots(string $patient_id, string $facilityid, string $appointmenttype, string $date, ?string $doctor_email = NULL): array {
                     switch ($appointmenttype):
                         case Appointment_Type::CHECK_UP:
                         case Appointment_Type::DOCTOR_CONSULTATION:
-                            return Normal_Slot::retrieve_free_slots_by_date($facilityid, $appointmenttype, $date);
+                            return Normal_Slot::retrieve_free_slots_by_date($patient_id, $facilityid, $appointmenttype, $date);
                         case Appointment_Type::SPECIALIST_CONSULTATION:
                             if ($doctor_email != NULL):
                                 return Special_Slot::retrieve_free_slots_by_date($facilityid, $doctor_email, $date);
@@ -229,11 +231,13 @@ else:
                                     url: "func/loadslots.php",
                                     data: {
                                         ajax: 1,
+                                        book: true,
                                         set_location: 1,
                                         set_facilityid: facilityid,
                                         set_appointmenttype: appointmenttype,
                                         set_date: date,
-                                        set_specialist: specialist
+                                        set_specialist: specialist,
+                                        patient_id: '<?php echo $patient_doc_id; ?>'
                                     },
                                     success: function (data) {
                                         //                        $('#hide_form').submit();
@@ -812,10 +816,12 @@ else:
                                 url: "func/loadslots.php",
                                 data: {
                                     ajax: 1,
+                                    book: true,
                                     set_facilityid: facilityid,
                                     set_appointmenttype: appointmenttype,
                                     set_date: date,
-                                    set_specialist: specialist
+                                    set_specialist: specialist,
+                                    patient_id: '<?php echo $patient_doc_id; ?>'
                                 },
                                 success: function (data) {
                                     //                                            $("#apptform").submit();

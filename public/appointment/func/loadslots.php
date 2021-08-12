@@ -24,17 +24,19 @@ require_once APPT_MOD . '/Special_Slot.php';
 require_once APPT_MOD . '/Appointment_Record.php';
 
 // -- DISPLAY AVAILABLE SLOTS ($doctor_email is optional -- Only when user select specialist)
-function retrieve_slots(string $facilityid, string $appointmenttype, string $date, ?string $doctor_email = NULL): array {
+function retrieve_slots(string $patient_id, string $facilityid, string $appointmenttype, string $date, ?string $doctor_email = NULL): array {
     switch ($appointmenttype):
         case Appointment_Type::CHECK_UP:
         case Appointment_Type::DOCTOR_CONSULTATION:
-            return Normal_Slot::retrieve_free_slots_by_date($facilityid, $appointmenttype, $date, true);
+            return Normal_Slot::retrieve_free_slots_by_date($patient_id,$facilityid, $appointmenttype, $date, true);
         case Appointment_Type::SPECIALIST_CONSULTATION:
             if ($doctor_email != NULL):
                 return Special_Slot::retrieve_free_slots_by_date($facilityid, $doctor_email, $date, true);
         endif;
     endswitch;
 }
+
+
 
 $cal_default = Time::CALENDAR_FORMAT_DEFAULT;
 $next_day = Time::get_enddate(date($cal_default), 1, $cal_default);
@@ -45,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"):
 
         $selected_date = Time::date_format_default($_POST['set_date']);
         $appt_date = Time::date_format_change($selected_date, $cal_default);
-        $raw_slots = retrieve_slots($_POST['set_facilityid'], $_POST['set_appointmenttype'], $selected_date, $_POST['set_specialist']);
+        $raw_slots = retrieve_slots($_POST['patient_id'],$_POST['set_facilityid'], $_POST['set_appointmenttype'], $selected_date, $_POST['set_specialist']);
 
         $slots_arr = StringUtils::object_to_array($raw_slots);
         # Add additional Information
