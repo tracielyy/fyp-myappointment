@@ -162,7 +162,7 @@ else:
                                     foreach ($_POST as $key => $value):
                                         if (isset($booking_info[$key])):
                                             $booking_info[$key] = htmlspecialchars($value);
-                                            echo $booking_info[$key];
+
                                             $validArr[$key] = False; // Set All Field Validation Check As False
                                             // -- Valid If It Is Not Empty
                                             if (!empty($booking_info[$key])):
@@ -244,9 +244,8 @@ else:
                             <!--HIDDEN FIELDS END-->
                             <!-- Same Day Booking -->
                             <div class="justify-content-center" style="min-width:720px!important; display:none;" id="appt-error">
-                                <div class="alert alert-danger" role="alert">
-                                    Booking of the same appointment type in the same day is not allowed. <br/>
-                                    Proceed to select a different appointment slot  instead.</a>
+                                <div class="alert alert-danger" role="alert" id="alert-message">
+
                                 </div>
                             </div>
                             <!-- END OF SAME DAY BOOKING -->
@@ -409,16 +408,18 @@ else:
                         if (!in_array(false, $validArr)):
                             $status = reschedule_appt($user->get_email(), $booking_info, $appt_obj);
                             if ($status):
-                                echo "change success";
                                 # __ Success Reschedule ___
                                 ?>
                                 <script>
+                                    window.location.replace(window.location.origin + '<?php echo APPT_WEB; ?>');
                                 </script>
                                 <?php
                             else:
                                 # __ Error Prompt For Selecting Same Day Appointment Slot __
                                 ?>
                                 <script>
+                                    $('#alert-message').html(' Booking of the same appointment type in the same day is not allowed.<br/>' +
+                                            'Proceed to select a different appointment slot  instead.</a>');
                                     $('#appt-booking').hide();
                                     $('#appt-error').show();
                                 </script>
@@ -426,9 +427,11 @@ else:
                             endif;
                         else:
                             # __ Error Prompt For Not Selecting The Slot __
-                            echo "change fail";
                             ?>
                             <script>
+                                $('#alert-message').html('Slot Not Selected');
+                                $('#appt-booking').hide();
+                                $('#appt-error').show();
                             </script>
                         <?php
                         endif;

@@ -232,9 +232,9 @@ if (isset($_SESSION["user"])):
                                                         <br>Appointment Status:
                                                         <?php echo $record->get_appointmentstatus(); // Return Appointment status            ?>
                                                         <br>
-                                                        <br>Date: <?php echo Time::date_format_change($date, Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                             ?>
-                                                        <br>Time: <?php echo Time::to_12hours($time, false); // Returns Time                                                                                                                                               ?>
-                                                        <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                                  ?>
+                                                        <br>Date: <?php echo Time::date_format_change($date, Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                              ?>
+                                                        <br>Time: <?php echo Time::to_12hours($time, false); // Returns Time                                                                                                                                                ?>
+                                                        <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                                   ?>
 
                                                         <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                                         <br>Address: <?php echo $record->get_facility()->get_address(); ?>
@@ -253,7 +253,7 @@ if (isset($_SESSION["user"])):
                                                                         onclick="upcoming_cancel_appt(this.value)">Cancel</button>
                                                             </div> <!-- BUTTON CANCEL COLUMN -->
                                                             <div class="col">
-                                                                <button type="button" class="btn btn-info col-12 text-light">Reschedule</button>
+                                                                <a href="<?php echo APPT_WEB . "/reschedule.php?id=" . $record->get_appointmentid(); ?>" class="btn btn-info col-12 text-light">Reschedule</a>
                                                             </div> <!-- BUTTON RESCEHDULE COLUMN -->
                                                             <!-- Modal -->
                                                             <div class="modal hide fade" id="cancelappt" tabindex="-1" aria-labelledby="cancelappointment" aria-hidden="true">
@@ -317,9 +317,9 @@ if (isset($_SESSION["user"])):
                                                     <?php echo $record->get_appointmentstatus(); // Return Appointment status                    ?>
                                                     <br>
                                                     <?php $appt_schedule = $record->get_appointmentslot()->get_appointmentschedule(); ?>
-                                                    <br>Date: <?php echo Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                         ?>
-                                                    <br>Time: <?php echo Time::to_12hours($appt_schedule->get_time(), false); // Returns Time                                                                                                                                                ?>
-                                                    <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                                ?>
+                                                    <br>Date: <?php echo Time::date_format_change($appt_schedule->get_date(), Time::DATE_FORMAT_APPOINTMENT); // Returns Date                                                                                                                                          ?>
+                                                    <br>Time: <?php echo Time::to_12hours($appt_schedule->get_time(), false); // Returns Time                                                                                                                                                 ?>
+                                                    <br>Location: <?php echo $record->get_facility()->get_facilityname(); // Returns Date                                                                                                                                                 ?>
 
                                                     <!-- $record->get_facility(); will return `Medical_Facility` object -->
                                                     <br>Address: <?php echo $record->get_facility()->get_address(); ?>
@@ -334,7 +334,7 @@ if (isset($_SESSION["user"])):
                                                                 "~" . Time::to_12hours($appt_schedule->get_time(), false);
                                                         ?>
                                                         <div class="col">
-                                                            <button type="button" class="btn btn-info col-12 text-light">Reschedule</button>
+                                                            <a href="<?php echo APPT_WEB . "/reschedule.php?id=" . $record->get_appointmentid(); ?>" class="btn btn-info col-12 text-light">Reschedule</a>
                                                         </div> <!-- BUTTON RESCEHDULE COLUMN -->
                                                     </div> <!-- BUTTON ROW-->
                                                 </div> <!-- CARD BODY -->
