@@ -27,6 +27,12 @@ else:
 
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST'):
+
+            # ____ TIME SLOT ADD ___ 
+            if (isset($_POST['time_slot'])):
+
+
+            endif;
             ?> 
             <script>
                 console.log("going thru post");
@@ -406,7 +412,7 @@ else:
                                                 </select>
                                             </div>
                                         </div>
-                                        <button type="submit" class="btn btn-primary text-center mt-3" style="float:right">
+                                        <button type="submit" class="btn btn-primary text-center mt-3" style="float:right" name="time_slot">
                                             Submit Time Slots
                                         </button>
                                     </form>
@@ -453,7 +459,7 @@ else:
 
                         // $.ajax({
                         //     type: "POST",
-                        //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);       ?>",
+                        //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);         ?>",
                         //     dataType: "text",
                         //     data: {
                         //         'ajax_check_mrid': true,
@@ -473,7 +479,7 @@ else:
 
                         // $.ajax({
                         //     type: "POST",
-                        //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);       ?>",
+                        //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);         ?>",
                         //     dataType: "text",
                         //     data: {
 
