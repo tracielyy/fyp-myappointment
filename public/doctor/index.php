@@ -9,11 +9,12 @@ require_once UTIL_MOD . '/Regex.php';
 require_once AUTH_MOD . '/Authentication.php';
 require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Medical_Personnel.php';
+require_once TIME_MOD . '/Time.php';
+
 
 /*
  *  MEDICAL DASHBOARD
  */
-
 
 if (!isset($_SESSION['user'])):
     header("Location:./../"); # -- REDIRECT USER TO THE INDEX PAGE
@@ -24,50 +25,17 @@ else:
     if (!User_Type::check_user_type(User_Type::MEDICAL_PERSONNEL, $user_type)):
         header("Location:./../"); # -- REDIRECT USER TO THE INDEX PAGE
     else:
-        
-        
-        if ($_SERVER['REQUEST_METHOD'] == 'POST'):
-            ?> <script>
-console.log("going thru post")
-</script><?php
-            echo 'going thru post';
-            if (isset($_POST['postmedical'])):
-                ?> <script>
-console.log("going isset")
-</script><?php
-
-                $patientid = $_POST['patientid'];
-                $slotid = $_POST['slotid'];
-                $practitionerid =$_POST['practitionerid'];
-                $facilityid = $_POST['facilityid'];
-            
-                $medicalrecord_array = array(
-                    'facilityid'=> $facilityid,
-                    'practitioner' => $practitionerid,
-                    'slotid' => $slotid,
-                    'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientid,$slotid)
-                );
-        
-                $mrid = check_mrid_exist($patientid,$slotid); //checks MRID but also, if available will put the mrid here
-        
-                if(!$mrid):
-                    $medical_record = Medical_Record::create_medical_record($patientid,$medicalrecord_array);
-                    $mrid = $medical_record->get_medicalrecordid();
-                    Appointment_Record::set_mrid($patientid,$slotid,$mrid);
-                endif;
-        
-                header("Location:" . DOC_WEB . "/patientvisit/index.php?id=".$mrid."&pt=".$patientid);
-            endif;
-        
-        endif;
-        
-        
-        ?>
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
+    <!-- Prevent Form Resubmission -->
+    <script>
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+    </script>
 
     <!-- Styling -->
     <link rel="stylesheet" href="./../css/medicaldashboard.css">
@@ -131,6 +99,130 @@ console.log("going isset")
 <body onload="startTime()">
 
     <?php   
+            
+                    
+                    
+                    if ($_SERVER['REQUEST_METHOD'] == 'POST'):
+                        
+                        $error = "";
+                        $success = "";
+                        //echo 'going thru post';
+            
+                        if (isset($_POST['submittimeslots']))
+                            {   
+                                //Date
+                                $startDate = $_POST['startDate'];
+                                $endDate = $_POST['endDate'];
+            
+                                if($startDate > $endDate)
+                                {
+                                    $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                                    $error .= '<strong>Your Start date must be earlier than the End date!</strong> Slots have not been submitted.';
+                                    $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                                    echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$error.'\');});</script>';
+                                } 
+                                else 
+                                {
+            
+                                if($_POST['startTime'] == 'Start Time' || $_POST['endTime'] == 'End Time' ) 
+                                {
+                                    $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                                    $error .= '<strong>You have entered incorrect time range!</strong> Slots have not been submitted.';
+                                    $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                                    echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$error.'\');});</script>';
+                                }
+                                else
+                                {
+            
+                                    if($_POST['intervals'] == 'Intervals') 
+                                    {
+                                        $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                                        $error .= '<strong>You have not entered the intervals!</strong> Slots have not been submitted.';
+                                        $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$error.'\');});</script>';
+                                    }
+                                    else
+                                    {
+                                        $startDate_converted = Time::date_format_default($startDate);
+                                        $endDate_converted = Time::date_format_default($endDate);
+                                        $dateArray = array();
+            
+                                        //Time
+                                        $startTime = $_POST['startTime'];
+                                        $startMeridiem = $_POST['startMeridiem'];
+                                        $startTimeMeridiem = $startTime.":00 ".$startMeridiem;
+                                        $startTime_converted = Time::to_24hours($startTimeMeridiem);
+            
+                                        $endTime = $_POST['endTime'];
+                                        $endMeridiem = $_POST['endMeridiem'];
+                                        $endTimeMeridiem = $endTime.":00 ".$endMeridiem;
+                                        $endTime_converted = Time::to_24hours($endTimeMeridiem);
+                                        $timeArray = array();
+            
+                                        //Interval
+                                        $interval = $_POST['intervals'];
+            
+                                        if($startDate_converted == $endDate_converted)
+                                        {
+                                            $dateArray = array($startDate_converted);
+                                        }else
+                                        {
+                                            $dateArray = Time::get_date_from_range($startTime_converted, $endDate_converted);
+                                        }
+                                        
+                                        //Tracie TODO function
+                                        $timeArray = Time::get_time_range_intervals($startTime_converted,$endTime_converted,$interval);
+
+
+                                        $success .= '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+                                    $success .= '<strong>Slots are successfuly added!</strong>';
+                                    $success .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                                    echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$success.'\');});</script>';
+                                    }
+                                    
+            
+                                }
+                                    
+                                }
+            
+                               
+            
+                            }
+            
+            
+            
+            
+                        if (isset($_POST['postmedical'])):
+                                        ?> <script>
+            console.log("going isset")
+            </script><?php
+            
+                            $patientid = $_POST['patientid'];
+                            $slotid = $_POST['slotid'];
+                            $practitionerid =$_POST['practitionerid'];
+                            $facilityid = $_POST['facilityid'];
+                        
+                            $medicalrecord_array = array(
+                                'facilityid'=> $facilityid,
+                                'practitioner' => $practitionerid,
+                                'slotid' => $slotid,
+                                'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientid,$slotid)
+                            );
+                    
+                            $mrid = check_mrid_exist($patientid,$slotid); //checks MRID but also, if available will put the mrid here
+                    
+                            if(!$mrid):
+                                $medical_record = Medical_Record::create_medical_record($patientid,$medicalrecord_array);
+                                $mrid = $medical_record->get_medicalrecordid();
+                                Appointment_Record::set_mrid($patientid,$slotid,$mrid);
+                            endif;
+                    
+                            header("Location:" . DOC_WEB . "/patientvisit/index.php?id=".$mrid."&pt=".$patientid);
+                        endif;
+                    
+                    endif;
+                    
+                    
 //         include COMPONENTS_PATH . '/navbar-loggedin.php';
                 $data="";
                 $dateToday = Time::get_current_date(); //Date today NEED TO CHANGE ONLY FOR DEBUG
@@ -166,6 +258,9 @@ console.log("going isset")
                 endforeach;
                 $data = "[".$data."]";
                  //echo $data ;
+
+
+                
                 ?>
     <script>
     var apptlist = <?php echo $data ?>;
@@ -314,103 +409,108 @@ console.log("going isset")
 
                             </div>
                         </div>
-
-                        <form method="post" action="">
-                            <div class="row my-3">
-                                <div class="col">
-                                    <input type="date" class="form-control" name="startDate"
-                                        value="<?php echo date('Y-m-d'); ?>">
-                                </div>
-                                <div class="col">
-                                    <input type="date" class="form-control" name="endDate"
-                                        value="<?php echo date('Y-m-d'); ?>">
-                                </div>
+                        <?php $dateTomorrow = date('Y-m-d',strtotime("+1 day")); ?>
+                        <h1 class="display-6 mt-4"><strong style="margin-bottom:5px">Add Shift</strong></h1>
+                        <div class="container mt-3" id="alertbox"></div>
+                    </div>
+                    <form name="shiftpostname" method="post" action="">
+                        <div class="row my-3">
+                            <div class="col">
+                                <p class="lead" style="margin-bottom:5px">Start Date</p>
+                                <input id="startDateID" min="<?php echo $dateTomorrow; ?>" type="date"
+                                    class="form-control" name="startDate" value="<?php echo $dateTomorrow; ?>">
                             </div>
-                            <div class="row mb-3">
-                                <div class="col">
-                                    <div class="row">
-                                        <div class="col">
-                                            <!-- Reason why use select is because only per hour, date input has minutes which we dont want -->
-                                            <div class="row">
-                                                <div class="col">
-                                                    <select name="startTime" class="form-select"
-                                                        aria-label="Default select example">
-                                                        <option selected hidden>Start Time</option>
-                                                        <option value="1">1</option>
-                                                        <option value="2">2</option>
-                                                        <option value="3">3</option>
-                                                        <option value="4">4</option>
-                                                        <option value="5">5</option>
-                                                        <option value="6">6</option>
-                                                        <option value="7">7</option>
-                                                        <option value="8">8</option>
-                                                        <option value="9">9</option>
-                                                        <option value="10">10</option>
-                                                        <option value="11">11</option>
-                                                        <option value="12">12</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col">
-                                                    <select name="startMeridiem" class="form-select"
-                                                        aria-label="Default select example">
-                                                        <option selected>AM</option>
-                                                        <option >PM</option>
-                                                    </select>
-                                                </div>
+                            <div class="col">
+                                <p class="lead" style="margin-bottom:5px">End Date</p>
+                                <input min="<?php echo $dateTomorrow; ?>" type="date" class="form-control"
+                                    name="endDate" value="<?php echo $dateTomorrow; ?>">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col">
+                                        <!-- Reason why use select is because only per hour, date input has minutes which we dont want -->
+                                        <div class="row">
+                                            <div class="col">
+                                                <select name="startTime" class="form-select"
+                                                    aria-label="Default select example">
+                                                    <option selected hidden>Start Time</option>
+                                                    <option value="1">1</option>
+                                                    <option value="2">2</option>
+                                                    <option value="3">3</option>
+                                                    <option value="4">4</option>
+                                                    <option value="5">5</option>
+                                                    <option value="6">6</option>
+                                                    <option value="7">7</option>
+                                                    <option value="8">8</option>
+                                                    <option value="9">9</option>
+                                                    <option value="10">10</option>
+                                                    <option value="11">11</option>
+                                                    <option value="12">12</option>
+                                                </select>
+                                            </div>
+                                            <div class="col">
+                                                <select name="startMeridiem" class="form-select"
+                                                    aria-label="Default select example">
+                                                    <option selected>AM</option>
+                                                    <option>PM</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col">
+                            </div>
+                            <div class="col">
 
-                                    <div class="row">
-                                        <div class="col">
-                                            <select name="endTime" class="form-select"
-                                                aria-label="Default select example">
-                                                <option selected hidden>End Time</option>
-                                                <option value="1">1</option>
-                                                <option value="2">2</option>
-                                                <option value="3">3</option>
-                                                <option value="4">4</option>
-                                                <option value="5">5</option>
-                                                <option value="6">6</option>
-                                                <option value="7">7</option>
-                                                <option value="8">8</option>
-                                                <option value="9">9</option>
-                                                <option value="10">10</option>
-                                                <option value="11">11</option>
-                                                <option value="12">12</option>
-                                            </select>
-                                        </div>
-                                        <div class="col">
-                                            <select name="endMeridiem" class="form-select"
-                                                aria-label="Default select example">
-                                                <option >AM</option>
-                                                <option selected>PM</option>
-                                            </select>
-                                        </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <select name="endTime" class="form-select" aria-label="Default select example">
+                                            <option selected hidden>End Time</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                            <option value="9">9</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                        </select>
+                                    </div>
+                                    <div class="col">
+                                        <select name="endMeridiem" class="form-select"
+                                            aria-label="Default select example">
+                                            <option>AM</option>
+                                            <option selected>PM</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col">
-                                    <select name="intervals" class="form-select" aria-label="Default select example">
-                                        <option selected>Intervals</option>
-                                        <option value="30">30 minutes</option>
-                                        <option value="60">1 hour</option>
-                                        <option value="90">1 hour 30 minutes</option>
-                                        <option value="120">2 hours</option>
-                                    </select>
-                                </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <select name="intervals" class="form-select" aria-label="Default select example">
+                                    <option value="Intervals" hidden selected>Intervals</option>
+                                    <option value="30">30 minutes</option>
+                                    <option value="60">1 hour</option>
+                                </select>
                             </div>
-                            <button type="submit" class="btn btn-primary text-center mt-3" style="float:right">
-                                Submit Time Slots
-                            </button>
-                        </form>
-                    </div>
+                        </div>
+                        <button name="submittimeslots" type="submit" class="btn btn-primary text-center mt-3"
+                            style="float:right">
+                            Submit Time Slots
+                        </button>
+                    </form>
+                    <small class="text-muted">*Notice: Start date has to be the next day, as patient can book
+                        appointment starting from tomorrow.</small>
                 </div>
             </div>
         </div>
+    </div>
 
 
 
