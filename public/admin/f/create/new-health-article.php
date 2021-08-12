@@ -159,10 +159,8 @@ else:
                 </style>
             </head>
             <body>
-                <!-- NavBar  (TOP) -->
+                <!-- NavBar  -->
                 <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
-                <!-- Canvas (SIDE) -->
-                <?php require_once TEMPLATES_PATH . "/fadmin-canvas.php"; ?>
 
                 <!-- Current Page (Add Health Article) -->
                 <main class="mt-5 pt-3">
@@ -247,6 +245,8 @@ else:
                 ></script>
                 <!-- for testing the input boxes and the reset button -->
                 <script>
+                    $('#nav-health-articles').addClass('active');
+
                     var checkBoxes = document.querySelectorAll("input[type = 'checkbox']");
                     var btnReset = document.getElementById('resetBtn');
                     var inputs = document.querySelectorAll('input');

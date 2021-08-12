@@ -206,13 +206,13 @@ else:
                                                         <div class="mb-3 row">
                                                             <label for="address" class="col-sm-2 col-form-label">Address: </label>
                                                             <div class="col-sm-10">
-                                                                <input type="text" readonly class="form-control-plaintext" id="staticAddress" placeholder="<?php echo $facility_info->get_address(); ?>">
+                                                                <input type="text" readonly class="form-control-plaintext" placeholder="<?php echo $facility_info->get_address(); ?>">
                                                             </div>
                                                         </div>
                                                         <div class="mb-3 row">
                                                             <label for="contact" class="col-sm-2 col-form-label">Contact: </label>
                                                             <div class="col-sm-10">
-                                                                <input type="text" readonly class="form-control-plaintext" id="staticContact" placeholder="<?php echo $facility_info->get_contactnumber(); ?>">
+                                                                <input type="text" readonly class="form-control-plaintext"  placeholder="<?php echo $facility_info->get_contactnumber(); ?>">
                                                             </div>
                                                         </div>
                                                         <?php

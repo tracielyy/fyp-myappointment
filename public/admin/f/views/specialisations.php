@@ -140,10 +140,8 @@ else:
                 </style>
             </head>
             <body>
-                <!-- NavBar  (TOP) -->
+                <!-- NavBar  -->
                 <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
-                <!-- Canvas (SIDE) -->
-                <?php require_once TEMPLATES_PATH . "/fadmin-canvas.php"; ?>
                 <!-- Current Page (View Facility Specialisations) -->
                 <main class="mt-5 pt-3">
                     <div class="container-fluid">
@@ -187,11 +185,11 @@ else:
                                     </div>
                                     <!-- END OF ONE SPECIALISATION CARD -->
                                     <?php
-                            endforeach;
-                            ?>
+                                endforeach;
+                                ?>
 
+                            </div>
                         </div>
-                    </div>
 
                 </main>
                 <br />
@@ -199,7 +197,7 @@ else:
                 <!-- main ends here -->
                 <section>
                     <div class="modal fade" id="deleteSpec" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" style="margin-left: 30rem;">
+                        <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="staticBackdropLabel">Delete Specialisation: <br/><b><span id="spec"></span></b></h5>
@@ -224,6 +222,8 @@ else:
                 </section>
 
                 <script>
+                    $('#nav-facility').addClass('active');
+                    $('#nav-specialisation').addClass('active');
                     var req = null;
                     // -- Pass Information To Modal
                     function delete_specialisation(specialisation, count_identifier) {

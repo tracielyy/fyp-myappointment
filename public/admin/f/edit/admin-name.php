@@ -10,9 +10,15 @@ require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Medical_Personnel.php';
 require_once USER_MOD . '/Facility_Admin.php';
 require_once USER_MOD . '/Super_Admin.php';
+
+require_once UTIL_MOD . '/Regex.php';
+
+require_once FACILITY_MOD . '/Medical_Facility.php';
+
 /*
- *  VIEW SUPER ADMIN PROFILE DETAILS
+ *  EDIT FACILITY ADMIN  -- NAME CHANGE
  */
+
 if (!isset($_SESSION['user'])):
     header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
 else:
@@ -21,7 +27,7 @@ else:
     $user_email = $user->get_email();
 
 // Check If User Is Super Admin
-    if (!User_Type::check_user_type(User_Type::SUPER_ADMIN, $user_type)):
+    if (!User_Type::check_user_type(User_Type::FACIILITY_ADMIN, $user_type)):
         header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
     else:
 
@@ -44,34 +50,24 @@ else:
         if ($_SERVER["REQUEST_METHOD"] == "GET") :
 
             $user_password = Account_User::retrieve_password_by_id($user->get_adminid());
-            $user_pin = Super_Admin::retrieve_pin_by_id($user->get_adminid());
+
             $admin = array(
                 'profile' => array(
                     'adminname' => $user->get_adminname(),
-                ),
-                'credentials' => array(
-                    'email' => $user->get_email(),
-                    'password' => $user_password,
-                    'secretpin' => $user_pin
                 )
             );
         elseif ($_SERVER["REQUEST_METHOD"] == "POST"):
             $validArr = array();
-            if (isset($_POST['edit_admin'])):
+            if (isset($_POST['edit_name'])):
                 $admin = array(
                     'profile' => array(
                         'adminname' => '',
-                    ),
-                    'credentials' => array(
-                        'email' => '',
-                        'password' => '',
-                        'secretpin' => ''
                     )
                 );
 
                 store_info($_POST, $admin, $validArr);
-            endif;
 
+            endif;
         endif;
         ?><!DOCTYPE html>
         <html lang="en">
@@ -79,7 +75,7 @@ else:
                 <meta charset="UTF-8" />
                 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>View My Profile</title>
+                <title>Admin Edit Profile: Name</title>
                 <!-- fontawesome -->
                 <script src="https://kit.fontawesome.com/dcfd5ba5e7.js"  crossorigin="anonymous"></script>
                 <!-- google fonts -->
@@ -176,7 +172,7 @@ else:
                 </style>
             </head>
             <body>
-                <?php require_once TEMPLATES_PATH . "/sadmin-navbar.php"; ?>
+                <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
                 <!-- main section starts here -->
                 <main class="mt-5 pt-3">
                     <div class="row">
@@ -185,55 +181,40 @@ else:
                                 <div class="card-body">
                                     <div class="card text-dark innerCard mb-3">
                                         <div class="card-title ms-2 mt-2">
-                                            <h4 class="text-muted" style="font-weight: 600; font-size: 1.5rem;">Edit Profile</h4>
+                                            <h4 class="text-muted" style="font-weight: 600; font-size: 1.5rem;">Profile: Admin Name Change</h4>
                                         </div>
                                         <hr class="ms-2" style="max-width: 60%;">
 
                                         <!-- Card Body -->
                                         <div class="card-body">
+                                            <!-- Spinner -->
+                                            <div class="text-center" id="spinner-container" class="p-5">
+                                                <div class="spinner-border text-secondary m-1" role="status" style="width: 15rem; height: 15em; border-width:2em;"></div>
+                                            </div>
                                             <!-- Form -->
                                             <form id="edit_admin_form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
                                                 <!-- Admin ID -->
                                                 <div class="mb-3 row">
-                                                    <label for="SuperadminID" class="col-sm-2 col-form-label">Admin ID: </label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" readonly class="form-control-plaintext" value="<?php echo $user->get_adminid(); ?>">
+                                                    <label for="adminid" class="col-sm-3 col-form-label">Admin ID: </label>
+                                                    <div class="col-sm-9">
+                                                        <div class="form-control-plaintext px-2" id="adminid"><?php echo $user->get_adminid(); ?></div>
                                                     </div>
                                                 </div>
                                                 <!-- Admin Name -->
                                                 <div class="mb-3 row">
-                                                    <label for="SuperadminName" class="col-sm-2 col-form-label">Admin Name: </label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" name="profile[adminname]" class="form-control" value="<?php echo $admin['profile']['adminname']; ?>">
+                                                    <label for="SuperadminName" class="col-sm-3 col-form-label">Admin Name: </label>
+                                                    <div class="col-sm-9" id="adminname-container">
+                                                        <input type="text" name="profile[adminname]" class="form-control" value="<?php echo $admin['profile']['adminname']; ?>" id="adminname">
+                                                        <span id="error-adminname" class="invalid-feedback"></span>
                                                     </div>
                                                 </div>
-                                                <!-- Email -->
-                                                <div class="mb-3 row">
-                                                    <label for="email" class="col-sm-2 col-form-label">Email: </label>
-                                                    <div class="col-sm-10">
-                                                        <input type="email" name="credentials[email]" class="form-control" value="<?php echo $admin['credentials']['email']; ?>">
-                                                    </div>
-                                                </div>
-                                                <!-- Password -->
-                                                <div class="mb-3 row">
-                                                    <label for="Adminpassword" class="col-sm-2 col-form-label">Password: </label>
-                                                    <div class="col-sm-10">
-                                                        <input type="password" name="credentials[password]" class="form-control" value="<?php echo $admin['credentials']['password']; ?>">
-                                                    </div>
-                                                </div>
-                                                <!-- Secret Pin -->
-                                                <div class="mb-3 row">
-                                                    <label for="SecretPin" class="col-sm-2 col-form-label">Secret Pin: </label>
-                                                    <div class="col-sm-10">
-                                                        <input type="password" name="credentials[secretpin]" class="form-control" value="<?php echo $admin['credentials']['secretpin']; ?>">
-                                                    </div>
-                                                </div>
+
                                                 <div class="d-grid gap-2 d-md-flex justify-content-md-center" style=" margin-top: 10px;">
-                                                    <button type="submit" name="edit_admin" class="btn btn-dark me-md-2 mr-2">
+                                                    <button type="submit" name="edit_name" class="btn btn-dark me-md-2 mr-2" if="edit-adminname">
                                                         <span><i class="fas fa-save"></i></span>
                                                         <span>Save</span>
                                                     </button>
-                                                    <a href="<?php echo SADMIN_WEB . "/views/super-admin.php"; ?>" class="btn btn-danger me-md-2 mr-2">
+                                                    <a href="<?php echo FADMIN_WEB . "/views/admin.php"; ?>" class="btn btn-danger me-md-2 mr-2">
                                                         <span><i class="fas fa-window-close"></i></span>
                                                         <span>Cancel</span>
                                                     </a>
@@ -248,9 +229,60 @@ else:
                 </main>
                 <!-- main ends here -->
                 <script>
+                    $('#spinner-container').hide();
                     $('#nav-edit-profile').addClass('active');
-                </script>
 
+                    $(document).ready(function () {
+                        $("#edit_admin_form").validate({
+                            rules: {
+                                "profile[adminname]": {
+                                    required: true,
+                                    adminnameRegex: true
+                                }
+
+                            },
+                            messages: {
+                                "profile[adminname]": {
+                                    required: "Required",
+                                    adminnameRegex: "Invalid Admin Name"
+                                }
+
+                            },
+                            errorElement: "em",
+                            errorPlacement: function (error, element) {
+                                // This is the default behavior 
+
+                                error.insertAfter(element);
+                                error.addClass("help-block invalid-feedback");
+                            },
+                            success: function (label, element) {
+                                $(element).addClass("is-valid");
+
+
+                            },
+                            highlight: function (element, errorClass, validClass) {
+                                $(element).addClass("is-invalid").removeClass("is-valid");
+                            },
+                            unhighlight: function (element, errorClass, validClass) {
+                                $(element).addClass("is-valid").removeClass("is-invalid");
+
+                            }
+                        });
+
+
+                    });
+
+                    /*----------------------------------------------
+                     CLIENT SIDE REGULAR EXPRESSION FOR PASSWORD
+                     -----------------------------------------------*/
+
+                    $.validator.addMethod("adminnameRegex", function (value, element) {
+                        return this.optional(element) ||
+                                /^([a-z0-9]+-)*[a-z0-9]+$/i.test(value);
+                    }, "Invalid Admin Name");
+
+
+                </script>
                 <!-- bootstrap js link -->
                 <script
                     src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
@@ -259,7 +291,39 @@ else:
                 ></script>
             </body>
         </html>
-    <?php
+        <?php
+        if (isset($_POST['edit_name'])):
+            // Validation
+
+            if (empty($admin['profile']['adminname'])):
+                $validArr['adminname'] = false;
+            elseif (!empty($admin['profile']['adminname']) && !Regex::validate_adminname($admin['profile']['adminname'])):
+                $validArr['adminname'] = false;
+            else:
+                $validArr['adminname'] = true;
+
+            endif;
+
+            if (!in_array(false, $validArr)):
+                ?>
+                <script>
+                    $('#spinner-container').show();
+                    $('#edit_admin_form').hide();
+                </script>
+                <?php
+                if ($admin['profile']['adminname'] !== $user->get_adminname()):
+                    Admin::update_adminname($user->get_adminid(), $admin['profile']['adminname']);
+                    $user->set_adminname($admin['profile']['adminname']);
+                    $_SESSION['user'] = serialize($user);
+                endif;
+                ?>
+                <script>
+                    window.location.replace(window.location.origin + '<?php echo FADMIN_WEB . "/views/admin.php"; ?>');
+                </script>
+                <?php
+            endif;
+        endif;
+
     endif; # -- END USER TYPE CHECK
 endif; # -- END SESSION CHECK
 ?>

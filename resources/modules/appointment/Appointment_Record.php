@@ -16,6 +16,8 @@ require_once APPT_MOD . '/Special_Slot.php';
 require_once APPT_MOD . '/Normal_Slot.php';
 require_once FACILITY_MOD . '/Medical_Facility.php';
 
+use Google\Cloud\Firestore\Transaction;
+
 class Appointment_Record {
 
     // Properties
@@ -166,7 +168,7 @@ class Appointment_Record {
                 break;
             endif;
         endforeach;
-        
+
         // Use The Appt ID & Set The mrid 
         $doc_ref = $db->get_db()->collection($doc_path)->document($appt_id);
         $trxn_result = $db->get_db()->runTransaction(function (Transaction $transaction) use ($doc_ref, $mrid) {
@@ -182,34 +184,32 @@ class Appointment_Record {
     }
 
     // -- Validate Appointment Booking  (Check If Patient Have Same Appointment) -- //
-    public static function validate_appt_booking(string $user_doc_id, array $booking_info): bool {
+    public static function validate_appt_booking(string $user_doc_id, array $booking_info): null|bool {
 
         # Search For Same Appointment
-        $booking_date = explode("~", $booking_info['slotid'])[1];
-        $db = new DbQuery();
-        $path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
-        $snapshot = $db->get_db()->collection($path)
-                        ->where("appointmentstatus", "=", Appointment_Status::UPCOMING)
-                        ->where("appointmenttype", "=", $booking_info['appointmenttype'])->documents();
+        if ($booking_info['slotid'] !== null || !empty($booking_info['slotid'])):
+            $booking_date = explode("~", $booking_info['slotid'])[1];
+            $db = new DbQuery();
+            $path = Database::ACCOUNT_USER . "/" . $user_doc_id . "/" . Database::APPOINTMENT_RECORD;
+            $snapshot = $db->get_db()->collection($path)
+                            ->where("appointmentstatus", "=", Appointment_Status::UPCOMING)
+                            ->where("appointmenttype", "=", $booking_info['appointmenttype'])->documents();
 
-        echo nl2br(PHP_EOL . "Get Called" . PHP_EOL);
+            # Loop & Check If There Is Any Match
+            foreach ($snapshot as $doc):
+                if ($doc->exists()):
+                    $comparison_date = explode("~", $doc->data()['slotid'])[1];
+                    # Check If Have Same Appointment Type In The Same Day
+                    if ($comparison_date == $booking_date):
+                        return False;
+                    endif;
 
-        # Loop & Check If There Is Any Match
-        foreach ($snapshot as $doc):
-            if ($doc->exists()):
-                $comparison_date = explode("~", $doc->data()['slotid'])[1];
-
-                echo "Comparison Date: " . $comparison_date . "<br/>";
-                echo "Booking Date: " . $booking_date . "<br/>";
-                # Check If Have Same Appointment Type In The Same Day
-                if ($comparison_date == $booking_date):
-                    return False;
                 endif;
 
-            endif;
-
-        endforeach;
-        return True;
+            endforeach;
+            return True;
+        endif;
+        return null;
     }
 
     // -- User-Defined ID -- //
@@ -324,25 +324,33 @@ class Appointment_Record {
         return $missed_arr;
     }
 
-    // -- RESCHEDULE APPOINTMENT
-    public static function reschedule_appointment(string $email, string $appointmentid, array $scheduledon) {
+    //  ___ For Reschedule Of Appointment ___ // 
+    public static function update_appointment_schedule(string $patient_doc_id, string $appointmentid, string $slotid): bool {
 
-        # Conditions (For Outer Collection)
-        $condition['credentials'] = array('email' => $email);
+        // Appointment Record Path
+        $path = Database::ACCOUNT_USER . "/" . $patient_doc_id . "/" . Database::APPOINTMENT_RECORD;
 
-        # Sub-Conditions (For Inner Collection)
-        $subcondition = array('appointmentid' => $appointmentid);
+        if ($appointmentid !== null):
 
-        # RESET Default Appointment Status (To Cater To MISSED Appointments)
-        $changed_info['appointmentstatus'] = Appointment_Status::UPCOMING;
+            $db = new DbQuery();
+            $doc_ref = $db->get_db()->collection($path)->document($appointmentid);
 
-        # Add The Rescheduled Time To Array
-        $changed_info['scheduledon'] = $scheduledon;
+            # Update Appointment Slot ID
+            $trnx_result = $db->get_db()->runTransaction(function (Transaction $transaction) use ($doc_ref, $slotid) {
+                $snapshot = $transaction->snapshot($doc_ref);
+                $db_slotid = $snapshot['slotid'];
+                if ($db_slotid !== $slotid):
+                    $transaction->update($doc_ref, [
+                        ['path' => 'slotid', 'value' => $slotid],
+                        ['path' => 'appointmentstatus', 'value' => Appointment_Status::UPCOMING]
+                    ]);
+                    return true;
+                endif;
+                return false;
+            });
+        endif;
 
-        # Update The Modified Information
-        $db = new DbQuery();
-        return $db->modify_nested_collection(Database::ACCOUNT_USER, Database::APPOINTMENT_RECORD,
-                        $condition, $subcondition, $changed_info);
+        return $trnx_result;
     }
 
     // -- REMOVE APPOINTMENT RECORD
@@ -405,7 +413,7 @@ class Appointment_Record {
     }
 
     // -- RETRIEVE APPOINTMENT BY APPOINTMENT ID
-    public static function retrieve_appointment_by_id(string $user_email, string $appointmentid): Appointment_Record {
+    public static function retrieve_appointment_by_id(string $user_email, string $appointmentid): null|Appointment_Record {
         $condition['credentials'] = array('email' => $user_email);
         $db = new DbQuery();
         $user_doc_id = $db->get_document_id(Database::ACCOUNT_USER, $condition);
@@ -415,9 +423,11 @@ class Appointment_Record {
 
         $appt_record = $db->fetch_document_by_id($doc_path, $appointmentid);
 
-        $appt_record_obj = self::initialise_appointment_record($appt_record);
-
-        return $appt_record_obj;
+        if ($appt_record !== null):
+            $appt_record_obj = self::initialise_appointment_record($appt_record);
+            return $appt_record_obj;
+        endif;
+        return null;
     }
 
     // -- Comparison Function 

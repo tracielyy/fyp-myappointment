@@ -127,10 +127,8 @@ else:
                     </style>
                 </head>
                 <body>
-                    <!-- NavBar  (TOP) -->
+                    <!-- NavBar  -->
                     <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
-                    <!-- Canvas (SIDE) -->
-                    <?php require_once TEMPLATES_PATH . "/fadmin-canvas.php"; ?>
                     <?php
                     if (!isset($_GET['id'])):
                         ?>
@@ -239,26 +237,26 @@ else:
                             ></script>
                             <!-- for testing the input boxes and the reset button -->
                             <script>
-                                var checkBoxes = document.querySelectorAll("input[type = 'checkbox']");
-                                var btnReset = document.getElementById('resetBtn');
-                                var inputs = document.querySelectorAll('input');
-                                var ta = document.querySelectorAll('textarea');
-                                btnReset.addEventListener('click', () => {
-                                    inputs.forEach(input => input.value = '');
-                                    ta.forEach(textarea => textarea.value = '');
-                                    checkBoxes.forEach(checkbox => checkbox.checked = false);
+                        var checkBoxes = document.querySelectorAll("input[type = 'checkbox']");
+                        var btnReset = document.getElementById('resetBtn');
+                        var inputs = document.querySelectorAll('input');
+                        var ta = document.querySelectorAll('textarea');
+                        btnReset.addEventListener('click', () => {
+                            inputs.forEach(input => input.value = '');
+                            ta.forEach(textarea => textarea.value = '');
+                            checkBoxes.forEach(checkbox => checkbox.checked = false);
+                        });
+                        function checkAll(myCheckBox) {
+                            if (myCheckBox.checked === true) {
+                                checkBoxes.forEach(function (checkbox) {
+                                    checkbox.checked = true;
                                 });
-                                function checkAll(myCheckBox) {
-                                    if (myCheckBox.checked === true) {
-                                        checkBoxes.forEach(function (checkbox) {
-                                            checkbox.checked = true;
-                                        });
-                                    } else {
-                                        checkBoxes.forEach(function (checkbox) {
-                                            checkbox.checked = false;
-                                        });
-                                    }
-                                }
+                            } else {
+                                checkBoxes.forEach(function (checkbox) {
+                                    checkbox.checked = false;
+                                });
+                            }
+                        }
 
 
                             </script>

@@ -37,7 +37,11 @@ else:
     if ($user->get_usertype() !== User_Type::FACIILITY_ADMIN):
         header("Location:/"); # -- REDIRECT BACK TO THE HOME PAGE
     else: # -- ONLY ALLOW FACILITY ADMIN
-        $facility = $user->get_facility();
+        $facility_id = $user->get_facility()->get_facilityid();
+
+        // Make Sure Get Fresh Information
+        $facility = Medical_Facility::retrieve_facility_by_id($facility_id);
+
         // get specialisations from facility
         $specialisations = $facility->get_specialisations();
         sort($specialisations);
@@ -66,7 +70,7 @@ else:
 
         $validArr = array();
         $err_msg = array();
-        
+
         $current_date = Time::get_current_date(Time::CALENDAR_FORMAT_DEFAULT);
         $years = 18;
         $max_date = Time::get_startdate_by_years($current_date, $years, Time::CALENDAR_FORMAT_DEFAULT);
@@ -179,10 +183,9 @@ else:
                 </style>
             </head>
             <body>
-                <!-- NavBar  (TOP) -->
+                <!-- NavBar  -->
                 <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
-                <!-- Canvas (SIDE) -->
-                <?php require_once TEMPLATES_PATH . "/fadmin-canvas.php"; ?>
+
                 <!-- Current Page (Add A New Doctor) -->
                 <main class="mt-5 pt-3">
                     <div class="container-fluid">
@@ -246,7 +249,7 @@ else:
                                             <div class="col">
                                                 <div class="form-group" id="dob-container">
                                                     <label for="dob">Date of birth <span>(18 and above)</span></label>
-                                                    <input type="date" name="profile[dob]" id="dob" class="form-control" value='<?php echo $doc_info['profile']['dob']; ?>' max="<?php echo $max_date;?>">
+                                                    <input type="date" name="profile[dob]" id="dob" class="form-control" value='<?php echo $doc_info['profile']['dob']; ?>' max="<?php echo $max_date; ?>">
                                                 </div>
                                             </div>
                                             <!-- gender -->
@@ -344,6 +347,9 @@ else:
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"  integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
                 <!-- for testing the input boxes and the reset button -->
                 <script>
+
+                    $('#nav-doctors').addClass('active');
+
                     var checkBoxes = document.querySelectorAll("input[type = 'checkbox']");
                     var btnReset = document.getElementById('resetBtn');
                     var inputs = document.querySelectorAll('input');

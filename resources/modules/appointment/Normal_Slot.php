@@ -103,7 +103,7 @@ class Normal_Slot extends Appointment_Slot {
     }
 
     // -- RETRIEVE APPOINTMENT SLOTS BY DATE
-    public static function retrieve_free_slots_by_date(string $facilityid, string $appointmenttype, string $date): array {
+    public static function retrieve_free_slots_by_date(string $patient_id, string $facilityid, string $appointmenttype, string $date): array {
 
         # Create Empty Array (Store Appointment Slots)
         $slots_arr = array();
@@ -126,7 +126,7 @@ class Normal_Slot extends Appointment_Slot {
                 $slot_data = $slot_snapshot->data();
 
                 # More Filtering (Make Sure There Is Enough Doctor For Patients) --> 1:1
-                self::filter_free_slots($slots_arr, $slot_data);
+                self::filter_free_slots($slots_arr, $slot_data, $patient_id);
             endif;
         endforeach;
 
@@ -143,33 +143,37 @@ class Normal_Slot extends Appointment_Slot {
         return $slot_list;
     }
 
-    // Filter & Make Sure Ratio Of Doctor To Patient Is 1:1
-    private static function filter_free_slots(array &$slots_arr, array $slot_data) {
+    // Filter & Make Sure Ratio Of Doctor To Patient Is 1:1 (filter away those contain own id already)
+    private static function filter_free_slots(array &$slots_arr, array $slot_data, string $patient_id) {
 
         # Get All The Counters For Comparison
         $doctor_count = count($slot_data['doctorlist']);
         $patient_count = count($slot_data['patientlist']);
 
         # More Filtering (Make Sure There Is Enough Doctor For Patients) --> 1:1
-        if ($doctor_count > $patient_count):
+        if ($doctor_count > $patient_count && !(in_array($patient_id, $slot_data['patientlist']))):
             # Add Normal Slot To Array
             $slots_arr[] = ($slot_data);
         endif;
     }
 
     // -- RETRIEVE APPOINTMENT SLOT (via slot id & appointment type)
-    public static function retrieve_apptslot_by_id(string $slotid, string $facilityid): Appointment_Slot {
+    public static function retrieve_apptslot_by_id(string $slotid, string $facilityid): null|Appointment_Slot {
 
-        # Split The ID
-        $id_data = explode("~", $slotid);
+        if ($slotid != null):
+            
+            # Split The ID
+            $id_data = explode("~", $slotid);
 
-        $db = new DbQuery();
+            $db = new DbQuery();
 
-        # Slot id <e.g 1001>~<date>~<appointmenttype>
-        $doc_path = Database::MEDICAL_FACILITY . "/" . $facilityid . "/" . $id_data[2] . "/" . $id_data[1] . "/"
-                . Database::SLOTS;
-        $slot_data = $db->fetch_document_by_id($doc_path, $slotid);
-        return self::initialise_normal_slot($slot_data, $facilityid);
+            # Slot id <e.g 1001>~<date>~<appointmenttype>
+            $doc_path = Database::MEDICAL_FACILITY . "/" . $facilityid . "/" . $id_data[2] . "/" . $id_data[1] . "/"
+                    . Database::SLOTS;
+            $slot_data = $db->fetch_document_by_id($doc_path, $slotid);
+            return self::initialise_normal_slot($slot_data, $facilityid);
+        endif;
+        return null;
     }
 
     public static function generate_slot_id(string $facilityid, string $appointmenttype, string $date) {

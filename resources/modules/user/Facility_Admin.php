@@ -133,6 +133,8 @@ class Facility_Admin extends Admin {
         return $trnx_result;
     }
 
+
+
     // -- RETRIEVE  FACILITY ADMIN DATA
     public static function retrieve_facility_admin(string $user_email): Facility_Admin {
 

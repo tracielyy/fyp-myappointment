@@ -148,10 +148,8 @@ else:
                 </style>
             </head>
             <body>
-                <!-- NavBar  (TOP) -->
+                <!-- NavBar  -->
                 <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
-                <!-- Canvas (SIDE) -->
-                <?php require_once TEMPLATES_PATH . "/fadmin-canvas.php"; ?>
                 <!-- Current Page (View Doctors) -->
                 <main class="mt-5 pt-3">
                     <div class="container-fluid">
@@ -216,7 +214,7 @@ else:
                 <section>
                     <!-- DELETE MODAL -->
                     <div class="modal fade" id="deleteDoctor" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-fullscreen-md" style="margin-left: 30rem;">
+                        <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="staticBackdropLabel">Delete Dr. <span id="doc-name"></span></h5>
@@ -241,6 +239,8 @@ else:
                 </section><!-- END DELETE MODAL -->
                 <br>
                 <script>
+                    $('#nav-doctors').addClass('active');
+
                     var req = null;
 
                     // -- Pass Information To Modal

@@ -22,6 +22,13 @@ include TEMPLATES_PATH . '/bootstrap.php';
         <link rel="stylesheet" href="./../css/profile.css">
         <!-- font awesome cdn -->
         <script src="https://use.fontawesome.com/releases/v5.13.1/js/all.js"></script>
+        <!-- Prevent Form Resubmission -->
+        <script>
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+        </script>
+        <!-- jQuery -->
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
         <style>
@@ -43,18 +50,18 @@ include TEMPLATES_PATH . '/bootstrap.php';
             }
         </style>
         <!-- Prevent Form Resubmission -->
-            <script>
-                if (window.history.replaceState) {
+        <script>
+            if (window.history.replaceState) {
                 window.history.replaceState(null, null, window.location.href);
-                }
-            </script>
+            }
+        </script>
     </head>
 
     <body>
         <?php
         if (isset($_SESSION["user"])):
             $error = "";
-            $success="";
+            $success = "";
             # "Unboxin" User Information
             $user = unserialize($_SESSION["user"]);
             $user_email = $user->get_email();
@@ -65,56 +72,83 @@ include TEMPLATES_PATH . '/bootstrap.php';
             if (User_Type::check_user_type(User_Type::PATIENT, $user_type) || User_Type::check_user_type(User_Type::MEDICAL_PERSONNEL, $user_type)):
                 include_once TEMPLATES_PATH . '/navbar-loggedin.php';
 
+                if ($_SERVER["REQUEST_METHOD"] == "POST" || $_SERVER["REQUEST_METHOD"] == "GET"):
+
+                    $details = array(
+                        'credentials' => array(
+                            'password' => '',
+                        ),
+                        'confirmpassword' => '',
+                        'currentpassword' => ''
+                    );
+
+                    $validArr = array();
+                endif;
+
+                // loop and store all the information into an array
+                function store_info(array &$post, array &$info_arr, array &$validArr): void {
+                    foreach ($post as $key => $value) :
+                        if (isset($info_arr[$key])) :
+
+                            // calls itself if it is an array
+                            if (is_array($value)):
+                                store_info($post[$key], $info_arr[$key], $validArr);
+                            else:
+                                $info_arr[$key] = htmlspecialchars($value);
+                                $validArr[$key] = False; // Set All Field Validation Check As False
+                            endif;
+                        endif;
+                    endforeach;
+                }
+
                 if (isset($_POST['submitpassword'])) :
+                    store_info($_POST, $details, $validArr);
+                    if (Authentication::authenticate_user($user->get_email(), $user->get_usertype(), $details['currentpassword'])) :
 
-                    $oldpass = $_POST['oldpassword'];
-                    $newpass = $_POST['password'];
-                    $confirmpass = $_POST['confirmpassword'];
-                    $secure = new Security();
+                        if ($details['credentials']['password'] == $details['confirmpassword']) :
 
-                    if (Authentication::authenticate_user($user->get_email(), $user->get_usertype(), $oldpass)) :
-                        if ($confirmpass == $newpass) :
-                            //SUCCESS CHANGING PASSWORD
-                            $new_hashed_pw = $secure->hash($newpass);
-                            Account_User::update_password($user->get_email(), $new_hashed_pw);
+                            $change_status = Account_User::change_password($user->get_email(), $details['credentials']['password'], $details['currentpassword']); // Will Return If Password Same 
+
                             $_SESSION['user'] = serialize($user);
                             $success .= '<div class="alert alert-success alert-dismissible fade show" role="alert">';
                             $success .= '<strong>Password successfully changed!</strong>';
                             $success .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$success.'\');});</script>';
+                            echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $success . '\');});</script>';
                         else :
                             //CONFIRM PASS AND NEW PASS IS NOT THE SAME ERROR
                             $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
                             $error .= '<strong>Confirm password and new password are not the same!</strong> Password has not been changed.';
                             $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$error.'\');});</script>';
+                            echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
                         endif;
                     else :
                         //CURRENT PASSWORD IS INCORRECT ERROR
                         $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
                         $error .= '<strong>Current password is incorrect!</strong> Password has not been changed.';
                         $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-                    echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$error.'\');});</script>';
+                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
                     endif;
 
-                elseif (isset($_POST['updateaddress'])) :
+                endif;
+
+                if (isset($_POST['updateaddress'])) :
 
                     $newaddress = $_POST['address'];
                     if (Account_User::update_address($user->get_email(), $newaddress)) :
-                       
+
                         //SUCCESS FOR ADDRESS
                         $user->set_address($newaddress);
                         $_SESSION['user'] = serialize($user);
                         $success .= '<div class="alert alert-success alert-dismissible fade show" role="alert">';
-                            $success .= '<strong>Address successfully changed!</strong>';
-                            $success .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$success.'\');});</script>';
+                        $success .= '<strong>Address successfully changed!</strong>';
+                        $success .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $success . '\');});</script>';
                     else :
-                    //ERROR FOR ADDRESS
-                    $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
-                    $error .= '<strong>Error occured!</strong> Address has not been changed.';
-                    $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-                    echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$error.'\');});</script>';
+                        //ERROR FOR ADDRESS
+                        $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                        $error .= '<strong>Error occured!</strong> Address has not been changed.';
+                        $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
                     endif;
 
                 elseif (isset($_POST['updatecontactnum'])) :
@@ -128,13 +162,13 @@ include TEMPLATES_PATH . '/bootstrap.php';
                             $success .= '<div class="alert alert-success alert-dismissible fade show" role="alert">';
                             $success .= '<strong>Contact number successfully changed!</strong>';
                             $success .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$success.'\');});</script>';
+                            echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $success . '\');});</script>';
                         else:
                             //ERROR FOR CONTACT NUM UPDATE
                             $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
                             $error .= '<strong>Error occured!</strong>Contact number has not been changed.';
                             $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$error.'\');});</script>';
+                            echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
                         endif;
                     endif; # -- Check Contact Number Not Empty
                 elseif (isset($_POST['changeEmail'])):
@@ -148,7 +182,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
                             $success .= '<div class="alert alert-success alert-dismissible fade show" role="alert">';
                             $success .= '<strong>Email successfully changed!</strong>';
                             $success .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$success.'\');});</script>';
+                            echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $success . '\');});</script>';
                         endif;
                     endif;
                 endif;
@@ -166,7 +200,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
                 </div>
 
                 <div class="container" id="alertbox">
-                    
+
                 </div>               
 
                 <div class="container-fluid">
@@ -224,32 +258,21 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                             </button>
                                         </div>
                                     </div>
-                                </form><!-- END CHANGE EMAIL FORM
+                                </form><!-- END CHANGE EMAIL FORM -->
 
-                                -->                                <!-- ONE TIME PASS FORM 
-                                                                <div id="onetimepass" class="onetimepass" style="display: hidden;">
-                                                                    <form class="form-group form-inline mt-1" style="display: hidden;" method="post">
-                                                                        <div class="input-group w-75">
-                                                                            <input class="form-control" type="otp" id="otp" style="display:inline;"
-                                                                                   placeholder="Enter OTP" name="otp">
-                                                                            <button class="btn btn-primary" type="submit">Submit
-                                                                                OTP
-                                                                            </button>
-                                                                        </div>
-                                                                    </form>
-                                                                </div>
-              -->
-                                
                                 <!-- CHANGE PASSWORD FORM -->
                                 <div id="changepassword" class="mt-5 mb-2 profile-text"><strong>Change Password:</strong></div>
                                 <form id="changepass" class="form-group" action="" method="post">
 
-                                    <input type="password" class="form-control w-75" id="oldPasswordID" name="oldpassword"
-                                           placeholder="Current Password">
-                                    <input type="password" class="form-control w-75 mt-3" name="password" id="newpasswordID"
-                                           placeholder="New Password">
-                                    <input type="password" class="form-control w-75 mt-3" name="confirmpassword"
-                                           id="confirmpasswordID" placeholder="Confirm New Password">
+                                    <!-- Current Password -->
+                                    <input type="password" class="form-control w-75" id="oldPasswordID" name="currentpassword" placeholder="Current Password" value="<?php echo $details['currentpassword']; ?>">
+                                    <span id="error-currentpassword" class="invalid-feedback"></span>
+
+                                    <!-- New Password -->
+                                    <input type="password" class="form-control w-75 mt-3" name="credentials[password]" id="newpasswordID" placeholder="New Password" value="<?php echo $details['credentials']['password']; ?>">
+
+                                    <!-- Confirm New Password -->
+                                    <input type="password" class="form-control w-75 mt-3" name="confirmpassword" id="confirmpasswordID" placeholder="Confirm New Password" value="<?php echo $details['confirmpassword']; ?>">
 
                                     <button name="submitpassword" class="btn btn-primary" style="margin-top:10px"
                                             type="submit">Change
@@ -271,7 +294,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                             </div>
                                             <div class="col-auto">
                                                 <div class="profile-text">
-                                                    <?php echo $user->get_firstname() . " " . $user->get_lastname(); ?> </div>
+        <?php echo $user->get_firstname() . " " . $user->get_lastname(); ?> </div>
                                             </div>
                                         </div>
 
@@ -347,7 +370,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
 
                                             <div class="col-10">
                                                 <div class="profile-text" id="ContactNum">
-                                                    <?php echo $user->get_contactnumber(); ?>
+        <?php echo $user->get_contactnumber(); ?>
                                                     <button type="button" class="btn btn-secondary ms-3" style="float:right"
                                                             id="changeCNbttn">Change
                                                         Contact Number</button>
@@ -390,7 +413,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
 
 
 
-                <script type="text/javascript">
+                <script type = "text/javascript">
 
                     // DISABLE THE `VERIFY` BUTTON WHEN NEEDED
                     function typedEmail()
@@ -417,9 +440,9 @@ include TEMPLATES_PATH . '/bootstrap.php';
                         return str.replace(/(\r\n|\n|\r)/gm, "");
                     }
 
-                    /*===========================
+                    /* ===========================
                      Dynamic Tabs
-                     =============================*/
+                     ============================= */
 
                     $(window).on("popstate", function () {
                         var scrollHeight = $(document).scrollTop();
@@ -467,7 +490,6 @@ include TEMPLATES_PATH . '/bootstrap.php';
                         $('#formchangeCN').toggle();
                     });
 
-
                     //hides one time pass
                     $('#onetimepass').children().hide();
 
@@ -479,9 +501,9 @@ include TEMPLATES_PATH . '/bootstrap.php';
                     //     }
                     // }
 
-                    /*------------------------------------------------
+                    /* ------------------------------------------------
                      ONE TIME PASS
-                     -------------------------------------------------*/
+                     ------------------------------------------------- */
 
                     var resend_otp_req = false;
                     // RESEND OTP
@@ -577,8 +599,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                     // create resend otp element
                                     if (!$('#resend-otp').length) {
                                         console.log("creating resend otp element");
-                                        var resend_otp =
-                                                "<button type='button' id='resend-otp' onclick='clickedResendOTP()' class='btn btn-link link-danger shadow-none'>Resend OTP</button>";
+                                        var resend_otp = "<button type='button' id='resend-otp' onclick='clickedResendOTP()' class='btn btn-link link-danger shadow-none'>Resend OTP</button>";
                                         $('#inputgroupemail').append(resend_otp);
                                     }
 
@@ -594,13 +615,11 @@ include TEMPLATES_PATH . '/bootstrap.php';
 
                     });
 
-
                     function invalid_otp_msg(msg) {
                         // WHEN THE OTP IS INVALID
                         $("#otp").addClass("is-invalid");
                         if (!$("#otp-feedback").length) {
-                            var otp_feedback =
-                                    `<div id='otp-feedback' class='invalid-feedback'>${msg}</div>`;
+                            var otp_feedback = `<div id='otp-feedback' class='invalid-feedback'>${msg}</div>`;
                             $('#onetimepass').append(otp_feedback);
                         }
                         $('#onetimepass').children().show();
@@ -682,10 +701,9 @@ include TEMPLATES_PATH . '/bootstrap.php';
                     }
                     );
 
-
-                    /*------------------------------------------------
+                    /* ------------------------------------------------
                      CLIENT SIDE VALIDATION FOR EMAIL
-                     -------------------------------------------------*/
+                     ------------------------------------------------- */
 
                     $(document).ready(function () {
                         $("#changeEmail").validate({
@@ -710,7 +728,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
                             },
                             success: function (label, element) {
 
-        //                                $(element).addClass("is-valid");
+                                //                                $(element).addClass("is-valid");
                                 document.getElementById('verifybutton').disabled = false;
 
                             },
@@ -718,16 +736,15 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                 $(element).addClass("is-invalid").removeClass("is-valid");
                             },
                             unhighlight: function (element, errorClass, validClass) {
-        //                                $(element).addClass("is-valid").removeClass("is-invalid");
+                                //                                $(element).addClass("is-valid").removeClass("is-invalid");
 
                             }
                         });
                     });
 
-
                     $.validator.addMethod("emailRegex", function (value, element) {
                         return this.optional(element) ||
-                                /^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\,\'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})/
+                                /^[a-zA-Z0-9]+(.[_a-z0-9-]+)(?!.*[~@\%\/\\\&\?\, \'\;\:\!\-]{2}).*@[a-z0-9-]+(.[a-z0-9-]+)(.[a-z]{2,3})/
                                 .test(value);
                     }, "Email format is incorrect.");
 
@@ -912,9 +929,16 @@ include TEMPLATES_PATH . '/bootstrap.php';
                 </script>
             </body>
 
-            <?php
-        endif; # -- END USER TYPE CHECK
-    endif; # -- END SESSION CHECK
+        <?php
+    endif; # -- END USER TYPE CHECK
+else:
     ?>
+        <!-- Redirect User To Login Page -->
+        <script>
+            window.location.replace(window.location.origin + '<?php echo LOGIN_WEB; ?>');
+        </script>
+<?php
+endif; # -- END SESSION CHECK
+?>
 
 </html>

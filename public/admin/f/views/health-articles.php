@@ -137,10 +137,8 @@ else:
                 </style>
             </head>
             <body>
-                <!-- NavBar  (TOP) -->
+                <!-- NavBar  -->
                 <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
-                <!-- Canvas (SIDE) -->
-                <?php require_once TEMPLATES_PATH . "/fadmin-canvas.php"; ?>
                 <!-- Current Page Display -->
                 <main class="mt-5 pt-3">
                     <div class="container-fluid">
@@ -223,6 +221,8 @@ else:
                     </div>
                 </section><!-- END DELETE MODAL -->
                 <script>
+                    $('#nav-health-articles').addClass('active');
+
                     // -- Pass Information To Modal
                     function delete_article(article_id) {
                         // -- Testing

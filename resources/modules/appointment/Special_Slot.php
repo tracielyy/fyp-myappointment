@@ -227,11 +227,6 @@ class Special_Slot extends Appointment_Slot {
         return $patient_counter;
     }
 
-    // check if there is any duplicate time in the same date
-    public static function check_slot_time_duplicate() {
-        
-    }
-
     // EDIT: only `available` & `time`
     public static function edit_slot(string $doctor_email, string $date, string $slotid, string $new_time,
             bool $available = true): bool {
@@ -330,21 +325,6 @@ class Special_Slot extends Appointment_Slot {
         return false; # -- Date Time Format Incorrect
     }
 
-    // Unfinished
-    public static function add_new_slots(string $doctor_email, array $date_range) {
-        # Get Doctor ID
-        $doctor_doc_id = Account_User::retrieve_user_doc_id($doctor_email);
 
-        # Insert Special Slots
-        $db = new DbQuery();
-        $slot_path = Database::ACCOUNT_USER . '/' . $doctor_doc_id . '/' . Database::APPOINTMENT_SLOTS;
-
-        foreach ($date_range as $date) {
-            $query = $db->get_db()->collection($slot_path)->document($date);
-            for ($i = 1001; $i <= 1015; $i++) {
-                
-            }
-        }
-    }
 
 }

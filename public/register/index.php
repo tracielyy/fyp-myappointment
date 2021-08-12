@@ -380,14 +380,14 @@ endif; # END POST REQUEST
                                     <div class="row">
                                         <div class="col-md-6 col-sm-12">
                                             <!-- Email -->
-                                            <div onkeyup="typedEmail()" id="email_container" class="input-group">
+                                            <div onchange="typedEmail()" id="email_container" class="input-group">
                                                 <input id="email" name="email" type="text" class="form-control"
                                                        placeholder="Email" aria-label="Email"
                                                        value="<?php echo htmlspecialchars($registerArr['email']); ?>">
                                                 <button class="btn btn-outline-secondary" type="button"
                                                         id="vrfyEmailBttn">Verify</button></input>
                                                         <?php
-// THIS SET OF PHP CODE MUST BE AFTER THE EMAIL HTML
+                                                        // THIS SET OF PHP CODE MUST BE AFTER THE EMAIL HTML
                                                         if (isset($_COOKIE['email_verified']) && $_COOKIE['email_verified'] === true):
                                                             echo "  
                                                                 <script>

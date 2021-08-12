@@ -11,8 +11,10 @@ require_once USER_MOD . '/Medical_Personnel.php';
 require_once USER_MOD . '/Facility_Admin.php';
 require_once USER_MOD . '/Super_Admin.php';
 
+require_once FACILITY_MOD . '/Medical_Facility.php';
+
 /*
- *  VIEW SUPER ADMIN PROFILE DETAILS
+ *  VIEW FACILITY ADMIN PROFILE DETAILS
  */
 if (!isset($_SESSION['user'])):
     header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
@@ -22,7 +24,7 @@ else:
     $user_email = $user->get_email();
 
 // Check If User Is Super Admin
-    if (!User_Type::check_user_type(User_Type::SUPER_ADMIN, $user_type)):
+    if (!User_Type::check_user_type(User_Type::FACIILITY_ADMIN, $user_type)):
         header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
     else:
         ?><!DOCTYPE html>
@@ -31,7 +33,7 @@ else:
                 <meta charset="UTF-8" />
                 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>Admin View Profile</title>
+                <title>View My Profile</title>
                 <!-- fontawesome -->
                 <script
                     src="https://kit.fontawesome.com/dcfd5ba5e7.js"
@@ -140,7 +142,7 @@ else:
                 </style>
             </head>
             <body>
-                <?php require_once TEMPLATES_PATH . "/sadmin-navbar.php"; ?>
+                <?php require_once TEMPLATES_PATH . "/fadmin-navbar.php"; ?>
 
                 <!-- main section starts here -->
                 <main class="mt-5 pt-3">
@@ -157,52 +159,42 @@ else:
                                             <div class="mb-3 row">
                                                 <label for="SuperadminID" class="col-sm-2 col-form-label">Admin ID: </label>
                                                 <div class="col-sm-10">
-                                                    <div class="form-control-plaintext" ><?php echo $user->get_adminid(); ?></div>
+                                                    <input type="text" readonly class="form-control-plaintext" value="<?php echo $user->get_adminid(); ?>">
                                                 </div>
                                             </div>
-                                            <!-- Admin Name -->
                                             <div class="mb-3 row">
                                                 <label for="adminname" class="col-sm-2 col-form-label">Admin Name: </label>
                                                 <div class="col-sm-10">
                                                     <div class="d-grid gap-1 d-md-flex justify-content" >
                                                         <div id="adminName" class="py-1 me-1"><?php echo $user->get_adminname(); ?></div>
-                                                        <a href="<?php echo SADMIN_WEB . "/edit/super-admin-name.php"; ?>" class="me-md-2 mr-2 editAdm" data-bs-toggle="tooltip" data-bs-placement="right" title="Edit Admin">
+                                                        <a href="<?php echo FADMIN_WEB . "/edit/admin-name.php"; ?>" class="me-md-2 mr-2 editAdm" data-bs-toggle="tooltip" data-bs-placement="right" title="Edit Admin">
                                                             <span><i class="fas fa-pen-square fa-2x"></i></span>
                                                         </a>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <!-- Email -->
                                             <div class="mb-3 row">
                                                 <label for="email" class="col-sm-2 col-form-label">Email: </label>
                                                 <div class="col-sm-10">
-                                                    <div class="form-control-plaintext" ><?php echo $user->get_email(); ?></div>
+                                                    <input type="email" class="form-control-plaintext" value="<?php echo $user->get_email(); ?>" id="email">
                                                 </div>
                                             </div>
                                             <div class="mb-3 row">
                                                 <label for="password" class="col-sm-2 col-form-label">Password: </label>
                                                 <div class="col-sm-10">
-                                                    <a href="<?php echo SADMIN_WEB . "/edit/super-admin-password.php"; ?>"  class="btn btn-dark me-md-2 mr-2">
+                                                    <a href="<?php echo FADMIN_WEB . "/edit/admin-password.php"; ?>"  class="btn btn-dark me-md-2 mr-2">
                                                         <span><i class="fas fa-lock"></i></span>
                                                         <span>Change Password</span>
                                                     </a>
                                                 </div>
                                             </div>
-                                            <div class="mb-3 row">
-                                                <label for="SecretPin" class="col-sm-2 col-form-label">Secret Pin: </label>
-                                                <div class="col-sm-10">
-                                                    <a href="<?php echo SADMIN_WEB . "/edit/super-admin-pin.php"; ?>"  class="btn btn-dark me-md-2 mr-2">
-                                                        <span><i class="fas fa-key"></i></span>
-                                                        <span>Change Secret Pin</span>
-                                                    </a>
-                                                </div>
-                                            </div>
+ 
+
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                 </main>
                 <!-- main ends here -->
                 <script>

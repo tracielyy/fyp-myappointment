@@ -46,16 +46,10 @@ class Security {
     }
 
     //This function verifies the password entered is correct or not 
-    public function compareHash($password, $stored_password) : string
+    public function compareHash($password, $stored_password) : bool
     {
-        if(password_verify($password, $stored_password))
-        {
-            return 'CORRECT_PASSWORD';
-        }
-        else
-        {
-            return 'INCORRECT_PASSWORD';
-        }
+        return (password_verify($password, $stored_password));
+
     }
 
     public function hash_256($data): string

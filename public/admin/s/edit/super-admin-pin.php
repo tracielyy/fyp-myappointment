@@ -10,9 +10,13 @@ require_once USER_MOD . '/Account_User.php';
 require_once USER_MOD . '/Medical_Personnel.php';
 require_once USER_MOD . '/Facility_Admin.php';
 require_once USER_MOD . '/Super_Admin.php';
+
+require_once FACILITY_MOD . '/Medical_Facility.php';
+
 /*
- *  VIEW SUPER ADMIN PROFILE DETAILS
+ *  EDIT SUPER ADMIN  -- SECRET PIN CHANGE
  */
+
 if (!isset($_SESSION['user'])):
     header("Location:/"); # -- REDIRECT USER TO THE LANDING PAGE
 else:
@@ -41,35 +45,25 @@ else:
             endforeach;
         }
 
-        if ($_SERVER["REQUEST_METHOD"] == "GET") :
+        $admin = array(
+            'credentials' => array(
+                'secretpin' => '',
+            ),
+            'confirmsecretpin' => ''
+        );
 
-            $user_password = Account_User::retrieve_password_by_id($user->get_adminid());
-            $user_pin = Super_Admin::retrieve_pin_by_id($user->get_adminid());
-            $admin = array(
-                'profile' => array(
-                    'adminname' => $user->get_adminname(),
-                ),
-                'credentials' => array(
-                    'email' => $user->get_email(),
-                    'password' => $user_password,
-                    'secretpin' => $user_pin
-                )
-            );
-        elseif ($_SERVER["REQUEST_METHOD"] == "POST"):
+        if ($_SERVER["REQUEST_METHOD"] == "POST"):
             $validArr = array();
             if (isset($_POST['edit_admin'])):
-                $admin = array(
-                    'profile' => array(
-                        'adminname' => '',
-                    ),
-                    'credentials' => array(
-                        'email' => '',
-                        'password' => '',
-                        'secretpin' => ''
-                    )
-                );
-
                 store_info($_POST, $admin, $validArr);
+                // Validation 
+                if (!empty($admin['credentials']['secretpin'])):
+                    $validArr['secretpin'] = true;
+                endif;
+                if (!empty($admin['confirmsecretpin']) && $admin['confirmsecretpin'] == $admin['credentials']['secretpin']):
+                    $validArr['confirmsecretpin'] = true;
+                endif;
+
             endif;
 
         endif;
@@ -79,7 +73,7 @@ else:
                 <meta charset="UTF-8" />
                 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>View My Profile</title>
+                <title>Admin Edit Profile: Password</title>
                 <!-- fontawesome -->
                 <script src="https://kit.fontawesome.com/dcfd5ba5e7.js"  crossorigin="anonymous"></script>
                 <!-- google fonts -->
@@ -185,7 +179,7 @@ else:
                                 <div class="card-body">
                                     <div class="card text-dark innerCard mb-3">
                                         <div class="card-title ms-2 mt-2">
-                                            <h4 class="text-muted" style="font-weight: 600; font-size: 1.5rem;">Edit Profile</h4>
+                                            <h4 class="text-muted" style="font-weight: 600; font-size: 1.5rem;">Profile: Secret Pin Change</h4>
                                         </div>
                                         <hr class="ms-2" style="max-width: 60%;">
 
@@ -195,48 +189,48 @@ else:
                                             <form id="edit_admin_form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
                                                 <!-- Admin ID -->
                                                 <div class="mb-3 row">
-                                                    <label for="SuperadminID" class="col-sm-2 col-form-label">Admin ID: </label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" readonly class="form-control-plaintext" value="<?php echo $user->get_adminid(); ?>">
+                                                    <label for="adminid" class="col-sm-3 col-form-label">Admin ID: </label>
+                                                    <div class="col-sm-9">
+                                                        <div class="form-control-plaintext px-2" id="adminid"><?php echo $user->get_adminid(); ?></div>
                                                     </div>
                                                 </div>
-                                                <!-- Admin Name -->
+                                                <!-- Admin Pin -->
                                                 <div class="mb-3 row">
-                                                    <label for="SuperadminName" class="col-sm-2 col-form-label">Admin Name: </label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" name="profile[adminname]" class="form-control" value="<?php echo $admin['profile']['adminname']; ?>">
+                                                    <label for="secretpin" class="col-sm-3 col-form-label">Secret Pin: </label>
+                                                    <div class="mb-3 col-sm-7">
+                                                        <div class="input-group"  id="secretpin-container">
+                                                            <input type="password" name="credentials[secretpin]" id="secretpin" class="form-control" value="<?php echo $admin['credentials']['secretpin']; ?>">
+                                                            <button class="btn btn-outline-secondary"  id="secretpin-hide-show" type="button" value="secretpin">
+                                                                <i class="fas fa-eye" id="secretpin_show_eye"></i>
+                                                                <i class="fas fa-eye-slash d-none" id="secretpin_hide_eye"></i>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <!-- Email -->
+                                                <!-- Confirm Pin -->
                                                 <div class="mb-3 row">
-                                                    <label for="email" class="col-sm-2 col-form-label">Email: </label>
-                                                    <div class="col-sm-10">
-                                                        <input type="email" name="credentials[email]" class="form-control" value="<?php echo $admin['credentials']['email']; ?>">
+                                                    <label for="confirmsecretpin" class="col-sm-3 col-form-label">Confirm Pin: </label>
+                                                    <div class="mb-3 col-sm-7">
+                                                        <div class="input-group" id="confirmsecretpin-container">
+                                                            <input type="password" name="confirmsecretpin" id="confirmsecretpin" class="form-control" value="<?php echo $admin['confirmsecretpin']; ?>">
+                                                            <button class="btn btn-outline-secondary"  id="confirmsecretpin-hide-show" type="button" value="confirmsecretpin">
+                                                                <i class="fas fa-eye" id="confirmsecretpin_show_eye"></i>
+                                                                <i class="fas fa-eye-slash d-none" id="confirmsecretpin_hide_eye"></i>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <!-- Password -->
-                                                <div class="mb-3 row">
-                                                    <label for="Adminpassword" class="col-sm-2 col-form-label">Password: </label>
-                                                    <div class="col-sm-10">
-                                                        <input type="password" name="credentials[password]" class="form-control" value="<?php echo $admin['credentials']['password']; ?>">
-                                                    </div>
-                                                </div>
-                                                <!-- Secret Pin -->
-                                                <div class="mb-3 row">
-                                                    <label for="SecretPin" class="col-sm-2 col-form-label">Secret Pin: </label>
-                                                    <div class="col-sm-10">
-                                                        <input type="password" name="credentials[secretpin]" class="form-control" value="<?php echo $admin['credentials']['secretpin']; ?>">
-                                                    </div>
-                                                </div>
-                                                <div class="d-grid gap-2 d-md-flex justify-content-md-center" style=" margin-top: 10px;">
-                                                    <button type="submit" name="edit_admin" class="btn btn-dark me-md-2 mr-2">
-                                                        <span><i class="fas fa-save"></i></span>
-                                                        <span>Save</span>
-                                                    </button>
+
+                                                <div class="d-grid gap-5 d-md-flex justify-content-md-between" style=" margin-top: 30px;">
                                                     <a href="<?php echo SADMIN_WEB . "/views/super-admin.php"; ?>" class="btn btn-danger me-md-2 mr-2">
                                                         <span><i class="fas fa-window-close"></i></span>
                                                         <span>Cancel</span>
                                                     </a>
+                                                    <button type="submit" name="edit_admin" class="btn btn-dark mr-2">
+                                                        <span><i class="fas fa-save"></i></span>
+                                                        <span>Save</span>
+                                                    </button>
+
                                                 </div>
                                             </form><!-- END FORM -->
                                         </div><!-- END CARD BODY --> 
@@ -249,8 +243,88 @@ else:
                 <!-- main ends here -->
                 <script>
                     $('#nav-edit-profile').addClass('active');
-                </script>
+                    $('#secretpin-hide-show, #confirmsecretpin-hide-show').on('click', function () {
+                        console.log($(this).val());
+                        var x = document.getElementById($(this).val());
+                        var show_eye = document.getElementById($(this).val() + "_show_eye");
+                        var hide_eye = document.getElementById($(this).val() + "_hide_eye");
+                        hide_eye.classList.remove("d-none");
+                        if (x.type === 'password') {
+                            x.type = 'text';
+                            show_eye.style.display = "none";
+                            hide_eye.style.display = "block";
+                        } else {
+                            x.type = 'password';
+                            show_eye.style.display = "block";
+                            hide_eye.style.display = "none";
+                        }
 
+                    });
+                    $("#edit_admin_form").validate({
+                        rules: {
+                            "credentials[secretpin]": {
+                                required: true,
+                                digit: true,
+                                minlength: 6,
+                                maxlength: 6
+
+                            },
+                            "confirmsecretpin": {
+                                required: true,
+                                equalTo: "#secretpin"
+                            }
+                        },
+                        messages: {
+                            "credentials[secretpin]": {
+                                required: "Please provide a pin",
+                                minlength: "Secret Pin needs to be 6 digits ONLY",
+                                maxlength: "Secret Pin needs to be 6 digits ONLY"
+                            },
+                            "confirmsecretpin": {
+                                required: "Please provide a confirm secret pin",
+                                equalTo: "Please enter the same secret pin"
+                            }
+                        },
+                        errorElement: "em",
+                        errorPlacement: function (error, element) {
+                            // Add the `help-block` class to the error element
+                            if (element.is('#secretpin')) {
+                                error.insertAfter(element.parents('#secretpin-container'));
+                            } else if (element.is("#confirmsecretpin")) {
+                                error.insertAfter(element.parents('#confirmsecretpin-container'));
+                            } else {
+                                error.insertAfter(element);
+                            }
+                            error.addClass("help-block invalid-feedback");
+                        },
+                        success: function (label, element) {
+                            // Add the span element, if doesn't exists, and apply the icon classes to it.
+
+                            $(element).addClass("is-valid");
+                        },
+                        highlight: function (element, errorClass, validClass) {
+                            $(element).addClass("is-invalid").removeClass("is-valid");
+                        },
+                        unhighlight: function (element, errorClass, validClass) {
+                            $(element).addClass("is-valid").removeClass("is-invalid");
+                            // if (element.is(":radio")) {
+                            //     $("#Male").addClass("is-valid").removeClass("is-invalid");
+                            // }
+                        }
+                    });
+
+                    /*----------------------------------------------
+                     CLIENT SIDE REGULAR EXPRESSION FOR PASSWORD
+                     -----------------------------------------------*/
+                    $.validator.addMethod("digit", function (value, element) {
+                        return this.optional(element) ||
+                                /(?=.*[0-9])/
+                                .test(value);
+                    }, "Only digits allowed");
+
+
+
+                </script>
                 <!-- bootstrap js link -->
                 <script
                     src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
@@ -259,7 +333,29 @@ else:
                 ></script>
             </body>
         </html>
-    <?php
+        <?php
+        if (isset($_POST['edit_admin'])):
+            if (!(in_array(false, $validArr))):
+                $change_status = Super_Admin::change_secretpin($user_email, $admin['credentials']['secretpin']);
+                if ($change_status):
+                    ?>
+                    <script>
+                    window.location.replace(window.location.origin + '<?php echo SADMIN_WEB . "/views/super-admin.php"; ?>');
+                    </script>
+                    <?php
+                else:
+
+                    # Add Some Error Message 
+                    ?>
+                    <script>
+                        console.log("current password is incorrect");
+                        $('#currentpassword').addClass("is-invalid");
+                        $('#error-currentpassword').html("Incorrect Password Entered");
+                    </script>
+                <?php
+                endif;
+            endif;
+        endif;
     endif; # -- END USER TYPE CHECK
 endif; # -- END SESSION CHECK
 ?>
