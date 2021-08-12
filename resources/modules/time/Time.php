@@ -97,7 +97,7 @@ class Time {
     }
 
     // -- Convert The Date & Time -- //
-    public static function to_24hours(string $time_12hours, bool $with_seconds): string {
+    public static function to_24hours(string $time_12hours, bool $with_seconds = NULL): string {
         $format = "";
         if ($with_seconds) {
             $format = self::TIME_FORMAT_DEFAULT;
@@ -107,7 +107,7 @@ class Time {
         return (string) date($format, strtotime($time_12hours));
     }
 
-    public static function to_12hours(string $time_24hours, bool $with_seconds): string {
+    public static function to_12hours(string $time_24hours, bool $with_seconds = NULL): string {
         $format = "";
         if ($with_seconds) {
             $format = self::TIME_FORMAT_AMPM;
@@ -159,6 +159,25 @@ class Time {
 
         // Return the array elements
         return $date_arr;
+    }
+
+    //To get an array of Time, interval must be in minutes;
+    public static function get_time_range_intervals(string $starttime, string $endtime , string $interval): array {
+        $time_array = array();
+        $intrvl = 'PT'.$interval.'M';
+
+        $intervals = new DateInterval($intrvl);
+
+        $realEnd = new DateTime($endtime);
+        $realEnd->add($intervals);
+
+        $period = new DatePeriod(new DateTime($starttime), $intervals, $realEnd);
+
+        // Use loop to store date into array
+        foreach ($period as $time) {
+            $time_arr[] = (string) $time->format('H:i');
+        }
+        return $time_arr;
     }
 
     public static function check_datetime_format(string $datetime, string $format = self::DATE_FORMAT_DEFAULT): bool {
