@@ -20,7 +20,8 @@ if (isset($_SESSION["user"])):
 	
     include_once TEMPLATES_PATH . '/navbar-loggedin.php';
     include TEMPLATES_PATH . '/bootstrap.php';
-    if (User_Type::check_user_type(User_Type::PATIENT, $user_type) || User_Type::check_user_type(User_Type::MEDICAL_PERSONNEL, $user_type) ):
+    if (User_Type::check_user_type(User_Type::PATIENT, $user_type) || User_Type::check_user_type(User_Type::MEDICAL_PERSONNEL, $user_type) 
+	|| User_Type::check_user_type(User_Type::FACILITY_ADMIN, $user_type) || User_Type::check_user_type(User_Type::SUPER_ADMIN, $user_type) ):
 ?>
 
 <html>

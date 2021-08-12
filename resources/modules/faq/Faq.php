@@ -115,7 +115,7 @@ class Faq {
         $db = new DbQuery();
         $ref = $db->get_db()->collection(Database::FAQ)->orderBy('id', 'DESC');
 
-        $limit = 10;
+        $limit = 20;
 
         if ($startAfter == null):
             # Beginning Query 

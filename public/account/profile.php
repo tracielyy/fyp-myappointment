@@ -49,12 +49,19 @@ include TEMPLATES_PATH . '/bootstrap.php';
                 color: #dc3545;
             }
         </style>
+        <!-- Prevent Form Resubmission -->
+            <script>
+                if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+                }
+            </script>
     </head>
 
     <body>
         <?php
         if (isset($_SESSION["user"])):
-
+            $error = "";
+            $success="";
             # "Unboxin" User Information
             $user = unserialize($_SESSION["user"]);
             $user_email = $user->get_email();
@@ -93,6 +100,35 @@ include TEMPLATES_PATH . '/bootstrap.php';
                         endif;
                     endforeach;
                 }
+                    $oldpass = $_POST['oldpassword'];
+                    $newpass = $_POST['password'];
+                    $confirmpass = $_POST['confirmpassword'];
+                    $secure = new Security();
+
+                    if (Authentication::authenticate_user($user->get_email(), $user->get_usertype(), $oldpass)) :
+                        if ($confirmpass == $newpass) :
+                            //SUCCESS CHANGING PASSWORD
+                            $new_hashed_pw = $secure->hash($newpass);
+                            Account_User::update_password($user->get_email(), $new_hashed_pw);
+                            $_SESSION['user'] = serialize($user);
+                            $success .= '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+                            $success .= '<strong>Password successfully changed!</strong>';
+                            $success .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$success.'\');});</script>';
+                        else :
+                            //CONFIRM PASS AND NEW PASS IS NOT THE SAME ERROR
+                            $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                            $error .= '<strong>Confirm password and new password are not the same!</strong> Password has not been changed.';
+                            $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$error.'\');});</script>';
+                        endif;
+                    else :
+                        //CURRENT PASSWORD IS INCORRECT ERROR
+                        $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                        $error .= '<strong>Current password is incorrect!</strong> Password has not been changed.';
+                        $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                    echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$error.'\');});</script>';
+                    endif;
 
                 if (isset($_POST['submitpassword'])) :
                     store_info($_POST, $details, $validArr);
@@ -102,11 +138,20 @@ include TEMPLATES_PATH . '/bootstrap.php';
 
                     $newaddress = $_POST['address'];
                     if (Account_User::update_address($user->get_email(), $newaddress)) :
+                       
+                        //SUCCESS FOR ADDRESS
                         $user->set_address($newaddress);
                         $_SESSION['user'] = serialize($user);
-
+                        $success .= '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+                            $success .= '<strong>Address successfully changed!</strong>';
+                            $success .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$success.'\');});</script>';
                     else :
-                    //echo "failed change";
+                    //ERROR FOR ADDRESS
+                    $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                    $error .= '<strong>Error occured!</strong> Address has not been changed.';
+                    $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                    echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$error.'\');});</script>';
                     endif;
 
                 elseif (isset($_POST['updatecontactnum'])) :
@@ -114,11 +159,19 @@ include TEMPLATES_PATH . '/bootstrap.php';
                     $contactnum = $_POST['contactnum'];
                     if (!empty($contactnum)):
                         if (Account_User::update_contact_number($user->get_email(), $contactnum)):
+                            //SUCCESS FOR CONTACT NUM UPDATE
                             $user->set_contactnumber($contactnum);
                             $_SESSION['user'] = serialize($user);
-
+                            $success .= '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+                            $success .= '<strong>Contact number successfully changed!</strong>';
+                            $success .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$success.'\');});</script>';
                         else:
-                        //echo "failed change";
+                            //ERROR FOR CONTACT NUM UPDATE
+                            $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                            $error .= '<strong>Error occured!</strong>Contact number has not been changed.';
+                            $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$error.'\');});</script>';
                         endif;
                     endif; # -- Check Contact Number Not Empty
                 elseif (isset($_POST['changeEmail'])):
@@ -128,11 +181,17 @@ include TEMPLATES_PATH . '/bootstrap.php';
                         if (Account_User::change_email($user_email, $new_email)):
                             $user->set_email($new_email);
                             $_SESSION['user'] = serialize($user);
+                            //SUCCESS FOR CONTACT NUM UPDATE
+                            $success .= '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+                            $success .= '<strong>Email successfully changed!</strong>';
+                            $success .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\''.$success.'\');});</script>';
                         endif;
                     endif;
                 endif;
                 ?>
-                <div class="row bg-light py-4">
+                <script>$("div .container #alertbox").append('hello');</script> 
+                <div class="row bg-light py-4 mb-5">
                     <div class="row bg-light">
                         <div class="col-xs-8 col-md-6 ms-5">
                             <h1 class="display-6"> <?php echo $user->get_fullname(); ?> </h1>
@@ -143,7 +202,11 @@ include TEMPLATES_PATH . '/bootstrap.php';
                     </div>
                 </div>
 
-                <div class="container-fluid mt-3">
+                <div class="container" id="alertbox">
+                    
+                </div>               
+
+                <div class="container-fluid">
                     <ul class="nav nav-tabs flex-column tabgroup" id="tabsID">
                         <li><a class="tablinks top active" href="#account" data-toggle='tab' id="default"><i
                                     class="fas fa-user-cog tab-icon"></i>Account </a></li>
@@ -895,8 +958,6 @@ include TEMPLATES_PATH . '/bootstrap.php';
                                 }
                             });
                         });
-
-
                     });
 
                     $.validator.addMethod("phoneRegex", function (value, element) {
