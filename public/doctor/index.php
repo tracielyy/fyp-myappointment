@@ -27,10 +27,14 @@ else:
         
         
         if ($_SERVER['REQUEST_METHOD'] == 'POST'):
-            ?> <script>console.log("going thru post")</script><?php
+            ?> <script>
+console.log("going thru post")
+</script><?php
             echo 'going thru post';
             if (isset($_POST['postmedical'])):
-                ?> <script>console.log("going isset")</script><?php
+                ?> <script>
+console.log("going isset")
+</script><?php
 
                 $patientid = $_POST['patientid'];
                 $slotid = $_POST['slotid'];
@@ -161,7 +165,7 @@ else:
                     $data = "{'name':'".$patient->get_firstname()."','date':'".$slot->get_appointmentschedule()->get_date()."','time':'". $slot->get_appointmentschedule()->get_time() ."','mrid':'".$mrid."'},";
                 endforeach;
                 $data = "[".$data."]";
-                // echo $data ;
+                 //echo $data ;
                 ?>
     <script>
     var apptlist = <?php echo $data ?>;
@@ -287,14 +291,123 @@ else:
 
             <div id="settings" class="tab-pane shadow rounded">
                 <div class="container mt-5">
-                    <h3 class="text-center">Shift</h3>
-                    <form action="">
-                    <input type="date" class="form-control" name="startdate" id="">
-                    <input type="date" class="form-control" name="enddate" id="">
-                    <input type="date" class="form-control" name="starttiming" id="">
-                    <input type="date" class="form-control" name="endtiming" id="">
-                    </form>
-                    
+                    <h3 class="text-center mb-5">Shift</h3>
+                    <div class="container">
+
+                        <div class="row">
+                            <div class="col">
+
+                                <table style="width: 100% !important" id="shifttable" class="display">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>date</td>
+                                            <td>time</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+
+                        <form method="post" action="">
+                            <div class="row my-3">
+                                <div class="col">
+                                    <input type="date" class="form-control" name="startDate"
+                                        value="<?php echo date('Y-m-d'); ?>">
+                                </div>
+                                <div class="col">
+                                    <input type="date" class="form-control" name="endDate"
+                                        value="<?php echo date('Y-m-d'); ?>">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col">
+                                            <!-- Reason why use select is because only per hour, date input has minutes which we dont want -->
+                                            <div class="row">
+                                                <div class="col">
+                                                    <select name="startTime" class="form-select"
+                                                        aria-label="Default select example">
+                                                        <option selected hidden>Start Time</option>
+                                                        <option value="1">1</option>
+                                                        <option value="2">2</option>
+                                                        <option value="3">3</option>
+                                                        <option value="4">4</option>
+                                                        <option value="5">5</option>
+                                                        <option value="6">6</option>
+                                                        <option value="7">7</option>
+                                                        <option value="8">8</option>
+                                                        <option value="9">9</option>
+                                                        <option value="10">10</option>
+                                                        <option value="11">11</option>
+                                                        <option value="12">12</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col">
+                                                    <select name="startMeridiem" class="form-select"
+                                                        aria-label="Default select example">
+                                                        <option selected>AM</option>
+                                                        <option >PM</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+
+                                    <div class="row">
+                                        <div class="col">
+                                            <select name="endTime" class="form-select"
+                                                aria-label="Default select example">
+                                                <option selected hidden>End Time</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <select name="endMeridiem" class="form-select"
+                                                aria-label="Default select example">
+                                                <option >AM</option>
+                                                <option selected>PM</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <select name="intervals" class="form-select" aria-label="Default select example">
+                                        <option selected>Intervals</option>
+                                        <option value="30">30 minutes</option>
+                                        <option value="60">1 hour</option>
+                                        <option value="90">1 hour 30 minutes</option>
+                                        <option value="120">2 hours</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary text-center mt-3" style="float:right">
+                                Submit Time Slots
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -304,10 +417,10 @@ else:
     </div><!-- END OF SIDE NAVIGATION TAB -->
     <form id="mrpost" method="post" name="postmedical" action="patientvisits/func/check.php">
 
-    <input type="hidden" name="practitionerid" id="practinput" value="">
-    <input type="hidden" name="slotid" id="slotinput" value="">
-    <input type="hidden" name="facilityid" id="facilityinput" value="">
-    <input type="hidden" name="patientid" id="patientinput" value="">
+        <input type="hidden" name="practitionerid" id="practinput" value="">
+        <input type="hidden" name="slotid" id="slotinput" value="">
+        <input type="hidden" name="facilityid" id="facilityinput" value="">
+        <input type="hidden" name="patientid" id="patientinput" value="">
     </form>
 
     <script>
@@ -332,7 +445,7 @@ else:
         $('input#facilityinput').val(facility_id);
         $('input#patientinput').val(patient_id);
 
-        $( "form#mrpost" ).submit();
+        $("form#mrpost").submit();
 
 
         // $.ajax({
@@ -360,7 +473,7 @@ else:
         //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']); ?>",
         //     dataType: "text",
         //     data: {
-                
+
         //     },
         //     success: function() {
         //         console.log("just posting");
@@ -445,6 +558,30 @@ else:
     //     this.time = time;
     //     this.mrid = mrid;
     // };
+    console.log(apptlist);
+
+    $(document).ready(function() {
+        <?php $shift='[]' ?>
+        var shiftdata = <?php echo $shift ?>;
+        var shifttables = $('#shifttable').DataTable({
+            responsive: true,
+            pageLength: 3,
+            "lengthChange": false,
+            data: shiftdata,
+            columns: [{
+                    data: 'date'
+                },
+                {
+                    data: 'time'
+                }
+            ],
+            "language": {
+                "emptyTable": "No slots opened"
+            }
+        });
+
+    });
+
 
     $(document).ready(function() {
         var appttable = $('#apptdashboard').DataTable({
@@ -474,8 +611,8 @@ else:
                 }
             ],
             "language": {
-      "emptyTable": "No appointment booked for you at the moment"
-        }
+                "emptyTable": "No appointment booked for you at the moment"
+            }
         });
 
     });
@@ -505,8 +642,8 @@ else:
                 }
             ],
             "language": {
-        "emptyTable": "No appointment booked for you at the moment"
-        }
+                "emptyTable": "No appointment booked for you at the moment"
+            }
         });
 
     });
@@ -605,11 +742,8 @@ else:
         });
 
     });
-
     </script>
 </body>
-
-
 
 </html>
 <?php
