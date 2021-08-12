@@ -595,10 +595,6 @@ include TEMPLATES_PATH . '/bootstrap.php';
                     });
 
 
-
-
-
-
                     function invalid_otp_msg(msg) {
                         // WHEN THE OTP IS INVALID
                         $("#otp").addClass("is-invalid");

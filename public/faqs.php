@@ -79,7 +79,7 @@ session_start();
             <h1>&emsp;Frequently Asked Questions</h1>
         </div>
 
-        <div class="container mt-4">
+        <div class="container-fluid mt-4">
             <div class="row">
                 <div class="col">
                     <details class="details" data-id="start" hidden></details>

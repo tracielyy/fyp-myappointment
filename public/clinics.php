@@ -73,12 +73,12 @@ session_start();
     <div>
         <!-- Navigation -->
 
-        <div class="header">
+        <div class="header container">
             <br>
             <h1 class="display-6 m-5">Registered Hospitals and Clinics</h1>
         </div>
 
-        <div class="container-lg">
+        <div class="container">
             <div class="row">
                 <div class="col">
                     <div class="row">
