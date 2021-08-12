@@ -288,7 +288,13 @@ else:
             <div id="settings" class="tab-pane shadow rounded">
                 <div class="container mt-5">
                     <h3 class="text-center">Shift</h3>
-                    <p>Shows to set the timing of work</p>
+                    <form action="">
+                    <input type="date" class="form-control" name="startdate" id="">
+                    <input type="date" class="form-control" name="enddate" id="">
+                    <input type="date" class="form-control" name="starttiming" id="">
+                    <input type="date" class="form-control" name="endtiming" id="">
+                    </form>
+                    
                 </div>
             </div>
         </div>
@@ -383,6 +389,7 @@ else:
         endforeach;
         ?>],
             datasets: [{
+                label: 'Num of patients',
                 data: [<?php
         foreach ($numofPatientsWeek as $date => $count): echo $count . ",";
         endforeach;
