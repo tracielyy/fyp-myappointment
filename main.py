@@ -125,7 +125,7 @@ def email():
             slotid = apptid[x]
             if apptdate[x] == tmr.strftime("%d-%m-%Y"):
                 print(str(pnamelist[nriclist[x]]) + ' ' + str(mflist[apptlocid[x]]) + ' ' + str(pemaillist[nriclist[x]]) + ' ' + str(apptdate[x]) + ' ' + str(mfslot[slotid]) + ' ' + appttype[x])
-                # send_email(pnamelist[nriclist[x]],mflist[apptlocid[x]],pemaillist[nriclist[x]],apptdate[x],mfslot[slotid],appttype[x])
+                send_email(pnamelist[nriclist[x]],mflist[apptlocid[x]],pemaillist[nriclist[x]],apptdate[x],mfslot[slotid],appttype[x])
                 print('Email Sent')
         else:
             print('No appointment Found for Checkup or Doctor Consultation')
@@ -272,7 +272,7 @@ def Add():
 
 def main():
     schedule.every(30).minutes.do(missed)
-    schedule.every().day.at('10:00').do(email)
+    schedule.every().day.at('11:15').do(email)
     schedule.every(30).days.do(Add)
 
     while True:
