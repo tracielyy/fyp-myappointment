@@ -175,9 +175,9 @@ class Time {
 
         // Use loop to store date into array
         foreach ($period as $time) {
-            $time_arr[] = (string) $time->format('H:i');
+            $time_array[] = (string) $time->format('H:i');
         }
-        return $time_arr;
+        return $time_array;
     }
 
     public static function check_datetime_format(string $datetime, string $format = self::DATE_FORMAT_DEFAULT): bool {

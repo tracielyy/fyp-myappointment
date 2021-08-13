@@ -21,6 +21,8 @@ else:
     $user = unserialize((string) $_SESSION["user"]);
     $user_type = $user->get_usertype();
     $user_email = $user->get_email();
+    $facilityids = $user->get_facilityids();
+
     if (!User_Type::check_user_type(User_Type::MEDICAL_PERSONNEL, $user_type)):
         header("Location:./../"); # -- REDIRECT USER TO THE INDEX PAGE
     else:
@@ -98,8 +100,19 @@ else:
             <body onload="startTime()">
 
                 <?php
+                // Variables 
+                $dateTomorrow = date('Y-m-d', strtotime("+1 day"));
                 $error = "";
                 $success = "";
+                $startDate = $dateTomorrow;
+                $endDate = $dateTomorrow;
+                $startTime = "";
+                $endTime = "";
+                $startMeridiem = "";
+                $endMeridiem = "";
+                $facilityidpicked = "";
+                $interval = "";
+
                 if ($_SERVER['REQUEST_METHOD'] == 'POST'):
 
                     // ____ Creation of slots with date & time array _____
@@ -125,6 +138,16 @@ else:
                         $startDate = $_POST['startDate'];
                         $endDate = $_POST['endDate'];
 
+                        // TIme
+                        $startTime = $_POST['startTime'];
+                        $startMeridiem = $_POST['startMeridiem'];
+                        $endTime = $_POST['endTime'];
+                        $endMeridiem = $_POST['endMeridiem'];
+
+                        //Interval
+                        $interval = $_POST['intervals'];
+                        $facilityidpicked = $_POST['facilitypick'];
+
                         if ($startDate > $endDate) {
                             $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
                             $error .= '<strong>Your Start date must be earlier than the End date!</strong> Slots have not been submitted.';
@@ -132,51 +155,43 @@ else:
                             echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
                         } else {
 
-                            if ($_POST['startTime'] == 'Start Time' || $_POST['endTime'] == 'End Time') {
+                            if ($startTime == 'Start Time' || $endTime == 'End Time') {
                                 $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
                                 $error .= '<strong>You have entered incorrect time range!</strong> Slots have not been submitted.';
                                 $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
                                 echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
                             } else {
 
-                                if ($_POST['intervals'] == 'Intervals') {
+                                if ($interval == 'Intervals') {
                                     $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
                                     $error .= '<strong>You have not selected the intervals!</strong> Slots have not been submitted.';
                                     $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
                                     echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
                                 } else {
 
-                                    if ($_POST['facilitypick'] == 'Select Facility') {
+                                    if ($facilityidpicked == 'Select Facility') {
                                         $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
                                         $error .= '<strong>You have not selected any Facility!</strong> Slots have not been submitted.';
                                         $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
                                         echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
-                                    }else 
-                                    {   
+                                    } else {
                                         //Date
                                         $startDate_converted = Time::date_format_default($startDate);
                                         $endDate_converted = Time::date_format_default($endDate);
                                         $dateArray = array();
 
                                         //Time
-                                        $startTime = $_POST['startTime'];
-                                        $startMeridiem = $_POST['startMeridiem'];
                                         $startTimeMeridiem = $startTime . ":00 " . $startMeridiem;
                                         $startTime_converted = Time::to_24hours($startTimeMeridiem);
 
-                                        $endTime = $_POST['endTime'];
-                                        $endMeridiem = $_POST['endMeridiem'];
                                         $endTimeMeridiem = $endTime . ":00 " . $endMeridiem;
                                         $endTime_converted = Time::to_24hours($endTimeMeridiem);
                                         $timeArray = array();
 
-                                        //Interval
-                                        $interval = $_POST['intervals'];
-
                                         if ($startDate_converted == $endDate_converted) {
                                             $dateArray = array($startDate_converted);
                                         } else {
-                                            $dateArray = Time::get_date_from_range($startTime_converted, $endDate_converted);
+                                            $dateArray = Time::get_date_from_range($startDate_converted, $endDate_converted);
                                         }
 
 
@@ -187,8 +202,6 @@ else:
                                         }
 
                                         ///Tracie TODO function (array are timeArray and dateArray)
-                                        //$facilityid = $user->get_facility()->get_facilityid(); Not used
-                                        $facilityidpicked = $_POST['facilitypick'];
                                         $doc_email = $user->get_email();
                                         create_slots($doc_email, $facilityidpicked, $dateArray, $timeArray);
 
@@ -196,8 +209,19 @@ else:
                                         $success .= '<strong>Slots are successfuly added!</strong>';
                                         $success .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
                                         echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $success . '\');});</script>';
+
+                                        // Reset
+                                        $error = "";
+                                        $success = "";
+                                        $startDate = $dateTomorrow;
+                                        $endDate = $dateTomorrow;
+                                        $startTime = "";
+                                        $endTime = "";
+                                        $startMeridiem = "";
+                                        $endMeridiem = "";
+                                        $facilityidpicked = "";
+                                        $interval = "";
                                     }
-                                    
                                 }
                             }
                         }
@@ -207,75 +231,68 @@ else:
 
 
                     if (isset($_POST['postmedical'])):
-                        ?> <script>
-                                            console.log("going isset");
-                        </script><?php
-                $patientid = $_POST['patientid'];
-                $slotid = $_POST['slotid'];
-                $practitionerid = $_POST['practitionerid'];
-                $facilityid = $_POST['facilityid'];
+                        $patientid = $_POST['patientid'];
+                        $slotid = $_POST['slotid'];
+                        $practitionerid = $_POST['practitionerid'];
+                        $facilityid = $_POST['facilityid'];
 
-                $medicalrecord_array = array(
-                    'facilityid' => $facilityid,
-                    'practitioner' => $practitionerid,
-                    'slotid' => $slotid,
-                    'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientid, $slotid)
-                );
+                        $medicalrecord_array = array(
+                            'facilityid' => $facilityid,
+                            'practitioner' => $practitionerid,
+                            'slotid' => $slotid,
+                            'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientid, $slotid)
+                        );
 
-                $mrid = check_mrid_exist($patientid, $slotid); //checks MRID but also, if available will put the mrid here
+                        $mrid = check_mrid_exist($patientid, $slotid); //checks MRID but also, if available will put the mrid here
 
-                if (!$mrid):
-                    $medical_record = Medical_Record::create_medical_record($patientid, $medicalrecord_array);
-                    $mrid = $medical_record->get_medicalrecordid();
-                    Appointment_Record::set_mrid($patientid, $slotid, $mrid);
+                        if (!$mrid):
+                            $medical_record = Medical_Record::create_medical_record($patientid, $medicalrecord_array);
+                            $mrid = $medical_record->get_medicalrecordid();
+                            Appointment_Record::set_mrid($patientid, $slotid, $mrid);
+                        endif;
+
+                        header("Location:" . DOC_WEB . "/patientvisit/index.php?id=" . $mrid . "&pt=" . $patientid);
+                    endif;
+
                 endif;
 
-                header("Location:" . DOC_WEB . "/patientvisit/index.php?id=" . $mrid . "&pt=" . $patientid);
-            endif;
+                //include COMPONENTS_PATH . '/navbar-loggedin.php';
+                $data = "";
+                $dateToday = Time::get_current_date(); //Date today NEED TO CHANGE ONLY FOR DEBUG
+                $dateToday_calendar = Time::date_format_change($dateToday, Time::CALENDAR_FORMAT_DEFAULT);
+                $dates = Time::get_date_from_range($dateToday, Time::get_enddate($dateToday, 6));
 
-        endif;
+                $patient_per_day = Normal_Slot::patient_count_per_date("mf001", $dateToday);
+                $patient_per_day += Special_Slot::patient_count_per_date("mf001", $dates[0]);
 
-        //include COMPONENTS_PATH . '/navbar-loggedin.php';
-        $data = "";
-        $dateToday = Time::get_current_date(); //Date today NEED TO CHANGE ONLY FOR DEBUG
-        $dates = Time::get_date_from_range($dateToday, Time::get_enddate($dateToday, 6));
+                //$slot_arr += Special_Slot::retrieve_booked_slots_by_date($user_email,$dates[2]);
+                $slot_arr = array();
+                $numofPatientsWeek = array();
+                foreach ($dates as $date):
+                    $slot_addition = Special_Slot::retrieve_booked_slots_by_date($user_email, $date);
+                    $numofPatientsWeek[$date] = count($slot_addition);
+                    $slot_arr = array_merge($slot_arr, $slot_addition);
+                endforeach;
 
-        $patient_per_day = Normal_Slot::patient_count_per_date("mf001", $dateToday);
-        $patient_per_day += Special_Slot::patient_count_per_date("mf001", $dates[0]);
-
-        //$slot_arr += Special_Slot::retrieve_booked_slots_by_date($user_email,$dates[2]);
-        $slot_arr = array();
-        $numofPatientsWeek = array();
-        foreach ($dates as $date):
-            $slot_addition = Special_Slot::retrieve_booked_slots_by_date($user_email, $date);
-            $numofPatientsWeek[$date] = count($slot_addition);
-            $slot_arr = array_merge($slot_arr, $slot_addition);
-        endforeach;
-
-        // echo "<pre>";
-        // echo var_dump($slot_arr);
-        // echo "</pre>";
-        //can use get_date_from_range -- make it to 7 days
-        //echo json_encode($slot_arr);
-        $userEmail = $user->get_email();
-        $practitionerid = Account_User::retrieve_user_doc_id($userEmail);
-        foreach ($slot_arr as $slot):
-            $patientid = $slot->get_patient();
-            $patient = Patient::retrieve_patient_by_id($patientid);
-            $slotid = $slot->get_slotid();
-            $facilityid = $slot->get_facilityid();
-            //$mrid ='<button onclick="check("'.$patientid.'","'.$slotid.'","'.$practitionerid.'","'.$facilityid.')" class="btn btn-primary">Go to Medical Record</button>';
-            $mrid = '<button id="#listbuttons" data-patient="' . $patientid . '" data-slot="' . $slotid . '" data-prac="' . $practitionerid . '" data-facility="' . $facilityid . '" class="btn btn-primary listbttns">Go to Medical Record</button>';
-            $data = "{'name':'" . $patient->get_firstname() . "','date':'" . $slot->get_appointmentschedule()->get_date() . "','time':'" . $slot->get_appointmentschedule()->get_time() . "','mrid':'" . $mrid . "'},";
-        endforeach;
-        $data = "[" . $data . "]";
-        //echo $data ;
+                $userEmail = $user->get_email();
+                $practitionerid = Account_User::retrieve_user_doc_id($userEmail);
+                foreach ($slot_arr as $slot):
+                    $patientid = $slot->get_patient();
+                    $patient = Patient::retrieve_patient_by_id($patientid);
+                    $slotid = $slot->get_slotid();
+                    $facilityid = $slot->get_facilityid();
+                    //$mrid ='<button onclick="check("'.$patientid.'","'.$slotid.'","'.$practitionerid.'","'.$facilityid.')" class="btn btn-primary">Go to Medical Record</button>';
+                    $mrid = '<button id="#listbuttons" data-patient="' . $patientid . '" data-slot="' . $slotid . '" data-prac="' . $practitionerid . '" data-facility="' . $facilityid . '" class="btn btn-primary listbttns">Go to Medical Record</button>';
+                    $data = "{'name':'" . $patient->get_firstname() . "','date':'" . $slot->get_appointmentschedule()->get_date() . "','time':'" . $slot->get_appointmentschedule()->get_time() . "','mrid':'" . $mrid . "'},";
+                endforeach;
+                $data = "[" . $data . "]";
+                ;
                 ?>
                 <script>
                     var apptlist = <?php echo $data ?>;
                 </script>
 
-        <?php ?>
+                <?php ?>
 
                 <div class="row bg-light py-4">
 
@@ -303,12 +320,12 @@ else:
                         </li>
 
                         <!-- SHIFT SETTINGS: ONLY SHOWS ON SPECIALIZED DOCTORS -->
-        <?php if (!($user->get_specialisation() == 'General')): ?>
+                        <?php if (!($user->get_specialisation() == 'General')): ?>
 
                             <li><a class="tablinks" href="#settings" data-toggle='tab'>
                                     <i class="far fa-clock tab-icon"></i>Shift Settings</a>
                             </li>
-        <?php endif; ?>
+                        <?php endif; ?>
                     </ul>
 
                     <div class="tab-content">
@@ -339,10 +356,10 @@ else:
 
                                         </div>
                                         <small class="text-muted mt-1" style="float:right">Last updated at
-        <?php
-        echo date("d/m/y");
-        echo " " . date("H:i:s");
-        ?></small>
+                                            <?php
+                                            echo date("d/m/y");
+                                            echo " " . date("H:i:s");
+                                            ?></small>
                                     </div>
                                 </div>
 
@@ -367,10 +384,10 @@ else:
                                             </tbody>
                                         </table>
                                         <small class="text-muted" style="float:right">Last updated at
-        <?php
-        echo date("d/m/y");
-        echo " " . date("H:i:s");
-        ?></small>
+                                            <?php
+                                            echo date("d/m/y");
+                                            echo " " . date("H:i:s");
+                                            ?></small>
                                     </div>
                                 </div>
 
@@ -404,7 +421,7 @@ else:
                         </div>
 
                         <!-- SHIFT SETTINGS: ONLY SHOWS ON SPECIALIZED DOCTORS -->
-        <?php if (!($user->get_specialisation() == 'General')): ?>
+                        <?php if (!($user->get_specialisation() == 'General')): ?>
 
                             <div id="settings" class="tab-pane shadow rounded">
                                 <div class="container mt-5">
@@ -431,7 +448,6 @@ else:
 
                                             </div>
                                         </div>
-            <?php $dateTomorrow = date('Y-m-d', strtotime("+1 day")); ?>
                                         <h1 class="display-6 mt-4"><strong style="margin-bottom:5px">Add Shift</strong></h1>
                                         <div class="container mt-3" id="alertbox"></div>
                                     </div>
@@ -439,13 +455,13 @@ else:
                                         <div class="row my-3">
                                             <div class="col">
                                                 <p class="lead" style="margin-bottom:5px">Start Date</p>
-                                                <input id="startDateID" min="<?php echo $dateTomorrow; ?>" type="date"
-                                                       class="form-control" name="startDate" value="<?php echo $dateTomorrow; ?>">
+                                                <input id="startDateID" min="<?php echo $dateToday_calendar; ?>" type="date"
+                                                       class="form-control" name="startDate" value="<?php echo $startDate; ?>">
                                             </div>
                                             <div class="col">
                                                 <p class="lead" style="margin-bottom:5px">End Date</p>
-                                                <input min="<?php echo $dateTomorrow; ?>" type="date" class="form-control"
-                                                       name="endDate" value="<?php echo $dateTomorrow; ?>">
+                                                <input min="<?php echo $dateToday_calendar; ?>" type="date" class="form-control"
+                                                       name="endDate" value="<?php echo $endDate; ?>">
                                             </div>
                                         </div>
                                         <div class="row mb-3">
@@ -458,25 +474,28 @@ else:
                                                                 <select name="startTime" class="form-select"
                                                                         aria-label="Default select example">
                                                                     <option selected hidden>Start Time</option>
-                                                                    <option value="1">1</option>
-                                                                    <option value="2">2</option>
-                                                                    <option value="3">3</option>
-                                                                    <option value="4">4</option>
-                                                                    <option value="5">5</option>
-                                                                    <option value="6">6</option>
-                                                                    <option value="7">7</option>
-                                                                    <option value="8">8</option>
-                                                                    <option value="9">9</option>
-                                                                    <option value="10">10</option>
-                                                                    <option value="11">11</option>
-                                                                    <option value="12">12</option>
+                                                                    <?php for ($i = 1; $i <= 12; $i++): ?>
+                                                                        <option value="<?php echo $i; ?>"
+                                                                        <?php
+                                                                        if ($startTime == $i):
+                                                                            echo 'selected';
+                                                                        endif;
+                                                                        ?>><?php echo $i; ?>
+                                                                        </option>
+                                                                    <?php endfor; ?>
                                                                 </select>
                                                             </div>
                                                             <div class="col">
                                                                 <select name="startMeridiem" class="form-select"
                                                                         aria-label="Default">
-                                                                    <option selected>AM</option>
-                                                                    <option>PM</option>
+                                                                    <option value="AM" selected <?php
+                                                                    if ($startMeridiem == "AM"): echo 'selected';
+                                                                    endif;
+                                                                    ?>>AM</option>
+                                                                    <option value="PM" <?php
+                                                                    if ($startMeridiem == "PM"): echo 'selected';
+                                                                    endif;
+                                                                    ?>>PM</option>
                                                                 </select>
                                                             </div>
                                                         </div>
@@ -489,25 +508,28 @@ else:
                                                     <div class="col">
                                                         <select name="endTime" class="form-select" aria-label="Default">
                                                             <option selected hidden>End Time</option>
-                                                            <option value="1">1</option>
-                                                            <option value="2">2</option>
-                                                            <option value="3">3</option>
-                                                            <option value="4">4</option>
-                                                            <option value="5">5</option>
-                                                            <option value="6">6</option>
-                                                            <option value="7">7</option>
-                                                            <option value="8">8</option>
-                                                            <option value="9">9</option>
-                                                            <option value="10">10</option>
-                                                            <option value="11">11</option>
-                                                            <option value="12">12</option>
+                                                            <?php for ($i = 1; $i <= 12; $i++): ?>
+                                                                <option value="<?php echo $i; ?>"
+                                                                <?php
+                                                                if ($endTime == $i):
+                                                                    echo 'selected';
+                                                                endif;
+                                                                ?>><?php echo $i; ?>
+                                                                </option>
+                                                            <?php endfor; ?>
                                                         </select>
                                                     </div>
                                                     <div class="col">
                                                         <select name="endMeridiem" class="form-select"
                                                                 aria-label="Default select">
-                                                            <option>AM</option>
-                                                            <option selected>PM</option>
+                                                            <option value="AM" selected <?php
+                                                            if ($endMeridiem == "AM"): echo 'selected';
+                                                            endif;
+                                                            ?>>AM</option>
+                                                            <option value="PM" <?php
+                                                            if ($endMeridiem == "PM"): echo 'selected';
+                                                            endif;
+                                                            ?>>PM</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -518,29 +540,43 @@ else:
                                             <div class="col">
                                                 <select name="intervals" class="form-select" aria-label="Default select">
                                                     <option value="Intervals" hidden selected>Intervals</option>
-                                                    <option value="30">30 minutes</option>
-                                                    <option value="60">1 hour</option>
+                                                    <option value="30" 
+                                                    <?php
+                                                    if ($interval == "30"):
+                                                        echo 'selected';
+                                                    endif;
+                                                    ?>>30 minutes</option>
+                                                    <option value="60"
+                                                    <?php
+                                                    if ($interval == "60"):
+                                                        echo 'selected';
+                                                    endif;
+                                                    ?>>1 hour</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col">
                                                 <select name="facilitypick" class="form-select" aria-label="Default select">
-                                                <option value="Select Facility" hidden>Select Facility</option>
-                                                   <?php
-                                                   $facilityids = $user->get_facilityids();
-                                                   $facilityobject = array();
-                                                   foreach($facilityids as $id){
-                                                     $obj = Medical_Facility::retrieve_facility_by_id($id);
-                                                     $facilityobject[] =  $obj;
-                                                    
-                                                   }
-                                                   /* display */
-                                                   foreach($facilityobject as $facility){
-                                                    
-                                                    echo '<option value="'.$facility->get_facilityid().'">'.$facility->get_facilityname().'</option>';
-                                                   }
-                                                   ?>
+                                                    <option value="Select Facility" hidden>Select Facility</option>
+                                                    <?php
+                                                    $facilityobject = array();
+                                                    foreach ($facilityids as $id) {
+                                                        $obj = Medical_Facility::retrieve_facility_by_id($id);
+                                                        $facilityobject[] = $obj;
+                                                    }
+                                                    /* display */
+                                                    foreach ($facilityobject as $facility) :
+                                                        ?>
+                                                        <option value="<?php echo $facility->get_facilityid(); ?>" <?php
+                                                        if ($facilityidpicked == $facility->get_facilityid()):
+                                                            echo 'selected';
+                                                        endif;
+                                                        ?>><?php echo $facility->get_facilityname(); ?>
+                                                        </option>;
+                                                        <?php
+                                                    endforeach;
+                                                    ?>
                                                 </select>
                                             </div>
                                         </div>
@@ -554,7 +590,7 @@ else:
                                 </div>
                             </div>
 
-        <?php endif; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -597,7 +633,7 @@ else:
 
                     // $.ajax({
                     //     type: "POST",
-                    //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);          ?>",
+                    //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);                                           ?>",
                     //     dataType: "text",
                     //     data: {
                     //         'ajax_check_mrid': true,
@@ -617,7 +653,7 @@ else:
 
                     // $.ajax({
                     //     type: "POST",
-                    //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);          ?>",
+                    //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);                                           ?>",
                     //     dataType: "text",
                     //     data: {
 
@@ -644,16 +680,16 @@ else:
                     type: 'bar',
                     data: {
                         labels: [<?php
-        foreach ($dates as $date):
-            echo "'" . $date . "',";
-        endforeach;
-        ?>],
+                foreach ($dates as $date):
+                    echo "'" . $date . "',";
+                endforeach;
+                ?>],
                         datasets: [{
                                 label: 'Num of patients',
                                 data: [<?php
-        foreach ($numofPatientsWeek as $date => $count): echo $count . ",";
-        endforeach;
-        ?>],
+                foreach ($numofPatientsWeek as $date => $count): echo $count . ",";
+                endforeach;
+                ?>],
                                 backgroundColor: [
                                     'rgba(255, 99, 132, 1)',
                                     'rgba(54, 162, 235, 1)',
