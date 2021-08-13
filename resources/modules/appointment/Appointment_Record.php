@@ -162,6 +162,7 @@ class Appointment_Record {
         $db = new DbQuery();
         $doc_path = Database::ACCOUNT_USER . "/" . $patientid . "/" . Database::APPOINTMENT_RECORD;
         $documents = $db->get_db()->collection($doc_path)->where('slotid', "=", $slotid)->where("mrid", "!=", "")->documents();
+        $appt_id = "";
         foreach ($documents as $doc):
             if ($doc->exists()):
                 $appt_id = $doc->id(); // Finding The Appt ID
