@@ -233,7 +233,7 @@ else:
                     endif;
                     
                     
-//         include COMPONENTS_PATH . '/navbar-loggedin.php';
+                //include COMPONENTS_PATH . '/navbar-loggedin.php';
                 $data="";
                 $dateToday = Time::get_current_date(); //Date today NEED TO CHANGE ONLY FOR DEBUG
                 $dates = Time::get_date_from_range($dateToday, Time::get_enddate($dateToday, 6));
@@ -303,9 +303,13 @@ else:
                     <i class="far fa-calendar-alt tab-icon"></i>Appointments</a>
             </li>
 
+            <!-- SHIFT SETTINGS: ONLY SHOWS ON SPECIALIZED DOCTORS -->
+            <?php if(!($user->get_specialisation() == 'General')):?>
+
             <li><a class="tablinks" href="#settings" data-toggle='tab'>
                     <i class="far fa-clock tab-icon"></i>Shift Settings</a>
             </li>
+            <?php endif;?>
         </ul>
 
         <div class="tab-content">
@@ -393,6 +397,9 @@ else:
                 </div>
 
             </div>
+            
+            <!-- SHIFT SETTINGS: ONLY SHOWS ON SPECIALIZED DOCTORS -->
+            <?php if(!($user->get_specialisation() == 'General')):?>
 
             <div id="settings" class="tab-pane shadow rounded">
                 <div class="container mt-5">
@@ -519,18 +526,22 @@ else:
                         appointment starting from tomorrow.</small>
                 </div>
             </div>
+
+            <?php endif;?>
         </div>
     </div>
 
 
 
     </div><!-- END OF SIDE NAVIGATION TAB -->
-    <form id="mrpost" method="post" name="postmedical" action="patientvisits/func/check.php">
 
+    <!-- Medical Record function -->
+    <form id="mrpost" method="post" name="postmedical" action="patientvisits/func/check.php">
         <input type="hidden" name="practitionerid" id="practinput" value="">
         <input type="hidden" name="slotid" id="slotinput" value="">
         <input type="hidden" name="facilityid" id="facilityinput" value="">
         <input type="hidden" name="patientid" id="patientinput" value="">
+        <button type="submit" name="medrecordsubmit" id="mdrecordbttn" value=""></button>
     </form>
 
     <script>
@@ -555,8 +566,7 @@ else:
         $('input#facilityinput').val(facility_id);
         $('input#patientinput').val(patient_id);
 
-        $("form#mrpost").submit();
-
+        $('input#mdrecordbttn').click();
 
         // $.ajax({
         //     type: "POST",
