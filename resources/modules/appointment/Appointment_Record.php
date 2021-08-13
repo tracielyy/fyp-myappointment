@@ -183,7 +183,7 @@ class Appointment_Record {
             });
             return $trxn_result;
         endif;
-        return null;
+        return false;
     }
 
     // -- Validate Appointment Booking  (Check If Patient Have Same Appointment) -- //
