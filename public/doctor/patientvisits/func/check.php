@@ -15,26 +15,28 @@ require_once MEDDOC_MOD . '/Medical_Record.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST'):
 
-    if (isset($_POST['medrecordsubmit'])):
-        ?> <script>console.log("going isset")</script><?php
-        $patientid = $_POST['patientid'];
-        $slotid = $_POST['slotid'];
-        $practitionerid =$_POST['practitionerid'];
-        $facilityid = $_POST['facilityid'];
+    if (isset($_POST['medrec_submit'])):
+        ?> <script>console.log("going isset ")</script><?php
+        $practitioneridpost = $_POST['prac_form'];
+        $slotidpost = $_POST['slot_form'];
+        $facilityidpost = $_POST['facility_form'];
+        $patientidpost = $_POST['patient_form'];
+        
     
         $medicalrecord_array = array(
-            'facilityid'=> $facilityid,
-            'practitioner' => $practitionerid,
-            'slotid' => $slotid,
-            'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientid,$slotid)
+            'facilityid'=> $facilityidpost,
+            'practitioner' => $practitioneridpost,
+            'slotid' => $slotidpost,
+            'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientidpost,$slotidpost)
         );
 
-        $mrid = check_mrid_exist($patientid,$slotid); //checks MRID but also, if available will put the mrid here
+        $mrid = NULL;
+        //$mrid = check_mrid_exist($patientidpost,$slotidpost); //checks MRID but also, if available will put the mrid here
 
         if(!$mrid):
-            $medical_record = Medical_Record::create_medical_record($patientid,$medicalrecord_array);
+            $medical_record = Medical_Record::create_medical_record($patientidpost,$medicalrecord_array);
             $mrid = $medical_record->get_medicalrecordid();
-            Appointment_Record::set_mrid($patientid,$slotid,$mrid);
+            Appointment_Record::set_mrid($patientidpost,$slotidpost,$mrid);
         endif;
 
         header("Location:" . DOC_WEB . "/patientvisit/index.php?id=".$mrid."&pt=".$patientid);

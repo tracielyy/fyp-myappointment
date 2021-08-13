@@ -78,18 +78,13 @@ else:
                         integrity="sha512-VCHVc5miKoln972iJPvkQrUYYq7XpxXzvqNfiul1H4aZDwGBGC0lq373KNleaB2LpnC2a/iNfE5zoRYmB4TRDQ=="
                 crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-                <!-- GRID JS -->
-                <!-- <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
-                <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" /> -->
 
                 <!-- DATATABLE JS -->
 
                 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js">
                 </script>
-                <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
-                <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-                <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script> -->
+              
 
                 <!-- DATATABLE JS RESPONSIVE-->
                 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
@@ -228,31 +223,32 @@ else:
                     }
 
 
+                    // if (isset($_POST['medrec_submit'])):
+                    //     ?> <script>//console.log("going isset ")</script><?php
+                    //     $practitioneridpost =$_POST['prac_form'];
+                    //     $slotidpost = $_POST['slot_form'];
+                    //     $facilityidpost = $_POST['facility_form'];
+                    //     $patientidpost = $_POST['patient_form'];
+                        
+                    
+                    //     $medicalrecord_array = array(
+                    //         'facilityid'=> $facilityidpost,
+                    //         'practitioner' => $practitioneridpost,
+                    //         'slotid' => $slotidpost,
+                    //         'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientidpost,$slotidpost)
+                    //     );
+                
+                    //     $mrid = check_mrid_exist($patientidpost,$slotidpost); //checks MRID but also, if available will put the mrid here
+                
+                    //     if(!$mrid):
+                    //         $medical_record = Medical_Record::create_medical_record($patientidpost,$medicalrecord_array);
+                    //         $mrid = $medical_record->get_medicalrecordid();
+                    //         Appointment_Record::set_mrid($patientidpost,$slotidpost,$mrid);
+                    //     endif;
+                
+                    //     header("Location:" . DOC_WEB . "/patientvisit/index.php?id=".$mrid."&pt=".$patientidpost);
 
-
-                    if (isset($_POST['postmedical'])):
-                        $patientid = $_POST['patientid'];
-                        $slotid = $_POST['slotid'];
-                        $practitionerid = $_POST['practitionerid'];
-                        $facilityid = $_POST['facilityid'];
-
-                        $medicalrecord_array = array(
-                            'facilityid' => $facilityid,
-                            'practitioner' => $practitionerid,
-                            'slotid' => $slotid,
-                            'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientid, $slotid)
-                        );
-
-                        $mrid = check_mrid_exist($patientid, $slotid); //checks MRID but also, if available will put the mrid here
-
-                        if (!$mrid):
-                            $medical_record = Medical_Record::create_medical_record($patientid, $medicalrecord_array);
-                            $mrid = $medical_record->get_medicalrecordid();
-                            Appointment_Record::set_mrid($patientid, $slotid, $mrid);
-                        endif;
-
-                        header("Location:" . DOC_WEB . "/patientvisit/index.php?id=" . $mrid . "&pt=" . $patientid);
-                    endif;
+                    // endif;
 
                 endif;
 
@@ -281,9 +277,11 @@ else:
                     $patient = Patient::retrieve_patient_by_id($patientid);
                     $slotid = $slot->get_slotid();
                     $facilityid = $slot->get_facilityid();
+                    $facilityy = Medical_Facility::retrieve_facility_by_id($facilityid);
+                    $facilityname = $facilityy->get_facilityname();
                     //$mrid ='<button onclick="check("'.$patientid.'","'.$slotid.'","'.$practitionerid.'","'.$facilityid.')" class="btn btn-primary">Go to Medical Record</button>';
-                    $mrid = '<button id="#listbuttons" data-patient="' . $patientid . '" data-slot="' . $slotid . '" data-prac="' . $practitionerid . '" data-facility="' . $facilityid . '" class="btn btn-primary listbttns">Go to Medical Record</button>';
-                    $data .= "{'name':'" . $patient->get_firstname() . "','date':'" . $slot->get_appointmentschedule()->get_date() . "','time':'" . $slot->get_appointmentschedule()->get_time() . "','mrid':'" . $mrid . "'},";
+                    $mrid = '<button id="#listbuttons" data-name="'.$patient->get_firstname().' '.$patient->get_lastname().'" data-time="'.$slot->get_appointmentschedule()->get_time().'" data-date="'.$slot->get_appointmentschedule()->get_date().'" data-facilityname="'.$facilityname.'" data-patient="' . $patientid . '" data-slot="' . $slotid . '" data-prac="' . $practitionerid . '" data-facility="' . $facilityid . '" class="btn btn-primary listbttns"><i class="far fa-clipboard"></i> Copy to search</button>';
+                    $data .= "{'name':'" . $patient->get_firstname()." ".$patient->get_lastname(). "','date':'" . $slot->get_appointmentschedule()->get_date() . "','time':'" . $slot->get_appointmentschedule()->get_time() . "','mrid':'" . $mrid . "','facilityname':'".$facilityname."'},";
                 endforeach;
                 $data = "[" . $data . "]";
                 
@@ -371,7 +369,7 @@ else:
                                                     <th>Name</th>
                                                     <th>Date</th>
                                                     <th>Time</th>
-                                                    <th>Medical Record</th>
+                                                    <th>Facility</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -379,7 +377,7 @@ else:
                                                     <td>name</td>
                                                     <td>date</td>
                                                     <td>time</td>
-                                                    <td>mrid</td>
+                                                    <td>facilityname</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -390,6 +388,7 @@ else:
                                             ?></small>
                                     </div>
                                 </div>
+                               
 
                             </div>
                         </div>
@@ -404,6 +403,7 @@ else:
                                             <th>Name</th>
                                             <th>Date</th>
                                             <th>Time</th>
+                                            <th>Facility</th>
                                             <th>Medical Record</th>
                                         </tr>
                                     </thead>
@@ -412,11 +412,45 @@ else:
                                             <td>name</td>
                                             <td>date</td>
                                             <td>time</td>
+                                            <td>facilityname</td>
                                             <td>mrid</td>
                                         </tr>
                                     </tbody>
                                 </table>
+
+                                <div class="row mt-4">
+                                    <p class="lead">Search Medical Record</p>
+                                    <div class="col">
+                                    <input id="namequery" class="form-control" placeholder="Name" readonly></input>
+                                    </div>
+                                    <div class="col">
+                                    <input id="datequery" class="form-control" placeholder="Date" readonly></input>
+                                    </div>
+                                    <div class="col">
+                                    <input id="timequery" class="form-control" placeholder="Time" readonly></input>
+                                    </div>
+                                    <div class="col">
+                                    <input id="facility" class="form-control" placeholder="Facility" readonly></input>
+                                    </div>
+                                    <div class="col">
+                                      
+                                        
+                                        <!-- Medical Record function -->
+                                        <form id="medrecordpost" method="post" action="patientvisits/func/check.php">
+                                                <input class="form-control" type="hidden" name="prac_form" id="practinput" value="" >
+                                                <input class="form-control" type="hidden" name="slot_form" id="slotinput" value="" >
+                                                <input class="form-control" type="hidden" name="facility_form" id="facilityinput" value="" >
+                                                <input class="form-control" type="hidden" name="patient_form" id="patientinput" value="" >
+                                                <button class="btn btn-primary" type="submit" name="medrec_submit" id="mdsubmit" value="go">Go to Medical Record</Button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                            
+
                             </div>
+
+                            
 
                         </div>
 
@@ -598,14 +632,7 @@ else:
 
             </div><!-- END OF SIDE NAVIGATION TAB -->
 
-            <!-- Medical Record function -->
-            <form id="mrpost" method="post" name="postmedical" action="patientvisits/func/check.php">
-                <input type="hidden" name="practitionerid" id="practinput" value="">
-                <input type="hidden" name="slotid" id="slotinput" value="">
-                <input type="hidden" name="facilityid" id="facilityinput" value="">
-                <input type="hidden" name="patientid" id="patientinput" value="">
-                <button type="submit" name="medrecordsubmit" id="mdrecordbttn" value="" hidden></button>
-            </form>
+            
 
             <script>
                 function strip_string(str) {
@@ -619,6 +646,11 @@ else:
                     var practitioner_id = $(this).attr("data-prac");
                     var facility_id = $(this).attr("data-facility");
 
+                    var name = $(this).attr("data-name");
+                    var date = $(this).attr("data-date");
+                    var time = $(this).attr("data-time");
+                    var facilityname = $(this).attr("data-facilityname");
+
                     console.log(patient_id);
                     console.log(slot_id);
                     console.log(practitioner_id);
@@ -629,47 +661,14 @@ else:
                     $('input#facilityinput').val(facility_id);
                     $('input#patientinput').val(patient_id);
 
-                    $('input#mdrecordbttn').click();
+                    $('input#namequery').val(name);
+                    $('input#datequery').val(date);
+                    $('input#timequery').val(time);
+                    $('input#facility').val(facilityname);   
 
-                    // $.ajax({
-                    //     type: "POST",
-                    //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);                                           ?>",
-                    //     dataType: "text",
-                    //     data: {
-                    //         'ajax_check_mrid': true,
-                    //         'patientid': patient_id,
-                    //         'slotid': slot_id,
-                    //         'facilityid': facility_id,
-                    //         'practitionerid': practitioner_id
-                    //     },
-                    //     success: function() {
-                    //         console.log(patient_id);
-                    //         console.log(slot_id);
-                    //     },
-                    //     error: function() {
-                    //         console.log("smthg wrong");
-                    //     }
-                    // });
-
-                    // $.ajax({
-                    //     type: "POST",
-                    //     url: "<?php //echo htmlspecialchars($_SERVER['PHP_SELF']);                                           ?>",
-                    //     dataType: "text",
-                    //     data: {
-
-                    //     },
-                    //     success: function() {
-                    //         console.log("just posting");
-                    //     },
-                    //     error: function() {
-                    //         console.log("smthg wrong");
-                    //     }
-                    // });
+                    $('#mdsubmit').prop('disabled', false);          
 
                 });
-
-
-
 
 
                 /*THIS ONE ON THE BOTTOM IS ON THE DASHBOARD!!!!! 
@@ -767,6 +766,8 @@ else:
 
 
                 $(document).ready(function () {
+
+                    $('#mdsubmit').prop('disabled', true);  
                     var appttable = $('#apptdashboard').DataTable({
                         responsive: true,
                         pageLength: 3,
@@ -790,7 +791,7 @@ else:
                                 data: 'time'
                             },
                             {
-                                data: 'mrid'
+                                data: 'facilityname'
                             }
                         ],
                         "language": {
@@ -804,7 +805,7 @@ else:
                 $(document).ready(function () {
                     var appttable = $('#apptontab').DataTable({
                         responsive: true,
-                        pageLength: 12,
+                        pageLength: 6,
                         "lengthChange": false,
                         "order": [
                             [1, "asc"],
@@ -821,6 +822,9 @@ else:
                                 data: 'time'
                             },
                             {
+                                data: 'facilityname'
+                            },
+                            {
                                 data: 'mrid'
                             }
                         ],
@@ -830,68 +834,6 @@ else:
                     });
 
                 });
-
-
-                // $(document).ready(function() {
-                //     new gridjs.Grid({
-                //         columns: ["Name", "Email", "Date", "Time"],
-                //         data: [
-                //             <?php
-//     $pnum = 0;
-//     $p_perday = 3; //Special_Slot::patient_count_per_date("mf001", "21-07-2021");
-//     foreach ($slot_arr as $slot):
-//         $patientid = $slot->get_patient();
-//         $patient = Patient::retrieve_patient_by_id($patientid);
-//         $str = "[\"" . $patient->get_firstname() . "\",\"" . $patient->get_email() . "\",\"" . $slot->get_appointmentschedule()->get_date() . "\",\"" . $slot->get_appointmentschedule()->get_time() . "\"],";
-//         echo $str;
-//     endforeach;
-//     
-        ?>
-                //         ],
-
-                //         pagination: {
-                //             enabled: true,
-                //             limit: 3,
-                //             summary: false
-                //         }
-                //     }).render(document.getElementById("wrapper2"));
-
-                //     new gridjs.Grid({
-                //         columns: ["Name", "Email", "Date", "Time",{
-                //     name: "Medical Records",
-                //     formatter: (cell) => {
-                //         return gridjs.html(`<a href="./patientvisits/index.php?id=035f05cbf562436d8f30&pt=S1499902G">Go to Medical Record</a>`)
-                //         // return `Update button`
-                //     }
-                // }],
-                //         data: [
-                //             ["John", "john@example.com", "24-June-2021", "14:00"],
-                //             ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
-                //             ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
-                //             ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
-                //             ["Afshin", "afshin@mail.com", "24-June-2021", "14:00"],
-                //             ["John", "john@example.com", "24-June-2021", "14:00"],
-                //             ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
-                //             ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
-                //             ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
-                //             ["John", "john@example.com", "24-June-2021", "14:00"],
-                //             ["Mark", "mark@gmail.com", "24-June-2021", "14:00"],
-                //             ["Eoin", "eoin@gmail.com", "24-June-2021", "14:00"],
-                //             ["Sarah", "sarahcdd@gmail.com", "24-June-2021", "14:00"],
-                //         ],
-
-                //         pagination: {
-                //             enabled: true,
-                //             limit: 6,
-                //             summary: false
-                //         },
-
-                //         sort: true,
-                //         search: true,
-                //     }).render(document.getElementById("wrapper"));
-
-                // });
-
 
 
                 /*===========================
