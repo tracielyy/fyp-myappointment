@@ -187,7 +187,7 @@ include TEMPLATES_PATH . '/bootstrap.php';
                     endif;
                 endif;
                 ?>
-                <script>$("div .container #alertbox").append('hello');</script> 
+               
                 <div class="row bg-light py-4 mb-5">
                     <div class="row bg-light">
                         <div class="col-xs-8 col-md-6 ms-5">
