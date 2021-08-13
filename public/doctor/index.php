@@ -568,7 +568,7 @@ else:
                 <input type="hidden" name="slotid" id="slotinput" value="">
                 <input type="hidden" name="facilityid" id="facilityinput" value="">
                 <input type="hidden" name="patientid" id="patientinput" value="">
-                <button type="submit" name="medrecordsubmit" id="mdrecordbttn" value=""></button>
+                <button type="submit" name="medrecordsubmit" id="mdrecordbttn" value="" hidden></button>
             </form>
 
             <script>
