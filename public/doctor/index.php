@@ -283,10 +283,10 @@ else:
                     $facilityid = $slot->get_facilityid();
                     //$mrid ='<button onclick="check("'.$patientid.'","'.$slotid.'","'.$practitionerid.'","'.$facilityid.')" class="btn btn-primary">Go to Medical Record</button>';
                     $mrid = '<button id="#listbuttons" data-patient="' . $patientid . '" data-slot="' . $slotid . '" data-prac="' . $practitionerid . '" data-facility="' . $facilityid . '" class="btn btn-primary listbttns">Go to Medical Record</button>';
-                    $data = "{'name':'" . $patient->get_firstname() . "','date':'" . $slot->get_appointmentschedule()->get_date() . "','time':'" . $slot->get_appointmentschedule()->get_time() . "','mrid':'" . $mrid . "'},";
+                    $data .= "{'name':'" . $patient->get_firstname() . "','date':'" . $slot->get_appointmentschedule()->get_date() . "','time':'" . $slot->get_appointmentschedule()->get_time() . "','mrid':'" . $mrid . "'},";
                 endforeach;
                 $data = "[" . $data . "]";
-                ;
+                
                 ?>
                 <script>
                     var apptlist = <?php echo $data ?>;
