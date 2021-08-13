@@ -85,14 +85,15 @@ def email():
     mplist = []
     mp = user.where(u'accountdetails.usertype', u'==', u'Medical Personnel').stream()
     for data in mp:
-        mplist.append(data.get('profile.nric'))
+        mplist.append(data.id)
         
     #Appointment slot for Specialist
-    # specialistslot = {}
-    # for key in mplist:
-    #     slot = user.document(key).collection('Appointment_Slots').document(tmr.strftime("%d-%m-%Y")).collection('Slots').stream()
-    # for slots in slot:
-    #     specialistslot.update({slots.get(u'slotid') : slots.get(u'time')})
+    specialistslot = {}
+    for key in mplist:
+        slot = user.document(key).collection('Appointment_Slots').document(tmr.strftime("%d-%m-%Y")).collection('Slots').stream()
+        for slots in slot:
+            specialistslot.update({slots.get(u'slotid') : slots.get(u'time')})
+    # print(specialistslot)
     print('Slot Updated')
 
     apptdate = []
@@ -100,15 +101,17 @@ def email():
     appttype = []
     nriclist = []
     specid = []
+    spectype = []
     for data in appointmentlist:
         appointmentlistid = data.split(' ',4)
         nriclist.append(appointmentlistid[0])
         specid.append(appointmentlistid[2])
+        spectype.append(appointmentlistid[3] + ' ' + appointmentlistid[4])
         apptid.append(appointmentlistid[2] + ' ' + appointmentlistid[3])
         appttype.append(appointmentlistid[4])
         apptdetails = appointmentlistid[2].split('~')
         apptdate.append(apptdetails[1])
-    # print(apptid)
+    # print(spectype)
 
     pnamelist = {}
     pemaillist = {}
@@ -131,13 +134,13 @@ def email():
             print('No appointment Found for Checkup or Doctor Consultation')
 
         #Check for Specialist
-        # if apptid[x] in specialistslot:
-        #     slotid = apptid[x]
-        #     print(str(pnamelist[nriclist[x]]) + ' ' + str(mflist[apptlocid[x]]) + ' ' + str(pemaillist[nriclist[x]]) + ' ' + str(apptdate[x]) + ' ' + str(specialistslot[slotid]) + ' ' + appttype[x])
-        #     send_email(pnamelist[nric],mflist[apptlocid],pemaillist[nric],apptdate[x],specialistslot[slotid],appttype[x])
-        #     print('Email Sent')
-        # else:
-        #     print('No appointment Found for Specialist')
+        if specid[x] in specialistslot:
+            slotid = specid[x]
+            print(str(pnamelist[nriclist[x]]) + ' ' + str(mflist[apptlocid[x]]) + ' ' + str(pemaillist[nriclist[x]]) + ' ' + str(apptdate[x]) + ' ' + str(specialistslot[slotid]) + ' ' + spectype[x])
+            send_email(pnamelist[nriclist[x]],mflist[apptlocid[x]],pemaillist[nriclist[x]],apptdate[x],specialistslot[slotid],appttype[x])
+            print('Email Sent')
+        else:
+            print('No appointment Found for Specialist')
 
 def missed():
     #Start End Date for check
@@ -268,7 +271,6 @@ def Add():
                 counter += 1
             print('Check up Slots Added')
     
-
 
 def main():
     schedule.every(30).minutes.do(missed)
