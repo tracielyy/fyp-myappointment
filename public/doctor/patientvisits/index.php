@@ -158,7 +158,8 @@ else:
                         //include_once TEMPLATES_PATH . '/navbar-loggedin.php';
                         $diagnosisdesc = $valid_vars->get_diagnosisdesc();
                         $practitioner = $valid_vars->get_practitioner();
-                        $practitionerid = $practitioner->get_nric();
+                        $practitioner_email= $practitioner->get_email();
+                        $practitioner_doc_id = Account_User::retrieve_user_doc_id($user_email);
                         //echo $practitionerid;
 
                         if ($_SERVER["REQUEST_METHOD"] == "POST"):
@@ -175,7 +176,7 @@ else:
                             //echo $diagnosisdesc;
                             endif;
 
-                            Medical_Record::update_medical_record($practitionerid, $patientid, $mrid, $diagnosisdesc, $presciptionsArray);
+                            $result = Medical_Record::update_medical_record($practitioner_doc_id, $patientid, $mrid, $diagnosisdesc, $presciptionsArray);
                             foreach ($presciptionsArray as $key => $value) :
                                 ?><script>
                                                                 loopforpresc(<?php echo "'" . $value . "'" ?>);
