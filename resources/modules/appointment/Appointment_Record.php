@@ -170,17 +170,20 @@ class Appointment_Record {
         endforeach;
 
         // Use The Appt ID & Set The mrid 
-        $doc_ref = $db->get_db()->collection($doc_path)->document($appt_id);
-        $trxn_result = $db->get_db()->runTransaction(function (Transaction $transaction) use ($doc_ref, $mrid) {
-            $snapshot = $transaction->snapshot($doc_ref);
-            $db_mrid = $snapshot['mrid'];
-            if ($db_mrid == ""):
-                $transaction->update($doc_ref, [['path', 'mrid', 'value', $mrid]]);
-                return true;
-            endif;
-            return false;
-        });
-        return $trxn_result;
+        if ($appt_id !== null):
+            $doc_ref = $db->get_db()->collection($doc_path)->document($appt_id);
+            $trxn_result = $db->get_db()->runTransaction(function (Transaction $transaction) use ($doc_ref, $mrid) {
+                $snapshot = $transaction->snapshot($doc_ref);
+                $db_mrid = $snapshot['mrid'];
+                if ($db_mrid == ""):
+                    $transaction->update($doc_ref, [['path', 'mrid', 'value', $mrid]]);
+                    return true;
+                endif;
+                return false;
+            });
+            return $trxn_result;
+        endif;
+        return null;
     }
 
     // -- Validate Appointment Booking  (Check If Patient Have Same Appointment) -- //
