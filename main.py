@@ -272,7 +272,7 @@ def Add():
 
 def main():
     schedule.every(30).minutes.do(missed)
-    schedule.every().day.at('11:15').do(email)
+    schedule.every().day.at('10:00').do(email)
     schedule.every(30).days.do(Add)
 
     while True:
