@@ -175,8 +175,6 @@ class Special_Slot extends Appointment_Slot {
         return $slots_arr;
     }
 
-
-
     // -- RETRIEVE APPOINTMENT SLOT (via slot id & appointment type)
     public static function retrieve_apptslot_by_id(string $id, string $facilityid): Appointment_Slot {
 
@@ -291,13 +289,10 @@ class Special_Slot extends Appointment_Slot {
         endif;
     }
 
-    public static function create_slot(string $doctor_email, string $facilityid, string $date, string $time, bool $available = true): bool {
+    public static function create_slot(string $doctor_doc_id, string $facilityid, string $date, string $time, bool $available = true): bool {
 
 
         if (Time::check_datetime_format($date, Time::DATE_FORMAT_DEFAULT) && Time::check_datetime_format($time, Time::TIME_FORMAT_DEFAULT_NOSECONDS)):
-
-            # Get Doctor ID
-            $doctor_doc_id = Account_User::retrieve_user_doc_id($doctor_email);
 
             # Check If The Doctor Exist
             if ($doctor_doc_id !== null):
@@ -324,7 +319,5 @@ class Special_Slot extends Appointment_Slot {
         endif;
         return false; # -- Date Time Format Incorrect
     }
-
-
 
 }
