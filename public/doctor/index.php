@@ -141,51 +141,63 @@ else:
 
                                 if ($_POST['intervals'] == 'Intervals') {
                                     $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
-                                    $error .= '<strong>You have not entered the intervals!</strong> Slots have not been submitted.';
+                                    $error .= '<strong>You have not selected the intervals!</strong> Slots have not been submitted.';
                                     $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
                                     echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
                                 } else {
-                                    $startDate_converted = Time::date_format_default($startDate);
-                                    $endDate_converted = Time::date_format_default($endDate);
-                                    $dateArray = array();
 
-                                    //Time
-                                    $startTime = $_POST['startTime'];
-                                    $startMeridiem = $_POST['startMeridiem'];
-                                    $startTimeMeridiem = $startTime . ":00 " . $startMeridiem;
-                                    $startTime_converted = Time::to_24hours($startTimeMeridiem);
+                                    if ($_POST['facilitypick'] == 'Select Facility') {
+                                        $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                                        $error .= '<strong>You have not selected any Facility!</strong> Slots have not been submitted.';
+                                        $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
+                                    }else 
+                                    {   
+                                        //Date
+                                        $startDate_converted = Time::date_format_default($startDate);
+                                        $endDate_converted = Time::date_format_default($endDate);
+                                        $dateArray = array();
 
-                                    $endTime = $_POST['endTime'];
-                                    $endMeridiem = $_POST['endMeridiem'];
-                                    $endTimeMeridiem = $endTime . ":00 " . $endMeridiem;
-                                    $endTime_converted = Time::to_24hours($endTimeMeridiem);
-                                    $timeArray = array();
+                                        //Time
+                                        $startTime = $_POST['startTime'];
+                                        $startMeridiem = $_POST['startMeridiem'];
+                                        $startTimeMeridiem = $startTime . ":00 " . $startMeridiem;
+                                        $startTime_converted = Time::to_24hours($startTimeMeridiem);
 
-                                    //Interval
-                                    $interval = $_POST['intervals'];
+                                        $endTime = $_POST['endTime'];
+                                        $endMeridiem = $_POST['endMeridiem'];
+                                        $endTimeMeridiem = $endTime . ":00 " . $endMeridiem;
+                                        $endTime_converted = Time::to_24hours($endTimeMeridiem);
+                                        $timeArray = array();
 
-                                    if ($startDate_converted == $endDate_converted) {
-                                        $dateArray = array($startDate_converted);
-                                    } else {
-                                        $dateArray = Time::get_date_from_range($startTime_converted, $endDate_converted);
+                                        //Interval
+                                        $interval = $_POST['intervals'];
+
+                                        if ($startDate_converted == $endDate_converted) {
+                                            $dateArray = array($startDate_converted);
+                                        } else {
+                                            $dateArray = Time::get_date_from_range($startTime_converted, $endDate_converted);
+                                        }
+
+
+                                        if ($startTime_converted == $endTime_converted) {
+                                            $timeArray = array($startTime_converted);
+                                        } else {
+                                            $timeArray = Time::get_time_range_intervals($startTime_converted, $endTime_converted, $interval);
+                                        }
+
+                                        ///Tracie TODO function (array are timeArray and dateArray)
+                                        //$facilityid = $user->get_facility()->get_facilityid(); Not used
+                                        $facilityidpicked = $_POST['facilitypick'];
+                                        $doc_email = $user->get_email();
+                                        create_slots($doc_email, $facilityidpicked, $dateArray, $timeArray);
+
+                                        $success .= '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+                                        $success .= '<strong>Slots are successfuly added!</strong>';
+                                        $success .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                                        echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $success . '\');});</script>';
                                     }
-
-
-                                    if ($startTime_converted == $endTime_converted) {
-                                        $timeArray = array($startTime_converted);
-                                    } else {
-                                        $timeArray = Time::get_time_range_intervals($startTime_converted, $endTime_converted, $interval);
-                                    }
-
-                                    ///Tracie TODO function (array are timeArray and dateArray)
-                                    $facilityid = $user->get_facility()->get_facilityid();
-                                    $doc_email = $user->get_email();
-                                    create_slots($doc_email, $facilityid, $dateArray, $timeArray);
-
-                                    $success .= '<div class="alert alert-success alert-dismissible fade show" role="alert">';
-                                    $success .= '<strong>Slots are successfuly added!</strong>';
-                                    $success .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-                                    echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $success . '\');});</script>';
+                                    
                                 }
                             }
                         }
@@ -462,7 +474,7 @@ else:
                                                             </div>
                                                             <div class="col">
                                                                 <select name="startMeridiem" class="form-select"
-                                                                        aria-label="Default select example">
+                                                                        aria-label="Default">
                                                                     <option selected>AM</option>
                                                                     <option>PM</option>
                                                                 </select>
@@ -475,7 +487,7 @@ else:
 
                                                 <div class="row">
                                                     <div class="col">
-                                                        <select name="endTime" class="form-select" aria-label="Default select example">
+                                                        <select name="endTime" class="form-select" aria-label="Default">
                                                             <option selected hidden>End Time</option>
                                                             <option value="1">1</option>
                                                             <option value="2">2</option>
@@ -493,7 +505,7 @@ else:
                                                     </div>
                                                     <div class="col">
                                                         <select name="endMeridiem" class="form-select"
-                                                                aria-label="Default select example">
+                                                                aria-label="Default select">
                                                             <option>AM</option>
                                                             <option selected>PM</option>
                                                         </select>
@@ -501,12 +513,34 @@ else:
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row">
+
+                                        <div class="row mb-3">
                                             <div class="col">
-                                                <select name="intervals" class="form-select" aria-label="Default select example">
+                                                <select name="intervals" class="form-select" aria-label="Default select">
                                                     <option value="Intervals" hidden selected>Intervals</option>
                                                     <option value="30">30 minutes</option>
                                                     <option value="60">1 hour</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                <select name="facilitypick" class="form-select" aria-label="Default select">
+                                                <option value="Select Facility" hidden>Select Facility</option>
+                                                   <?php
+                                                   $facilityids = $user->get_facilityids();
+                                                   $facilityobject = array();
+                                                   foreach($facilityids as $id){
+                                                     $obj = Medical_Facility::retrieve_facility_by_id($id);
+                                                     $facilityobject[] =  $obj;
+                                                    
+                                                   }
+                                                   /* display */
+                                                   foreach($facilityobject as $facility){
+                                                    
+                                                    echo '<option value="'.$facility->get_facilityid().'">'.$facility->get_facilityname().'</option>';
+                                                   }
+                                                   ?>
                                                 </select>
                                             </div>
                                         </div>
