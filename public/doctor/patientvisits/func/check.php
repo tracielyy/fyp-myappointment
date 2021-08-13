@@ -15,7 +15,7 @@ require_once MEDDOC_MOD . '/Medical_Record.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST'):
 
-    if (isset($_POST['patientid']) && isset($POST['slotid']) && isset($_POST['practitionerid']) && isset($_POST['facilityid'])):
+    if (isset($_POST['medrecordsubmit'])):
         ?> <script>console.log("going isset")</script><?php
         $patientid = $_POST['patientid'];
         $slotid = $_POST['slotid'];
