@@ -174,9 +174,6 @@ class Appointment_Record {
 
         // Use The Appt ID & Set The mrid 
         if ($appt_id !== null ):
-            ?>
-            <script>console.log('<?php echo $appt_id; ?>');</script>
-            <?php
             $doc_ref = $db->get_db()->collection($doc_path)->document($appt_id);
             $trxn_result = $db->get_db()->runTransaction(function (Transaction $transaction) use ($doc_ref, $mrid) {
                 $snapshot = $transaction->snapshot($doc_ref);

@@ -16,34 +16,38 @@ require_once MEDDOC_MOD . '/Medical_Record.php';
 if ($_SERVER['REQUEST_METHOD'] == 'POST'):
 
     if (isset($_POST['medrec_submit'])):
-        ?> <script>console.log("going isset ")</script><?php
+
+        function check_medical_record_exist(string $patientid, string $slotid): bool|string {
+            $mr = Medical_Record::retrieve_medical_record_by_slot($patientid, $slotid);
+            return ($mr == null) ? false : $mr->get_medicalrecordid();
+        }
+
         $practitioneridpost = $_POST['prac_form'];
         $slotidpost = $_POST['slot_form'];
         $facilityidpost = $_POST['facility_form'];
         $patientidpost = $_POST['patient_form'];
-        
-    
+
         $medicalrecord_array = array(
-            'facilityid'=> $facilityidpost,
+            'facilityid' => $facilityidpost,
             'practitioner' => $practitioneridpost,
             'slotid' => $slotidpost,
-            'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientidpost,$slotidpost)
+            'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientidpost, $slotidpost)
         );
 
-        $mrid = NULL;
-        //$mrid = check_mrid_exist($patientidpost,$slotidpost); //checks MRID but also, if available will put the mrid here
+//        $mrid = NULL;
+        $mrid = check_medical_record_exist($patientidpost, $slotidpost); //checks MRID but also, if available will put the mrid here
 
-        if(!$mrid):
-            $medical_record = Medical_Record::create_medical_record($patientidpost,$medicalrecord_array);
+        if (!$mrid):
+            $medical_record = Medical_Record::create_medical_record($patientidpost, $medicalrecord_array);
             $mrid = $medical_record->get_medicalrecordid();
-            Appointment_Record::set_mrid($patientidpost,$slotidpost,$mrid);
+            Appointment_Record::set_mrid($patientidpost, $slotidpost, $mrid);
         endif;
 
-        header("Location:" . DOC_WEB . "/patientvisits/index.php?id=".$mrid."&pt=".$patientidpost);
-        
+        header("Location:" . DOC_WEB . "/patientvisits/index.php?id=" . $mrid . "&pt=" . $patientidpost);
+
     else:
         echo "test";
-        // header("Location:" . "/");
+    // header("Location:" . "/");
     endif;
 
 endif;

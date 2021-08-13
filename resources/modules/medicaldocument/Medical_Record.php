@@ -203,4 +203,17 @@ class Medical_Record {
         return $trnx_result;
     }
 
+    public static function retrieve_medical_record_by_slot(string $patient_doc_id, string $slotid): null|Medical_Record {
+        $db = new DbQuery();
+        $mr_path = Database::ACCOUNT_USER . '/' . $patient_doc_id . '/' . Database::MEDICAL_RECORD;
+        $documents = $db->get_db()->collection($mr_path)->where('slotid', '=', $slotid)->documents();
+        foreach ($documents as $doc):
+            if ($doc->exists()):
+                $mr_data = $doc->data();
+                return ($mr_data !== null) ? self::initialise_medical_record($mr_data) : null;
+                break;
+            endif;
+        endforeach;
+    }
+
 }
