@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'):
             Appointment_Record::set_mrid($patientidpost,$slotidpost,$mrid);
         endif;
 
-        header("Location:" . DOC_WEB . "/patientvisit/index.php?id=".$mrid."&pt=".$patientid);
+        header("Location:" . DOC_WEB . "/patientvisits/index.php?id=".$mrid."&pt=".$patientidpost);
         
     else:
         echo "test";

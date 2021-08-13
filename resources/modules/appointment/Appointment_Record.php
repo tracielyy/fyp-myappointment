@@ -1,5 +1,4 @@
 <?php
-
 /*
  * @author yanying (Tracie)
  */
@@ -7,6 +6,7 @@
 //require_once '../resources/config.php';
 require_once TIME_MOD . '/Time.php';
 require_once ENUMS_PATH . '/Appointment_Status.php';
+require_once UTIL_MOD . '/StringUtils.php';
 
 require_once DB_MOD . '/DbQuery.php';
 require_once DB_MOD . '/Database.php';
@@ -159,10 +159,12 @@ class Appointment_Record {
     }
 
     public static function set_mrid(string $patientid, string $slotid, string $mrid): bool {
+
+        # __ Check Appt Record With A Specific Slotid Where mrid Is Not Empty __
         $db = new DbQuery();
         $doc_path = Database::ACCOUNT_USER . "/" . $patientid . "/" . Database::APPOINTMENT_RECORD;
-        $documents = $db->get_db()->collection($doc_path)->where('slotid', "=", $slotid)->where("mrid", "!=", "")->documents();
-        $appt_id = "";
+        $documents = $db->get_db()->collection($doc_path)->where('slotid', "=", $slotid)->where("mrid", "=", "")->documents();
+        $appt_id = null;
         foreach ($documents as $doc):
             if ($doc->exists()):
                 $appt_id = $doc->id(); // Finding The Appt ID
@@ -171,13 +173,16 @@ class Appointment_Record {
         endforeach;
 
         // Use The Appt ID & Set The mrid 
-        if ($appt_id !== null):
+        if ($appt_id !== null ):
+            ?>
+            <script>console.log('<?php echo $appt_id; ?>');</script>
+            <?php
             $doc_ref = $db->get_db()->collection($doc_path)->document($appt_id);
             $trxn_result = $db->get_db()->runTransaction(function (Transaction $transaction) use ($doc_ref, $mrid) {
                 $snapshot = $transaction->snapshot($doc_ref);
                 $db_mrid = $snapshot['mrid'];
                 if ($db_mrid == ""):
-                    $transaction->update($doc_ref, [['path', 'mrid', 'value', $mrid]]);
+                    $transaction->update($doc_ref, [['path' => 'mrid', 'value' => $mrid]]);
                     return true;
                 endif;
                 return false;
@@ -481,5 +486,4 @@ class Appointment_Record {
     }
 
 }
-
 ?>

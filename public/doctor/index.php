@@ -84,7 +84,7 @@ else:
                 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js">
                 </script>
-              
+
 
                 <!-- DATATABLE JS RESPONSIVE-->
                 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
@@ -128,7 +128,7 @@ else:
 
                     //echo 'going thru post';
 
-                    if (isset($_POST['submittimeslots'])) {
+                    if (isset($_POST['submittimeslots'])) :
                         //Date
                         $startDate = $_POST['startDate'];
                         $endDate = $_POST['endDate'];
@@ -143,33 +143,33 @@ else:
                         $interval = $_POST['intervals'];
                         $facilityidpicked = $_POST['facilitypick'];
 
-                        if ($startDate > $endDate) {
+                        if ($startDate > $endDate) :
                             $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
                             $error .= '<strong>Your Start date must be earlier than the End date!</strong> Slots have not been submitted.';
                             $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
                             echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
-                        } else {
+                        else :
 
-                            if ($startTime == 'Start Time' || $endTime == 'End Time') {
+                            if ($startTime == 'Start Time' || $endTime == 'End Time') :
                                 $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
                                 $error .= '<strong>You have entered incorrect time range!</strong> Slots have not been submitted.';
                                 $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
                                 echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
-                            } else {
+                            else :
 
-                                if ($interval == 'Intervals') {
+                                if ($interval == 'Intervals') :
                                     $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
                                     $error .= '<strong>You have not selected the intervals!</strong> Slots have not been submitted.';
                                     $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
                                     echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
-                                } else {
+                                else :
 
-                                    if ($facilityidpicked == 'Select Facility') {
+                                    if ($facilityidpicked == 'Select Facility') :
                                         $error .= '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
                                         $error .= '<strong>You have not selected any Facility!</strong> Slots have not been submitted.';
                                         $error .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
                                         echo '<script> $(document).ready(function () {$("div.container#alertbox").prepend(\'' . $error . '\');});</script>';
-                                    } else {
+                                    else :
                                         //Date
                                         $startDate_converted = Time::date_format_default($startDate);
                                         $endDate_converted = Time::date_format_default($endDate);
@@ -183,18 +183,17 @@ else:
                                         $endTime_converted = Time::to_24hours($endTimeMeridiem);
                                         $timeArray = array();
 
-                                        if ($startDate_converted == $endDate_converted) {
+                                        if ($startDate_converted == $endDate_converted) :
                                             $dateArray = array($startDate_converted);
-                                        } else {
+                                        else :
                                             $dateArray = Time::get_date_from_range($startDate_converted, $endDate_converted);
-                                        }
+                                        endif;
 
-
-                                        if ($startTime_converted == $endTime_converted) {
+                                        if ($startTime_converted == $endTime_converted) :
                                             $timeArray = array($startTime_converted);
-                                        } else {
+                                        else :
                                             $timeArray = Time::get_time_range_intervals($startTime_converted, $endTime_converted, $interval);
-                                        }
+                                        endif;
 
                                         ///Tracie TODO function (array are timeArray and dateArray)
                                         $doc_email = $user->get_email();
@@ -216,39 +215,33 @@ else:
                                         $endMeridiem = "";
                                         $facilityidpicked = "";
                                         $interval = "";
-                                    }
-                                }
-                            }
-                        }
-                    }
-
+                                    endif;
+                                endif;
+                            endif;
+                        endif;
+                    endif;
 
                     // if (isset($_POST['medrec_submit'])):
-                    //     ?> <script>//console.log("going isset ")</script><?php
-                    //     $practitioneridpost =$_POST['prac_form'];
-                    //     $slotidpost = $_POST['slot_form'];
-                    //     $facilityidpost = $_POST['facility_form'];
-                    //     $patientidpost = $_POST['patient_form'];
-                        
-                    
-                    //     $medicalrecord_array = array(
-                    //         'facilityid'=> $facilityidpost,
-                    //         'practitioner' => $practitioneridpost,
-                    //         'slotid' => $slotidpost,
-                    //         'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientidpost,$slotidpost)
-                    //     );
-                
-                    //     $mrid = check_mrid_exist($patientidpost,$slotidpost); //checks MRID but also, if available will put the mrid here
-                
-                    //     if(!$mrid):
-                    //         $medical_record = Medical_Record::create_medical_record($patientidpost,$medicalrecord_array);
-                    //         $mrid = $medical_record->get_medicalrecordid();
-                    //         Appointment_Record::set_mrid($patientidpost,$slotidpost,$mrid);
-                    //     endif;
-                
-                    //     header("Location:" . DOC_WEB . "/patientvisit/index.php?id=".$mrid."&pt=".$patientidpost);
-
-                    // endif;
+                    //     
+                    ?> <script>//console.log("going isset ")</script><?php
+                //     $practitioneridpost =$_POST['prac_form'];
+                //     $slotidpost = $_POST['slot_form'];
+                //     $facilityidpost = $_POST['facility_form'];
+                //     $patientidpost = $_POST['patient_form'];
+                //     $medicalrecord_array = array(
+                //         'facilityid'=> $facilityidpost,
+                //         'practitioner' => $practitioneridpost,
+                //         'slotid' => $slotidpost,
+                //         'appointmenttype' => Appointment_Record::retrieve_appointmenttype($patientidpost,$slotidpost)
+                //     );
+                //     $mrid = check_mrid_exist($patientidpost,$slotidpost); //checks MRID but also, if available will put the mrid here
+                //     if(!$mrid):
+                //         $medical_record = Medical_Record::create_medical_record($patientidpost,$medicalrecord_array);
+                //         $mrid = $medical_record->get_medicalrecordid();
+                //         Appointment_Record::set_mrid($patientidpost,$slotidpost,$mrid);
+                //     endif;
+                //     header("Location:" . DOC_WEB . "/patientvisit/index.php?id=".$mrid."&pt=".$patientidpost);
+                // endif;
 
                 endif;
 
@@ -280,11 +273,10 @@ else:
                     $facilityy = Medical_Facility::retrieve_facility_by_id($facilityid);
                     $facilityname = $facilityy->get_facilityname();
                     //$mrid ='<button onclick="check("'.$patientid.'","'.$slotid.'","'.$practitionerid.'","'.$facilityid.')" class="btn btn-primary">Go to Medical Record</button>';
-                    $mrid = '<button id="#listbuttons" data-name="'.$patient->get_firstname().' '.$patient->get_lastname().'" data-time="'.$slot->get_appointmentschedule()->get_time().'" data-date="'.$slot->get_appointmentschedule()->get_date().'" data-facilityname="'.$facilityname.'" data-patient="' . $patientid . '" data-slot="' . $slotid . '" data-prac="' . $practitionerid . '" data-facility="' . $facilityid . '" class="btn btn-primary listbttns"><i class="far fa-clipboard"></i> Copy to search</button>';
-                    $data .= "{'name':'" . $patient->get_firstname()." ".$patient->get_lastname(). "','date':'" . $slot->get_appointmentschedule()->get_date() . "','time':'" . $slot->get_appointmentschedule()->get_time() . "','mrid':'" . $mrid . "','facilityname':'".$facilityname."'},";
+                    $mrid = '<button id="#listbuttons" data-name="' . $patient->get_firstname() . ' ' . $patient->get_lastname() . '" data-time="' . $slot->get_appointmentschedule()->get_time() . '" data-date="' . $slot->get_appointmentschedule()->get_date() . '" data-facilityname="' . $facilityname . '" data-patient="' . $patientid . '" data-slot="' . $slotid . '" data-prac="' . $practitionerid . '" data-facility="' . $facilityid . '" class="btn btn-primary listbttns"><i class="far fa-clipboard"></i> Copy to search</button>';
+                    $data .= "{'name':'" . $patient->get_firstname() . " " . $patient->get_lastname() . "','date':'" . $slot->get_appointmentschedule()->get_date() . "','time':'" . $slot->get_appointmentschedule()->get_time() . "','mrid':'" . $mrid . "','facilityname':'" . $facilityname . "'},";
                 endforeach;
                 $data = "[" . $data . "]";
-                
                 ?>
                 <script>
                     var apptlist = <?php echo $data ?>;
@@ -388,7 +380,7 @@ else:
                                             ?></small>
                                     </div>
                                 </div>
-                               
+
 
                             </div>
                         </div>
@@ -421,36 +413,36 @@ else:
                                 <div class="row mt-4">
                                     <p class="lead">Search Medical Record</p>
                                     <div class="col">
-                                    <input id="namequery" class="form-control" placeholder="Name" readonly></input>
+                                        <input id="namequery" class="form-control" placeholder="Name" readonly></input>
                                     </div>
                                     <div class="col">
-                                    <input id="datequery" class="form-control" placeholder="Date" readonly></input>
+                                        <input id="datequery" class="form-control" placeholder="Date" readonly></input>
                                     </div>
                                     <div class="col">
-                                    <input id="timequery" class="form-control" placeholder="Time" readonly></input>
+                                        <input id="timequery" class="form-control" placeholder="Time" readonly></input>
                                     </div>
                                     <div class="col">
-                                    <input id="facility" class="form-control" placeholder="Facility" readonly></input>
+                                        <input id="facility" class="form-control" placeholder="Facility" readonly></input>
                                     </div>
                                     <div class="col">
-                                      
-                                        
+
+
                                         <!-- Medical Record function -->
                                         <form id="medrecordpost" method="post" action="patientvisits/func/check.php">
-                                                <input class="form-control" type="hidden" name="prac_form" id="practinput" value="" >
-                                                <input class="form-control" type="hidden" name="slot_form" id="slotinput" value="" >
-                                                <input class="form-control" type="hidden" name="facility_form" id="facilityinput" value="" >
-                                                <input class="form-control" type="hidden" name="patient_form" id="patientinput" value="" >
-                                                <button class="btn btn-primary" type="submit" name="medrec_submit" id="mdsubmit" value="go">Go to Medical Record</Button>
+                                            <input class="form-control" type="hidden" name="prac_form" id="practinput" value="" >
+                                            <input class="form-control" type="hidden" name="slot_form" id="slotinput" value="" >
+                                            <input class="form-control" type="hidden" name="facility_form" id="facilityinput" value="" >
+                                            <input class="form-control" type="hidden" name="patient_form" id="patientinput" value="" >
+                                            <button class="btn btn-primary" type="submit" name="medrec_submit" id="mdsubmit" value="go">Go to Medical Record</Button>
                                         </form>
                                     </div>
                                 </div>
 
-                            
+
 
                             </div>
 
-                            
+
 
                         </div>
 
@@ -632,7 +624,7 @@ else:
 
             </div><!-- END OF SIDE NAVIGATION TAB -->
 
-            
+
 
             <script>
                 function strip_string(str) {
@@ -664,9 +656,9 @@ else:
                     $('input#namequery').val(name);
                     $('input#datequery').val(date);
                     $('input#timequery').val(time);
-                    $('input#facility').val(facilityname);   
+                    $('input#facility').val(facilityname);
 
-                    $('#mdsubmit').prop('disabled', false);          
+                    $('#mdsubmit').prop('disabled', false);
 
                 });
 
@@ -767,7 +759,7 @@ else:
 
                 $(document).ready(function () {
 
-                    $('#mdsubmit').prop('disabled', true);  
+                    $('#mdsubmit').prop('disabled', true);
                     var appttable = $('#apptdashboard').DataTable({
                         responsive: true,
                         pageLength: 3,
