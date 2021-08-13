@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @author yanying (Tracie)
  */
@@ -173,7 +174,7 @@ class Appointment_Record {
         endforeach;
 
         // Use The Appt ID & Set The mrid 
-        if ($appt_id !== null ):
+        if ($appt_id !== null):
             $doc_ref = $db->get_db()->collection($doc_path)->document($appt_id);
             $trxn_result = $db->get_db()->runTransaction(function (Transaction $transaction) use ($doc_ref, $mrid) {
                 $snapshot = $transaction->snapshot($doc_ref);
@@ -465,21 +466,34 @@ class Appointment_Record {
         return null;
     }
 
-    public static function check_mrid_exist(string $patientid, string $slotid): bool|string {
+    public static function update_status_complete(string $patientid, string $slotid) {
 
         $db = new DbQuery();
         $doc_path = Database::ACCOUNT_USER . "/" . $patientid . "/" . Database::APPOINTMENT_RECORD;
-        $documents = $db->get_db()->collection($doc_path)
-                ->where('slotid', "=", $slotid)
-                ->where("mrid", "!=", "")
-                ->documents();
+        $documents = $db->get_db()->collection($doc_path)->where('slotid', "=", $slotid)->where("mrid", "!=", "")->documents();
+        $appt_id = null;
+        foreach ($documents as $doc){
+            if ($doc->exists()){
+                $appt_id = $doc->id(); // Finding The Appt ID
+                break;
+            }
+        }
+        echo $appt_id;
 
-        foreach ($documents as $doc):
-            if ($doc->exists()):
-                return $doc->data()['mrid'];
-            endif;
-        endforeach;
-        return false;
+        if ($patientid != null && $appt_id != null) {
+
+            $doc_path = Database::ACCOUNT_USER . "/" . $patientid . "/" . Database::APPOINTMENT_RECORD;
+            $doc_ref = $db->get_db()->collection($doc_path)->document($appt_id);
+            $trnx_result = $db->get_db()->runTransaction(function (Transaction $transaction) use ($doc_ref) {
+                $snapshot = $transaction->snapshot($doc_ref);
+                $db_mrid = $snapshot['mrid'];
+                if ($db_mrid !== "") {
+                    $transaction->update($doc_ref, [
+                        ['path' => 'appointmentstatus', 'value' => Appointment_Status::COMPLETED]
+                    ]);
+                }
+            });
+        }
     }
 
 }

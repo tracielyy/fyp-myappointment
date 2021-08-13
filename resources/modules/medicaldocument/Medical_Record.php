@@ -214,6 +214,7 @@ class Medical_Record {
                 break;
             endif;
         endforeach;
+        return null;
     }
 
 }
