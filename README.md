@@ -1,10 +1,9 @@
 # fyp-myappointment
-
+- Institute: University Of Wollongong
 - Module: CSIT 321 - Project
 - Group Number: FYP-21-S2-24
 
 # Group Member:
-
 - Ling Yan Ying  (Team Leader | Back-End Developer | Software Tester)
 - Kadek Anantawijaya Swadharma (Lead Developer | Software Designer)
 - Ho Murn Por Jeremy (Software Analyst | Marketing Site Moderator)
