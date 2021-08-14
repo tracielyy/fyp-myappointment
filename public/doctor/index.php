@@ -21,11 +21,11 @@ else:
     $user = unserialize((string) $_SESSION["user"]);
     $user_type = $user->get_usertype();
     $user_email = $user->get_email();
-    $facilityids = $user->get_facilityids();
 
     if (!User_Type::check_user_type(User_Type::MEDICAL_PERSONNEL, $user_type)):
         header("Location:./../"); # -- REDIRECT USER TO THE INDEX PAGE
     else:
+        $facilityids = $user->get_facilityids();
         ?>
         <!DOCTYPE html>
         <html lang="en">
@@ -519,8 +519,8 @@ else:
                                                                     endif;
                                                                     ?>>AM</option>
                                                                     <option value="PM" <?php
-                                                                    if ($startMeridiem == "PM"): echo 'selected';
-                                                                    endif;
+                                                        if ($startMeridiem == "PM"): echo 'selected';
+                                                        endif;
                                                                     ?>>PM</option>
                                                                 </select>
                                                             </div>
@@ -553,8 +553,8 @@ else:
                                                             endif;
                                                             ?>>AM</option>
                                                             <option value="PM" <?php
-                                                            if ($endMeridiem == "PM"): echo 'selected';
-                                                            endif;
+                                                if ($endMeridiem == "PM"): echo 'selected';
+                                                endif;
                                                             ?>>PM</option>
                                                         </select>
                                                     </div>
@@ -595,9 +595,9 @@ else:
                                                     foreach ($facilityobject as $facility) :
                                                         ?>
                                                         <option value="<?php echo $facility->get_facilityid(); ?>" <?php
-                                                        if ($facilityidpicked == $facility->get_facilityid()):
-                                                            echo 'selected';
-                                                        endif;
+                                        if ($facilityidpicked == $facility->get_facilityid()):
+                                            echo 'selected';
+                                        endif;
                                                         ?>><?php echo $facility->get_facilityname(); ?>
                                                         </option>;
                                                         <?php
@@ -671,16 +671,16 @@ else:
                     type: 'bar',
                     data: {
                         labels: [<?php
-                foreach ($dates as $date):
-                    echo "'" . $date . "',";
-                endforeach;
-                ?>],
+                        foreach ($dates as $date):
+                            echo "'" . $date . "',";
+                        endforeach;
+                        ?>],
                         datasets: [{
                                 label: 'Num of patients',
                                 data: [<?php
-                foreach ($numofPatientsWeek as $date => $count): echo $count . ",";
-                endforeach;
-                ?>],
+                        foreach ($numofPatientsWeek as $date => $count): echo $count . ",";
+                        endforeach;
+                        ?>],
                                 backgroundColor: [
                                     'rgba(255, 99, 132, 1)',
                                     'rgba(54, 162, 235, 1)',
